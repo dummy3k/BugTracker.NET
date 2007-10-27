@@ -1,0 +1,169 @@
+<style>
+
+body {font-family: verdana, arial; font-size: 10pt; background: #ffffef; }
+td {font-size: 10pt;}
+p {font-size: 10pt;}
+
+a {color:#0000ff; font-size: 10pt; text-decoration: none; }
+a:visited {color:#0000ff; font-size: 10pt; text-decoration: none; }
+a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
+
+li {list-style-position: inside; font-size: 8pt;}
+
+.log {
+	color: #00aa00;
+	padding-bottom: 8px;
+	padding-top: 8px;
+	padding-left: 8px;
+	padding-right: 8px;
+	font-size: 14pt;
+	font-weight: bold;
+	border-bottom: 3px solid #00cc00;
+	}
+
+
+b {color: #ff0000;}
+
+
+.hdg {
+border-left: 10px solid #009900;
+padding-left: 10px;
+margin-bottom: 10px;
+font-size: 12pt;
+font-weight: bold;
+color: #009900;
+}
+
+
+</style>
+
+<body>
+<div style="width:600;">
+<div style="border: 1px solid blue; background: yellow; padding: 10px;">
+This page contains the Installation Instructions for BugTracker.NET.
+<br>
+ Complete documentation is available at <a href=http://ifdefined.com/README.html>http://ifdefined.com/README.html</a><br>
+ Please do spend some time also reading the comments in the Web.config file.<br>
+ If you need more help, post a question to the <a target=_blank href=http://sourceforge.net/forum/forum.php?forum_id=226938>Help Forum</a> at Sourceforge.<br>
+ or contact me at <a href=mailto:ctrager@yahoo.com>ctrager@yahoo.com</a><br>
+ <p>
+ But try the <a href=http://ifdefined.com/README.html>documentation</a> and the comments in Web.config first please.
+<p>
+Good Luck! - Corey
+</div>
+<p>
+
+<p>&nbsp<p><a name=installation></a><span class=hdg>Installation</span>
+<p>
+You need to have IIS installed and configured with ASP.NET 2.0.
+<p>
+You need SQL Server running, either SQL Server itself or the free SQL Server Express.
+<p>
+Here are the steps:
+<p>
+1. Unzip the zip file into a folder.
+<p>
+2. Create an IIS virtual directory and point it to the folder.
+<p>
+3. Edit the file "Web.config", changing the following settings, according to the instructions in that file:<br>
+LogFileFolder<br>
+UploadFolder<br>
+AbsoluteUrlPrefix<br>
+<p>
+4. Create a database. Name it whatever you want.
+<p>
+( If you don't have a tool like SQL Server Management Studio
+Express to create a database, you can use the BugTracker.NET
+web pages to create a data. First change the
+ConnectionString setting in Web.config to point to the "master"
+database, bring up default.aspx, select the "Setup Database
+Tables" link, then use the "Create Database" button.)
+<p>
+5. Modify the "ConnectionString" setting in Web.config to point to your database server and newly created database.
+ <a href=#connection>[Connection string help]</a>
+<p>
+6. Point your browser to your virtual directory and login
+as user "admin", password "admin". (If default.aspx isn't the
+default document, point your browser to the "default.aspx" within
+your virtual directory).
+<p>
+You will be prompted to run the setup.sql script, which creates the database tables, from a web page form, or you
+could also do it in your favorite db admin tool.
+<p>
+7. Read this warning:
+
+<div style='background:yellow; border:2px solid red; padding:6px;'>
+	<p>
+	WARNING: If you are planning to use Bugtracker.NET on a public web server,
+	after you install you should:
+	<p>
+	1. Change the "admin" password.
+	<p>
+	2. Delete the files "query.aspx" and "install.aspx"
+	<p>
+	3. Set "AllowQueryEditingForNonAdmins" to "0" in Web.config.
+
+	<p>
+	<span style="font-size: 8pt; color: #666666;">
+	Why? Because query.aspx will execute whatever SQL is sent to it under certain
+	conditions. If there is a "users" table in the BugTracker.NET database, it's safe.
+	It will authenticate the user and only allow admins to use it.
+	require the user to be admin. But if there is NOT yet a users table,
+	it will allow anybody to do anything (because if there is NOT a
+	users table, query.aspx is serving as your tool to help you get the
+	app up and running).
+	</span>
+</div>
+
+<p>&nbsp<p>
+At this point you should be able to add bugs by clicking on "add a bug". Please take some time to look at the rest of this documentation.
+Also, please read the comments in the Web.config to learn what else you can do with BugTracker.NET.
+<p>
+If you want to backup BugTracker.NET data, then backup the following:
+<p>
+1. Your SQL Server database
+<p>
+2. The files you have in the folder you have configured as your "UploadFolder" in Web.config
+<p>
+3. Your configuration and customized files:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;a) Web.config<br>
+&nbsp;&nbsp;&nbsp;&nbsp;b) btnet_service.exe.config<br>
+&nbsp;&nbsp;&nbsp;&nbsp;c) btnet_custom.css, btnet_edit_bug.css, btnet_search.css<br>
+
+
+
+<!-------------------- Database connection string ------------------->
+
+<p>&nbsp<p><a name=connection></a><span class=hdg>Database connection string</span>
+<p>
+The hardest part of this procedure for most people is getting the ConnectionString to work.
+<p>
+For help, see these links, the "SqlConnection (.NET)" sections
+<br><a href=http://www.connectionstrings.com/?carrier=sqlserver2005>http://www.connectionstrings.com/?carrier=sqlserver2005</a>
+<br><a href=http://www.sqlstrings.com/SQL-Server-connection-strings.htm>http://www.sqlstrings.com/SQL-Server-connection-strings.htm</a>
+<br><a href=http://articles.techrepublic.com.com/5100-3513_11-6084879.html>http://articles.techrepublic.com.com/5100-3513_11-6084879.html</a>
+<p>
+Another thing you might try to get the connection string right is the following:
+<p>1. Create a new blank file and name it test.udl.
+<p>2. Double click on it, and a "Data Link Properties" dialog should appear.
+<p>3. On "Providers" tab, select "Microsoft OLE DB Provider for SQL Server" or "SQL Native Client"
+<p>4. On "Connections" tab, try various settings and use the the "Test Connection" button to test them. Click "Ok" when it works.
+<p>5. Open the test.udl file in Notepad and copy the line that starts with "Provider=" into your Web.config "ConnectionString" value, BUT delete the little part that says "Provider=SQLNCLI.1;"
+
+
+<p>&nbsp<p><a name=trouble></a><span class=hdg>Trouble logging in</span>
+<p>
+If you are having problems with getting the aspx pages (ASP.NET)
+to work, or if you login and it seems like nothing happens, it
+could be because your IIS doesn't know about your ASP.NET.
+Search for "aspnet_regiis.exe" on Google, and follow instructions.
+<p>
+If you can login with Firefox but not with IE, and if you know
+you are entering in the correct user/password but keep getting
+redirected back to the login page, then for some reason your
+IE is not sending cookies to the web server. Newer versions of IE
+won't send cookies if the host name has characters that are
+not legal host name characters. Does you host name have, for example,
+an underscore in it?
+</div>
+</body>

@@ -1,0 +1,17 @@
+/* use this to customize search.aspx */
+
+/*
+The custom fields have unique ids too.   Here I'm moving the custom
+fields away from where they normall show.
+*/
+
+/*
+#foobar_label {font-size: 12pt; color: red; position: relative; top: 32px;}
+#foobar {font-size: 12pt; color: orange;     position: relative; top: 32px;}
+
+#foobar2_label {font-size: 12pt; color: red; position: relative; top: -32px;}
+#foobar2 {font-size: 12pt; color: green;     position: relative; top: -32px;}
+*/
+
+
+

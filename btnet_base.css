@@ -1,0 +1,202 @@
+body {font-family: verdana, arial; font-size: 10pt; background: #ffffef; }
+td {font-size: 8pt;}
+p {font-size: 10pt;}
+
+a {color:#0000ff; font-size: 10pt; text-decoration: none; }
+a:visited {color:#0000ff; font-size: 10pt; text-decoration: none; }
+a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
+
+
+/* bug tables */
+
+.bugt {
+border-collapse: collapse;  
+border-width: 1px; 
+border-style: solid;
+border-color: #aaaaaa;
+padding: 3px;
+}
+
+/* bug table headers */
+
+.bugh {
+background: #dddddd; 
+vertical-align: top;  
+text-align: center; 
+border-top: 1px solid #aaaaaa;
+border-bottom: 1px solid #dddddd;
+border-left: 1px solid #aaaaaa;
+border-right: 1px solid #aaaaaa;
+}
+
+/* filter row in bug table heading */ 
+
+.bugf {
+background: #dddddd; 
+vertical-align: top;  
+text-align: center; 
+border-top: 1px solid #dddddd;
+border-bottom: 1px solid #aaaaaa;
+border-left: 1px solid #aaaaaa;
+border-right: 1px solid #aaaaaa;
+}
+
+/* table cell for bug table */
+.bugd {
+vertical-align: top;
+border: 1px solid #aaaaaa; 
+padding: 3px;
+}
+
+/* other tables, like list of users, projects */
+
+.datat {
+border-collapse: collapse;  
+border-width: 1px; 
+border-style: solid;
+border-color: #aaaaaa;
+}
+
+
+/* table headers */
+.datah {
+background: #dddddd; 
+vertical-align: top;  
+text-align: center; 
+border-top: 1px solid #aaaaaa;
+border-bottom: 1px solid #aaaaaa;
+border-left: 1px solid #aaaaaa;
+border-right: 1px solid #aaaaaa;
+padding: 3px;
+}
+
+
+/* table cell */
+.datad {
+background: #ffffff; 
+vertical-align: top;  
+border: 1px solid #aaaaaa;
+padding: 3px;
+}
+
+
+.err {color: red; font-size: 10pt; font-weight: bold;}
+.btn {background: #ffeeaa; color: #0000ff; }
+
+.menubar {background: #ccfffe; padding: 0px; border-bottom: 1px solid #00cc00;}
+
+.cmt {background: white; border: 1px #009900 solid; padding: 3px;}
+.cmt_text {font-family:courier; font-size: 10pt;}
+
+.pst {font-size: 8pt; color: darkgreen;}
+.listitem {color: #00cc00;}
+.smallnote {font-size: 7pt; color: green;}
+
+.logo {
+background: #00cc00; 
+font-family: arial;
+padding: 5px; 
+color: white; 
+font-size: 12pt; 
+font-weight: bold;
+}
+
+.lbl {font-size: 8pt;}
+.static {font-size: 8pt; padding: 3px; font-weight: bold;}
+
+.frm {
+padding: 6px;
+border-left: 1px solid silver;
+border-top: 1px solid silver;
+border-right: 2px solid black;
+border-bottom: 3px solid black;
+background: #e9e9e9;
+}
+
+.align {text-align: left;}
+
+.gray_link {color: #999999; font-size: 10pt;}
+
+.menu_item {}
+.selected_menu_item {font-weight: bold;}
+
+.click_to_sort {font-size: 7pt; color: green;}
+
+
+.popup_div {
+position: absolute;
+background: #cccccc;
+top: 150;
+left: 50;
+padding: 0px;
+border-left: 1px solid black;
+border-top: 1px solid black;
+border-right: 2px solid black;
+border-bottom: 3px solid black;
+display: none;
+z-index:1000;
+}
+
+.popup_iframe {
+width: 600;
+height: 600;
+}
+
+
+.buglist_popup {
+z-index: 111; 
+border-left: 1px solid silver;
+border-top: 1px solid silver;
+border-right: 2px solid black;
+border-bottom: 3px solid black;
+padding: 3px; 
+position:absolute; top:0; left:0;  
+background:#ccffcc;
+color:black; 
+display:none;
+width: 500;
+font-size: 8pt;  
+font-family: verdana;
+text-overflow: clip;
+}
+
+.suggest_select {
+font-size:8pt;
+background: #ccffcc;
+border: 1px black solid;
+}
+
+.filter {font-family: arial; font-size: 7pt; background: #dddddd;  color: #666666;}
+.filter_selected {font-family: arial; font-size: 7pt; background: yellow; color: red;}
+
+.tab_btn
+{
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	
+	border-top: 1px silver solid;
+	border-left: 1px silver solid;
+	border-bottom: 2px black solid;
+	border-right: 2px black solid;
+}
+
+.tab_btn_pushed
+{
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+
+	border-top: 2px black solid;
+	border-left: 2px black solid;
+	border-bottom: 1px silver solid;
+	border-right: 1px silver solid;
+}
+
+.private {font-size: 7pt; color:red; font-weight: bold; letter-spacing: 3px;}

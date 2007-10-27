@@ -1,0 +1,3024 @@
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+Release notes:
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+-----------------------------------------------------------------------
+Version 2.5.9  10/26/2007
+-----------------------------------------------------------------------
+
+list of bugs retains the filters, sort, page until you pick a new query
+or until you change.
+
+checking for dupe query names before saving
+-----------------------------------------------------------------------
+Version 2.5.8  10/26/2007
+-----------------------------------------------------------------------
+
+To migrate from 2.5.7 to 2.5.8 run the sql in upgrade.sql.
+
+IMPORTANT: This release affects user permissions and the behavior of 
+the search page.  It's possible that some non-admins will temporarily
+have FEWER permissions because I'm changing some settings to be from
+global, for the entire installation, to per-user. 
+
+All users will be able to save searches as queries, but only users
+you choose will be allowed to edit the raw sql.
+
+Please keep reading for the details:
+
+* The following settings in Web.config are now obsolete.  Instead
+of the global switches here in Web.config, you can now control these
+settings for individual users, which is explained in the next
+bullet point:
+	HideSql
+	AllowQueryPageForNonAdmins
+	AllowBugDeletionForNonAdmins
+	AllowCommentDeletionForNonAdmins
+	AllowBugMergingForNonAdmins
+	AllowAttachmentDeletionForNonAdmins
+	AllowQueryEditingForNonAdmins
+
+
+* The following fields have been added to the users page, permission tab. 
+Here's how they are explained on the page edit_user.aspx, in the 
+permissions pane:
+
+	Use the following settings to control permissions for non-admins.
+	Admins have all permissions regardless of these settings.
+	[] External user   (External users cannot view posts marked 
+			"Visible for internal usrs only") 	 
+	[] Can edit sql and create/edit queries for everybody 	 
+	[] Can delete bugs 	 
+	[] Can edit and delete comments and attachments 	 
+	[] Can merge two bugs into one 	 
+	[] Can mass edit bugs on search page 	 
+	[] Can use reports 	 
+	[] Can create/edit reports 	 
+	[X] Appears in "assigned to" dropdown in edit bug page (defaults to true)
+	
+Except for "Appears in 'assigned to' dropdown in edit bug page",
+all the other fields default to false.  That is, if you had any of the "Allow"
+settings in Web.config set to "1", you will have to edit the user permissions
+to restore the feature to that user. For example, if you had 
+"AllowBugDeletionForNonAdmins" set to "1", you will have to edit each user 
+and check "Can delete bugs".
+
+You could also run some SQL to update settings for all users.
+The format would be:
+	update users set XXX = 1
+Replace X with one of the new fields:
+	us_can_edit_sql
+	us_can_delete_bug
+	us_can_edit_and_delete_posts
+	us_can_merge_bugs
+	us_can_mass_edit_bugs
+	us_can_use_reports
+	us_can_edit_reports
+
+The end result of removing the fields from Web.config and putting them
+on the user page is that you now have finer-grained control over
+who can do what.
+
+* All users by default now have the ability to save search criteria
+as a private query that only that user can see.  Users with 
+minimum permissions cannot see or edit the sql itself.  Admin can
+grant permission to individual users to see and edit sql, create
+public queries.
+
+* Added new feature/concept: a distinction between internal and
+external users.  The feature is turned off by default.  Enable
+by setting "EnableInternalOnlyPosts" in Web.config to "1".  When
+enabled, acheckbox appears where you can add/edit comments
+or attachments.  The checkbox lets you mark the comment or attachment
+as "Visible to internal users only". Users marked "external" on the 
+edit_user.aspx permission pane won't be able to see them.  
+Please read the entire comment in Web.config.
+
+* Added the ability to create a new user by copying an existing user.
+Everything on the edit_user.aspx page gets copied except for the
+source user's username, first and last name, password, email address,
+and email signiture.  All the permissions get copied.  
+
+* Cosmetic change.  The links to "edit" or "delete" things like users,
+projects, categories have been moved from the far right to the far 
+left.
+
+
+-----------------------------------------------------------------------
+Version 2.5.7  10/14/2007
+-----------------------------------------------------------------------
+
+The changes in this release only affect appearance - the css files and
+how they interact with the web pages.   
+
+Btnet_base.css has been changed so that more control of the tables
+is in .css.  But good luck actually changing anything - I found that
+Firefox and Internet Explorer's reaction to table-related css changes to
+be very different.  If you have made changes css changes to customize
+the look of tables, it's possible that you will have to adjust them
+with this release.  But you'll end up with more css control.
+
+Also, if you have wanted to use css positioning, you might have found
+that changes to the edit page break the search page. Now the edit bug 
+page, edit_bug.aspx, now additionally includes the btnet_edit_bug.css 
+and the search page, search.aspx now additionally includes 
+btnet_search.css.   These new css pages allow you to change css 
+positioning of elements on those pages indepenently, so that  changes 
+to positioning on one page don't affect the other.
+
+* Fixed bug 1806180 - "Sortable.js doesn't maintain class attribute on
+table."
+
+* Fixed bug 1778632 - "Using custom CSS formats Search page too"
+
+* Did RFE 1033103 - "Move All Formatting to CSS"
+
+-----------------------------------------------------------------------
+Version 2.5.6  9/23/2007
+-----------------------------------------------------------------------
+
+No features or bug fixes in this release.  
+
+The code is now more compatible with Visual Studio.  The ideas for 
+these changes come from Andrew McKay.   You can now compile and publish
+the web pages using Visual Studio.
+
+More detail about the changes:
+
+* The files related to SharpMimeTool.dll have been moved to a separate 
+"SharpMime" folder and now there is a csproj file too.   
+
+* Likewise, code for btnet_service.exe and btnet_console.exe also have
+been moved to a seperate "btnet_service" folder and there are csproj
+files for each.
+
+* Renamed some "inc..." files so that they have an .inc file extension
+instead of an .aspx extension.   The .aspx was confusing to Visual
+Studio.
+
+* Made minor changes to the code to make a lot of the compile warnings
+go away.  You can ignore the warnings about about the obsolete 
+System.Web.Mail and System.Configuration.ConfigurationSettings. 
+They still work fine.
+
+-----------------------------------------------------------------------
+Version 2.5.5  9/21/2007
+-----------------------------------------------------------------------
+
+Important bug fix:
+
+* Fixed bug 1800000 "Search.aspx throwing error in SQL" - because 
+there's a space missing after the "and" or after the "or".
+
+* Fixed bug in insert_bug.aspx if screen capture or btnet_service.exe
+tries to use it after website has been idle for a while, related to
+forum thread "project email insertion causes strange error".
+
+-----------------------------------------------------------------------
+Version 2.5.4  9/16/2007
+-----------------------------------------------------------------------
+
+* Enhanced search:  Added radio button that allows users to 
+use "or" logic between SQL where clauses instead of always "and".
+So, instead of 
+	where A = 1
+	and B = 2 
+	and C = 3
+You can do
+	where A = 1
+	or B = 2
+	or C = 3
+It's either all "and" or all "or".
+
+
+Also, for custom text fields that are not dropdowns, SQL uses "like" 
+operator instead of equals.  That is, search looks for rows where 
+the field has a value that contains the text the user typed in rather
+than rows where the field has a value that exactly matches what the
+user typed in.
+
+* Fixed bug 1647742 "Popups don't close always and should have a 
+delay".   I you have disabled the popups because you thought they were
+annoying, I encourage you to try them again.   Email me at 
+ctrager@yahoo.com and tell me what you think.
+
+* Fixed bug in send_mail.aspx.   The bug description and the fix are
+from Jochen Jonckheere: "The forwarded email didn’t contain the 
+original e-mail, or just a part of it.  The cause is that FCKeditor 
+sees a < or > as the beginning of a tag and if it isn’t a valid one the 
+rest of the text is ignored. This only occurs when using Firefox."
+
+* Fixed bug 1789400 "Error when searching with no criteria selected".
+The problem was a custom column with the characters "order" as part of
+its name.   Confused my logic that looks for the "ORDER BY" clause
+in SQL.
+
+-----------------------------------------------------------------------
+Version 2.5.3  9/3/2007
+-----------------------------------------------------------------------
+
+* Added support for GMail SMTP and POP3.  See new settings in 
+Web.config and btnet_service.exe.config. Thanks to Eric (TehOne) 
+Lebetsamer for the code.
+
+* Fixed bug 1771868 "Tabs don't change on settings pages for IE"
+
+* Fixed bug 1766649 "Decimal custom fields cause search.aspx to crash"
+Thanks to "David" for the code.
+
+* Added "LogSqlEnabled" setting in Web.config, which you can use
+to log less by setting to "0".
+
+-----------------------------------------------------------------------
+Version 2.5.2  7/15/2007
+-----------------------------------------------------------------------
+
+* I posted version 1.9 of btnetsc.exe, the screen capture utility.
+
+It now works with non ascii (Chinese, Arabic, etc), both the short 
+description and the longer comment area. Also, you no longer have to 
+tell it the "codepage".   
+
+(This was my own personal #1 bug.  I probably spent 100 hours trying to 
+get btnetsc.exe to fully support Unicode.  Whew!)
+
+* RFE 1749357 "Allow filtering on empty field" -
+Added [none] and [any] options to the dropdown filters.   In order
+for these to work right, you have to make sure that all your bug
+queries return blanks, not nulls for columns with no value.   See
+setup.sql for how I've used "isnull" in the queries, for example:
+select .... isnull(ct_name,'') .... left outer join categories....
+
+* RFE 1744256 "please remove 7000 character limitation" - removed
+the restriction.
+
+* RFE 1746947 "Filter User List (Admin page) - show/hide inactive 
+users"
+
+* Fixed date format in btnet log (for debugging).   It should always
+show time down to seconds regardless of app's display format.
+
+* Added some logging messages that might help folks who have the 
+problem where they log in and get redirected back to the login page
+over and over.   It doesn't fix the problem, but it makes it
+clearer if the problem is being caused by the failure of the browser
+to send the cookie back that was issued to it when the browser 
+logged in.
+
+-----------------------------------------------------------------------
+Version 2.5.1  6/26/2007
+-----------------------------------------------------------------------
+
+* Fixed upgrade.sql.   It was missing the "pu_admin" column on
+project_user_xref, required for upgrading to 2.5.0.
+
+* Fixed generate_btnetsc_reg.aspx.  It had the wrong registry key.
+Thanks to "romwil" for the code for this fix.
+
+* Enhanced insert_bug.aspx so that categories, etc can be controlled
+from the query string.  See README.HTML.   Look for "$CATEGORY$".
+
+* Added a "more CSS info..." link to edit_priority.aspx, 
+edit_status.aspx.    If you are using CSS styles to indicate 
+different priorities and statuses, or if you are interested in doing
+so, then click on that link.   The new page (edit_styles.aspx) gives
+you an overview of the combined effect of the priority and status
+styles.
+
+-----------------------------------------------------------------------
+Version 2.5.0  6/15/2007
+-----------------------------------------------------------------------
+
+Run this SQL for this upgrade  (also found in upgrade.sql)
+alter table users add us_enable_bug_list_popups int not null default(1)
+alter table users add us_created_user int not null default(1)
+
+* Added new feature "project admin".  An admin is able to give
+permission to a regular user to add and delete users for specified
+projects.   This features satisfies RFE:
+1451208 "New role of project admin - can add users for his project"
+Does not satisfy the following which deals with changing project
+settings.
+1719295 "Admin for his own project"
+
+* Added ability in user settings to turn OFF the green popups in 
+the bug lists.
+
+* This won't matter to you unless you have modified your copy of
+BugTracker.NET's source code:
+Re-arranged some code.   I moved things out of a couple of the "inc" 
+files and into util.cs.   I also organized the  code a bit 
+within util.cs into more classes.  The following files are now
+gone:
+inc_insert_bug.aspx
+inc_print_bug.aspx
+edit_user_permissions.aspx
+
+* Added a link "screen capture" to bugs.aspx to make it
+easier to get started with the screen capture utility.
+From it you can download the screen capture utility from sourceforge
+and you can generate a .reg file to initialize btnetsc.exe's settings.
+
+*Along with this release, I'm posting btnetsc_1.8.exe.   (The 
+screen capture utility).   It now looks for its settings in a new 
+place in the registry that isn't version dependent, so that as you 
+upgrade without loosing your previous  settings.    
+
+* Also new in screen capture utility, You can now also post screen
+capture images to EXISTING bugs rather than being forced to create
+new ones.
+
+* Rearranged the code in upgrade.sql, so that the most recent
+entries are at the bottom instead of the top.
+
+* Emails are now sent UTF8 encoded.  If somehow that breaks things
+for you, set the new "BodyEncodingUTF8" Web.config setting to "0".
+
+* Made cosmetic changes to the "settings" page the pages for editing
+users, edit_self.aspx and edit_user.aspx.    They have something
+like tabs now, except that the tabs don't look like tabs.
+
+-----------------------------------------------------------------------
+Version 2.4.9  5/12/2007
+-----------------------------------------------------------------------
+
+To migrate from 2.4.8 to 2.4.9, run the sql in upgrade.sql:
+
+alter table bug_posts add bp_comment_search ntext null
+alter table users add us_use_fckeditor int not null default(0)
+alter table bug_relationships alter column re_type nvarchar(500)
+
+* This release integrates "FCKEditor" (www.fckeditor.net).  To try it 
+out, go to your user settings and check "edit using colors and fonts".
+Thanks to Jochen Jonckheere for this nice new feature.
+
+* Changed the documentation in README.html.   Most important to some
+of you, I added instructions on how to use the Visual Studio debugger
+with BugTracker.NET.   (Thanks to the anonymous person who posted the
+instructions on the sourceforge forum.)
+
+* Fixed bug 1708170 "Using presets does not refresh Re-assign drop
+down".   I fixed it by removing "project" as one of the fields that
+the preset link changes.
+
+* Fixed bug - Dropdown filter was showing users who didn't have 
+permissions in projects for which the logged in user has permissions.
+
+* Fixed bug 1689731 "bug relationship with long comment causes SQL 
+error".  I increased the size of the column 500.
+
+* Fixed bug where users without project permissions related to the
+logged on user were being displayed in the user filter dropdowns of
+the bug lists.
+
+* Changed the send_email.aspx "To:" field allow for more characters.
+
+* The "edit comment" page is now only available for comments.  Not
+for sent emails, history of updates.   It doesn't make sense to be 
+able to edit the text of an email after it has been sent.
+
+* Cosmetic improvements:  Changed edit_bug.aspx so that its appearance 
+can be a bit more controlled using style sheets.   I also added some 
+more sample code to btnet_custom.css.   The intent of the changes and 
+the sample code was to show that you could align the column of the 
+labels and dropdowns the way you liked, using css.
+
+* Recompiled btnet_service.exe, just in case I had forgotten to last
+time...  Sorry...
+
+* Corrected the spelling of "EXCEPTION" in Global.asax.
+
+* Added a note about the "sessionState" setting and the "mode"
+attribute in Web.config.
+
+* Fixed another null object error in "print details" related to 
+ASP.NET session timeout.
+
+* Fixed bug where emails weren't being processed right because
+header fields said "from:" instead of "From:".
+Discussed in Help Forum topic "from: missing from emailed bugs".
+For more info, see:
+http://www.devnewsgroups.net/group/microsoft.public.dotnet.framework/topic62515.aspx
+
+* Now preventing passwords from being filled in automatically on the
+"edit user" pages.   Added "autocomplete=off" to password and confirm 
+password fields. 
+
+* Not sure if this made it into the compiled version of 
+btnet_service.exe or not in 2.4.8, but this time for sure 
+the service now is marked as having a dependency on TCPIP.    That
+allows Windows to know that it needs to start the network stuff 
+before it starts this service, like when the server is rebooted.
+Thanks to Jochen Jonckheere.
+
+-----------------------------------------------------------------------
+Version 2.4.8  3/11/2007
+-----------------------------------------------------------------------
+
+* Fixed bug 1663239 "Swedish characters stripped in email bug reports"
+The problem is related to how the POP3 service client reads the
+input.   I'm a little bit worried that my fix is risky, so only turn
+on the fix if you think you need it.   To turn it on, set
+"ReadInputStreamCharByChar" in btnet_service.exe.config to "1".
+
+* Fixed bug 1672988 "Custom user dropdown shows integer rather than 
+name in email"
+
+* Fixed bug 1643938 "Item has already been added. Key in dictionary: 
+SERVER_NAME".   Or, at least I hope I fixed it.   I can't reproduce it,
+but I got rid of the line of code that was causing it, I think.   Let
+me know if you still have this problem.   The folks who have had it
+say it is very infrequent.
+
+* Fixed bugs 1649980, 1638919 "ERROR AFTER SESSION TIMEOUT".  I'm still
+using ASP.NET session variables in a few places, but not the one here
+that was causing problems.
+
+* Added logic for RFE 836604 "allow customization of subject field of 
+e-mail notifications".   Related to this RFE, the app is no longer using 
+Web.config setting "PutTrackingIdStringInNotifications".  Instead, it
+is using new Web.config setting "NotificationSubjectFormat", which can 
+do what the "PutTrackingIdStringInNotifications" setting did, and much
+more too.   See comments in Web.config for "NotificationSubjectFormat"
+on how to use the new setting.
+
+* When you add somebody ELSE as a subscriber to a bug, that person
+will now get a notification at that moment, instead of having to
+do a subsequent change to trigger the sending of the email.
+
+* Changed btnet_base.css to make the filter dropdowns less wide.  Not
+much difference on IE, but it helps with screen real estate on
+Firefox.
+
+* Added X axis labels to the line charts you can view from the "reports"
+page.
+
+* Made some minor performance improvements by batching up SQL on the 
+search.aspx page.
+
+
+-----------------------------------------------------------------------
+Version 2.4.7  3/02/2007
+-----------------------------------------------------------------------
+
+* "Fixed" bug 1654938 "Edit a comment destroys Umlaut's".  Actually,
+I can't reproduce the problem, but I added a line in Web.config so that
+if you do have the problem you can turn on a fix for yourself. See the 
+new Web.config setting "HtmlDecodeComment".
+
+* Add others as subscribers.  From the subscribers link on the
+edit_bug.aspx page, you can now add others besides yourself
+as subscribers. 
+
+* Changed btnet_service.exe "Installer" to record dependency on TCP/IP.
+Used code from Jochen Jonckheere verbatim.
+
+* Added "TotalErrorsAllowed" to btnet_service.exe.config.   The comment
+there says:
+
+"How many errors should we allow before the fetch loop automatically 
+stops? This is a safeguard in case there is some sort of problem with 
+the web server where insert_bug.aspx does succeed in inserting the bug, 
+but somehow fails to give a good response to this service.
+
+If the service doesn't get a good response, it will not delete the email 
+from the pop3 server and will try to insert the email again when the 
+fetch interval triggers another loop.    The result can be a lot of 
+duplicate bugs generated from the one problem email.   This has
+happened to a couple people...."
+
+-----------------------------------------------------------------------
+Version 2.4.6  2/24/2007
+-----------------------------------------------------------------------
+
+I added some integration with Subversion.  
+
+If you aren't using Subversion, don't bother with this release.
+
+If you want to do the integration, run the sql in upgrade.sql and
+then read the instructions in the file.
+"btnet_post_commit.rename_to_vbs"
+
+Before using it, rename it to btnet_post_commit.vbs.
+
+With this script, when you commit to cvs, if you put the bugid at the
+start of you commit comment, the script will insert recs into a new
+bug_file_revisions table connecting the bug with the revision and the
+files.
+
+-----------------------------------------------------------------------
+Version 2.4.5  2/22/2007
+-----------------------------------------------------------------------
+
+The handling of incoming emails is better with this release.
+
+I'm using the latest SharpMimeTools, downloaded from here:
+http://anmar.eu.org/projects/sharpmimetools
+
+Here's the line I use to compile the source into the dll:
+C:\cit\btnet>csc /debug /R:log4net.dll /target:library SharpMimeTools.cs 
+ABNF.cs SharpMessage.cs SharpMimeAddress.cs SharpMimeHeader.cs 
+SharpMimeMessage.cs SharpMimeMessageCollection.cs 
+SharpMimeMessageStream.cs SharpDecodeOptions.cs SharpTnefMessage.cs
+
+Besides using a newer SharpMimeTools, I also made fixes to my code:
+
+* Fixed bug 1665336 "Thunderbird e-mails end up as HTML code".  I'm 
+now making an attachment of everything that does NOT look like the
+plain text message body.
+
+* Fixed bug 1663242 "Email attachments not working for Thunderbird".
+A variation on the same problem.
+
+* Fixed bug parsing incoming emails with multiparts nested within 
+multiparts.   A symptom of the bug was that I was failing to find a
+message body.
+
+* New Web.config "ProcessVariablesInEmails" setting for turning
+variable parsing on and off.  Set to 0 by default, so if you were 
+using these variables, make sure your Web.config now has this
+set to 1.
+
+* Added another variable parsed in the email, $PROJECT$.  See
+sourcecode of insert_bug.aspx for how these work.
+
+* Changed all uses of @@IDENTITY in SQL to scope_identity(). 
+
+* Added "PutTrackingIdStringInNotifications" to Web.config.
+This is related to the forum thread "TrackingIdString".
+http://sourceforge.net/forum/forum.php?thread_id=1676067&forum_id=226938
+
+* Added support for RFE 1641374 "Automatically re-open an issue".
+See Web.config setting "StatusResultingFromIncomingEmail".
+
+-----------------------------------------------------------------------
+Version 2.4.4  1/14/2007
+-----------------------------------------------------------------------
+
+Minor bug fixes only in this release.
+
+Fixed bug 1635411 "error when user is view only, and default perm lvl 
+is 0".
+
+Fixed bug with bugs.aspx and $fullnames in SQL, in bugs.aspx
+
+Fixed bug with "[first]" link as discussed in Help forum topic
+"[last] / [first] link issue".
+
+Fixed problem with old sql in upgrade.sql as discussed in Help forum 
+topic "Updgrade issues from v1.9.6 to v2.4.3"
+
+Fixed problem with custom user dropdowns as discussed in Help forum
+topic "User type custom col history shows user id"
+
+Fixed bug 1605280 "SSPI login fails if the user's full name contains '
+[single quote]".
+
+I added "HtmlEncodeSql" setting in web.config.   If you are having
+the problems described in these bugs, try setting it to 1 and 
+let me know at ctrager@yahoo.com if it helps.
+1590120 html encoding wrong for editing queries 
+1585740 "Saving Query does not allow < or > symbols?"
+
+You can now pass the user and password to default.aspx in the URL, like
+http://YOURHOST/default.aspx?user=admin&password=admin
+
+-----------------------------------------------------------------------
+Version 2.4.3  11/19/2006
+-----------------------------------------------------------------------
+
+Minor fixes:
+
+* Fixed bug 1595637 "btnet 2.4.2, ToTable() doesn't compile in 
+.NET 1.1"
+
+* Fixed bug 1597628 "Default search.aspx SQL doesn't work with 
+UseFullNames"
+
+* Fixed crash on null when bug's fk to user defined attribute table, 
+or something similar was pointing to a non-existent row.  This happens
+if you delete a row in the status, permission, category, or user 
+defined attribute table directly in SQL instead of going through the 
+webpages.   The webpages stop you from deleting rows if they are 
+referenced by bugs.
+
+* I added a page "default_simple.aspx".   Some folks have experienced 
+the following symptom:  They setup up BugTracker.NET and try to log in
+for the first time and after typing in the valid user/password the next 
+page they see is still default.aspx, with no error message.  If you are
+having this problem, try default_simple.aspx, and maybe that will work?
+
+-----------------------------------------------------------------------
+Version 2.4.2  11/12/2006
+-----------------------------------------------------------------------
+
+For this upgrade, run these sql statements:
+alter table custom_col_metadata add ccm_sort_seq int default(0)
+alter table custom_col_metadata add ccm_dropdown_type varchar(20) null
+
+I changed Bug_list.js.  Sometimes when I change javascript files
+folks report problems.   The solution is to clear the browser cache so
+that the browser gets the latest file.
+
+* When adding a new bug, now displaying a project's default user
+before the bug has been added to the db.
+
+* Fixed bug where searching on text fields wasn't working with 
+unicode.
+
+* There's now a new type of custom field, a "user" dropdown.   It is
+populated with the same list of users as "assigned to".   In other 
+words, it follows the same permission rules.    For those of you who
+wanted an "owner", in addition to the "assigned to", or something
+like that, I think this will work for you.
+
+* You can now specify what order custom fields appear on the screen.
+It used to be they displayed in the order that you created them.  Now
+they display in the order that you arrange them. If you want more
+control over layout, use the custom css file.
+
+* The filters feature, the ones that you see in the column headings, 
+has been enhanced.  There are now filters for custom fields which are 
+dropdowns, including the new "users" dropdown, the "User Defined 
+Attribute", and the "reported by" and "assigned to" fields.
+
+* Custom columns are now automatically added as "SELECT" columns in
+the SQL being generated by the search page.  In the past, they had
+been added to the search results, but not to the SQL you could see
+at the bottom of the page, that you could save as a query.
+
+* On the search page, custom columns which are dropdowns are presented
+as dropdowns that allow multiple selection, just like the built in
+fields like "category", etc.    
+
+* On the search page, custom columns which are NOT dropdowns, which
+are presented as simple input fields now support multiple entries, 
+seperated by commas.
+
+-----------------------------------------------------------------------
+Version 2.4.1  10/28/2006
+-----------------------------------------------------------------------
+
+* Fixed bug 1583153 "Add New Bug" gives security warning using IE, this
+page contains both secure and nonsecure items.
+
+* Fixed bug 1583310 "Print Detail crashed tracker when bg_id isn't 
+called 'id'"
+
+* Fixed bug 1584916 "Custom dropdown, first option not visible in IE"
+
+* Corrected HTML encoding in popups in bug list.
+
+* Added Web.config setting "SmtpUseSSL". If your SMTP provider 
+requires SSL.  Gmail, apparently, does.
+
+* Added Web.config setting "BugListFormSubmitMethod". Here's what I
+wrote in Web.config:
+
+"When navigating back to the bug list using the browser's "Back" button,
+do you get a warning "Warning: Page has Expired"?   If so, try changing 
+this from "POST" to "GET".
+			
+But, if you get a javascript error when submitting the form around the
+line "theForm.submit()", then use "POST".
+			
+GET can break if you are sending too much data back to the server - and
+ASP.NET's viewstate mechanism is kind of long."
+		
+This change covers RFE 1583779 "back to the view page"
+
+-----------------------------------------------------------------------
+Version 2.4.0  10/21/2006
+-----------------------------------------------------------------------
+
+You will need to run this SQL to upgrade to this release.
+
+create table custom_col_metadata
+(
+ccm_colorder int not null,
+ccm_dropdown_vals nvarchar(1000) not null default('')
+)
+create unique index cdv_index on custom_col_metadata (ccm_colorder)
+
+
+* Finally added ability to create as many dropdown custom fields as 
+you want.   Try the "admin" "custom fields" page.
+
+This change is related to these RFEs:
+1578265 "custom listbox"
+1063616 "CODE TO CREATE PICKLIST CUSTOM FIELD POSTED HERE"
+1556453 "allow unlimited custom dropdowns - global or proj specific"
+
+* Made default values for custom fields actually work right.  This
+was RFE 1017561 "Ability to create default value for custom fields".
+
+* Added "Presets" feature to edit_bug.asp.  Set all 6 dropdowns with
+one click.
+
+* Adjusted copyright notice so as not to interfere with exporting to 
+excel.
+
+* Fixed bug 1578303 "edit_self.aspx can't handle NULL in 
+users.us_default_query"
+
+* When there were to many pages, the links to move from pages stretched
+across the page.   Now showing thirty at a time.
+
+* Fixed bug 1014749 "CHNGING PRJCT: shouldn\'t be able to change to 
+view only prj"
+
+* Fixed bug 1346170 "Bugs stranded if no Project assigned"
+
+* Fixed bug 1463935 "View only user should not be able to edit comments"
+
+* Fixed bug 1040849 "CHNGING PRJCT: bug_subscriptions not updated".  
+
+
+-----------------------------------------------------------------------
+Version 2.3.9  10/13/2006
+-----------------------------------------------------------------------
+
+* Fixed bug 1575345 "Datetime conversion error on bug updt
+(localization problem)".  If your times use "." as a seperator
+instead of a ":", this will help you.
+
+* Related to above, corrected default "SQLServerDateFormat" in
+Web.config to "yyyyMMdd HH\:mm\:ss".
+
+* I revised Web.config comments based on info in 1239348 "CultureName 
+comments in Web.config misleading regarding date".
+
+* Fixed bugs 1521559 "Search Page Too Wide With Long Custom Fields"
+and 1575969 "large custom field shows as "text", not "textarea" in 
+search"
+
+* Fixed bug where a ">" in the sql saved as a query were saved as 
+"&gt;".   
+
+* Fixed handling of single quotes in search.aspx in custom fields.
+
+* RFE 1575859 "custom link at post level, same as link at bug level"
+Jochen Jonckheere did the work and contributed a fun example that
+can translate a bug comment from one language to another.
+
+See the new "CustomPostLinkLabel" and "CustomPostLinkUrl" settings
+in Web.config.
+
+-----------------------------------------------------------------------
+Version 2.3.8  10/11/2006
+-----------------------------------------------------------------------
+
+Just one big fix - for bug 1575066 "bugs.aspx not dispayed in IE".
+Sorry everybody.
+
+You can just edit your copies of bugs.aspx and search.aspx instead
+of downloading this version.
+
+Change this:
+<div id="popup" class="buglist_popup"</div>
+
+to this:
+<div id="popup" class="buglist_popup"></div>
+
+(add a closing ">")
+
+-----------------------------------------------------------------------
+Version 2.3.7  10/10/2006
+-----------------------------------------------------------------------
+
+* Fix for bug 917157 introduced a bug.   The bug was, if you try to 
+update the same bug twice in a row, the second time you are prompted 
+to refresh, even though there was nobody else updating the same bug.
+
+* Added AJAX effect to search.aspx on the "description contains" field.
+Like "Intellisense" or Google "Suggest", it will respond to the
+characters as you type them by looking for similar entries in the
+database
+
+Added the setting "SearchSuggestMinChars" to Web.config, which let's
+you control when "suggest" activates.   Set it to something like 9999
+if you want to turn it off.
+
+* Removed the "alert corey" from show/hide form in search.aspx.  I 
+thought I had done it a long time ago....
+
+* Emails received by btnet_service or btnet_console now cause the
+bugs last_updated_user and date to change.
+
+-----------------------------------------------------------------------
+Version 2.3.6  10/8/2006
+-----------------------------------------------------------------------
+
+* Added AJAX effect to bugs.aspx and search.aspx.   I show the first 
+comment of a bog in a popup div when the house hovers over the 
+description.
+
+* Fixed bug 1086404 "Cannot autosubscribe to 'no project' bugs"
+
+* Moved some javascript out of .aspx files into .js files.
+
+-----------------------------------------------------------------------
+Version 2.3.5  10/7/2006
+-----------------------------------------------------------------------
+
+* Fixed bug 839417 "Double click on Update yields double records"
+
+* Fixed bug 894971 "Enter does not work in add_attachment.aspx"
+
+* Fixed bug 917157 "Data is written to DB when the data hasn't been
+changed".  This is really about how the app handles the situation when
+there are two people both updating the same bug around the same time.
+
+Now the app will tell you:
+	Bug was NOT updated.
+	Somebody changed it while you were editing it.
+	Click to refresh the page and discard your change
+
+* Fixed bug 1572700 "Merging bugs - deleted bug still in query results"
+
+* Fixed bug 1021073 "Subscriptions aren't updated retroactively when 
+settings chg". and RFE 1063134 "Update subscription 
+historically/Synchronize subscription"
+
+See the pages for editing users or your own settings, "Apply 
+subscription changes retroactively".
+
+* Merging a bug now generates email notifications like other bug
+updates.
+
+-----------------------------------------------------------------------
+Version 2.3.4  10/6/2006
+-----------------------------------------------------------------------
+
+* Fixed typo in setup.sql, line 222.   Said "ndex" instead of "index".
+
+* Fixed bug 1202670 "mixed-mode authentication break direct bug links 
+from email".   The fix is thanks to Michael Wilson.
+
+* Removed some code I accidently left in the btnet_service.exe for
+testing.   The test code made it impossible to turn the logging off
+and the logging was always pointing at c:\temp\a.txt.   Logging
+was just added a couple days ago in 2.3.3.
+
+* Fixed bug 1571090 "btnet_service.exe can stay in 'starting' state 
+a long time.   Now the service is responsive if you want to stop 
+it even if it is in the middle of downloading emails.
+
+-----------------------------------------------------------------------
+Version 2.3.3  10/4/2006
+-----------------------------------------------------------------------
+
+* Fixed bug 1571057 "btnet_service.exe with new style config does not 
+work.".   For this, take a look at the revised btnet_service.exe.config
+sample and structure yours the same way.   Below I show the structure.
+Also the service now supports a log file, which you can control
+using the "LogFileFolder" and "LogEnabled" settings.
+
+<configuration>
+
+	<configSections>
+		<section
+			name="btnetSettings"
+			type="System.Configuration.NameValueFileSectionHandler,System, Version=1.0.3300.0,Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+	</configSections>
+
+	<btnetSettings>
+
+		<GlobalSettings>
+			<add key="LogFileFolder" value="c:\temp"/>
+			<add key="LogEnabled" value="1"/>
+			<!--
+				How frequently should btnet_console.exe or btnet_service.exe check the server for emails?
+			-->
+			<add key="FetchIntervalInMinutes" value="15"/>
+		</GlobalSettings>
+
+		<Website>
+		etc...
+		etc...
+		</Website>
+
+		<Website>
+		etc...
+		etc...
+		</Website>
+		
+	</btnetSettings>
+</configuration>
+
+* I provided a workaround for bug 1566732 "Blank notifications if 
+viewed on web at gmail or yahoo mail".    I guess yahoo mail and gmail
+don't like the style sheet (the .css file) that is used for the 
+HTML mail notifications.  
+
+see the following for more info:
+http://sourceforge.net/tracker/index.php?func=detail&aid=1566732&group_id=66812&atid=515837
+
+The workaround allows you to create an optional 
+"btnet_base_notifications.css" and "btnet_custom_notifications.css"
+and then the app will use those files as the style sheets for the 
+emails instead of "btnet_base.css" and "btnet_custom.css".
+
+You can create those optional files and just leave them empty as a work
+around for the problems.
+
+Unfortunately, these style sheets will apply for all your users that
+get notifications, not just the ones who use yahoo or gmail.
+
+* Removed the "two-way" checkbox on the new relationship page, because
+it wasn't implemented in a solid way.
+
+-----------------------------------------------------------------------
+Version 2.3.2  10/1/2006
+-----------------------------------------------------------------------
+
+* Added new "relationships" page.   This fulfills RFE 973438 "Automate 
+two-way bug association in bug dependencies".   You will need to
+run the SQL in update.sql to create the new bug_relationships table.
+
+* Cosmetic changes: - The new relationship page and pages for viewing
+history and subscribers are now viewed without leaving the bug page.
+
+* Now updating "last_updated_user" and "last_updated_date" at time
+that bug is created.
+
+-----------------------------------------------------------------------
+Version 2.3.1  9/28/2006
+-----------------------------------------------------------------------
+
+IMPORTANT BUG FIX!
+
+This release contains an important bug fix for everybody who uses
+version 2.3.0 of btnet_service.exe.   The bug is 1566824, "Bad Bug! - 
+E-mails recieved multiple times (btnet_service)".    Everybody using
+2.3.0 should upgrade their btnet_service.exe.
+
+The only other fix in this release is for 1563084 "Timeout errors while
+fetching bug posts".  Changed the sql to make it perform better.  
+If your bug database is getting big, you will want this fix too.
+
+-----------------------------------------------------------------------
+Version 2.3.0  09/20/2006
+-----------------------------------------------------------------------
+
+The only change in this release is to support this RFE:
+1557071 "let one btnet_service.exe support multiple btnet websites".
+
+I changed files POP3Main.cs, my Web.config sample file - I just removed
+the "pop3Settings" section, and I added a new btnet_service.exe.config 
+sample file.
+
+If you aren't interested in this change, you can continue running your
+old btnet_service.exe or old btnet_console.exe and it will still
+work fine.    I didn't change how the exe talks to the website.  I only
+changed how the exe gets and processes its settings.
+
+If you are intersted, the you'll need to read the comments in the sample
+in btnet_service.exe.config included in this release.    In the future,
+if you ever want to pickup a change or fix I make to the exe's, you'll
+have to convert to the new style config file.   Conversion takes about 
+30 seconds worth of typing.
+
+
+-----------------------------------------------------------------------
+Version 2.2.9  09/17/2006
+-----------------------------------------------------------------------
+
+This release involves database changes.
+
+* Fixed bug 1557070 "Specifying default vals only works for ascii"
+
+I changed the way you specify the default category, status, etc from
+being done in Web.config to being done in the database.   So, you
+need to run this SQL to update your database:
+
+alter table projects add pj_default int not null default(0)
+alter table categories add ct_default int not null default(0)
+alter table priorities add pr_default int not null default(0)
+alter table statuses add st_default int not null default(0)
+alter table user_defined_attribute add udf_default int not null default(0)
+
+These Web.config settings are obsolete:
+<add key="DefaultProject" value="[no project]"/>
+<add key="DefaultCategory" value="[no category]"/>
+<add key="DefaultPriority" value="[no priority]"/>
+<add key="DefaultStatus" value="[no status]"/>
+<add key="DefaultUserDefinedBugAttribute" value="[none]"/>
+
+If you have specified some defaults, for example, a DefaultCategory, 
+then you will have to edit the category using the web pages.
+
+Also in this release:
+
+* Minor cosmetic changes to how filters are displayed.
+
+* Batched some SQL statements for better performance.
+
+* Corrected version/date on about.aspx page.
+
+-----------------------------------------------------------------------
+Version 2.2.8  09/16/2006
+-----------------------------------------------------------------------
+
+Added ability to filter bug lists by project, category, priority, and
+status.   Take a look at the dropdowns in the column headers.
+This takes care of RFE's: 1556554, 1217944.   It should reduce the need
+to do searches or create custom queries.
+
+* Fixed bug 1533796 - "excel-export to IE - disable "no-cache" header"
+
+* Fixed bug 1521559 - "Search Page Too Wide With Long Custom Fields"
+
+* Fixed bug 1466318 - "Edit comment page shows text as utf-8."
+
+* Fixed bug 1522450 - "HTML encoded characters somehow got into SQL" 
+(actually, I can't reproduce, but I fixed something that might be 
+related).    
+
+-----------------------------------------------------------------------
+Version 2.2.7  07/23/2006
+-----------------------------------------------------------------------
+
+* Fixed bug 1498074 "search.aspx contains debug alert statements"
+
+* Fixed bug 1512575 "logic for displaying inline is wrongly case 
+sensistive"
+
+* Fixed bug related to toggling "inline images" on and off
+
+* Fixed bug 1512893 - "Logoff does not destroy the ASP.NET Session vars"
+
+* In response to bug 1521293 "Feature Request - POST ID Sequence Number",
+the bug posts are now numbered, so you can refer to them.   They are also 
+anchors, so you can link to them directly, for example
+http://yourhost/yourbtnet/edit_bug.aspx?id=1#2
+where the bugid is 1 and the post# is 2.
+
+-----------------------------------------------------------------------
+Version 2.2.6  05/28/2006
+-----------------------------------------------------------------------
+
+* Fixed bug 1484770 "Error in validate() when editing bug as comment
+only user"
+
+* Fixed bug 1493462 "endless loop of redirects in mixed mode 
+authentication" - original code and the fix by Michael Wilson.
+
+* Fixed bug 1490922 "SQL not showing up in search.aspx for IE (works in
+Firefox)"
+
+* RFE 1488728 "underline links in bug emails"
+
+* Probably/maybe fixed bug1251124 "Too many sql server connections
+opened" using code from Michael Wilson.
+
+-----------------------------------------------------------------------
+Version 2.2.5  04/28/2006
+-----------------------------------------------------------------------
+
+These two bugs turned out to be the same.  Fixed them both.   Sorry it
+took so long.   
+* Fixed bug 1476758 "Send mail problem in 2.2.4"
+* Fixed bug 1472328 "email received from -email link is generated wrong"
+
+* Fixed bug 1476151 "TO: and CC: not working for mails".   
+
+* Fixed typo in "CustomMenuLinkUrl" setting. in Web.config.  Was "CUs.."
+
+* Search page now supports custom columns!   Thanks to Michael Wilson
+for doing most of the work on this.
+
+* Now using Michael Wilson's code verbatim for autopostback when project
+changes in edit_bug.aspx.  
+
+* RFE 475492 "remember 'Show inline Images' setting".   Works for
+showing/hiding history also.
+
+
+-----------------------------------------------------------------------
+Version 2.2.4  04/15/2006
+-----------------------------------------------------------------------
+
+Note that I recompiled btnet_console and btnet_service for this 
+release.
+
+Lots of fixes and some small improvements in the way incoming and 
+outgoing email is handled.
+
+* Fixed bug 1466329 "btnet_service.exe doesn't understand encoded 
+Subject header".   The fix is actually in insert_bug.aspx.
+
+* Fixed bug 1282096 "DO NOT EDIT THIS problem when mail subjects are too
+long".   In other words, if the subject takes up two lines instead of
+one, it's handled.
+
+* Fixed bug 1029625 "CHNGING PRJCT: should trigger custom project field
+refresh".   I only postback to the server if the subject line of the
+bug is still blank.  I don't want to loose anything that the user has
+typed in.
+
+* Fixed/changed how the "From" is populated.  I put the user's and the
+project's addresses in a dropdown and pre-select the more likely one.
+
+* Added buttons to launch a little popup for selecting addresses
+that the system already knows about.     
+
+* Fixed filtering of cc addresses so as not to cc the from address.
+
+* Signiture wasn't working for all cases.   Now it is.
+
+* Fixed handling of attachments when used inline, the way Microsoft
+Outlook sends them.   Mime parsing now looks for content type name 
+if there isn't a content disposition filename.
+
+
+-----------------------------------------------------------------------
+Version 2.2.3  04/08/2006
+-----------------------------------------------------------------------
+
+To upgrade from 2.2.2, run the relevant portion of upgrade.sql.
+It adds the email signiture column to the users table.    Users can now
+add signiture to an outgoing email.   Jochen Jonckheere did the work.
+
+
+Also in this release:
+
+
+* Fixed bug 1466307 "When adding project, pop3 stuff is not inserted into 
+db"
+
+* Fixed bug 1464165 "'Force project' protects all fields until after bug 
+is added
+
+* Fixed bug with reply all.  Wasn't always adding the incoming Cc 
+addresses to the outgoing email's Cc line.
+
+* Displaying or printing bugs in list now preserve comment line breaks.
+Let me know if you liked it the old way better.
+
+* Email auto reply text now lets you include $BUGID$ which will be
+replaced by the actual bg_id.
+
+* Changed how "DefaultProject", "DefaultCategory", etc settings in 
+Web config work.   They now affect bugs inserted via email or screen
+capture too.
+
+* Now populating size and content-type of outgoing email attachments.
+
+* Now displaying size and content-type of email attachments.
+
+* New feature, "foward".   Added ability to forward emails, attachments, 
+comments.  Jochen Jonckheere did most of the work.
+
+-----------------------------------------------------------------------
+Version 2.2.2  03/10/2006
+-----------------------------------------------------------------------
+
+**** EXTREMELY CRITICAL BUG FIX *****
+
+* Fixed bug 1447296 email attachments get lost (when multiple and when 
+merged)
+
+The file attachments themselves are safe in the upload folder, but 
+the database recs (rows in bug_posts of type "file" with a non-null
+value in bp_parent) are messed up in some cases resulting in the
+attachments being invisible.    This bug was introduced in 2.1.8.
+
+The problem with the incoming emails is if there are multiple 
+attachments, the attachments #2 and onwards get the wrong parent in the
+db and are invisible.    The SQL below were give them a parent that
+will make them visible.   It only affects the ones that are messed up.
+It's not a perfect fix if there are multiple emails belonging to the 
+bug - it might not re-attach the attachments to the correct email, but
+it will attach them to one of the incoming emails, so at least they 
+will be visible.
+
+The second part of the bug concerns email attachments when two bugs
+are merged.   I dont' have anything that repairs the database in that
+situation.
+
+The following SQL will make any missing incoming email attachments
+visible:
+
+select bp_bug bug, bp_id parent into #t
+from bug_posts where bp_type = 'received'
+
+update bug_posts set 
+bp_parent = parent
+from bug_posts, #t
+where bp_bug = bug
+and bp_parent is not null
+and bp_parent not in (select parent from #t)
+and parent < bp_id
+
+drop table #t
+
+If you want to do a better fix by hand, the true bp_parent of an email
+attachment is the bug_post of type "recieved" with the max bp_id
+that's still lower than the bug_post representing the attachment.
+
+-----------------------------------------------------------------------
+Version 2.2.1 - 03/05/2006
+-----------------------------------------------------------------------
+
+* BugTracker.NET uses something called SharpMimeTools for parsing the
+incoming emails.   I rebuilt the SharpMimeTools.dll using the latest
+version of SharpMimeTools, 0.5.    The newer version has some bug
+fixes.
+
+Here's the link to SharpMimeTools: 
+http://anmar.eu.org/projects/sharpmimetools/
+
+This is the line I used to compile:
+csc /debug /R:log4net.dll /target:library SharpMimeTools.cs ABNF.cs 
+SharpMessage.cs SharpMimeAddress.cs SharpMimeHeader.cs 
+SharpMimeMessage.cs SharpMimeMessageCollection.cs 
+SharpMimeMessageStream.cs 
+
+* Changes to allow BugTracker.NET to be hosted, for example at 
+godaddy, which I've tested.   Specifically, if the log and upload folder 
+settings in Web.config don't start with a drive letter or with \\, then 
+they are interpreted as relative to the web folder (using 
+Server.MapPath).
+
+* Add "png" to the list of image types that can be shown inline.
+
+* Fixed bug 1438068 "SingularBugLabel is not used in the queries screen"
+
+-----------------------------------------------------------------------
+Version 2.2.0 again  - 02/21/2006
+-----------------------------------------------------------------------
+
+The only difference between this and 2.1.9 is that upgrade.sql has been
+corrected.
+
+-----------------------------------------------------------------------
+Version 2.1.9  02/18/2006
+-----------------------------------------------------------------------
+
+See notes for version 2.1.8 if you are skipping from 2.1.7 or below.
+
+* Fixed bug introduced in 2.1.7 that prevented handling of incoming 
+emails with attachments.
+
+* Fixed index-out-of-bounds error that sometimes occurs when using
+"reply all" if the email is very short.
+
+* Fixed bug 1427804 "plain text attachment of email mistaken for email 
+body"
+
+* If email is only text/html, without a text/plain alternative, the
+html will be used as the body as is. 
+
+* btnet_service.exe and btnet_console.exe have been recompiled
+for .NET Framework 2.0.   If you are still on 1.1, download an
+earlier BugTracker.NET version.    The symptom is a message saying
+"Not a Win32 application".
+
+-----------------------------------------------------------------------
+Version 2.1.8  02/17/2006
+-----------------------------------------------------------------------
+
+If you are installing BugTracker.NET for the first time, you can ignore
+the notes for this release.
+
+This release is not backwards compatible with 2.1.7.   You will need
+to run the sql in upgrade.sql.    The main thing it does is merge
+the bug_comments table and bug_attachments table together into a new
+table, bug_posts.   If you have written your own SQL that references
+these tables, this release might break that SQL, but the views below
+will probably allow your SQL to keep working.   
+
+Don't hesitate to email me at ctrager@yahoo.com for questions.
+
+I recomend making a copy of your database, converting your copy
+using the sql in upgrade.sql, then trying this version of the 
+BugTracker.NET code against it.
+
+create view bug_attachments
+as
+select 
+bp_id ba_id,
+bp_bug ba_bug,
+bp_file ba_file,
+bp_comment ba_desc,
+bp_size ba_size,
+bp_date ba_uploaded_date, 
+bp_user ba_uploaded_user,
+bp_content_type ba_content_type,
+bp_parent ba_comment 
+from bug_posts
+where bp_type = 'file'
+
+create view bug_comments
+as
+select
+bp_id bc_id,
+bp_bug bc_bug,
+bp_user bc_user,
+bp_date bc_date, 
+bp_comment bc_comment,
+bp_email_from bc_email_from,
+bp_email_to bc_email_to,
+bp_type bc_type 
+from bug_posts
+where bp_type <> 'file'
+
+
+The reason that I merged the files together is so that I could show
+the file attachments mixed in with the bug comments and the update 
+history rather than in a seperate list.   The app also now supports the
+ability for users to toggle on and off the display of attachments or
+email attachments to be inline - in the edit_bug.aspx page, rather than
+the viewer having to be forced to launch another page.
+
+
+The Web.config setting "ShowHistoryWithComments" is obsolete, 
+because now the user can turn that on and off at will.
+
+All the visual changes are in edit_bug.aspx, where the attachements 
+used to be.   
+
+Also try attaching html and/or text files and then toggling the view
+images inline switch.
+
+Notice also that you can resize the comments, images, and the iframes
+that hold the html and text attachments by using the [+] and [-] links.
+
+Send me an email at ctrager@yahoo.com and let me know what you think
+about the changes. 
+
+
+-----------------------------------------------------------------------
+Version 2.1.7  02/04/2006
+-----------------------------------------------------------------------
+
+* Fixed bug 1404030 "javascript related to paging, sorting seems 
+broken?".    In .NET 2.0, versus earlier versions, the id of the forms
+changed from "_ctl0" to "ctl00".   Now btnet checks which version of
+.NET is running and uses the appropriate form name.
+
+* Fixed occasionally "access denied" error when writing to log by 
+preventing concurrent access to it using "lock" keyword.
+
+-----------------------------------------------------------------------
+Version 2.1.6  01/29/2006
+-----------------------------------------------------------------------
+
+!!!! IMPORTANT !!!!
+This release includes a major revision by Michael Wilson to how users 
+control when they receive emails from the system.   You will need to 
+make changes to you database structure in order to deploy this version.   
+The SQL script for these changes is in the file "upgrade.sql", the 
+section labeled "upgrade from 2.1.5 to 2.1.6".
+
+Now the screen screens for controlling notifications include these 
+categories:
+Notifications for subscribed bugs reported by me:  	 	 
+Notifications for subscribed bugs assigned to me: 		 
+Notifications for all other subscribed bugs: 		 
+
+For each category, you can make these choices:
+no notifications
+when created
+when status changes
+when status or assigned-to changes
+when anything changes
+
+You can also now receive notifications even on bugs that you have changed.
+
+Also in this release:
+
+* Fixed bug 1351070 "text gets wrongly converted to datetime for custom
+field"
+
+* Improved performance of btnet_service.cs, btnet_service/console.exe
+for large attachments.   Old version sometimes spiked CPU to 100%.
+Thanks to Sylvain Ross for this fix.
+
+* Added "TrackingIdString" to Web.config which allows you to change
+the text "DO NOT EDIT THIS:" in the subject line of emails to 
+something else.   Needed both in Web.config file and in config file
+used by btnet_console/service.exe.
+
+* Logic for coming up with a name for the log file was in two places
+and didn't match.    Now in one place.
+
+
+-----------------------------------------------------------------------
+Version 2.1.5  12/4/2005
+-----------------------------------------------------------------------
+
+**** EXTREMELY CRITICAL BUG FIX *****
+
+* 1371108  "Attachment files deleted during mass update"  I apologize 
+to folks who have lost data as a result of this bug.   This solves the 
+mystery of some data that I've lost too at my real job.  Thanks to 
+Michael Wilson for discovering this and fixing it.  
+
+Also:
+
+*  Fixed bug 1366049 "user cannot change Project in certain case".  
+Thanks to "alexbrak" for this code.
+
+*  For the screen capture utility, bug 1194476 "btnetsc.exe gets 'Bad 
+Request (Invalid Verb)' error from IIS, I'm uploading a recompiled
+version with the fix submitted by somebody anonymously.   It doesn't
+seem to hurt anything.   I can't recreate the "Invalid Verb" error, but
+maybe for those folks who get the error, this code is the solution.
+Please let me know if this release fixes the error for you at
+ctrager@yahoo.com.   Thanks.
+
+-----------------------------------------------------------------------
+Version 2.1.4  10/22/2005
+-----------------------------------------------------------------------
+
+Thanks to "alexbrak" and "hvdakker" for a couple of the fixes in this 
+release.
+
+Added "SearchSQL" in Web.config per RFE 1295604.  This allows you to
+customize which columns are displayed in the search page.
+
+* Fixed bug 1292282 "edit_bug.aspx uses bugid instead of commentid in 
+from link"
+
+* Fixed bug 1304359 "can't delete custom field w/constraint that 
+contains spaces"
+
+* Fixed bug 1304365 "error message fails to support SingularBugLabel 
+setting"
+
+* Fixed bug 1305200 "apostrophe in from email address causes problem"
+
+* Fixed bug 1305890 "short_desc should be replaced with subject in 
+insert_bug"
+
+* Fixed bug 1313879 "Attachments with spaces are not downloaded 
+correctly"
+
+* Fixed bug 1315001 "Login form accept cripted passwords"
+
+* Fixed bug 1325567 "Problem with entering date/time in custom field"
+
+-----------------------------------------------------------------------
+Version 2.1.3  09/25/2005
+-----------------------------------------------------------------------
+
+Added the following Web.config settings for btnet_service.exe and
+btnet_console.exe, and recompiled those files.
+
+The new settings help with testing and capturing emails that cause
+errors.
+
+Use "MessageOutputFile" to dump the input.
+Use "MessageInputFile" to feed them input from a file instead of from
+a POP3 server.
+
+Also:
+
+Credit again goes to Jochen Jonckheere for several of the changes:
+
+* Fixed bug 1299905 "guest permissions not being reduced from ALL to 
+REPORTER"
+
+* Fixed bug 1291537 "util.this_fullname set incorrectly"
+
+* Fixed bug 1288156 "project customisable fields do not retain selection
+on edit"
+
+* Fixed bug 1292218 "DefaultPermissionLevel used if no forced project 
+defined"
+
+* Fixed bug 1297553 "An e-mail with DO NOT EDIT THIS for a bug that is 
+deleted"
+
+* Fixed bug 1279548 "auto-reply e-mail comming from wrong person"
+
+* Added "reply all" functionaly per RFE 1280708
+
+* Added bugid to auto-reply subject per RFE 1279540
+
+-----------------------------------------------------------------------
+Version 2.1.2  09/10/2005
+-----------------------------------------------------------------------
+
+Credit goes to Jochen Jonckheere for several of the fixes in this 
+release.
+
+* Fixed 1280731.   Users without permission to add bugs were able to 
+add them.   Now, if you force a user to a specific project, and if
+that project doesn't have add rights, then a user can't add a bug.
+
+* Fixed bug 1285992, endless loop when autoreply to/from addresses are
+the same.
+
+* Fixed bug 1285729 "send_mail.aspx doubles new line".  I commented out
+the line.  I hope this helps.
+
+* Fixed bug 1278982 "DIV-tag on wrong place" in bugs.aspx
+
+* Fixed bug 1278964 "SPAN-tag not closed in menu" in util.cs
+
+* Fixed bug 1277422 "reply link not available for non-admins"
+
+* Fixed bug 1257368 "util.cs:405 invalid cast exception"
+
+* Fixed bug 1255880 "Date picker gives javascript error when clicked"
+
+* Fixed bug 1238322 "String comparisons are case sensitive in pop3 bug 
+insert"
+
+* Fixed 1280720 and 1272577 - Notifictions not sent when a bug was
+added if user wanted only status changes.
+
+
+-----------------------------------------------------------------------
+Version 2.1.1  07/09/2005
+-----------------------------------------------------------------------
+
+* Added additional search field: "Bug comments since", for finding bugs
+to which a comment has recently been posted.
+
+* Fixed bug 1233504 "in email notification, error when clicking on 
+email addr"
+
+* Fixed bug 234816 "error with links in BugDescritpion via BUGID#XXX"
+
+* Fixed bug 1233627 "Error in Custom Date Field" when name of custom
+field contains a space and when you try to show the calendar date
+picker.
+
+* Fixed bug 1232461 "invalid project in btnetsc results in 'obj ref not
+set' error
+
+* Added example querys to setup.sql that demos using css classes for
+formating bugs and demoing a way to show the most recent comment in
+the bug list.
+
+
+CHANGES TO BTNETSC.EXE too:
+
+
+* In btnetsc.exe, fixed bug 1223432 "btnetsc Bug not going to numbered 
+project"
+
+* In btnetsc.exe, if somebody enters "http://" in the url in the
+configuration page, the program strips it off rather than getting
+an error when doing the send.
+
+
+-----------------------------------------------------------------------
+Version 2.1.0  07/04/2005
+-----------------------------------------------------------------------
+
+* Fixed bug 1202186 "Session ID conflicts with mutliple installs on 
+1 server" using code from Michael Wilson.
+
+* Fixed bug 1212800 "Status change not detected when TrackBugHistory 
+= 0"
+
+* Didn't fix 1225521 "occasional log file not found error", but I 
+did fix the error message.  I suspect the real problem is something
+else, but this error message was displayed INSTEAD of whatever the
+real problem is.
+
+* Fixed bug 1229656 "Bug page expires when returning from detail page"
+
+* For RFE 1220637 "Set default values for dropdowns", Now you
+can control what values show up in the dropdowns with these new
+Web.config settings.   Thanks to Michael Wilson.    My spelling
+of these keys is a bit different than the spelling in the code
+Michael posted.
+
+<add key="DefaultProject" value="[no project]"/>
+<add key="DefaultCategory" value="[no category]"/>
+<add key="DefaultPriority" value="[no priority]"/>
+<add key="DefaultStatus" value="[no status]"/>
+<add key="DefaultUserDefinedBugAttribute" value="[none]"/>
+
+* For RFE 1232110, log file filenames now have leading zeros when day 
+or month is a single digit.   2005_07_04 intstead of 2005_7_4.
+
+* URLs and email addresses in bug comments are converted to 
+clickable links.   Thanks to Jason Taylor.
+
+* Now handling single quotes in category, priority, status, udf fields
+correctly when recording updates.
+
+-----------------------------------------------------------------------
+Version 2.0.9  05/28/2005
+-----------------------------------------------------------------------
+
+Bug fixes only:
+
+* A few fixes from Michael Wilson in util.cs, including "us_fullname"
+bug, 
+
+* Fixed bugs - again - related to replying to emails and the system
+mixing up the id of the bug and the id of the comment.   This problem
+would result in "Object reference not set" errors.
+
+* The 2.0.8 change "Email attachments no longer have the number
+prefixes on their filenames..." wasn't working because I left in some
+debugging code.
+
+-----------------------------------------------------------------------
+Version 2.0.8  05/14/2005
+-----------------------------------------------------------------------
+
+* Fixed a bug parsing "From" in emails.   When a "From: " line was
+contained in the body, the "From" from the body was used instead of the
+correct one from the header.   I recompiled btnet_console.exe and
+btnet_service.exe.  
+
+* Fixed "Object reference not set to an instance of an object" bug
+when replying to incoming email replies.
+
+* Added "export to excel" links to bugs.aspx and search.aspx.
+
+* The Web.config setting "UseFullNames" now affects more places
+in edit_bugs.aspx than it did before.
+
+* Added extra Web.config setting "SmtpForceReplaceOfBareLineFeeds".
+Ignore this setting unless you are esperiencing the symptoms described
+in bug #1194530 and here: http://cr.yp.to/docs/smtplf.html
+
+* Added Web.config setting "AutoReplyText".   BugTracker.NET can 
+automatically respond to incoming emails using the specified text.
+
+* Email attachments no longer have the number prefixes on their
+filenames in the email itself.   I'm referring to the prefixes that are 
+created when the file is saved as an attachment in the upload folder.
+
+* For attachments, there are now now two links: "view" and "save".   
+"Save" forces a save dialog box, as before, but "view" will allow you to
+view the attachment, if the browser understands how to do it.
+
+* Michael Wilson fixed the "credential conflict" bug described in
+bug #995410.
+
+* Fixed a couple other minor bugs related to authentication.  Removed
+"logoff" link from menu if windows authentication, because you actually
+can't logoff.   Fixed bug where logon page's username field was 
+populated with something that looked like "1:username".
+
+
+-----------------------------------------------------------------------
+Version 2.0.7  04/23/2005
+-----------------------------------------------------------------------
+
+* Added file upgrade.sql.   Run it to upgrade to upgrade to this
+version.   It justs adds a column to the bug_attachments table.
+
+* In bug comments that are from emails, if there is an attachment, an
+attachment link also shows up at the bottom of the comment text for that
+emai.   This change isn't retro-active to bugs added prior to installing 
+this version, but there is some SQL in upgrade.sql you might want to try
+that could make this feature work for you for previously entered bugs.
+
+* This version no longer supports the Web.config setting
+"ShowInitialCommentFirst" because I ended up thinking that the 
+presentation was too confusing.   And coding it was kind of messy too.
+
+This version does, however, still support "CommentSortOrder", so if
+you want this first comment on top, you can still do that.
+
+* On the "queries" page, added ability to export the bug list to excel.
+It's actually just a tab delimited text file.
+
+* default.aspx now supports having some custom HTML printed on it.
+See "CustomWelcomeHtml" in Web.config.
+
+* admin.aspx now displays the physical path and machine name.
+
+* Revised "mixed mode" security.   My two-virtual-directory scheme was
+not good.   The setting in Web.config "AllowLogonIfWindowsAuthFails" is 
+now obsolete.   
+
+Instead, the setting "WindowsAuthentication" now allows a value of 2 for 
+using both form-based and windows authentication at the same time.  
+See instructions in Web.config on how to configure IIS security.
+
+* There's an instance of BugTracker.NET I have set up where the "project"
+dropdown doesn't really apply, so I wanted to hide it.   I ended up
+adding element ID's to all of the dropdowns and their labels in 
+edit_bugs.aspx, so that they can be selectively hidden via the style
+sheet.   For example, to hide the "category" dropdown and its label:
+#category_label {display:none;}
+#category {display:none;}
+You can also use the style sheets to change the look of the global
+custom fields (but not the project specific custom dropdowns.
+
+
+-----------------------------------------------------------------------
+Version 2.0.6  04/16/2005
+-----------------------------------------------------------------------
+
+* TRY THE NEW SCREEN CAPTURE UTILITY!.    It's a seperate download
+from the btnet project page on sourceforge.
+
+* Fixed bugs in javascript that sorts HTML tables when you click on
+column headings.
+
+* Fixed bug# 1161208 - special chars were displaying wrong in 
+notification emails.
+
+-----------------------------------------------------------------------
+Version 2.0.5  04/03/2005
+-----------------------------------------------------------------------
+
+* Fixed javascript error on search.aspx "Save SQL as query" link.
+
+* Added pop-up for selecting dates for custom bug fields when datatype
+is date.
+
+* If you add a "PromptBeforeLeavingEditBugPage" key to Web.config and
+set it to "1", then clicking on "add attachment", "send email" will
+display a confirmation prompt.
+
+-----------------------------------------------------------------------
+Version 2.0.4  04/02/2005
+-----------------------------------------------------------------------
+
+* Moved release notes to this file, RELEASE_NOTES.TXT
+
+* Updated tips in README.TXT.   Even if you are already using btnet, 
+maybe take a look at them.
+
+* Fixed bug with search.aspx "to" dates.
+
+* Added concept of "Guest" account.  Just name the user "Guest" and no 
+matter what the other settings say, the user will be allowed no greater
+than "Reporter" permissions.    You can explicitly reduce the 
+permissions even more by just editing the account.
+
+* Now supports plain and windows authentication at the same time.
+See note in Web.config above the WindowsAuthentication key.
+
+* See these new settings in Web.config.
+<add key="CustomBugLinkLabel" value="YOUR LINK"/>
+<add key="CUstomBugLinkUrl" value="your_url.aspx"/>
+<add key="CustomMenuLinkLabel" value="YOUR LINK"/>
+<add key="CUstomMenuLinkUrl" value="your_url.aspx"/>
+
+-----------------------------------------------------------------------
+Version 2.0.3  03/28/2005
+-----------------------------------------------------------------------
+
+* Recompiled btnet_service.exe, btnet_console.exe to correct problem
+with incoming emails updating existing bugs failing to be processed.
+This bug was introduced in version 1.9.8.
+
+* Javascript for sorting HTML tables now works with Firefox too.
+
+-----------------------------------------------------------------------
+Version 2.0.2  03/26/2005
+-----------------------------------------------------------------------
+
+* Closed some SQL injection vulnerabilities.   Thanks to Maty Siman at 
+http://www.checkmarx.com.
+
+* Added mass update/delete to search.aspx for admins.   Too hard to
+add it for non-admins and still respect all the project permissions.
+
+* Corrected this setting in Web.config (HH, instead of hh):
+<add key="SQLServerDateFormat" value="yyyy-MM-dd HH:mm:ss" />
+
+-----------------------------------------------------------------------
+Version 2.0.1  03/17/2005
+-----------------------------------------------------------------------
+
+Important bug fixes.
+
+* Merging bugs feature was broken.  Fixed now.
+
+* Handling of plain text incoming emails was broken.  Fixed now.
+
+* Fixed javascript error in edit_priority.aspx
+
+-----------------------------------------------------------------------
+Version 2.0.0  03/13/2005
+-----------------------------------------------------------------------
+
+* added "reply" link in edit_bug.aspx, which quotes the email you are 
+replying to.
+
+-----------------------------------------------------------------------
+Version 1.9.9  03/13/2005
+-----------------------------------------------------------------------
+
+* TO MIGRATE TO 1.9.9, RUN THE FOLLOWING:
+alter table users add us_auto_subscribe_reported_bugs int null default(0)
+update users set us_auto_subscribe_reported_bugs = 0
+
+* Added ability to automatically subscriber to bugs that you report.
+
+* Revised edit_user.aspx and edit_self.aspx layout and on screen 
+explanations in order to make them less confusing to the user.
+
+* Attachments to incoming emails are now saved as attachments to the
+bug.  
+
+* To and Cc headers in incoming email are now saved as part of the 
+comments.
+
+* Added ability to add a custom link to the edit_bug.aspx page, just
+to the left of the "prev", "next" links.   See Web.config:
+<add key="CustomBugLinkLabel" value="YOUR LINK"/>
+<add key="CUstomBugLinkUrl" value="your_url.aspx"/>
+
+* Admin editing of priorities now gives feedback on color.
+
+-----------------------------------------------------------------------
+Version 1.9.8  03/10/2005
+-----------------------------------------------------------------------
+
+* MAJOR CHANGES in how incoming emails are handled.  Btnet_console.exe 
+and btnset_service.exe have been recompiled as part of this change.
+Also notice two new dlls in the bin folder.  I used the following
+command line to compile SharpMimeTools.dll:
+
+csc /debug /R:log4net.dll emailmessage2.cs sharpmimemessage.cs 
+sharpmimeaddress.cs sharpmimeheader.cs sharpmimetools.cs 
+sharpmimemessagestream.cs sharpmimemessagecollection.cs abnf.cs
+
+The MIME parsing is now done using "SharpMimeTools", excellent work
+from the SharpWebMail project.   Thanks to SharpMimeTools, non-ascii
+emails are now handled correctly.
+
+I plan to handle incoming file attachments in the next release, too.
+
+Also:
+
+* Comments on existing bugs coming in via btnet_console/service now
+include the subject as part of the comment text.
+
+* Fixed handling of nvarchar custom fields.
+
+-----------------------------------------------------------------------
+Version 1.9.7  03/06/2005
+-----------------------------------------------------------------------
+
+I've changed the VARCHAR types in setup.sql to NVARCHAR types, in order
+to handle Unicode.    I've also changed all the logic that builds SQL
+statements to build SQL using Unicode literals.   For examle, where it
+used to say:  Update foo set bar = '$1', it now says set bar = N'$1'.
+
+I might have may missed a couple places, so if you encounter a bug,
+post it at sourceforge and I'll try to post an updated release as soon
+as possible, within days.
+
+Unicode strings use two bytes per char, so in setup.sql I've doubled
+the length of strings.   In a few places I've more than doubled, where
+I thought the lengths were too short anyway.
+
+I've also changed the columns bc_comment and a couple others from
+varchar to ntext, so that there isn't a size limitation.
+
+The ALTER TABLE script below worked for me and I hope it works for you.
+
+Also in this release: Changed dbutil to use database connections with 
+very brief lifespans, rather than keeping them open for the entire 
+sever-side page generation (Thanks Jason C.).
+
+- - - - - - - - - - - - - - - - - 
+
+
+alter table users alter column us_username nvarchar(40) 
+alter table users alter column us_password nvarchar(64) 
+alter table users alter column us_firstname nvarchar(60) 
+alter table users alter column us_lastname nvarchar(60) 
+alter table users alter column us_email nvarchar(120) 
+
+alter table categories alter column ct_name nvarchar(80) 
+
+alter table projects alter column pj_name varchar(30) 
+
+alter table projects alter column pj_name nvarchar(80) 
+alter table projects alter column pj_pop3_password nvarchar(20) 
+alter table projects alter column pj_pop3_email_from nvarchar(120) 
+
+alter table projects alter column pj_custom_dropdown_label1 nvarchar(80) 
+alter table projects alter column pj_custom_dropdown_label2 nvarchar(80) 
+alter table projects alter column pj_custom_dropdown_label3 nvarchar(80) 
+alter table projects alter column pj_custom_dropdown_values1 nvarchar(2000) 
+alter table projects alter column pj_custom_dropdown_values2 nvarchar(2000) 
+alter table projects alter column pj_custom_dropdown_values3 nvarchar(2000) 
+
+alter table bugs alter column bg_short_desc nvarchar(200) 
+
+alter table bugs alter column bg_project_custom_dropdown_value1 nvarchar(120) 
+alter table bugs alter column bg_project_custom_dropdown_value2 nvarchar(120) 
+alter table bugs alter column bg_project_custom_dropdown_value3 nvarchar(120) 
+
+alter table bug_comments alter column bc_comment ntext 
+alter table bug_comments alter column bc_email_from nvarchar(800) 
+alter table bug_comments alter column bc_email_to nvarchar(100) 
+
+alter table bug_attachments alter column ba_file nvarchar(1000) 
+alter table bug_attachments alter column ba_desc nvarchar(200) 
+alter table bug_attachments alter column ba_content_type nvarchar(200) 
+
+alter table user_defined_attribute alter column udf_name nvarchar(60) 
+
+alter table statuses alter column st_name nvarchar(60) 
+alter table statuses alter column st_sort_seq int
+alter table statuses alter column st_style nvarchar(30) 
+
+alter table priorities alter column pr_name nvarchar(60) 
+alter table priorities alter column pr_sort_seq int
+alter table priorities alter column pr_background_color nvarchar(14) 
+alter table priorities alter column pr_style nvarchar(30) 
+
+alter table queries alter column qu_desc nvarchar(200)
+alter table queries alter column qu_sql ntext
+
+alter table reports alter column rp_desc nvarchar(200) 
+alter table reports alter column rp_sql ntext 
+
+
+-----------------------------------------------------------------------
+Version 1.9.6  02/06/2005
+-----------------------------------------------------------------------
+
+* Fixed problems with dates on search.aspx.  I hope.
+
+* Added "UseFullNames" setting in Web.config.  Controls how user names
+show up in dropdowns.
+
+* Added pseudo variable $ME for use in reports.
+
+* Bolding of selected menu items now controlled via style sheet.
+
+* AllowCommentDeletionForNonAdmins now also allows editing of comments.
+
+* You probably want to run this to allow for longer attachment
+filenames:
+alter table bug_attachments alter column ba_file varchar(256)
+
+-----------------------------------------------------------------------
+Version 1.9.5  10/09/2004
+-----------------------------------------------------------------------
+
+* Fixed crash in edit_status.aspx and edit_priority.aspx
+
+* Revised logic for internationalizing dates.   See Web.config.  Thanks
+to Martin Ricther.   I used your code verbatim.
+
+* Fixed bug where adding a comment caused prior update history to not
+be displayed.
+
+* Added this line in send_email.aspx per discussion in Help forum 
+"Mail trouble/question":
+body_text = body_text.Replace("\n","\r\n");
+
+* Added some validation for custom fields, for datetime, int, and 
+decimal formats.
+
+* You can now make a custom field required.  (Logic just looks at
+whether the field is NULL or NOT NULL).
+
+
+-----------------------------------------------------------------------
+Version 1.9.4  9/20/2004
+-----------------------------------------------------------------------
+
+* Only one change since 1.9.3 - fixed an important bug.   Adding just a
+comment to an existing bug didn't work.   To fix, I added the following
+line to edit_bug.aspx after line 772:
+
+|| comment.Value.Length > 0
+
+
+-----------------------------------------------------------------------
+Version 1.9.3  9/19/2004
+-----------------------------------------------------------------------
+
+* Fixed null/not null problems in setup.sql
+
+* Fixed some places where "bug" should have been replaced by Web.config
+setting SingularBugLabel.  Also, appropriately capitalizing the
+lable.  Thanks Tom Sella - I used your code verbatim.
+
+* No longer using hard-coded scheme for bug attachments content
+type.   Instead, storing PostedFile.ContentType. Thanks "nickbeen".
+
+* Now checking for changes before updating bg_last_updated_user,
+bg_last_updated_date.
+
+* search.aspx now allows search on bugs with no specified category,
+status, priority, project, assigned-to.
+
+* Added "LogoHtml" setting in Web.config.   That allows you to set
+the logo and its link to whatever you want.
+
+-----------------------------------------------------------------------
+Migrating to 1.9.3
+-----------------------------------------------------------------------
+
+alter table bug_attachments add ba_content_type varchar(100) null
+
+-----------------------------------------------------------------------
+Version 1.9.2  9/03/2004
+-----------------------------------------------------------------------
+
+* Search "to" dates now go through then end of the "to" day, 
+to the time 23:59:59
+
+* Corrected instructions for migrating to 1.9.1 below.  Added update
+statements.
+
+* Fixed crash when merging bugs that also have subscriptions.
+
+* The first column of bug queries used to be unconditionally
+interpreted as a bgcolor for the "<td>" element.    That's still true as
+long as the text start with an "#", as in "#ffaaaa".   However, if the
+first column does not start with an "#", the first column is 
+interpreted as a css style class.   For example, "<td class=yourclass".
+
+You can also now enter a css style class for a status and/or a priorty.
+
+I've changed the explanatory text on the edit_query.aspx to relect
+this change.
+
+
+* Added sort sequence to categories and user_defined_attributes. 
+They now behave like statuses and priorities.   Also, sorts now look
+at name too as a secondary sort field.
+
+
+-----------------------------------------------------------------------
+Migrating to 1.9.2
+-----------------------------------------------------------------------
+
+alter table user_defined_attribute add udf_sort_seq int not null default(0)
+alter table categories add ct_sort_seq int not null default(0)
+alter table priorities add pr_style varchar(10) not null default('')
+alter table statuses add st_style varchar(10) not null default('')
+
+
+-----------------------------------------------------------------------
+Version 1.9.1  8/27/2004
+-----------------------------------------------------------------------
+
+* AppTitle setting in Web.config also affects the web page titles
+(i.e, the <title> element).
+
+* Adding an attachment creates an entry in bug change history
+
+* Adding an attachment or sending an email triggers notifications
+
+* Fixed bug whereby same user could subscribe twice to same bug.
+
+* Fixed bug whereby bugs entered by email that triggered notifications
+resulted in "Object reference not set to an instance of an object"
+in util.cs.
+
+* Used contributor jhetler's idea and code for imbedding a print of 
+the bug in send_email.aspx when "include bug description" is checked.
+
+* Used contributor ekalinin's idea about an option allowing users to 
+send notifications to themselves.   See edit_user.aspx,
+edit_self.aspx.
+
+* Used contributor ekalinin's idea about an option allowing users to 
+receive notifications only when status changes.   See edit_user.aspx,
+edit_self.aspx.
+
+* Added ability to edit SQL for reports with help from 
+contributor regent10.
+
+-----------------------------------------------------------------------
+Migrating to 1.9.1
+-----------------------------------------------------------------------
+
+Corrected this file so that the alter table statement for 1.8.6 reads:
+    alter table users add us_only_status_change_notifications int null default(0)
+
+Use this SQL to drop the bogus field:
+    alter table projects drop column add us_only_status_change_notifications
+
+Also run this:
+alter table users add us_send_notifications_to_self int null default(0)
+update users set us_only_status_change_notifications = 0
+update users set us_send_notifications_to_self = 0
+
+-----------------------------------------------------------------------
+Version 1.9.0  8/20/2004
+-----------------------------------------------------------------------
+
+Small changes:
+
+* The pages no longer let you delete a project, user, category, 
+priority, status or user_defined_attribute value if it is still being
+referenced by a bug.
+
+* Delete confirmation pages echo the name of the item being deleted
+when they are prompting the user for confirmation.
+
+* Replaced my edit_user_permissions2.aspx with one from Eugene Kalinin
+per bug 1010967, List all users on "per user permissons".
+
+* Fix to how links to interior pages are handled when user isn't logged
+in.   Query string vars were getting truncated.
+
+* Fix to how white space is handled when printing custom text fields.
+
+-----------------------------------------------------------------------
+Version 1.8.9  8/18/2004
+-----------------------------------------------------------------------
+
+Important bug fix again:
+
+* The printed and emailed bugs were broken so that they were printing 
+the id's rather than the descriptions of fields like status, category, 
+etc.   Fixed that.
+
+And less serious
+
+* Custom textarea fields are now HTML encoded for display on
+edit_bugs.aspx page and on for printing/emails.
+
+I'd like to think that this version is pretty stable.
+
+-----------------------------------------------------------------------
+Version 1.8.8  8/16/2004
+-----------------------------------------------------------------------
+
+Bug fixes only, but important ones.
+
+* In version 1.8.7, the alter script in this README.TXT was STILL wrong.
+I corrected it again from bg_custom_project...  to bg_project_custom...
+
+* Starting with version 1.8.5, the user dropdowns are filtered so that
+a given user doesn't see other users with whom that user doesn't have
+any projects in common.    In this release I have changed the queries
+that implement the feature to fix a bug.   Also, the admin user is now
+treated just like any other user.
+
+-----------------------------------------------------------------------
+Version 1.8.7  8/16/2004
+-----------------------------------------------------------------------
+
+The only change is a correct to the SQL "alter" statements below,
+for migrating to 1.8.6.
+
+I originally wrote bg_custom_project_dropdown1_value, etc.   
+That's wrong.
+It should be bg_custom_project_dropdown_value1
+
+I corrected it below.
+
+
+-----------------------------------------------------------------------
+Version 1.8.6  8/14/2004
+-----------------------------------------------------------------------
+
+* Now supports custom dropdowns specific to a project.  For 
+example you could set up project #1 to have a custom dropdown of
+"Version" with values of "1.0", "2.0", but for project #2 it would have
+the values of "3.1", "3.2".   Go to an existing project and edit it to
+try out this feature.
+
+This is a complicated feature to implement.  I probably made a mistake
+or two.  Please help me by reporting any bugs you find and I'll try to
+fix them ASAP and post a new version.   
+
+I apologize in advance if this new feature causes you any inconvience.
+
+-----------------------------------------------------------------------
+Migrating to 1.8.6
+-----------------------------------------------------------------------
+
+alter table projects add pj_enable_custom_dropdown1 int null default(0)
+alter table projects add pj_enable_custom_dropdown2 int null default(0)
+alter table projects add pj_enable_custom_dropdown3 int null default(0)
+alter table projects add pj_custom_dropdown_label1 varchar(30) null
+alter table projects add pj_custom_dropdown_label2 varchar(30) null
+alter table projects add pj_custom_dropdown_label3 varchar(30) null
+alter table projects add pj_custom_dropdown_values1 varchar(1000) null
+alter table projects add pj_custom_dropdown_values2 varchar(1000) null
+alter table projects add pj_custom_dropdown_values3 varchar(1000) null
+
+alter table bugs add bg_project_custom_dropdown_value1 varchar(40) null
+alter table bugs add bg_project_custom_dropdown_value2 varchar(40) null
+alter table bugs add bg_project_custom_dropdown_value3 varchar(40) null
+
+alter table users add us_only_status_change_notifications int null default(0)
+
+-----------------------------------------------------------------------
+Version 1.8.5  8/12/2004
+-----------------------------------------------------------------------
+
+Bug fixes only.
+
+* Fixed bug related to selecting item in "re-assign" dropdown on 
+edit_bug.aspx.   This bug was introduced in version 1.8.4.
+
+* Now preserving white space and line breaks in custom fields
+
+* Now Handling double quotes in custom fields properly
+
+
+-----------------------------------------------------------------------
+Version 1.8.4  8/09/2004
+-----------------------------------------------------------------------
+
+* Added ability to delete file attachments.   Also added setting in
+Web.config to turn the feature on and off:
+<add key="AllowAttachmentDeletionForNonAdmins" value="0"/>
+
+* added "id" column to the admin pages that list things, 
+like categories.aspx.
+
+* In search, show inactive users and projects in dropdowns too.
+
+* In search, if admin user, show all uesrs and projects regardless of
+permission.
+
+* In dropdowns in edit_bug.aspx and search.aspx, only show users 
+related to projects that user has permissions for.   To really see the
+effect of this, DefaultPermissionLevel in Web.Config should be set to
+0.
+
+* Version 1.8.2's base and custom css thing broke the the emails.  Now
+the emails use both the base and custom style sheets too.
+
+* Merging bugs now creates a comment belonging to the "into" bug, 
+recording the act of merging itself. 
+
+-----------------------------------------------------------------------
+Version 1.8.3  7/31/2004
+-----------------------------------------------------------------------
+
+* Version 1.8.2 broke the hyperlinks feature.  This release fixes it.
+
+* What broke the hyperlinks was the way I was handling trying to
+preserve white space in the comments.   I changed it again.  
+Line breaks are converted to "<br>".
+Tabs are converted to "&nbsp;&nbsp;&nbsp;&nbsp;".
+One space is left alone.
+Two spaces are converted to " &nbsp;"
+
+-----------------------------------------------------------------------
+Version 1.8.2  7/29/2004
+-----------------------------------------------------------------------
+
+* Fixed problem with comment formatting that resulted in the text not
+word-wrapping.
+
+* Added the option to show the initially entered comment on top, like
+Sourceforge does, when the general order of comments is most recent
+first, i.e., "desc" in Web.config
+
+* Made it easier to customize css.   Put your customizations in
+btnet_custom.css instead of btnet.css and then as I change btnet.css, 
+your overrides in btnet_custom.css will still work.    Thanks to
+Michael Wilson for this idea.
+
+* Maybe you like a more neutral word like "issue", "ticket", or "item"
+rather than "bug"?  Added settings to web config that allow you to get 
+rid of most occurrences of the word "bug" in the user interface for 
+non-admin users:
+
+	<add key="AppTitle" value="Customer Support"/>
+	<add key="SingularBugLabel" value="Item"/>
+	<add key="PluralBugLabel" value="Items"/>
+	<!-- customize marker for creating hyperlinks in bug comments -->
+	<add key="BugLinkMarkerx" value="itemid#"/>
+	
+* Made btnet_service.exe and btnet_console.exe a little more robust
+when encoutering problems communicating with web server.   Also, they
+don't choke now when encountering an unusual "multipart" type.
+
+-----------------------------------------------------------------------
+Version 1.8.1  6/26/2004
+-----------------------------------------------------------------------
+
+* Added feature allowing one bug to be merged into another.  
+
+Added a new setting in Web.config, "AllowBugMergingForNonAdmins", that 
+controls whether non-admins have access to this feature.
+
+* Formatting of bug comment text is now preserved.
+
+* When deleting a bug, attachments are now deleted too.   You might 
+need to adjust permission on the file upload folder.
+
+* Added new page "view subscribers" so you can see who is subscribed 
+to a bug.
+
+* Added Web.config option "EncryptStoredPasswords".   See note on 
+migrating below.    Btnet now checks for both the encrypted and 
+unencrypted versions of the password, so there's no need to convert 
+existing data.   The unencrypted passwords will still work.
+
+If you want to convert, the only way I have provided is
+to go reset the passwords one by one using the web pages.    I didn't
+provide a tool to conver them all at once.
+
+-----------------------------------------------------------------------
+Migrating to 1.8.1
+-----------------------------------------------------------------------
+
+You only need to run this if you set EncryptPasswords to "1"
+
+alter table users alter column us_password varchar(32) not null
+	
+-----------------------------------------------------------------------
+Version 1.8.0  6/18/2004
+-----------------------------------------------------------------------
+
+* Emails are now sent by default as just one email with many 
+recipients.  Added new Web.config setting, "SendJustOneEMail".   If you
+liked things better the old way, change this setting to "0".    Thanks 
+for the code, Victor.
+
+* Fixed bug where custom fields weren't saved on an add, just an 
+update.
+
+* On the login page, now filling in the username with previously used
+username.
+
+-----------------------------------------------------------------------
+Version 1.7.9  6/12/2004
+-----------------------------------------------------------------------
+
+* Added "Reporter" permission.    Reporters can add bugs, update
+comments, upload attachments, but can't change status, assignment
+etc after adding bug.   Works best when you set user's "forced project".
+
+* Added user's "forced project".   If set, user is limited to adding 
+bugs to the specified project.
+
+* Added "PrintHistory" setting to Web.config.  Controls whether 
+change history is included in print of bugs.    Note however, the
+same logic is used to print the email notifications.
+
+* Added page for changing per user per project permissiong coming from
+the project in addition to the one that already exists coming from the
+user.
+
+* Added links from search page to "print list" and "print detail"
+
+* Added custom columns to search screen results
+
+* Changed how the edit_bugs.aspx looks for users with View Only
+permissions.  
+
+* Lots of little bug fixes, including newly recompiled btnet_console.exe
+and btnet_service.exe.   They no longer crash on multiplart/mixed emails.
+
+
+-----------------------------------------------------------------------
+Migrating to 1.7.9
+-----------------------------------------------------------------------
+
+alter table users add us_forced_project int null
+
+-----------------------------------------------------------------------
+Version 1.7.8 4/17/2004
+-----------------------------------------------------------------------
+
+* Made bugs per page a user setting rather than a global setting.
+Web.config's "BugsPerPage" is obsolete
+You have to run this sql:
+alter table users add us_bugs_per_page int null
+
+* Added ability to print the details of multiple bugs at once
+
+* Added links for printing bugs on bugs.aspx page.   If you sort the 
+list by clicking on the column headings, you can then print the list
+in that sort order.
+
+* Uses TextArea controls instead of Input controls for large custom
+fields.  Thanks to "wulfman2u" for submitting the code for this change
+in RFE #935798
+
+
+-----------------------------------------------------------------------
+Version 1.7.7 3/30/2004
+-----------------------------------------------------------------------
+
+* Now recording changes to custom columns in bug's audit trail
+
+* Added "logged in as" feedback in upper right
+
+* Added new link on admin page to new custom fields pages.   These 
+pages help you generate the sql to add custom fields to bugs table.
+
+
+-----------------------------------------------------------------------
+Version 1.7.6 3/03/2004
+-----------------------------------------------------------------------
+
+* Custom fields now appear on print_bug.aspx and email notifications.
+
+* When adding new bug, project dropdown defaults to last project
+you worked with, not merely last project you added a bug to.
+
+* Bugs page now remembers the last query you selected in dropdown
+
+Bug Fixes:
+
+* Added "Reported On" to print_bug.aspx
+
+* Updating a bug with custom date field preserves the null.
+
+* Date picker (calendar.js) is now works with European date formats.
+
+* util.cs no longer changes the case of the SQL in order to modify
+it to apply permissions.
+
+
+-----------------------------------------------------------------------
+Version 1.7.5 2/27/2004
+-----------------------------------------------------------------------
+
+* Added support for adding one attachment to outgoing emails.   
+Attachments to emails become bug attachments too.   It's not a very 
+nice implementation, but it's better than nothing.  
+
+* Now checking that to, from, and subject fields of outgoing email 
+are not blank.
+
+Bug Fixes:
+
+* Added missing column "us_auto_subscribe_own_bugs" to users table in
+setup.sql
+
+* Emails generated by clicking on "send email" link have proper magic
+words in subject so that replies to them are posted back to same bug.
+
+* Custom date fields now work when adding a new bug as opposed to just
+updating an existing bug.  (no problem with other data types).
+To add a custom field, use SQL like this to alter the bugs table:
+
+alter table bugs add [Target Completion Date] datetime null
+
+
+-----------------------------------------------------------------------
+Version 1.7.4 2/19/2004
+-----------------------------------------------------------------------
+
+
+Added new setting "DefaultPermissionLevel" in Web.Config.   Previously,
+default permission meant allow everything unless specifically denied.
+Now you can set btnet to deny everything unless specifically allowed.
+
+Added new way to subscribe to email notifications, Auto Subscribe Own.
+When set, user to whom bug is assigned is automatically subscribed to
+receive notifications.   See note below "Migrating to 1.7.4.
+
+Added new values to Web.config which I hope help with date localization.
+This isn't meant to be a complete solution yet.
+
+
+"JustDateFormat" - use this to specify the date format without time
+
+"SQLServerDateFormat" - tell btnet how SQL Server dates are formated.
+I'm not sure if this really works.
+
+These should help with custom columns of type datetype.   These should
+also help allow users to enter dates in local format on the search page.
+The calendar control still returns dates in YYYY-MM-DD format, however.
+
+
+Other Bug fixes:
+
+* Better handling of email errors.  Instead of crash, error message is
+returned to user and info is written to log.
+
+* Now able to turn off logging via LogEnabled setting in Web.config.
+
+* Better handling of custom columns.   Now works with DateTime and
+nvarchar.
+
+
+-----------------------------------------------------------------------
+Migrating to 1.7.4 
+-----------------------------------------------------------------------
+
+Run this sql:
+
+alter table users add us_auto_subscribe_own_bugs int null default(0)
+update users set us_auto_subscribe_own_bugs = 0
+
+
+
+-----------------------------------------------------------------------
+Version 1.7.3 2/7/2004
+-----------------------------------------------------------------------
+
+btnet_console.exe and btnet_service.exe now use these settings 
+in Web.config as their btnet user/password when inserting bugs.'
+
+<add key="ServiceUsername" value="email2"/>
+<add key="ServicePassword" value="x"/>
+
+These entries replace the "username" and "password" entries.
+
+* Also for btnet_console and btnet_service, added new 
+"SubjectCannotContain" entry to Web.config.   If not blank,
+then emails containing the string are skipped.
+
+* Bug descriptions are now hotlinks if the column heading starts with
+the chars "DESC" (case insensitive).
+
+
+Bug fixes:
+
+* Fixed view_attachment.aspx.  Copyright notice had been part of 
+response.
+
+* Fixed page title of print_bug.aspx
+
+* Now works with case-sensitive databases.
+
+* Don't send notifications to users w/o view permission.
+
+* Don't allow multiple default queries.
+
+* Don't show "add attachment" and "send email" links for view only
+users.
+
+* No longer using hardcoded "email/x" username/password in 
+btnet_service.exe and btnet_console.exe.   
+Instead using "ServiceUsernname" and "ServicePassword".
+
+
+-----------------------------------------------------------------------
+Version 1.7.2 12/18/2003
+-----------------------------------------------------------------------
+
+* You can add custom columns to the bug table and they will
+show up in the edit_bug.aspx form.   For example, if you want
+a version field, execute:
+
+alter table bugs add version varchar(20) null
+
+No validation yet.   If you enter non-numeric data or a string that's
+too long or leave a required field blank, you will not get a friendly
+error message.
+
+-----------------------------------------------------------------------
+Version 1.7.1 12/9/2003
+-----------------------------------------------------------------------
+
+bug fixes only
+
+* fixed inc_insert_bugs.aspx so as not to insert additional, duplicate,
+subscriptions each time bug is changed
+
+* fixed setup.sql to add missing comma in 
+"create table project_user_xref"
+
+-----------------------------------------------------------------------
+Version 1.7.0 12/6/2003
+-----------------------------------------------------------------------
+
+* see note below how to migrate to this version.
+
+* save queries as either "public" or "private".   "private" queries
+are only visible to the person wh0 saved them.
+
+* Admins can set project level permissions for users.   Per project, 
+bugs are either hidden, readonly, or fully editable.   Since this logic
+is new, please don't trust it 100% to prevent a malicious user from 
+editing bugs they aren't supposed to.   There might still be holes. 
+
+* btnet_console.exe and btnet_service.exe used to fail if the Subject
+header came before the From headers.   Fixed.
+
+-----------------------------------------------------------------------
+Migrating 1.7.0
+-----------------------------------------------------------------------
+
+	alter table queries add qu_user int null
+	alter table project_user_xref add pu_permission_level int default(2)
+
+-----------------------------------------------------------------------
+Version 1.6.9 11/12/2003
+-----------------------------------------------------------------------
+
+* see note below on how to migrate to this version.
+
+* !!!! IMPORTANT !!!!
+delete_bug was completely broken in 1.6.8 but even worse, before that
+it was deleting the wrong stuff - like potentially a comment belonging
+not to the bug being deleted but to another bug.   Fixed in this version
+
+The sql used to say:
+		sql = @"delete from bug_comments where bc_id = $1
+			delete from bug_attachments where ba_id = $1
+			delete from bug_subscriptions where bs_bug = $1
+			delete from bugs where bg_id = $1";
+Now it says:
+		sql = @"delete from bug_comments where bc_bug = $1
+			delete from bug_attachments where ba_bug = $1
+			delete from bug_subscriptions where bs_bug = $1
+			delete from bugs where bg_id = $1";
+
+
+* A while back I made some columns bigger in setup.sql.   You might want
+to do the same, but you don't have to.  Here's the SQL:
+
+alter table bug_comments alter column bc_comment varchar(7000)
+alter table bug_comments alter column bc_email_from varchar(255)
+alter table queries alter column qu_sql varchar(7000)
+
+* view_web_config.aspx was broken.  Fixed now.
+
+* New "WindowsAuthentication" setting in Web.config.  See instructions
+in web.config on how to avoid receiving a logon prompt.
+
+* Receiving too many emails? Users can decide to receive only email 
+notifications on new bugs, rather than receiving a change every time a
+bug is changed. 
+
+-----------------------------------------------------------------------
+Migrating to 1.6.9 
+-----------------------------------------------------------------------
+
+Run this sql:
+
+alter table users add us_only_new_bug_notifications int null default(0)
+update users set us_only_new_bug_notifications = 0
+
+-----------------------------------------------------------------------
+Version 1.6.8 11/10/2003
+-----------------------------------------------------------------------
+
+SEE "MIGRATING TO 1.6.8" BELOW
+
+I'm trying to make BugTracker.NET more secure, suitable for a public
+web server.   I think at this point, it is secure from mischief from
+unauthorized or non-admin users.   Admin users can pretty much do
+whatever they want, so don't grant admin rights to somebody you don't
+know and trust.
+
+* Revised logon scheme.  Before the browser carried cookies that
+indicated whether the user was authenticated and an admin user.   These
+were simple cookies, easy to forge.   Now cookie is a guid that must
+match up with an entry in the new "sessions" table.  
+
+* Revised search.aspx so that it does NOT run the sql sent to it in
+the HTTP request but instead reassembles it based on the contents of
+the controls.
+
+* Revised query.aspx so that IF there is a users table (i.e, post
+installation), it will require that a user be authenticated and
+admin.   The idea is to let anybody use it before installation, but
+after installation only admins.
+
+* Now calling HttpUtility.HtmlDecode for values from textareas before
+storing them in the database.   I hope this doesn't break anything for 
+you.    The intent is that when the subject or body contains html tags,
+those tags should be stored in the database as written.   However, when
+echoed back in the web pages, the text from the db should be Html 
+encoded to prevent cross-site-scripting problems.  I think btnet is
+safe from cross-site-scripting attacks from non-admin users.
+
+* Fixed broken AllowQueryEditingForNonAdmins setting.   Web.config now
+sets it to off by default.  Keep this turned off on a public web server.
+
+* New "CommentSortOrder" in Web.config - set to either "asc" or "desc"
+to control sort order of comments and history.
+
+* New "Send Email" link from edit_bug.aspx to send_email.aspx.
+
+-----------------------------------------------------------------------
+Migrating 1.6.8  
+-----------------------------------------------------------------------
+
+Run this:
+
+create table sessions
+(
+	se_id char(37) not null,
+	se_date datetime not null default(getdate()),
+	se_user int not null
+)
+
+-----------------------------------------------------------------------
+Version 1.6.7  11/06/2003
+-----------------------------------------------------------------------
+
+!!PLEASE SET THE NEW "AbsoluteUrlPrefix" VALUE IN Web.config!!   
+
+You need to configure it for the bug-to-bug hyper links to work.
+
+* Email notifications now contain hyperlinks
+
+* A bunch of little bug fixes.
+
+* Minor cosmetic improvements
+
+
+-----------------------------------------------------------------------
+Version 1.6.6 11/02/2003
+-----------------------------------------------------------------------
+
+* You can save shortcuts and links to bugs.   When you click on link,
+if you are not logged in, you will be presented with the logon page, 
+default.aspx.    After logging in you will be redirected to the link.
+
+* Quickly switch queries on bug page using new drop down
+
+* Better, safer handling of user-entered text used to build SQL 
+statements
+
+-----------------------------------------------------------------------
+Version 1.6.5 11/01/2003
+-----------------------------------------------------------------------
+
+Many thanks to Eugene Kalinin (http://sourceforge.net/users/ekalinin/)
+for his input on this release.
+
+* Now able to search on user defined attribute and last updated
+
+* User defined attribute shows up in search results and in notification
+email
+
+* "Prev" and "next" links on edit_bug.aspx for navigating through list
+of bugs without returning to the list.   
+
+* Notification emails are now in Html format and include everything
+you would see on the "print" page.
+
+* Bug comments textarea is bigger for new bugs
+
+* If you add a new bug, and then another, the project is initialized
+to the previously used project.
+
+* Logging now actually logs something: url, who the user is, and all the
+sql.
+
+* Added SmtpSendUsing setting in Web.config.  See below in the tips
+section to see how the Web.config settings are used to configure email
+messages.
+
+* Fixed bug: btnet_service.exe, btnet_console.exe were not URL encoding
+their request to insert_bug.aspx
+
+
+-----------------------------------------------------------------------
+Version 1.6.4 10/26/2003
+-----------------------------------------------------------------------
+
+* Automatically subscribe to bug notifications on a per-project basis.
+
+* Added "settings" link.  Non-admin users can control their own user 
+settings.
+
+-----------------------------------------------------------------------
+Migrating to 1.6.4
+-----------------------------------------------------------------------
+
+There is a new table.  To add the table to your database, logon, click 
+on admin, click on run ad-hoc query, paste in the text below and submit.
+
+create table project_user_xref
+(
+pu_id int identity not null,
+pu_project int not null,
+pu_user int not null,
+pu_auto_subscribe int not null default(0)
+)
+
+create index pu_index_1 on project_user_xref (pu_project, pu_user)
+create index pu_index_2 on project_user_xref (pu_user, pu_project)
+
+
+-----------------------------------------------------------------------
+Version 1.6.3 10/22/2003
+-----------------------------------------------------------------------
+
+* Search now searches comments too
+
+* Added SmtpServerPickupDirectory setting in Web.config.   You probably
+don't need it.
+
+* Added InsertBugUrl setting in Web.Config - removed hard-coded 
+127.0.0.1 URL from pop3 client
+
+
+-----------------------------------------------------------------------
+Version 1.6.2 10/03/2003
+-----------------------------------------------------------------------
+
+Various bug fixes, including:
+* bug attachment links were not being displayed right in edit_bugs.aspx
+* This README.TXT file said bc_type is a char(1) instead of a varchar(8)
+* Dropdowns sometimes were not in any meaningful sort order
+
+Also:
+* Added line charts (in addition to pie and bar)
+
+-----------------------------------------------------------------------
+Version 1.6.1 09/21/2003
+-----------------------------------------------------------------------
+
+Added "reports.aspx".   It's a page that lists various summary reports
+that you can view either as data or in pie or bar chart form.
+
+Create your own reports by adding entries to the "reports" table.
+
+* Renamed btnet_pop3.exe to btnet_console.exe.   There is also now
+a version that runs as a service, btnet_service.exe.   See Tips
+section below for how to setup up btnet_service.exe.
+
+-----------------------------------------------------------------------
+Migrating to 1.6.1
+-----------------------------------------------------------------------
+
+Run the following SQL
+
+create table reports
+(
+	rp_id int identity not null,
+	rp_desc varchar(80) not null,
+	rp_sql varchar(1024) not null,
+	rp_chart_type varchar(8) not null
+)
+
+
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values('Bugs by Status',
+'select st_name [status], count(1) [count] from bugs inner join statuses on bg_status = st_id group by st_name order by st_name',
+'pie')
+
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values('Bugs by Priority',
+'select pr_name [priority], count(1) [count] from bugs inner join priorities on bg_priority = pr_id group by pr_name order by pr_name',
+'pie')
+
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values('Bugs by Category',
+'select ct_name [category], count(1) [count] from bugs inner join categories on bg_category = ct_id group by ct_name order by ct_name',
+'pie')
+
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values('Bugs by Month',
+'select month(bg_reported_date) [month], count(1) [count] from bugs group by year(bg_reported_date), month(bg_reported_date) order by year(bg_reported_date), month(bg_reported_date)',
+'bar')
+
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values('Bugs by Day of Year',
+'select datepart(dy, bg_reported_date) [day of year], count(1) [count] from bugs group by datepart(dy, bg_reported_date), datepart(dy,bg_reported_date) order by 1',
+'bar')
+
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values('Bugs by User',
+'select bg_reported_user, count(1) [r] into #t from bugs group by bg_reported_user; select bg_assigned_to_user, count(1) [a] into #t2 from bugs group by bg_assigned_to_user; select us_username, r [reported], a [assigned] from users left outer join #t on bg_reported_user = us_id left outer join #t2 on bg_assigned_to_user = us_id order by 1', 
+'table')
+
+
+-----------------------------------------------------------------------
+Version 1.6
+-----------------------------------------------------------------------
+
+* Added btnet_pop3.exe.  It's a POP3 client that fetches emails and
+stuffs them in the database as bugs.  See "Tips" section below for more
+info.
+
+* BUG_HISTORY has been merged into BUG_COMMENTS.  See "Migrating to 1.6"
+section below.
+
+* Improved SMTP support - now able to specify a user/password for SMTP
+servers that require authentication.   See in Web.config:
+<add key="SmtpServerAuthenticateUser" value="YOUR SMTP USER NAME"/>
+<add key="SmtpServerAuthenticatePassword" value="YOUR PASSWORD"/>
+
+* Got rid of Authenticate.dll scheme.
+
+* Fixed bug where notification emails had incorrect bug status, category,
+project, etc. 
+
+* Fixed bug where edit_user.aspx died with names like O'Hara, O'Malley.
+
+
+-----------------------------------------------------------------------
+Migrating to 1.6
+-----------------------------------------------------------------------
+
+
+1) There are new columns in the project table and bug_comments table.   To add the columns to
+your database, logon, click on admin, click on run ad-hoc query, paste 
+in the text below and submit.
+
+alter table projects add pj_enable_pop3 int null 
+alter table projects add pj_pop3_username varchar(50) null
+alter table projects add pj_pop3_password varchar(20) null
+alter table projects add pj_pop3_email_from varchar(50) null
+
+alter table bug_comments add bc_email_from varchar(255) null
+alter table bug_comments add bc_email_to varchar(255) null
+alter table bug_comments add bc_type varchar(8) null
+
+2) Bug comment and bug history tables have been merged into one
+table and a bc_type field now distinguishes them.  The types are:
+comment
+update
+received [email]
+sent [email]
+
+The following SQL updates the bug_comment -- copy data from history to comments and get rid of history table
+
+update bug_comments set bc_type = 'comment'
+
+insert into bug_comments 
+(bc_bug, bc_user, bc_date, bc_comment, bc_type)
+select bh_bug, bh_user, bh_date, bh_what, 'update'
+from bug_history
+
+drop table bug_history
+
+
+2) Update the top of your Web.config file, so that it looks like this:
+
+<configSections>
+	<section
+		name="btnetSettings"
+		type="System.Configuration.NameValueFileSectionHandler,System, Version=1.0.3300.0,Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+	<section
+		name="pop3Settings"
+		type="System.Configuration.NameValueFileSectionHandler,System, Version=1.0.3300.0,Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+</configSections>
+
+
+3) Add this after the line containing "</btnetSettings>".  Change the
+actual settings to fit your situation.
+
+	<pop3Settings>
+		<!--
+			Replace my server with YOUR server.
+		-->
+		<add key="Pop3Server" value="pop.sbcglobal.yahoo.com"/>
+
+		<!--
+			BugTracker.NET username, password that btnet_service.exe will use
+			to talk to BugTracker.NET
+		-->
+		<add key="username" value="email"/>
+		<add key="password" value="x"/>
+
+		<!--
+			Only retrieve messages if they contain a magic word in their subject.
+			If the value is blank, then btnet_pop3.exe will retrieve all messages.
+			Probably for your production, the value should be blank.
+		-->
+		<add key="SubjectMustContain" value="test"/>
+		<!--
+			For my own testing, it was useful to have this option.
+			For production the value should be 1.
+		-->
+		<add key="DeleteMessagesOnServer" value="1"/>
+
+		<!--
+			How frequently should btnet_pop3.exe check the server for emails?
+		-->
+		<add key="FetchIntervalInMinutes" value="15"/>
+
+	</pop3Settings>
+ 
+-----------------------------------------------------------------------
+Version 1.5.1
+-----------------------------------------------------------------------
+
+* Added view_web_config.aspx to view Web.config file for admins
+* Added ability to delete bugs
+* Web.config gives more control over what non-admins are allowed
+to do.  
+* Web.config controls whether raw SQL displays on the query and search
+pages
+* Web.config controls whether bug change history entries are show with
+bug comment entries or seperately
+
+-----------------------------------------------------------------------
+Version 1.5
+-----------------------------------------------------------------------
+
+Migrating from 1.4 to 1.5
+
+
+There are new columns in the project table.   To add the columns to
+your database, logon, click on admin, click on run ad-hoc query, paste 
+in the text below and submit.
+
+alter table projects add pj_default_user int null
+alter table projects add pj_auto_assign_default_user int null
+alter table projects add pj_auto_subscribe_default_user int null
+
+
+-----------------------------------------------------------------------
+Version 1.4
+-----------------------------------------------------------------------
+
+* New print bug feature
+* Revised database access layer to - was architected all wrong.  You
+shouldn't even use versions prior to 1.4 anymore.  Sorry.
+
+

@@ -1,0 +1,315 @@
+-- Run this, or portions of this, to upgrade from one
+-- version to another.   Newer entries are at the bottom.
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 1.9.8 to 1.9.9
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table users add us_auto_subscribe_reported_bugs int null default(0)
+update users set us_auto_subscribe_reported_bugs = 0
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.0.6 to 2.0.7
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table bug_attachments add ba_comment int null 
+ 
+/* 
+The SQL below might be something you want to try. It attempts to guess 
+the relationship of an attachment to a comment by looking at how  
+close in time they were added. If it's just a couple seconds a part, 
+I assume they are related. For me, where I have just a few users 
+on the system, this heuristic makes sense. I wouldn't use it if 
+I had a lot of users. 
+*/ 
+ 
+select ba_id, bc_id  
+into #t  
+from bug_attachments 
+inner join bug_comments on ba_bug = bc_bug and  
+abs(datediff(s,ba_uploaded_date, bc_date)) < 4 -- 3 seconds or less 
+ 
+update bug_attachments 
+set ba_comment = #t.bc_id 
+from #t where bug_attachments.ba_id = #t.ba_id 
+ 
+drop table #t 
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.1.5 to 2.1.6
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table users
+   add us_reported_notifications int not null default(4),
+       us_assigned_notifications int not null default(4),
+       us_subscribed_notifications int not null default(4)
+go
+
+update users
+   set us_reported_notifications = 1, us_assigned_notifications = 1, us_subscribed_notifications = 1
+   where isnull(us_only_status_change_notifications, 0) = 0 and isnull(us_only_new_bug_notifications, 0) = 1
+
+update users
+   set us_reported_notifications = 2, us_assigned_notifications = 2, us_subscribed_notifications = 2
+   where isnull(us_only_status_change_notifications, 0) = 1
+go
+
+declare @defaults cursor
+declare @default varchar(50)
+set @defaults = cursor for
+   select name from sysobjects 
+      where id in
+            (
+               select cdefault from syscolumns 
+                  where name in ('us_only_status_change_notifications', 'us_only_new_bug_notifications')
+            )
+
+open @defaults
+fetch next from @defaults into @default
+while (@@fetch_status=0) begin
+   execute('alter table users drop constraint ' + @default)
+   fetch next from @defaults into @default
+end
+close @defaults
+deallocate @defaults
+go
+
+alter table users
+   drop column us_only_status_change_notifications,
+      us_only_new_bug_notifications
+go
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.1.7 to 2.1.8
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+--  TRY THIS ON A BACKUP FIRST!
+
+-- create a new table to hold the comments and the attachments
+create table bug_posts
+(
+bp_id int identity primary key not null,
+bp_bug int not null,
+bp_type varchar(8) not null,
+bp_user int not null,
+bp_date datetime not null,
+bp_comment ntext not null,
+bp_email_from nvarchar(800) null,
+bp_email_to nvarchar(800) null,
+bp_file nvarchar(1000) null,
+bp_size int null,
+bp_content_type nvarchar(200) null,
+bp_parent int null,
+bp_original_comment_id int null
+)
+
+-- insert the attachments, but we want to 
+-- keep the id's because they relate to 
+-- the uploaded file names.
+
+set identity_insert bug_posts on 
+
+insert into bug_posts (
+bp_id, bp_bug, bp_type, 
+bp_user, bp_date, bp_comment, 
+bp_file, bp_size, bp_content_type, 
+bp_parent)
+select 
+ba_id, ba_bug, 'file', 
+ba_uploaded_user, ba_uploaded_date, ba_desc, 
+ba_file, ba_size, ba_content_type,
+ba_comment
+from bug_attachments
+
+set identity_insert bug_posts off
+
+-- insert the comments.  id's don't matter
+insert into bug_posts (
+bp_bug, bp_type, 
+bp_user, bp_date, bp_comment, 
+bp_email_from, bp_email_to,
+bp_original_comment_id)
+
+select 
+bc_bug, bc_type,
+bc_user, bc_date, bc_comment, 
+bc_email_from, bc_email_to
+bc_comment, bc_id
+from bug_comments
+
+-- the email attachments need to point to new parents
+select a.bp_id a, b.bp_id b
+into #t
+from bug_posts a
+inner join bug_posts b on a.bp_parent =
+b.bp_original_comment_id
+where a.bp_parent is not null
+
+update bug_posts set bp_parent = b
+from #t 
+where bp_id = a
+
+create index bp_index_1 on bug_posts (bp_bug)
+
+-- get rid of the column we needed just for the conversion
+alter table bug_posts drop column bp_original_comment_id
+
+-- Just in case, hide, but don't drop the original tables
+-- You can drop them if you want.
+exec sp_rename bug_attachments, bug_attachments_obsolete
+exec sp_rename bug_comments, bug_comments_obsolete
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.2.2 to 2.2.3
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+
+alter table users add us_signature nvarchar(1000) null
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.2.8 to 2.2.9
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table projects add pj_default int not null default(0)
+alter table categories add ct_default int not null default(0)
+alter table priorities add pr_default int not null default(0)
+alter table statuses add st_default int not null default(0)
+alter table user_defined_attribute add udf_default int not null default(0)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.3.1 to 2.3.2
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+create table bug_relationships
+(
+re_id int identity primary key not null,
+re_bug1 int not null,
+re_bug2 int not null,
+re_type nvarchar(100) null
+)
+
+create unique index re_index_1 on bug_relationships (re_bug1, re_bug2)
+create unique index re_index_2 on bug_relationships (re_bug2, re_bug1)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.3.9 to 2.4.0
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+create table custom_col_metadata
+(
+ccm_colorder int not null,
+ccm_dropdown_vals nvarchar(1000) not null default('')
+)
+
+create unique index cdv_index on custom_col_metadata (ccm_colorder)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.4.1 to 2.4.2
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table custom_col_metadata add ccm_sort_seq int default(0)
+alter table custom_col_metadata add ccm_dropdown_type varchar(20) null
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.4.5 to 2.4.6
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+create table bug_file_revisions
+(
+bfr_id int identity primary key not null,
+bfr_bug int not null,
+bfr_revision int not null,
+bfr_action nvarchar(8) null,
+bfr_file nvarchar(400) null,
+bfr_date datetime not null
+)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.4.8 to 2.4.9
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+-- add a couple new columns to existing tables
+alter table bug_posts add bp_comment_search ntext null
+alter table users add us_use_fckeditor int not null default(0)
+-- increase the size of the column
+alter table bug_relationships alter column re_type nvarchar(500)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.4.9 to 2.5.0
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table users add us_enable_bug_list_popups int not null default(1)
+alter table users add us_created_user int not null default(1)
+alter table project_user_xref add pu_admin int not null default(0)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.5.7 to 2.5.8
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table users add us_external_user int not null default(0)
+alter table users add us_can_be_assigned_to int not null default(1)
+
+alter table users add us_can_edit_sql int not null default(0)
+alter table users add us_can_delete_bug int not null default(0)
+alter table users add us_can_edit_and_delete_posts int not null default(0)
+alter table users add us_can_merge_bugs int not null default(0)
+alter table users add us_can_mass_edit_bugs int not null default(0)
+alter table users add us_can_use_reports int not null default(0)
+alter table users add us_can_edit_reports int not null default(0)
+
+alter table bug_posts add bp_hidden_from_external_users int not null default(0)

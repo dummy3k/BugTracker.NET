@@ -1,0 +1,68 @@
+<%@ Import Namespace="System.IO" %>
+<%@ Import Namespace="btnet" %>
+<%@ Assembly Src="util.cs"%>
+<script runat="server" language="C#">
+
+/*
+Copyright 2002 Corey Trager 
+Distributed under the terms of the GNU General Public License
+*/
+
+string prev_day = DateTime.Now.ToString("yyyy-MM-dd");
+
+public void Application_Error(Object sender, EventArgs e)
+{
+
+	Exception exc = Server.GetLastError().GetBaseException();
+
+	bool log_enabled = (Util.get_setting("LogEnabled","1") == "1");
+	if (log_enabled)
+	{
+
+		string path = Util.get_log_file_path();
+		
+		// open file
+		StreamWriter w = File.AppendText(path);
+		
+		w.WriteLine("\nTIME: "  + DateTime.Now.ToLongTimeString());
+		w.WriteLine("MSG: " + exc.Message.ToString());
+		w.WriteLine("URL: " + Request.Url.ToString());
+		w.WriteLine("EXCEPTION: " + exc.ToString());
+		
+		w.Close();
+	}
+	
+	bool error_email_enabled = (btnet.Util.get_setting("ErrorEmailEnabled","1") == "1");
+	if (error_email_enabled)
+	{
+		string to = Util.get_setting("ErrorEmailTo","");
+		string from = Util.get_setting("ErrorEmailFrom","");
+		string subject = "Error: " + exc.Message.ToString();
+		string body = "\nTIME: "
+			+ DateTime.Now.ToLongTimeString()
+			+ "\nURL: "
+			+ Request.Url.ToString()
+			+ "\nException: "
+			+ exc.ToString();
+
+		btnet.Email.send_email(to, from, "", subject, body); // 5 args				
+	}
+}
+  
+/*
+public void Application_BeginRequest(Object sender, EventArgs e)
+{
+
+	string day = DateTime.Now.ToString("yyyy-MM-dd");
+	
+	if (day != prev_day)
+	{
+		prev_day = day;
+		Util.write_to_log("Global.asax detected first page hit of the day");
+	}
+
+	
+}
+*/
+
+</script>
