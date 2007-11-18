@@ -9,6 +9,7 @@ Distributed under the terms of the GNU General Public License
 DataSet ds;
 DbUtil dbutil;
 Security security;
+int bugid;
 
 void Page_Load(Object sender, EventArgs e)
 {
@@ -21,9 +22,9 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "view history";
 
-	string string_bg_id = Request["id"];
+	bugid = Convert.ToInt32(Util.sanitize_integer(Request["id"]));
 
-	int permission_level = Bug.get_bug_permission_level(Convert.ToInt32(string_bg_id), security);
+	int permission_level = Bug.get_bug_permission_level(bugid, security);
 	if (permission_level == Security.PERMISSION_NONE)
 	{
 		Response.Write("You are not allowed to view this item");
@@ -40,7 +41,7 @@ void Page_Load(Object sender, EventArgs e)
 		and bp_type = 'update'
 		order by bp_date " + Util.get_setting("CommentSortOrder","desc");
 
-	sql = sql.Replace("$bg", Util.sanitize_integer(string_bg_id));
+	sql = sql.Replace("$bg", Convert.ToString(bugid));
 
 	ds = dbutil.get_dataset(sql);
 }
@@ -58,7 +59,7 @@ void Page_Load(Object sender, EventArgs e)
 
 <body width=600>
 <div class=align>
-History of Changes
+History of Changes for <% Response.Write(Convert.ToString(bugid)); %>
 <p>
 <%
 if (ds.Tables[0].Rows.Count > 0)

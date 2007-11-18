@@ -37,17 +37,20 @@ drop table [user_defined_attribute]
 if exists (select * from dbo.sysobjects where id = object_id(N'[users]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [users]
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[contacts]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
-drop table [contacts]
-
 if exists (select * from dbo.sysobjects where id = object_id(N'[bug_relationships]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [bug_relationships]
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[custom_col_metadata]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [custom_col_metadata]
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[bug_file_revisions]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
-drop table [bug_file_revisions]
+if exists (select * from dbo.sysobjects where id = object_id(N'[svn_affected_paths]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [svn_affected_paths]
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[svn_revisions]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [svn_revisions]
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[bug_post_attachments]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [bug_post_attachments]
 
 /* USER */
 
@@ -156,7 +159,12 @@ pj_custom_dropdown_label3 nvarchar(80) null,
 pj_custom_dropdown_values1 nvarchar(800) null,
 pj_custom_dropdown_values2 nvarchar(800) null,
 pj_custom_dropdown_values3 nvarchar(800) null,
-pj_default int not null default(0)
+pj_default int not null default(0),
+pj_description nvarchar(200) null,
+pj_subversion_repository_url nvarchar(255) null,
+pj_subversion_username nvarchar(100) null,
+pj_subversion_password nvarchar(80) null,
+pj_websvn_url nvarchar(100) null
 )
 
 insert into projects (pj_name) values('project 1')
@@ -207,6 +215,16 @@ bp_hidden_from_external_users int not null default(0)
 
 create index bp_index_1 on bug_posts (bp_bug)
 
+/* BUG POST ATTACHMENTS -- database storage of attachments */
+
+create table bug_post_attachments
+(
+bpa_id int identity primary key not null,
+bpa_post int not null,
+bpa_content image not null
+)
+
+create unique index bpa_index on bug_post_attachments (bpa_post)
 
 /* BUG SUBSCRIPTIONS */
 
@@ -298,25 +316,6 @@ insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) val
 insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) values ('low', 3, '#ffffff', 'pr3_')
 
 
-/* CONTACTS */
-
-/*
-
--- For the future....
-
-create table contacts
-(
-cc_id int identity primary key not null,
-cc_firstname nvarchar(60) null,
-cc_lastname nvarchar(60) null,
-cc_email nvarchar(120) not null,
-cc_user int not null, -- always populated
-cc_public int not null -- if 1, then shared
-cc_project int not null,  -- if shared, if 0, then global, else shared within project
-)
-*/
-
-
 /* CUSTOM DROPDOWN VALS */
 
 create table custom_col_metadata
@@ -331,17 +330,35 @@ create unique index cdv_index on custom_col_metadata (ccm_colorder)
 
 
 
-/* BUG FILE REVISIONS */
-
-create table bug_file_revisions
+create table svn_revisions
 (
-bfr_id int identity primary key not null,
-bfr_bug int not null,
-bfr_revision int not null,
-bfr_action nvarchar(8) null,
-bfr_file nvarchar(400) null,
-bfr_date datetime not null
+svnrev_id int identity primary key not null,
+svnrev_revision int not null,
+svnrev_bug int not null,
+svnrev_repository nvarchar(400) not null,
+svnrev_author nvarchar(100) not null,
+svnrev_svn_date nvarchar(100) not null,
+svnrev_btnet_date datetime not null,
+svnrev_msg ntext not null
 )
+
+create index svn_bug_index on svn_revisions (svnrev_bug)
+
+
+/* SVN AFFECTED PATH */
+
+create table svn_affected_paths
+(
+svnap_id int identity primary key not null,
+svnap_svnrev_id int not null,
+svnap_action nvarchar(8) not null,
+svnap_path nvarchar(400) not null
+)
+
+create index svn_revision_index on svn_affected_paths (svnap_svnrev_id)
+
+
+
 
 
 /* REPORTS */

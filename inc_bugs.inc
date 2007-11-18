@@ -377,7 +377,6 @@ void display_bugs(bool show_checkbox)
 
 	}}
 
-	Response.Write ("<td class=bugh>edit</td>");
 	Response.Write ("</tr>\n<tr>");
 
 	////////////////////////////////////////////////////////////////////
@@ -495,7 +494,6 @@ void display_bugs(bool show_checkbox)
 
 	}}
 
-	Response.Write ("<td class=bugf>&nbsp;</td>");
 	Response.Write ("</tr>\n");
 
 	string class_or_color = "class=bugd";
@@ -609,7 +607,6 @@ void display_bugs(bool show_checkbox)
 			}
 		}
 
-		Response.Write ("<td class=bugd><a href=edit_bug.aspx?id=" + Convert.ToString(dr[1]) + ">edit</a></td>");
 		Response.Write ("</tr>");
 
 		j++;

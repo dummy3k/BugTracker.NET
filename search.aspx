@@ -496,7 +496,7 @@ void load_drop_downs()
 <title id="titl" runat="server">btnet search</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
-<link rel="StyleSheet" href="btnet_search.css" type="text/css">
+<link rel="StyleSheet" href="custom/btnet_search.css" type="text/css">
 
 <script type="text/javascript" language="JavaScript" src="overlib_mini.js"></script>
 <script type="text/javascript" language="JavaScript" src="calendar.js"></script>
@@ -1423,5 +1423,5 @@ else
 <input type="hidden" name="sql_text" value="">
 </form>
 
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>

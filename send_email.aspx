@@ -1,5 +1,6 @@
 <%@ Page language="C#" validateRequest="false" %>
 <%@ Register TagPrefix="FCKeditorV2" Namespace="FredCK.FCKeditorV2" Assembly="FredCK.FCKeditorV2" %>
+<%@ Import Namespace="System.IO" %>
 <!--
 Copyright 2002-2007 Corey Trager
 Distributed under the terms of the GNU General Public License
@@ -71,6 +72,7 @@ void Page_Load(Object sender, EventArgs e)
 				bp_email_from,
 				bp_date,
 				bp_type,
+                bp_content_type,				
 				bg_project,
 				isnull(us_signature,'') [us_signature],
 				isnull(pj_pop3_email_from,'') [pj_pop3_email_from],
@@ -213,7 +215,18 @@ void Page_Load(Object sender, EventArgs e)
 					{
 						if (security.this_use_fckeditor)
 						{
+                            if (Convert.ToString(dr["bp_content_type"]) != "text/html") 
+                            {
 							fckeBody.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
+						}
+						else
+						{
+                                if (i == 0) 
+                                {
+                                    fckeBody.Value += "<hr>";
+                                }
+                                fckeBody.Value += lines[i];
+                            }
 						}
 						else
 						{
@@ -232,7 +245,7 @@ void Page_Load(Object sender, EventArgs e)
                 foreach (DataRowView drv in dv)
                 {
                     attachments_label.InnerText = "Select attachments to forward:";
-                    lstAttachments.Items.Add(new ListItem(drv["bp_file"].ToString(),drv["bg_id"].ToString() + "_" + drv["bp_id"].ToString() + "_" + drv["bp_file"].ToString()));
+                    lstAttachments.Items.Add(new ListItem(drv["bp_file"].ToString(), drv["bp_id"].ToString()));
                 }
 
 			}
@@ -419,7 +432,7 @@ void on_update(object Source, EventArgs e)
 
 	int comment_id = Convert.ToInt32(dbutil.execute_scalar(sql));
 
-	string[] attachments = handle_attachments(comment_id);
+	int[] attachments = handle_attachments(comment_id);
 
 	string body_text;
 	System.Web.Mail.MailFormat format;
@@ -500,21 +513,9 @@ void on_update(object Source, EventArgs e)
 
 
 ///////////////////////////////////////////////////////////////////////
-string[] handle_attachments(int comment_id)
+int[] handle_attachments(int comment_id)
 {
-	string real_filename = "";
     ArrayList attachments = new ArrayList();
-
-    string upload_folder;
-    try
-	{
-        upload_folder = btnet.Util.get_upload_folder();
-    }
-    catch (Exception e)
-    {
-        msg.InnerText = e.Message;
-        return null;
-	}
 
     string filename = System.IO.Path.GetFileName(attached_file.PostedFile.FileName);
     if (filename != "")
@@ -536,54 +537,24 @@ string[] handle_attachments(int comment_id)
 			return null;
 		}
 
-
-		System.IO.FileInfo fi = new System.IO.FileInfo("filename");
-		int bp_id = save_attachment(comment_id, filename, content_length, fi.Extension);
-
-		real_filename = upload_folder + "\\" + bg_id.Value + "_"  // bug id
-		+ bp_id + "_"   // attachment id
-		+ filename;
-
-		// save to disk
-		attached_file.PostedFile.SaveAs(real_filename);
-		attachments.Add(real_filename);
+        int bp_id = Bug.insert_post_attachment(Convert.ToInt32(bg_id.Value), attached_file.PostedFile.InputStream, content_length, filename, "email attachment", file_extension_to_content_type(Path.GetExtension(filename)), comment_id, false, false);
+        attachments.Add(bp_id);
 	}
 
     //attachments to forward
-    string source_filename;
-    string dest_filename;
 
     foreach (ListItem item_attachment in lstAttachments.Items)
 	{
         if (item_attachment.Selected)
         {
+            int bp_id = Convert.ToInt32(item_attachment.Value);
 
-            filename = item_attachment.Value;
-
-            source_filename = upload_folder + "\\" + filename;
-
-            int pos = filename.IndexOf("_");
-            if (pos > -1)
-            {
-                pos = filename.IndexOf("_", pos + 1);
-                if (pos > -1)
-                {
-                    filename = filename.Substring(pos + 1);
-                }
-			}
-
-			System.IO.FileInfo fi = new System.IO.FileInfo(source_filename);
-			int bp_id = save_attachment(comment_id, filename, Convert.ToInt32(fi.Length), fi.Extension);
-			filename = bg_id.Value + "_" + bp_id + "_" + filename;
-			dest_filename = upload_folder + "\\" + filename;
-			System.IO.File.Copy(source_filename, dest_filename);
-
-
-			attachments.Add(dest_filename);
+            Bug.insert_post_attachment_copy(Convert.ToInt32(bg_id.Value), bp_id, "email attachment", comment_id, false, false);
+            attachments.Add(bp_id);
         }
     }
 
-    return (string[])attachments.ToArray(System.Type.GetType("System.String"));
+    return (int[])attachments.ToArray(typeof(int));
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -748,10 +719,11 @@ function findPosY(obj)
 
 	<tr>
 	<td class=lbl>From:</td>
-	<td>
 
+    <td>
 	<asp:DropDownList id="from" runat="server">
 	</asp:DropDownList>
+	</td>
 
 	<td runat="server" class=err id="from_err">&nbsp;</td>
 	</tr>
@@ -821,14 +793,14 @@ function findPosY(obj)
 	<tr>
 	<td colspan=2 align=center>
 	<input runat="server" class=btn type=submit id="sub" value="Send" OnServerClick="on_update">
-	<td>&nbsp</td>
 	</td>
+	<td>&nbsp;</td>
 	</tr>
-	</td></tr></table>
-
+    </table>
 	<input type=hidden id="bg_id" runat="server">
 </form>
-</td></tr></table></div>
+</table>
+</div>
 
 <div id=addrs class=frm style="display: none; position:absolute;">
 
@@ -899,5 +871,5 @@ function findPosY(obj)
 	</select>
 </div>
 
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>

@@ -483,14 +483,14 @@ void Page_Load(Object sender, EventArgs e)
 				+ "</a>&nbsp;&nbsp;&nbsp;&nbsp;<span class=smallnote>(save changes first)</span>";
 			toggle_history.InnerHtml = toggle_history_link;
 
-			string history_link = "<a href=javascript:open_popup('view_bug_history.aspx?id="
+			string history_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=view_bug_history.aspx?id="
 				+ Convert.ToString(id)
-				+ "')>history</a>";
+				+ ">history</a>";
 			history.InnerHtml = history_link;
 
-			string subscribers_link = "<a href=javascript:open_popup('view_subscribers.aspx?id="
+			string subscribers_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=view_subscribers.aspx?id="
 				+ Convert.ToString(id)
-				+ "')>subscribers</a>";
+				+ ">subscribers</a>";
 			subscribers.InnerHtml = subscribers_link;
 
 			int relationship_cnt = 0;
@@ -498,10 +498,28 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				relationship_cnt = (int) dr["relationship_cnt"];
 			}
-			string relationships_link = "<a href=javascript:open_popup('relationships.aspx?id="
+			string relationships_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=relationships.aspx?id="
 				+ Convert.ToString(id)
-				+ "')>relationships (<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
+				+ ">relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
 			relationships.InnerHtml = relationships_link;
+
+			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")
+			{
+				int revision_cnt = 0;
+				if (id != 0)
+				{
+					revision_cnt = (int) dr["revision_cnt"];
+				}
+				string revisions_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=view_svn_file_revisions.aspx?id="
+					+ Convert.ToString(id)
+				+ ">revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
+				revisions.InnerHtml = revisions_link;
+			}
+			else
+			{
+				revisions.InnerHtml = "";
+			}
+
 
 			if ((string) dr["last_updated_user"] != "")
 			{
@@ -987,6 +1005,7 @@ void load_drop_downs()
 	// do a batch of sql statements
 	DataSet ds_dropdowns = dbutil.get_dataset(sql);
 
+/*
 	// if no projects, then don't allow user to add
 	if (ds_dropdowns.Tables[0].Rows.Count == 0)
 	{
@@ -1001,7 +1020,7 @@ void load_drop_downs()
 		Response.Write("</a>");
 		Response.End();
 	}
-
+*/
 	project.DataSource = ds_dropdowns.Tables[0];
 	project.DataTextField = "pj_name";
 	project.DataValueField = "pj_id";
@@ -1306,20 +1325,20 @@ bool record_changes()
 		sql += base_sql.Replace(
 			"$3",
 			"changed "
-			+ Request["label_pcd1"]
-			+ " from \"" + prev_pcd1.Value  + "\" to \"" + Request["pcd1"] + "\"");
+			+ Request["label_pcd1"].Replace("'","''")
+            + " from \"" + prev_pcd1.Value + "\" to \"" + Request["pcd1"].Replace("'","''") + "\"");
 
 		prev_pcd1.Value = Request["pcd1"];
 	}
-	if (Request["pcd2"] != null && prev_pcd2.Value != Request["pcd2"])
+    if (Request["pcd2"] != null && prev_pcd2.Value != Request["pcd2"].Replace("'","''"))
 	{
 
 		do_update = true;
 		sql += base_sql.Replace(
 			"$3",
 			"changed "
-			+ Request["label_pcd2"]
-			+ " from \"" + prev_pcd2.Value  + "\" to \"" + Request["pcd2"] + "\"");
+			+ Request["label_pcd2"].Replace("'","''")
+            + " from \"" + prev_pcd2.Value + "\" to \"" + Request["pcd2"].Replace("'","''") + "\"");
 
 		prev_pcd2.Value = Request["pcd2"];
 	}
@@ -1330,8 +1349,8 @@ bool record_changes()
 		sql += base_sql.Replace(
 			"$3",
 			"changed "
-			+ Request["label_pcd3"]
-			+ " from \"" + prev_pcd3.Value  + "\" to \"" + Request["pcd3"] + "\"");
+			+ Request["label_pcd3"].Replace("'","''")
+            + " from \"" + prev_pcd3.Value + "\" to \"" + Request["pcd3"].Replace("'","''") + "\"");
 
 		prev_pcd3.Value = Request["pcd3"];
 	}
@@ -1527,7 +1546,8 @@ void on_update (Object sender, EventArgs e)
 	// save for next bug
 	Session["project"] = project.SelectedItem.Value;
 
-	bool only_action_was_private_comment = false;
+	bool bug_fields_have_changed = false;
+    bool bugpost_fields_have_changed = false;
 
 	if (good)
 	{
@@ -1785,7 +1805,7 @@ void on_update (Object sender, EventArgs e)
 					format_last_update_text(last_update_date);
 					btnet.Bug.auto_subscribe(id, Convert.ToInt32(new_project));
 					format_subcribe_cancel_link();
-					only_action_was_private_comment = !(record_changes());
+                    bug_fields_have_changed = record_changes();
 				}
 				else
 				{
@@ -1802,11 +1822,11 @@ void on_update (Object sender, EventArgs e)
 			} // permission_level = 3 or not
 
 
-			btnet.Bug.insert_comment(id, security.this_usid, commentText, null, commentType, internal_only.Checked);
+            bugpost_fields_have_changed = (btnet.Bug.insert_comment(id, security.this_usid, commentText, null, commentType, internal_only.Checked) != 0);
 
 
 			string result = "";
-			if (!only_action_was_private_comment)
+			if (bug_fields_have_changed || (bugpost_fields_have_changed && !internal_only.Checked))
 			{
 				result = btnet.Bug.send_notifications(btnet.Bug.UPDATE,
 					id,
@@ -1862,12 +1882,11 @@ void on_update (Object sender, EventArgs e)
 <title id=titl runat="server">add new</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
-<link rel="StyleSheet" href="btnet_edit_bug.css" type="text/css">
+<link rel="StyleSheet" href="custom/btnet_edit_bug.css" type="text/css">
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
 <script type="text/javascript" language="JavaScript" src="overlib_mini.js"></script>
 <script type="text/javascript" language="JavaScript" src="calendar.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
-
 
 <script>
 var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditBugPage","0")); %>'
@@ -1876,15 +1895,6 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 
 </head>
 <body>
-<div id="popup_div" class=popup_div>
-	<div id="popup_bar"  style='text-align: right;'>
-		<a href="#" onclick="close_popup();">close [x]</a>&nbsp;&nbsp;<br>
-	</div>
-	<div>
-		<iframe frameborder=0 class=popup_iframe id="popup_iframe" name="popup_iframe" src="dummy.html">
-		</iframe>
-	</div>
-</div>
 <% security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs")); %>
 
 <div id="overDiv" style="position:absolute;visibility:hidden; z-index:1000;"></div>
@@ -1919,9 +1929,8 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 	<span id="last_changed" runat="server" class=pst></span>
 	<td align=right>
 	<span id="history" runat="server"></span>
-	&nbsp;&nbsp;&nbsp;&nbsp;
 	<span id="relationships" runat="server"></span>
-	&nbsp;&nbsp;&nbsp;&nbsp;
+	<span id="revisions" runat="server"></span>
 	<span id="subscribers" runat="server"></span>
 	</td>
 	</tr>
@@ -2437,5 +2446,5 @@ if (id != 0)
 
 </table>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>

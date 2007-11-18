@@ -94,7 +94,7 @@ or
 <a id="confirm_href" runat="server" href="">confirm delete</a>
 </a>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

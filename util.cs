@@ -284,26 +284,17 @@ namespace btnet
 		public void write_menu(HttpResponse Response, string this_link)
 		{
 
+			// topmost visible HTML
+			string custom_header = (string) Util.context.Application["custom_header"];
+			Response.Write(custom_header);
+
 			Response.Write("<table border=0 width=100% cellpadding=0 cellspacing=0 class=menubar><tr>");
 
 			// logo
-			string logo = Util.get_setting("LogoHtml","");
+			string logo = (string) Util.context.Application["custom_logo"];
+			Response.Write(logo);
 
-			if (logo == "")
-			{
-				Response.Write("<td width=100 valign=middle>");
-				Response.Write("<a href=http://ifdefined.com/bugtrackernet.html><div class=logo>");
-				Response.Write(Util.get_setting("AppTitle","BugTracker.NET"));
-				Response.Write("</div></a>");
-				Response.Write("</td>");
-				Response.Write("<td width=20>&nbsp;</td>");
-				//Response.Write("</td>");
-			}
-			else
-			{
-				Response.Write(logo);
-			}
-
+			Response.Write("<td width=20>&nbsp;</td>");
 			write_menu_item(Response, this_link, Util.get_setting("PluralBugLabel","bugs"), "bugs.aspx");
 			write_menu_item(Response, this_link, "search", "search.aspx");
 			write_menu_item(Response, this_link, "queries", "queries.aspx");
@@ -341,7 +332,7 @@ namespace btnet
 					Util.get_setting("CustomMenuLinkUrl",""));
 			}
 
-			write_menu_item(Response, this_link, "about", "about.aspx");
+			write_menu_item(Response, this_link, "about", "about.html");
 
 			// go to
 			Response.Write("<td nowrap valign=middle>");
@@ -928,10 +919,11 @@ namespace btnet
 		///////////////////////////////////////////////////////////////////////
 		public static string get_upload_folder()
 		{
+            String folder = Util.get_setting("UploadFolder", "");
+            if (folder == "")
+                return null;
 
-			string folder = get_absolute_or_relative_folder(
-				Util.get_setting("UploadFolder","c:\\"));
-
+            folder = get_absolute_or_relative_folder(folder);
 			if (!System.IO.Directory.Exists(folder))
 			{
 				throw (new Exception("UploadFolder specified in Web.config, \""
@@ -1124,6 +1116,108 @@ namespace btnet
         }
 
 
+		///////////////////////////////////////////////////////////////////////
+		public static string run_svn(string args_without_password, string svn_username, string svn_password)
+		{
+			// run "svn.exe" and capture its output
+
+			System.Diagnostics.Process p = new System.Diagnostics.Process();
+			string svn_path = Util.get_setting("SubversionPathToSvn", "svn");
+			p.StartInfo.FileName = svn_path;
+			p.StartInfo.UseShellExecute = false;
+			p.StartInfo.RedirectStandardOutput = true;
+			p.StartInfo.RedirectStandardError = true;
+
+			args_without_password += " --non-interactive";
+			Util.write_to_log ("Subversion command:" + svn_path + " " + args_without_password);
+
+			string args_with_password = args_without_password;
+
+			if (svn_username != "")
+			{
+				args_with_password += " --username ";
+				args_with_password += svn_username;
+				args_with_password += " --password ";
+				args_with_password += svn_password;
+			}
+
+			p.StartInfo.Arguments = args_with_password;
+			p.Start();
+			string stdout = p.StandardOutput.ReadToEnd();
+			p.WaitForExit();
+			stdout += p.StandardOutput.ReadToEnd();
+
+			string error = p.StandardError.ReadToEnd();
+
+			if (error != "")
+			{
+				Util.write_to_log(error);
+				Util.write_to_log(stdout);
+			}
+
+			if (error != "")
+            {
+                string msg = "ERROR:";
+                msg += "<div style='color:red; font-weight: bold; font-size: 10pt;'>";
+                msg += "<br>Error executing svn.exe command from web server.";
+                msg += "<br>" + error;
+                msg += "<br>Arguments passed to svn.exe (except user/password):" + args_without_password;
+                if (error.Contains("File not found"))
+                {
+                    msg += "<br><br>***** Has this file been deleted or renamed? See the following links:";
+                    msg += "<br><a href=http://svn.collab.net/repos/svn/trunk/doc/user/svn-best-practices.html>http://svn.collab.net/repos/svn/trunk/doc/user/svn-best-practices.html</a>";
+                    msg += "<br><a href=http://subversion.open.collab.net/articles/best-practices.html>http://subversion.open.collab.net/articles/best-practices.html</a>";
+                    msg += "</div>";
+                }
+                return msg;
+            }
+			else
+            {
+				return stdout;
+            }
+		}
+
+		public static void get_subversion_connection_info(
+			DbUtil dbutil,
+			int bugid,
+    		ref string repository_url,
+    		ref string svn_username,
+    		ref string svn_password,
+    		ref string websvn_url)
+    	{
+			repository_url = Util.get_setting("SubversionRepositoryUrl","");
+			svn_username = Util.get_setting("SubversionUsername","");
+			svn_password = Util.get_setting("SubversionPassword","");
+			websvn_url = Util.get_setting("WebSvnUrl","");
+
+			string sql = @"
+			select isnull(pj_subversion_repository_url,'') [pj_subversion_repository_url],
+			isnull(pj_subversion_username,'') [pj_subversion_username],
+			isnull(pj_subversion_password,'') [pj_subversion_password],
+			isnull(pj_websvn_url,'') [pj_websvn_url]
+			from projects
+			inner join bugs on pj_id = bg_project
+			where bg_id = $bg";
+
+			sql = sql.Replace("$bg",Convert.ToString(bugid));
+			DataRow dr = dbutil.get_datarow(sql);
+
+			if (dr == null)
+			{
+				return;
+			}
+
+			if ((string) dr["pj_subversion_repository_url"] != "")
+			{
+				repository_url = (string) dr["pj_subversion_repository_url"] ;
+				svn_username = (string) dr["pj_subversion_username"] ;
+				svn_password = (string) dr["pj_subversion_password"] ;
+				websvn_url = (string) dr["pj_websvn_url"] ;
+			}
+
+
+		}
+
 
 	} // end Util
 
@@ -1207,16 +1301,14 @@ namespace btnet
 			{
 
 				if ((edit_url != "" || delete_url != "")
-				&& db_column_count == 0) // (ds.Tables[0].Columns.Count - 1))
+				&& db_column_count == (ds.Tables[0].Columns.Count - 1))
 				{
 					if (edit_url != "")
 					{
-						db_column_count++;
 						r.Write ("<td class=datah valign=bottom>edit</td>");
 					}
 					if (delete_url != "")
 					{
-						db_column_count++;
 						r.Write ("<td class=datah valign=bottom>delete</td>");
 					}
 
@@ -1240,19 +1332,29 @@ namespace btnet
 					}
 
 					r.Write ("<td class=datah valign=bottom>\n");
-					string s = "<a href='javascript: sort_by_col($col, \"$type\")'>";
-					s = s.Replace("$col", Convert.ToString(db_column_count));
-					s = s.Replace("$type", datatype);
-					r.Write (s);
-					r.Write (dc.ColumnName);
-					r.Write ("</a>");
-					//r.Write ("<br>");
+
+					if (dc.ColumnName.StartsWith("$no_sort_"))
+					{
+						r.Write(dc.ColumnName.Replace("$no_sort_",""));
+					}
+					else
+					{
+						string sortlink = "<a href='javascript: sort_by_col($col, \"$type\")'>";
+						sortlink = sortlink.Replace("$col", Convert.ToString(db_column_count));
+						sortlink = sortlink.Replace("$type", datatype);
+						r.Write (sortlink);
+						r.Write (dc.ColumnName);
+						r.Write ("</a>");
+					}
+
+					//r.Write ("<br>"); // for debugging
 					//r.Write (dc.DataType);
+
 					r.Write ("</td>\n");
-					db_column_count++;
 
 				}
 
+				db_column_count++;
 
 			}
 			r.Write ("</tr>\n");
@@ -1279,7 +1381,7 @@ namespace btnet
 					string datatype = ds.Tables[0].Columns[i].DataType.ToString();
 
 					if ((edit_url != "" || delete_url != "")
-					&& i == 0) // (ds.Tables[0].Columns.Count - 1))
+					&& i == (ds.Tables[0].Columns.Count - 1))
 					{
 						if (edit_url != "")
 						{
@@ -1377,6 +1479,29 @@ namespace btnet
 		}
 
 		///////////////////////////////////////////////////////////////////////
+        public object execute_scalar(SqlCommand cmd)
+        {
+            log_command(cmd);
+
+            using (SqlConnection conn = get_sqlconnection())
+            {
+                try
+                {
+                    cmd.Connection = conn;
+                    object returnValue;
+                    conn.Open();
+                    returnValue = cmd.ExecuteScalar();
+                    conn.Close();
+                    return returnValue;
+                }
+                finally
+                {
+                    cmd.Connection = null;
+                }
+            }
+        }
+
+		///////////////////////////////////////////////////////////////////////
 		public void execute_nonquery(string sql)
 		{
 
@@ -1393,6 +1518,74 @@ namespace btnet
 				conn.Close();
 			}
 		}
+
+		///////////////////////////////////////////////////////////////////////
+        public void execute_nonquery(SqlCommand cmd)
+        {
+            log_command(cmd);
+
+            using (SqlConnection conn = get_sqlconnection())
+            {
+                try
+                {
+                    cmd.Connection = conn;
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    conn.Close();
+                }
+                finally
+                {
+                    cmd.Connection = null;
+                }
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        public SqlDataReader execute_reader(string sql, CommandBehavior behavior)
+        {
+            if (Util.get_setting("LogSqlEnabled", "1") == "1")
+            {
+                Util.write_to_log("sql=\n" + sql);
+            }
+
+            SqlConnection conn = get_sqlconnection();
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    conn.Open();
+                    return cmd.ExecuteReader(behavior | CommandBehavior.CloseConnection);
+                }
+            }
+            catch
+            {
+                conn.Close();
+                throw;
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        public SqlDataReader execute_reader(SqlCommand cmd, CommandBehavior behavior)
+        {
+            log_command(cmd);
+
+            SqlConnection conn = get_sqlconnection();
+            try
+            {
+                cmd.Connection = conn;
+                conn.Open();
+                return cmd.ExecuteReader(behavior | CommandBehavior.CloseConnection);
+            }
+            catch
+            {
+                conn.Close();
+                throw;
+            }
+            finally
+            {
+                cmd.Connection = null;
+            }
+        }
 
 		///////////////////////////////////////////////////////////////////////
 		public DataSet get_dataset(string sql)
@@ -1442,6 +1635,37 @@ namespace btnet
 				return ds.Tables[0].Rows[0];
 			}
 		}
+
+        ///////////////////////////////////////////////////////////////////////
+        public void log_command(SqlCommand cmd)
+        {
+            if (Util.get_setting("LogSqlEnabled", "1") == "1")
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append("sql=\n" + cmd.CommandText);
+                foreach (SqlParameter param in cmd.Parameters)
+                {
+                    sb.Append("\n  ");
+                    sb.Append(param.ParameterName);
+                    sb.Append("=");
+                    if (param.Value == null || Convert.IsDBNull(param.Value))
+                    {
+                        sb.Append("null");
+                    }
+                    else if (param.SqlDbType == SqlDbType.Text || param.SqlDbType == SqlDbType.Image)
+                    {
+                        sb.Append("...");
+                    }
+                    else
+                    {
+                        sb.Append("\"");
+                        sb.Append(param.Value);
+                        sb.Append("\"");
+                    }
+                }
+                Util.write_to_log(sb.ToString());
+            }
+        }
 
 	} // end DbUtil
 
@@ -2141,10 +2365,11 @@ namespace btnet
             string body,
             System.Web.Mail.MailFormat body_format,
             System.Web.Mail.MailPriority priority,
-            string[] attachments,
+            int[] attachment_bpids,
             bool return_receipt)
         {
             ArrayList files_to_delete = new ArrayList();
+            ArrayList directories_to_delete = new ArrayList();
             System.Web.Mail.MailMessage msg = new System.Web.Mail.MailMessage();
             msg.To = to;
             msg.From = from;
@@ -2217,50 +2442,39 @@ namespace btnet
 			}
 
             string email_path = "";
-            if (attachments != null)
-            {
-                foreach (string attachment in attachments)
+            if (attachment_bpids != null)
                 {
-                    // remove the bug and attachment prefixes from the filename
-                    string attachment_file_file = System.IO.Path.GetFileName(attachment);
+                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                Directory.CreateDirectory(tempDirectory);
+                directories_to_delete.Add(tempDirectory);
 
-                    int pos = attachment_file_file.IndexOf("_");
-                    if (pos > -1)
+                foreach (int attachment_bpid in attachment_bpids)
                     {
-                        pos = attachment_file_file.IndexOf("_", pos + 1);
-                        if (pos > -1)
+                    byte[] buffer = new byte[16 * 1024];
+                    string dest_path_and_filename;
+                    Bug.BugPostAttachment bpa = Bug.get_bug_post_attachment(attachment_bpid);
+                    using (bpa.content)
                         {
-                            email_path = System.IO.Path.GetDirectoryName(attachment)
-                                + "\\" + attachment_file_file.Substring(pos + 1);
-                        }
-                    }
-
-
-                    System.Web.Mail.MailAttachment mail_attachment;
-
-                    // use the file without the attachment prefixes
-                    if (email_path != "")
+                        dest_path_and_filename = Path.Combine(tempDirectory, bpa.file);
+                        using (FileStream out_stream = new FileStream(dest_path_and_filename, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                     {
+                            int bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
+                            while (bytes_read != 0)
+                            {
+                                out_stream.Write(buffer, 0, bytes_read);
 
-                        System.IO.File.Copy(attachment, email_path);
-                        files_to_delete.Add(email_path);
-
-                        mail_attachment = new System.Web.Mail.MailAttachment(
-                            email_path,
-                            System.Web.Mail.MailEncoding.Base64);
-                        msg.Attachments.Add(mail_attachment);
-                        // intentionally not deleting file here - see below
+                                bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
                     }
-                    else
-                    {
-                        mail_attachment = new System.Web.Mail.MailAttachment(
-                            attachment,
-                            System.Web.Mail.MailEncoding.Base64);
-                        msg.Attachments.Add(mail_attachment);
                     }
 
                 }
 
+                    System.Web.Mail.MailAttachment mail_attachment = new System.Web.Mail.MailAttachment(
+                        dest_path_and_filename,
+                        System.Web.Mail.MailEncoding.Base64);
+                    msg.Attachments.Add(mail_attachment);
+                    files_to_delete.Add(dest_path_and_filename);
+                }
             }
 
 
@@ -2274,7 +2488,15 @@ namespace btnet
                 {
                     foreach (string file in files_to_delete)
                     {
-                        System.IO.File.Delete(file);
+                        File.Delete(file);
+                    }
+                }
+
+                if (directories_to_delete.Count > 0)
+                {
+                    foreach (string directory in directories_to_delete)
+                    {
+                        Directory.Delete(directory);
                     }
                 }
 
@@ -2396,6 +2618,8 @@ namespace btnet
 
             DbUtil dbutil = new DbUtil();
             DataSet ds = dbutil.get_dataset(sql);
+            if (upload_folder != null)
+            {
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
 
@@ -2413,10 +2637,12 @@ namespace btnet
                 }
 
             }
+            }
 
             // delete the database entries
 
-            sql = @"delete from bug_posts where bp_bug = $bg
+            sql = @"delete bug_post_attachments from bug_post_attachments inner join bug_posts on bug_post_attachments.bpa_post = bug_posts.bp_id where bug_posts.bp_bug = $bg
+                delete from bug_posts where bp_bug = $bg
 				delete from bug_subscriptions where bs_bug = $bg
 				delete from bug_relationships where re_bug1 = $bg
 				delete from bug_relationships where re_bug2 = $bg
@@ -2426,6 +2652,261 @@ namespace btnet
             dbutil.execute_nonquery(sql);
 
 
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        public static int insert_post_attachment_copy(int bugid, int copy_bpid, string comment, int parent, bool hidden_from_external_users, bool send_notifications)
+        {
+            return insert_post_attachment(bugid, null, -1, copy_bpid, null, comment, null, parent, hidden_from_external_users, send_notifications);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        public static int insert_post_attachment(int bugid, Stream content, int content_length, string file, string comment, string content_type, int parent, bool hidden_from_external_users, bool send_notifications)
+        {
+            return insert_post_attachment(bugid, content, content_length, -1, file, comment, content_type, parent, hidden_from_external_users, send_notifications);
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        private static int insert_post_attachment(int bugid, Stream content, int content_length, int copy_bpid, string file, string comment, string content_type, int parent, bool hidden_from_external_users, bool send_notifications)
+        {
+            // Note that this method does not perform any security check nor does
+            // it check that content_length is less than MaxUploadSize.
+            // These are left up to the caller.
+
+            DbUtil dbutil = new DbUtil();
+            Security security = new Security();
+            string upload_folder = Util.get_upload_folder();
+            string sql;
+            bool store_attachments_in_database = (Util.get_setting("StoreAttachmentsInDatabase", "0") == "1");
+            string effective_file = file;
+            int effective_content_length = content_length;
+            string effective_content_type = content_type;
+            Stream effective_content = null;
+
+            try
+            {
+                // Determine the content. We may be instructed to copy an existing
+                // attachment via copy_bpid, or a Stream may be provided as the content parameter.
+
+                if (copy_bpid != -1)
+                {
+                    BugPostAttachment bpa = get_bug_post_attachment(copy_bpid);
+
+                    effective_content = bpa.content;
+                    effective_file = bpa.file;
+                    effective_content_length = bpa.content_length;
+                    effective_content_type = bpa.content_type;
+                }
+                else
+                {
+                    effective_content = content;
+                    effective_file = file;
+                    effective_content_length = content_length;
+                    effective_content_type = content_type;
+                }
+
+                // Insert a new post into bug_posts.
+
+                sql = @"insert into bug_posts
+			            (bp_type, bp_bug, bp_file, bp_comment, bp_size, bp_date, bp_user, bp_content_type, bp_parent, bp_hidden_from_external_users)
+			            values ('file', $bg, N'$fi', N'$de', $si, getdate(), $us, N'$ct', $pa, $internal)
+			            select scope_identity()";
+
+                sql = sql.Replace("$bg", Convert.ToString(bugid));
+                sql = sql.Replace("$fi", effective_file.Replace("'", "''"));
+                sql = sql.Replace("$de", comment.Replace("'", "''"));
+                sql = sql.Replace("$si", Convert.ToString(effective_content_length));
+                sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+                sql = sql.Replace("$ct", effective_content_type.Replace("'", "''"));
+                if (parent == -1)
+                {
+                    sql = sql.Replace("$pa", "null");
+                }
+                else
+                {
+                    sql = sql.Replace("$pa", Convert.ToString(parent));
+                }
+                sql = sql.Replace("$internal", btnet.Util.bool_to_string(hidden_from_external_users));
+
+                int bp_id = Convert.ToInt32(dbutil.execute_scalar(sql));
+
+                try
+                {
+                    // Store attachment in bug_post_attachments table.
+
+                    if (store_attachments_in_database)
+                    {
+                        byte[] data = new byte[effective_content_length];
+                        int bytes_read = 0;
+
+                        while (bytes_read < effective_content_length)
+                        {
+                            int bytes_read_this_iteration = effective_content.Read(data, bytes_read, effective_content_length - bytes_read);
+                            if (bytes_read_this_iteration == 0)
+                            {
+                                throw new Exception("Unexpectedly reached the end of the stream before all data was read.");
+                            }
+                            bytes_read += bytes_read_this_iteration;
+                        }
+
+                        sql = @"insert into bug_post_attachments
+                                (bpa_post, bpa_content)
+                                values (@bp, @bc)";
+                        using (SqlCommand cmd = new SqlCommand(sql))
+                        {
+                            cmd.Parameters.AddWithValue("@bp", bp_id);
+                            cmd.Parameters.Add("@bc", SqlDbType.Image).Value = data;
+                            dbutil.execute_nonquery(cmd);
+                        }
+                    }
+                    else
+                    {
+                        // Store attachment in UploadFolder.
+
+                        if (upload_folder == null)
+                        {
+                            throw new Exception("StoreAttachmentsInDatabase is false and UploadFolder is not set in web.config.");
+                        }
+
+                        // Copy the content Stream to a file in the upload_folder.
+                        byte[] buffer = new byte[16384];
+                        int bytes_read = 0;
+                        using (FileStream fs = new FileStream(upload_folder + "\\" + bugid + "_" + bp_id + "_" + effective_file, FileMode.CreateNew, FileAccess.Write))
+                        {
+                            while (bytes_read < effective_content_length)
+                            {
+                                int bytes_read_this_iteration = effective_content.Read(buffer, 0, buffer.Length);
+                                if (bytes_read_this_iteration == 0)
+                                {
+                                    throw new Exception("Unexpectedly reached the end of the stream before all data was read.");
+                                }
+                                fs.Write(buffer, 0, bytes_read_this_iteration);
+                                bytes_read += bytes_read_this_iteration;
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // clean up
+                    sql = @"delete from bug_posts where bp_id = $bp";
+
+                    sql = sql.Replace("$bp", Convert.ToString(bp_id));
+
+                    dbutil.execute_nonquery(sql);
+
+                    throw;
+                }
+
+                if (send_notifications)
+                {
+                    btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security.this_usid, security.this_is_admin);
+                }
+                return bp_id;
+            }
+            finally
+            {
+                // If this procedure "owns" the content (instead of our caller owning it), dispose it.
+                if (effective_content != null && effective_content != content)
+                {
+                    effective_content.Dispose();
+                }
+            }
+        }
+
+        public class BugPostAttachment
+        {
+            public BugPostAttachment(string file, Stream content, int content_length, string content_type)
+            {
+                this.file = file;
+                this.content = content;
+                this.content_length = content_length;
+                this.content_type = content_type;
+            }
+
+            public string file;
+            public Stream content;
+            public int content_length;
+            public string content_type;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        public static BugPostAttachment get_bug_post_attachment(int bp_id)
+        {
+            // Note that this method does not perform any security check.
+            // This is left up to the caller.
+
+            DbUtil dbutil = new DbUtil();
+            string upload_folder = Util.get_upload_folder();
+            string sql;
+            bool store_attachments_in_database = (Util.get_setting("StoreAttachmentsInDatabase", "0") == "1");
+            int bugid;
+            string file;
+            int content_length;
+            string content_type;
+            Stream content = null;
+
+            try
+            {
+                sql = @"select bp_bug, bp_file, bp_size, bp_content_type
+                        from bug_posts
+                        where bp_id = $bp";
+                sql = sql.Replace("$bp", Convert.ToString(bp_id));
+                using (SqlDataReader reader = dbutil.execute_reader(sql, CommandBehavior.CloseConnection))
+                {
+                    if (reader.Read())
+                    {
+                        bugid = reader.GetInt32(reader.GetOrdinal("bp_bug"));
+                        file = reader.GetString(reader.GetOrdinal("bp_file"));
+                        content_length = reader.GetInt32(reader.GetOrdinal("bp_size"));
+                        content_type = reader.GetString(reader.GetOrdinal("bp_content_type"));
+                    }
+                    else
+                    {
+                        throw new Exception("Existing bug post not found.");
+                    }
+                }
+
+                sql = @"select bpa_content
+                            from bug_post_attachments
+                            where bpa_post = $bp";
+                sql = sql.Replace("$bp", Convert.ToString(bp_id));
+
+                object content_object;
+                content_object = dbutil.execute_scalar(sql);
+
+                if (content_object != null && !Convert.IsDBNull(content_object))
+                {
+                    content = new MemoryStream((byte[])content_object);
+                }
+                else
+                {
+                    // Could not find in bug_post_attachments. Try the upload_folder.
+                    if (upload_folder == null)
+                    {
+                        throw new Exception("The attachment could not be found in the database and UploadFolder is not set in web.config.");
+                    }
+
+                    string upload_folder_filename = upload_folder + "\\" + bugid + "_" + bp_id + "_" + file;
+                    if (File.Exists(upload_folder_filename))
+                    {
+                        content = new FileStream(upload_folder_filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    }
+                    else
+                    {
+                        throw new Exception("Attachment not found in database or UploadFolder.");
+                    }
+                }
+
+                return new BugPostAttachment(file, content, content_length, content_type);
+            }
+            catch
+            {
+                if (content != null)
+                    content.Dispose();
+
+                throw;
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -2446,75 +2927,89 @@ namespace btnet
             int this_usid,
             DataSet ds_custom_cols)
         {
-            string sql = @"
-					declare @related int;
-					select @related = count(1)
-						from bug_relationships
-						where re_bug1 = $id;
+            string sql = @" /* get_bug_datarow */
+declare @revision int
+set @revision = 0";
 
-					select bg_id [id],
-					bg_short_desc [short_desc],
-					isnull(ru.us_username,'[deleted user]') [reporter],
-					case rtrim(ru.us_firstname)
-						when null then isnull(ru.us_lastname, '')
-						when '' then isnull(ru.us_lastname, '')
-						else isnull(ru.us_lastname + ', ' + ru.us_firstname,'')
-					end [reporter_fullname],
-					bg_reported_date [reported_date],
-					isnull(lu.us_username,'') [last_updated_user],
-					case rtrim(lu.us_firstname)
-						when null then isnull(lu.us_lastname, '')
-						when '' then isnull(lu.us_lastname, '')
-						else isnull(lu.us_lastname + ', ' + lu.us_firstname,'')
-					end [last_updated_fullname],
+   			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")
+            {
+				sql += @"
+select @revision = count(1)
+	from svn_affected_paths
+	inner join svn_revisions on svnap_svnrev_id = svnrev_id
+	where svnrev_bug = $id;";
+			}
+
+            sql += @"
+declare @related int;
+select @related = count(1)
+	from bug_relationships
+	where re_bug1 = $id;
+
+select bg_id [id],
+bg_short_desc [short_desc],
+isnull(ru.us_username,'[deleted user]') [reporter],
+case rtrim(ru.us_firstname)
+	when null then isnull(ru.us_lastname, '')
+	when '' then isnull(ru.us_lastname, '')
+	else isnull(ru.us_lastname + ', ' + ru.us_firstname,'')
+end [reporter_fullname],
+bg_reported_date [reported_date],
+isnull(lu.us_username,'') [last_updated_user],
+case rtrim(lu.us_firstname)
+	when null then isnull(lu.us_lastname, '')
+	when '' then isnull(lu.us_lastname, '')
+	else isnull(lu.us_lastname + ', ' + lu.us_firstname,'')
+end [last_updated_fullname],
 
 
-					bg_last_updated_date [last_updated_date],
-					isnull(bg_project,0) [project],
-					isnull(pj_name,'[no project]') [current_project],
+bg_last_updated_date [last_updated_date],
+isnull(bg_project,0) [project],
+isnull(pj_name,'[no project]') [current_project],
 
-					isnull(bg_category,0) [category],
-					isnull(ct_name,'') [category_name],
+isnull(bg_category,0) [category],
+isnull(ct_name,'') [category_name],
 
-					isnull(bg_priority,0) [priority],
-					isnull(pr_name,'') [priority_name],
+isnull(bg_priority,0) [priority],
+isnull(pr_name,'') [priority_name],
 
-					isnull(bg_status,0) [status],
-					isnull(st_name,'') [status_name],
+isnull(bg_status,0) [status],
+isnull(st_name,'') [status_name],
 
-					isnull(bg_user_defined_attribute,0) [udf],
-					isnull(udf_name,'') [udf_name],
+isnull(bg_user_defined_attribute,0) [udf],
+isnull(udf_name,'') [udf_name],
 
-					isnull(bg_assigned_to_user,0) [assigned_to_user],
-					isnull(asg.us_username,'[not assigned]') [assigned_to_username],
-					case rtrim(asg.us_firstname)
-						when null then isnull(asg.us_lastname, '[not assigned]')
-						when '' then isnull(asg.us_lastname, '[not assigned]')
-						else isnull(asg.us_lastname + ', ' + asg.us_firstname,'[not assigned]')
-					end [assigned_to_fullname],
+isnull(bg_assigned_to_user,0) [assigned_to_user],
+isnull(asg.us_username,'[not assigned]') [assigned_to_username],
+case rtrim(asg.us_firstname)
+	when null then isnull(asg.us_lastname, '[not assigned]')
+	when '' then isnull(asg.us_lastname, '[not assigned]')
+	else isnull(asg.us_lastname + ', ' + asg.us_firstname,'[not assigned]')
+end [assigned_to_fullname],
 
-					isnull(bs_id,0) [subscribed],
-					isnull(pu_permission_level,$dpl) [pu_permission_level],
+isnull(bs_id,0) [subscribed],
+isnull(pu_permission_level,$dpl) [pu_permission_level],
 
-					isnull(bg_project_custom_dropdown_value1,'') [bg_project_custom_dropdown_value1],
-					isnull(bg_project_custom_dropdown_value2,'') [bg_project_custom_dropdown_value2],
-					isnull(bg_project_custom_dropdown_value3,'') [bg_project_custom_dropdown_value3],
-					@related [relationship_cnt],
-					getdate() [snapshot_timestamp]
-					$custom_cols_placeholder
-					from bugs
-					left outer join user_defined_attribute on bg_user_defined_attribute = udf_id
-					left outer join statuses on bg_status = st_id
-					left outer join priorities on bg_priority = pr_id
-					left outer join categories on bg_category = ct_id
-					left outer join projects on bg_project = pj_id
-					left outer join users asg on bg_assigned_to_user = asg.us_id
-					left outer join users ru on bg_reported_user = ru.us_id
-					left outer join users lu on bg_last_updated_user = lu.us_id
-					left outer join bug_subscriptions on bs_bug = bg_id and bs_user = $us
-					left outer join project_user_xref on pj_id = pu_project
-						and pu_user = $us
-					where bg_id = $id";
+isnull(bg_project_custom_dropdown_value1,'') [bg_project_custom_dropdown_value1],
+isnull(bg_project_custom_dropdown_value2,'') [bg_project_custom_dropdown_value2],
+isnull(bg_project_custom_dropdown_value3,'') [bg_project_custom_dropdown_value3],
+@related [relationship_cnt],
+@revision [revision_cnt],
+getdate() [snapshot_timestamp]
+$custom_cols_placeholder
+from bugs
+left outer join user_defined_attribute on bg_user_defined_attribute = udf_id
+left outer join statuses on bg_status = st_id
+left outer join priorities on bg_priority = pr_id
+left outer join categories on bg_category = ct_id
+left outer join projects on bg_project = pj_id
+left outer join users asg on bg_assigned_to_user = asg.us_id
+left outer join users ru on bg_reported_user = ru.us_id
+left outer join users lu on bg_last_updated_user = lu.us_id
+left outer join bug_subscriptions on bs_bug = bg_id and bs_user = $us
+left outer join project_user_xref on pj_id = pu_project
+	and pu_user = $us
+where bg_id = $id";
 
             if (ds_custom_cols.Tables[0].Rows.Count == 0)
             {

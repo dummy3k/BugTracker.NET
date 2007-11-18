@@ -49,8 +49,32 @@ void Page_Load(Object sender, EventArgs e)
 	string filename = (string) dr["bp_file"];
 	string content_type = (string) dr["bp_content_type"];
 
-	// create path
+    // First, try to find it in the bug_post_attachments table.
+    sql = @"select bpa_content 
+            from bug_post_attachments
+            where bpa_post = @bp";
+
+    bool foundInDatabase = false;
+    String foundAtPath = null;
+    using (SqlCommand cmd = new SqlCommand(sql))
+    {
+        cmd.Parameters.AddWithValue("@bp", id);
+
+        // Use an SqlDataReader so that we can write out the blob data in chunks.
+        
+        using (SqlDataReader reader = dbutil.execute_reader(cmd, CommandBehavior.CloseConnection | CommandBehavior.SequentialAccess))
+        {
+            if (reader.Read()) // Did we find the content in the database?
+            {
+                foundInDatabase = true;
+            }
+            else
+            {
+                // Otherwise, try to find the content in the UploadFolder.
+
 	string upload_folder = Util.get_upload_folder();
+                if (upload_folder != null)
+                {
 	StringBuilder path = new StringBuilder(upload_folder);
 	path.Append("\\");
 	path.Append(Convert.ToString(bug_id));
@@ -61,11 +85,25 @@ void Page_Load(Object sender, EventArgs e)
 
 	if (System.IO.File.Exists(path.ToString()))
 	{
+                        foundAtPath = path.ToString();
+                    }
+                }
+            }
+
+            // We must have found the content in the database or on the disk to proceed.
+
+            if (!foundInDatabase && foundAtPath == null)
+            {
+                Response.Write("File not found:<br>" + filename);
+                return;
+            }
+
+            // Write the ContentType header.
 
 		if (content_type == null || content_type == "")
 		{
 
-			string ext = System.IO.Path.GetExtension(path.ToString()).ToLower();
+                string ext = System.IO.Path.GetExtension(filename).ToLower();
 
 			if (ext == ".txt")
 			{
@@ -108,15 +146,31 @@ void Page_Load(Object sender, EventArgs e)
 			Response.AddHeader ("content-disposition","inline; filename=\"" + filename + "\"");
 		}
 
+            // Write the data.
 
+            if (foundInDatabase)
+            {
+                long totalRead = 0;
+                long dataLength = reader.GetBytes(0, 0, null, 0, 0);
+                byte[] buffer = new byte[16 * 1024];
 
-		Response.WriteFile(path.ToString());
+                while (totalRead < dataLength)
+                {
+                    long bytesRead = reader.GetBytes(0, totalRead, buffer, 0, (int)Math.Min(dataLength - totalRead, buffer.Length));
+                    totalRead += bytesRead;
 
-
+                    Response.OutputStream.Write(buffer, 0, (int)bytesRead);
+                }
+            }
+            else if (foundAtPath != null)
+            {
+                Response.WriteFile(foundAtPath);
 	}
 	else
 	{
-		Response.Write ("File not found:<br>" + path.ToString());
+                Response.Write("File not found:<br>" + filename);
+            }
+        }
 	}
 
 

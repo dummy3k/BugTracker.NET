@@ -7,25 +7,10 @@ function set_relationship_cnt(cnt)
 	el.firstChild.nodeValue = cnt;
 }
 
-
-
-function open_popup(url)
+function open_popup_window(url, title, bugid)
 {
-	close_popup();
-	iframe = window.document.getElementById("popup_iframe");
-	iframe.src=url;
-	popup = window.document.getElementById("popup_div");
-	popup.style.display = "block";
-}
-
-function close_popup()
-{
-
-	popup = window.document.getElementById("popup_div");
-	popup.style.display = "none";
-
-	iframe = window.document.getElementById("popup_iframe");
-	iframe.src="dummy.html";
+	w = window.open(url + '?id=' + bugid, title + bugid, "menubar=0, scrollbars=1, toolbar=0, resizable=1,width=750,height=550")
+	w.focus()
 }
 
 function add_attachment(id)
@@ -86,7 +71,7 @@ function toggle_images(id)
 		var result = confirm('Toggle inline display of images?  Changes here will not be saved.');
 		if (result)
 		{
-			window.document.location = "toggle_images?id=" + id;
+			window.document.location = "toggle_images.aspx?id=" + id;
 		}
 	}
 	else
@@ -102,7 +87,7 @@ function toggle_history(id)
 		var result = confirm('Toggle inline display of history?  Changes here will not be saved.');
 		if (result)
 		{
-			window.document.location = "toggle_history?id=" + id;
+			window.document.location = "toggle_history.aspx?id=" + id;
 		}
 	}
 	else

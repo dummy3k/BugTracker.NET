@@ -100,19 +100,6 @@ could also do it in your favorite db admin tool.
 	1. Change the "admin" password.
 	<p>
 	2. Delete the files "query.aspx" and "install.aspx"
-	<p>
-	3. Set "AllowQueryEditingForNonAdmins" to "0" in Web.config.
-
-	<p>
-	<span style="font-size: 8pt; color: #666666;">
-	Why? Because query.aspx will execute whatever SQL is sent to it under certain
-	conditions. If there is a "users" table in the BugTracker.NET database, it's safe.
-	It will authenticate the user and only allow admins to use it.
-	require the user to be admin. But if there is NOT yet a users table,
-	it will allow anybody to do anything (because if there is NOT a
-	users table, query.aspx is serving as your tool to help you get the
-	app up and running).
-	</span>
 </div>
 
 <p>&nbsp<p>

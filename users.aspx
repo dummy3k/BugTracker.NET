@@ -35,7 +35,9 @@ void Page_Load(Object sender, EventArgs e)
 			where pu_admin = 1;
 
 			select u.us_id [id],
-			'<a href=edit_user.aspx?copy=y&id=' + convert(varchar,u.us_id) + '>copy</a>' [add<br>like<br>this],
+			'<a href=edit_user.aspx?id=' + convert(varchar,u.us_id) + '>edit</a>' [$no_sort_edit],
+			'<a href=edit_user.aspx?copy=y&id=' + convert(varchar,u.us_id) + '>copy</a>' [$no_sort_add<br>like<br>this],
+			'<a href=delete_user.aspx?id=' + convert(varchar,u.us_id) + '>delete</a>' [$no_sort_delete],
 
 			u.us_username [username],
 			isnull(u.us_firstname,'') + ' ' + isnull(u.us_lastname,'') [name],
@@ -55,8 +57,7 @@ void Page_Load(Object sender, EventArgs e)
 			isnull(qu_desc,'') [default query],
 			case when u.us_enable_notifications = 1 then 'Y' else 'N' end [notif-<br>ications],
 
-			u2.us_username [created<br>by],
-			u.us_id [hidden]
+			u2.us_username [created<br>by]
 
 			from users u
 			left outer join queries on u.us_default_query = qu_id
@@ -78,7 +79,10 @@ void Page_Load(Object sender, EventArgs e)
 			where pu_admin = 1;
 
 			select u.us_id [id],
-			'<a href=edit_user.aspx?copy=y&id=' + convert(varchar,u.us_id) + '>copy</a>' [add<br>like<br>this],
+			'<a href=edit_user.aspx?id=' + convert(varchar,u.us_id) + '>edit</a>' [$no_sort_edit],
+			'<a href=edit_user.aspx?copy=y&id=' + convert(varchar,u.us_id) + '>copy</a>' [$no_sort_add<br>like<br>this],
+			'<a href=delete_user.aspx?id=' + convert(varchar,u.us_id) + '>delete</a>' [$no_sort_delete],
+
 			u.us_username [username],
 			isnull(u.us_firstname,'') + ' ' + isnull(u.us_lastname,'') [name],
 			case when u.us_admin = 1 then 'Y' else 'N' end [admin],
@@ -95,9 +99,8 @@ void Page_Load(Object sender, EventArgs e)
 			case when u.us_can_be_assigned_to = 1 then 'Y' else 'N' end [can<br>be<br>assigned<br>to],
 			isnull(pj_name,'') [forced<br>project],
 			isnull(qu_desc,'') [default query],
-			case when u.us_enable_notifications = 1 then 'Y' else 'N' end [notif-<br>ications],
+			case when u.us_enable_notifications = 1 then 'Y' else 'N' end [notif-<br>ications]
 
-			us_id [hidden]
 			from users u
 			left outer join queries on us_default_query = qu_id
 			left outer join projects on us_forced_project = pj_id
@@ -166,8 +169,12 @@ void Page_Load(Object sender, EventArgs e)
 
 if (ds.Tables[0].Rows.Count > 0)
 {
+//	SortableHtmlTable.create_from_dataset(
+//		Response, ds, "edit_user.aspx?id=", "delete_user.aspx?id=", false);
+
 	SortableHtmlTable.create_from_dataset(
-		Response, ds, "edit_user.aspx?id=", "delete_user.aspx?id=", false);
+		Response, ds, "", "", false);
+
 
 }
 else
@@ -176,5 +183,5 @@ else
 }
 %>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>

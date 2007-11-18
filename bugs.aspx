@@ -288,6 +288,6 @@ else
 <!-- #include file = "inc_bugs2.inc" -->
 </div>
 </form>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 

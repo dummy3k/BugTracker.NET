@@ -82,7 +82,7 @@ or
 <p>
 <a id="confirm_href" runat="server" href=""></a>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

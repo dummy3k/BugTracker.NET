@@ -2,5 +2,5 @@
 @import url(btnet_base.css);
 
 /* Import optional custom CSS rules */
-@import url(btnet_custom.css);
+@import url(custom/btnet_custom.css);
 

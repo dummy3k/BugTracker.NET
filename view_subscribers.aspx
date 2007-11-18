@@ -24,7 +24,7 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "view subscribers";
 
-	bugid = Convert.ToInt32(Request["id"]);
+	bugid = Convert.ToInt32(Util.sanitize_integer(Request["id"]));
 
 	int permission_level = Bug.get_bug_permission_level(bugid, security);
 	if (permission_level == Security.PERMISSION_NONE)
@@ -88,7 +88,7 @@ void Page_Load(Object sender, EventArgs e)
 		us_username [user],
 		us_lastname + ', ' + us_firstname [name],
 		us_email [email],
-		case when us_reported_notifications < 4 or us_assigned_notifications < 4 or us_subscribed_notifications < 4 then 'Y' else 'N' end [reduced bug<br>notifications]
+		case when us_reported_notifications < 4 or us_assigned_notifications < 4 or us_subscribed_notifications < 4 then 'Y' else 'N' end [user is<br>filtering<br>notifications]
 		from bug_subscriptions
 		inner join users on bs_user = us_id
 		where bs_bug = $bg
@@ -192,9 +192,10 @@ void Page_Load(Object sender, EventArgs e)
 
 <body width=600>
 <div class=align>
-Subscribers
+Subscribers for <% Response.Write(Convert.ToString(bugid)); %>
 <p>
 
+<table border=0><tr><td>
 <form class=frm runat="server" action="view_subscribers.aspx">
 <table>
 <tr><td><span class=lbl>add subscriber:</span>
@@ -209,6 +210,7 @@ Subscribers
 <input type=hidden name="action" value="add">
 
 </form>
+</td></tr></table>
 
 <%
 if (ds.Tables[0].Rows.Count > 0)

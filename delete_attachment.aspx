@@ -51,12 +51,15 @@ void Page_Load(Object sender, EventArgs e)
 		string filename = (string) dbutil.execute_scalar(sql);
 
 		// delete the row representing the attachment
-		sql = @"delete bug_posts where bp_id = $ba";
+		sql = @"delete bug_post_attachments where bpa_post = $ba
+            delete bug_posts where bp_id = $ba";
 		sql = sql.Replace("$ba", attachment_id_string);
 		dbutil.execute_nonquery(sql);
 
 		// delete the file too
 		string upload_folder = Util.get_upload_folder();
+        if (upload_folder != null)
+        {
 		StringBuilder path = new StringBuilder(upload_folder);
 		path.Append("\\");
 		path.Append(bug_id_string);
@@ -68,6 +71,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			System.IO.File.Delete(path.ToString());
 		}
+        }
 
 
 		Response.Redirect("edit_bug.aspx?id=" + bug_id_string);
@@ -119,7 +123,7 @@ or
 <p>
 <a id="confirm_href" runat="server" href="">confirm delete</a>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

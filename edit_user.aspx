@@ -412,6 +412,18 @@ class Project
 ///////////////////////////////////////////////////////////////////////
 string replace_vars_in_sql_statement(string sql)
 {
+
+	string password_to_store;
+	if (Util.get_setting("EncryptStoredPasswords", "0") == "1")
+	{
+		password_to_store = Util.encrypt_string_using_MD5(pw.Value);
+	}
+	else
+	{
+		password_to_store = pw.Value;
+	}
+
+	sql = sql.Replace("$pw", password_to_store.Replace("'","''"));
 	sql = sql.Replace("$un", username.Value.Replace("'","''"));
 	sql = sql.Replace("$fn", firstname.Value.Replace("'","''"));
 	sql = sql.Replace("$ln", lastname.Value.Replace("'","''"));
@@ -468,16 +480,6 @@ void on_update (Object sender, EventArgs e)
 	if (good)
 	{
 
-		string password_to_store;
-		if (Util.get_setting("EncryptStoredPasswords", "0") == "1")
-		{
-			password_to_store = Util.encrypt_string_using_MD5(pw.Value);
-		}
-		else
-		{
-			password_to_store = pw.Value.Replace("'","''");
-		}
-
 		if (id == 0 || copy)  // insert new
 		{
 			// See if the user already exists?
@@ -489,58 +491,59 @@ void on_update (Object sender, EventArgs e)
 			{
 
 				// MAW -- 2006/01/27 -- Converted to use new notification columns
-				sql = @"insert into users
-					(us_username, us_password,
-					us_firstname, us_lastname,
-					us_bugs_per_page,
-					us_use_fckeditor,
-					us_enable_bug_list_popups,
-					us_email,
-					us_active, us_admin,
-					us_enable_notifications,
-					us_send_notifications_to_self,
-                    us_reported_notifications,
-                    us_assigned_notifications,
-                    us_subscribed_notifications,
-					us_auto_subscribe,
-					us_auto_subscribe_own_bugs,
-					us_auto_subscribe_reported_bugs,
-					us_default_query,
-					us_signature,
-					us_forced_project,
+				sql = @"
+insert into users
+(us_username, us_password,
+us_firstname, us_lastname,
+us_bugs_per_page,
+us_use_fckeditor,
+us_enable_bug_list_popups,
+us_email,
+us_active, us_admin,
+us_enable_notifications,
+us_send_notifications_to_self,
+us_reported_notifications,
+us_assigned_notifications,
+us_subscribed_notifications,
+us_auto_subscribe,
+us_auto_subscribe_own_bugs,
+us_auto_subscribe_reported_bugs,
+us_default_query,
+us_signature,
+us_forced_project,
 
-	                us_external_user,
-                	us_can_edit_sql,
-                	us_can_delete_bug,
+us_external_user,
+us_can_edit_sql,
+us_can_delete_bug,
 
-					us_can_edit_and_delete_posts,
-					us_can_merge_bugs,
-					us_can_mass_edit_bugs,
+us_can_edit_and_delete_posts,
+us_can_merge_bugs,
+us_can_mass_edit_bugs,
 
-					us_can_use_reports,
-					us_can_edit_reports,
-					us_can_be_assigned_to,
+us_can_use_reports,
+us_can_edit_reports,
+us_can_be_assigned_to,
 
-					us_created_user)
+us_created_user)
 
-					values (
-					N'$un', N'$pw', N'$fn', N'$ln',
-					$bp, $fk, $pp, N'$em',
-					$ac, $ad, $en,  $ss,
-					$rn, $an, $sn, $as,
-					$ao, $ar, $dq, N'$sg',
-					$fp,
-	                $ext, $cuq, $ces, $cdb,
-					$cep, $cmb, $cme,
-					$cur, $cer, $cba,
-					$cu
+values (
+N'$un', N'$pw', N'$fn', N'$ln',
+$bp, $fk, $pp, N'$em',
+$ac, $ad, $en,  $ss,
+$rn, $an, $sn, $as,
+$ao, $ar, $dq, N'$sg',
+$fp,
+$ext, $ces, $cdb,
+$cep, $cmb, $cme,
+$cur, $cer, $cba,
+$createdby
 
-					);
+);
 
-					select scope_identity()";
+select scope_identity()";
 
 				sql = replace_vars_in_sql_statement(sql);
-				sql = sql.Replace("$cu", Convert.ToString(security.this_usid));
+				sql = sql.Replace("$createdby", Convert.ToString(security.this_usid));
 
 
 				// only admins can create admins.
@@ -581,50 +584,48 @@ void on_update (Object sender, EventArgs e)
 			if (user_count == 0)
 			{
 
-				sql = @"update users set
-					us_username = N'$un',
-					$PASSWORD$
-					us_firstname = N'$fn',
-					us_lastname = N'$ln',
-					us_bugs_per_page = N'$bp',
-					us_use_fckeditor = $fk,
-					us_enable_bug_list_popups = $pp,
-					us_email = N'$em',
-					us_active = $ac,
-					us_admin = $ad,
-					us_enable_notifications = $en,
-					us_send_notifications_to_self = $ss,
-					us_reported_notifications = $rn,
-					us_assigned_notifications = $an,
-					us_subscribed_notifications = $sn,
-					us_auto_subscribe = $as,
-					us_auto_subscribe_own_bugs = $ao,
-					us_auto_subscribe_reported_bugs = $ar,
-					us_default_query = $dq,
-					us_signature = N'$sg',
-					us_forced_project = $fp,
+				sql = @"
+update users set
+us_username = N'$un',
+$PASSWORD$
+us_firstname = N'$fn',
+us_lastname = N'$ln',
+us_bugs_per_page = N'$bp',
+us_use_fckeditor = $fk,
+us_enable_bug_list_popups = $pp,
+us_email = N'$em',
+us_active = $ac,
+us_admin = $ad,
+us_enable_notifications = $en,
+us_send_notifications_to_self = $ss,
+us_reported_notifications = $rn,
+us_assigned_notifications = $an,
+us_subscribed_notifications = $sn,
+us_auto_subscribe = $as,
+us_auto_subscribe_own_bugs = $ao,
+us_auto_subscribe_reported_bugs = $ar,
+us_default_query = $dq,
+us_signature = N'$sg',
+us_forced_project = $fp,
 
-	                us_external_user = $ext,
-                	us_can_edit_sql = $ces,
-                	us_can_delete_bug = $cdb,
+us_external_user = $ext,
+us_can_edit_sql = $ces,
+us_can_delete_bug = $cdb,
 
-					us_can_edit_and_delete_posts = $cep,
-					us_can_merge_bugs = $cmb,
-					us_can_mass_edit_bugs = $cme,
+us_can_edit_and_delete_posts = $cep,
+us_can_merge_bugs = $cmb,
+us_can_mass_edit_bugs = $cme,
 
-					us_can_use_reports = $cur,
-					us_can_edit_reports = $cer,
-					us_can_be_assigned_to = $cba
+us_can_use_reports = $cur,
+us_can_edit_reports = $cer,
+us_can_be_assigned_to = $cba
 
-					where us_id = $id";
+where us_id = $id";
 
 
 				if (pw.Value != "")
 				{
-					string s = "us_password = N'";
-					s += pw.Value.Replace("'","''");
-					s += "',";
-					sql = sql.Replace("$PASSWORD$", s);
+					sql = sql.Replace("$PASSWORD$", "us_password = N'$pw',");
 				}
 				else
 				{
@@ -1418,7 +1419,7 @@ function show_permissions_settings()
 	</table>
 </form>
 </td></tr></table></div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

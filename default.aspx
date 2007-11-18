@@ -23,8 +23,6 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "logon";
 
-	app.InnerText = Util.get_setting("AppTitle","BugTracker.NET");
-
 	msg.InnerText = "";
 
 	// see if the connection string works
@@ -177,7 +175,7 @@ void on_logon(Object sender, EventArgs e)
 	<br>
 	<a target=_blank style=" font-size: 7pt; font-family: arial; letter-spacing: 1px;" href=http://ifdefined.com/README.html>Help</a>
 	<br>
-	<a target=_blank style=" font-size: 7pt; font-family: arial; letter-spacing: 1px;" href=about.aspx>About</a>
+	<a target=_blank style=" font-size: 7pt; font-family: arial; letter-spacing: 1px;" href=about.html>About</a>
 	<br>
 	<a target=_blank style=" font-size: 7pt; font-family: arial; letter-spacing: 1px;" href=http://ifdefined.com/README.html>Donate</a>
 </span>
@@ -186,24 +184,7 @@ void on_logon(Object sender, EventArgs e)
 
 <%
 
-string logo = Util.get_setting("LogoHtml","");
-
-if (logo == "")
-{
-
-%>
-
-<td width=100 valign=middle>
-<a href=http://ifdefined.com/bugtrackernet.html>
-	<div class=logo id=app runat="server">BugTracker.NET</div>
-</a>
-
-<%
-}
-else
-{
-	Response.Write(logo);
-}
+Response.Write (Application["custom_logo"]);
 
 %>
 

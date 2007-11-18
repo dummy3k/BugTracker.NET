@@ -48,8 +48,8 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (Request["mass_delete"] != null)
 		{
-
-			sql = "delete from bug_posts where bp_bug in (" + list + ")";
+		    sql += "delete bug_post_attachments from bug_post_attachments inner join bug_posts on bug_post_attachments.bpa_post = bug_posts.bp_id where bug_posts.bp_bug in (" + list + ")";
+			sql += "\ndelete from bug_posts where bp_bug in (" + list + ")";
 			sql += "\ndelete from bug_subscriptions where bs_bug in (" + list + ")";
 			sql += "\ndelete from bug_relationships where re_bug1 in (" + list + ")";
 			sql += "\ndelete from bug_relationships where re_bug2 in (" + list + ")";
@@ -110,6 +110,8 @@ void Page_Load(Object sender, EventArgs e)
 			if (Request["mass_delete"] != null)
 			{
 				string upload_folder = Util.get_upload_folder();
+                if (upload_folder != null)
+                {
 				string sql2 = @"select bp_bug, bp_id, bp_file from bug_posts where bp_type = 'file' and bp_bug in (" + list + ")";
 				DataSet ds = dbutil.get_dataset(sql2);
 				foreach (DataRow dr in ds.Tables[0].Rows)
@@ -127,6 +129,7 @@ void Page_Load(Object sender, EventArgs e)
 						System.IO.File.Delete(path.ToString());
 					}
 				}
+			}
 			}
 			dbutil.execute_nonquery(sql);
 			Response.Redirect ("search.aspx");
@@ -168,6 +171,6 @@ void Page_Load(Object sender, EventArgs e)
 	<pre id="sql_text" runat="server"></pre>
 
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 

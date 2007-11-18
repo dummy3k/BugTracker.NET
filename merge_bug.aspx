@@ -171,6 +171,8 @@ void on_update(object Source, EventArgs e)
 		// rename the attachments
 
 		string upload_folder = Util.get_upload_folder();
+        if (upload_folder != null)
+        {
 
 		sql = @"select bp_id, bp_file from bug_posts
 			where bp_type = 'file' and bp_bug = $from";
@@ -204,6 +206,7 @@ void on_update(object Source, EventArgs e)
 			}
 
 		}
+        }
 
 
 		// copy the from db entries to the to
@@ -366,7 +369,7 @@ INTO <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>:
 
 
 </td></tr></table></div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

@@ -270,7 +270,7 @@ function change_sample_color()
 	</td></tr></table>
 </form>
 </td></tr></table></div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

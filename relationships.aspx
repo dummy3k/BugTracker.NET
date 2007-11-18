@@ -155,7 +155,7 @@ void Page_Load(Object sender, EventArgs e)
 	sql = @"select bg_id [id],
 		bg_short_desc [desc ],
 		re_type [comment],
-		'<a target=_blank href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view],
+		'<a href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view],
 		'<a href=relationships.aspx?action=remove&id=$bg'
 		+ '&bugid2='
 		+ convert(varchar,re_bug2)
@@ -182,9 +182,9 @@ void Page_Load(Object sender, EventArgs e)
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
 </head>
 
-<body onload=parent.set_relationship_cnt(<%Response.Write(Convert.ToString(ds.Tables[0].Rows.Count));%>)>
+<body onload=opener.set_relationship_cnt(<%Response.Write(Convert.ToString(ds.Tables[0].Rows.Count));%>)>
 <div class=align>
-Relationships
+Relationships for <% Response.Write(Convert.ToString(bugid)); %>
 <p>
 <table border=0><tr><td>
 

@@ -96,5 +96,5 @@ else
 
 %>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>

@@ -313,3 +313,92 @@ alter table users add us_can_use_reports int not null default(0)
 alter table users add us_can_edit_reports int not null default(0)
 
 alter table bug_posts add bp_hidden_from_external_users int not null default(0)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.5.9 to 2.6.0
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+-- Don't forget to replace your Subversion post-commit hook script too.
+
+-- Step #1 - Create the new tables
+
+/* SVN REVISION  */
+
+create table svn_revisions
+(
+svnrev_id int identity primary key not null,
+svnrev_revision int not null,
+svnrev_bug int not null,
+svnrev_repository nvarchar(400) not null,
+svnrev_author nvarchar(100) not null,
+svnrev_svn_date nvarchar(100) not null,
+svnrev_btnet_date datetime not null,
+svnrev_msg ntext not null
+)
+
+create index svn_bug_index on svn_revisions (svnrev_bug)
+
+
+/* SVN AFFECTED PATH */
+
+create table svn_affected_paths
+(
+svnap_id int identity primary key not null,
+svnap_svnrev_id int not null,
+svnap_action nvarchar(8) not null,
+svnap_path nvarchar(400) not null
+)
+
+create index svn_revision_index on svn_affected_paths (svnap_svnrev_id)
+
+
+-- Step #2 - Copy data from obsolete bug_file_revisions table into new tables,
+-- if you have been using Subversion integration in earlier BugTracker.NET
+-- versions.
+
+insert into svn_revisions
+(svnrev_revision, 
+svnrev_bug,
+svnrev_repository,
+svnrev_author,
+svnrev_svn_date,
+svnrev_btnet_date,
+svnrev_msg)
+select distinct bfr_revision, bfr_bug, '', '', convert(varchar(400),bfr_date), bfr_date,''
+from bug_file_revisions
+
+insert into svn_affected_paths
+(svnap_svnrev_id,
+svnap_action,
+svnap_path)
+select distinct svnrev_id, bfr_action, bfr_file
+from bug_file_revisions
+inner join svn_revisions on bfr_revision = svnrev_revision
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.6.3 to 2.6.4
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+create table bug_post_attachments
+(
+bpa_id int identity primary key not null,
+bpa_post int not null,
+bpa_content image not null
+)
+
+create unique index bpa_index on bug_post_attachments (bpa_post)
+
+
+alter table projects add pj_description nvarchar(200) null
+alter table projects add pj_subversion_repository_url nvarchar(255) null
+alter table projects add pj_subversion_username nvarchar(100) null
+alter table projects add pj_subversion_password nvarchar(80) null
+alter table projects add pj_websvn_url nvarchar(100) null

@@ -48,6 +48,26 @@ public void Application_Error(Object sender, EventArgs e)
 		btnet.Email.send_email(to, from, "", subject, body); // 5 args				
 	}
 }
+     
+public void Application_OnStart(Object sender, EventArgs e)
+{
+     
+	string path = HttpContext.Current.Server.MapPath(null);
+
+	System.IO.StreamReader sr = System.IO.File.OpenText(path + "\\custom\\custom_header.html" );
+	Application["custom_header"] = sr.ReadToEnd();
+	sr.Close();
+	
+	sr = System.IO.File.OpenText(path + "\\custom\\custom_footer.html" );
+	Application["custom_footer"] = sr.ReadToEnd();
+	sr.Close();
+
+	sr = System.IO.File.OpenText(path + "\\custom\\custom_logo.html" );
+	Application["custom_logo"] = sr.ReadToEnd();
+	sr.Close();
+	
+}
+
   
 /*
 public void Application_BeginRequest(Object sender, EventArgs e)

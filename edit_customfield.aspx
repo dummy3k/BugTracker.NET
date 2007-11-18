@@ -47,6 +47,9 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("$co", Convert.ToString(id));
 		DataRow dr = dbutil.get_datarow(sql);
 
+		name.InnerText = (string) dr["name"];
+
+
 		// Fill in this form
 		vals.Value = (string) dr["vals"];
 		sort_seq.Value = Convert.ToString(dr["column order"]);
@@ -161,6 +164,19 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td colspan=3>
+	Field Name:&nbsp;<span class=smallnote style="font-size: 12pt; font-weight: bold;" id="name" runat="server">
+	</span>
+	</td>
+	</tr>
+
+	<tr>
+	<td colspan=3>
+	&nbsp;
+	</td>
+	</tr>
+
+	<tr>
+	<td colspan=3>
 	<span class=smallnote>
 	A dropdown type of "normal" uses the values specified in "Normal Dropdown Values" below.
 	<br>A dropdown type of "users" is filled with values from the users table.
@@ -168,7 +184,6 @@ void on_update (Object sender, EventArgs e)
 	</span>
 	</td>
 	</tr>
-
 
 	<tr>
 	<td class=lbl>Dropdown Type:</td>
@@ -241,7 +256,7 @@ void on_update (Object sender, EventArgs e)
 </form>
 
 </td></tr></table></div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

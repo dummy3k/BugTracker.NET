@@ -23,16 +23,14 @@ Response.Write ("Windows Registry Editor Version 5.00");
 Response.Write ("\n\n");
 Response.Write ("[HKEY_CURRENT_USER\\Software\\BugTracker.NET\\btnetsc\\SETTINGS]" + "\n");
 
-string url = Request.ServerVariables["SERVER_NAME"] + Request.ServerVariables["URL"];
+string url = "http://" + Request.ServerVariables["SERVER_NAME"] + Request.ServerVariables["URL"];
 url = url.Replace("generate_btnetsc_reg","insert_bug");
 write_variable_value("Url", url);
-write_variable_value("Port", Request.ServerVariables["SERVER_PORT"]);
 write_variable_value("Project", "0");
 write_variable_value("Email", security.this_email);
 write_variable_value("Username", security.this_username);
-write_variable_value("Codepage", "0");
 
-/*
+
 NameValueCollection NVCSrvElements = Request.ServerVariables;
 string[] array1 = NVCSrvElements.AllKeys;
 
@@ -42,7 +40,7 @@ Response.Write("=");
 Response.Write(Request.ServerVariables[array1[i]]);
 Response.Write("<br>");
 }
-*/
+
 }
 
 void write_variable_value(string var, string val)

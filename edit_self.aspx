@@ -188,7 +188,7 @@ void on_update (Object sender, EventArgs e)
 		string password_to_store;
 		if (Util.get_setting("EncryptStoredPasswords", "0") == "1")
 		{
-			password_to_store = Util.encrypt_string_using_MD5(pw.Value);
+			password_to_store = Util.encrypt_string_using_MD5(pw.Value).Replace("'","''");
 		}
 		else
 		{
@@ -628,7 +628,7 @@ function show_notification_settings()
 	</table>
 </form>
 </td></tr></table></div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

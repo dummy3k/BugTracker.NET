@@ -28,7 +28,7 @@ Distributed under the terms of the GNU General Public License
 			+ "translate";
 
 		string string_bp_id = Request["postid"];
-		string string_bg_id = "";
+		string string_bg_id = Request["bugid"];
 
 		if (!IsPostBack)
 		{
@@ -45,14 +45,6 @@ Distributed under the terms of the GNU General Public License
 				sql = sql.Replace("$id", string_bp_id);
 
 				DataRow dr = dbutil.get_datarow(sql);
-
-// added check for permission level - corey
-				int permission_level = Bug.get_bug_permission_level((int) dr["bp_bug"], security);
-				if (permission_level == Security.PERMISSION_NONE)
-				{
-					Response.Write("You are not allowed to view this item");
-					Response.End();
-				}
 
 				string_bg_id = Convert.ToString((int) dr["bp_bug"]);
 				object obj = dr["bp_comment"];
@@ -77,6 +69,13 @@ Distributed under the terms of the GNU General Public License
 					source.InnerText = obj.ToString();
 			}
 
+            // added check for permission level - corey
+            int permission_level = Bug.get_bug_permission_level(Convert.ToInt32(string_bg_id), security);
+            if (permission_level == Security.PERMISSION_NONE) {
+                Response.Write("You are not allowed to view this item");
+                Response.End();
+            }
+			
 			back_href.HRef = "edit_bug.aspx?id=" + string_bg_id;
 
 			bugid.Value = string_bg_id;

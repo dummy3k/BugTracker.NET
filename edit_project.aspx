@@ -70,8 +70,11 @@ void Page_Load(Object sender, EventArgs e)
 			isnull(pj_auto_subscribe_default_user,0) [pj_auto_subscribe_default_user],
 			isnull(pj_enable_pop3,0) [pj_enable_pop3],
 			isnull(pj_pop3_username,'') [pj_pop3_username],
-			isnull(pj_pop3_password,'') [pj_pop3_password],
 			isnull(pj_pop3_email_from,'') [pj_pop3_email_from],
+			isnull(pj_description,'') [pj_description],
+			isnull(pj_subversion_repository_url,'') [pj_subversion_repository_url],
+			isnull(pj_subversion_username,'') [pj_subversion_username],
+			isnull(pj_websvn_url,'') [pj_websvn_url],
 			isnull(pj_enable_custom_dropdown1,0) [pj_enable_custom_dropdown1],
 			isnull(pj_enable_custom_dropdown2,0) [pj_enable_custom_dropdown2],
 			isnull(pj_enable_custom_dropdown3,0) [pj_enable_custom_dropdown3],
@@ -94,7 +97,6 @@ void Page_Load(Object sender, EventArgs e)
 			default_selection.Checked = Convert.ToBoolean((int) dr["pj_default"]);
 			enable_pop3.Checked = Convert.ToBoolean((int) dr["pj_enable_pop3"]);
 			pop3_username.Value = (string) dr["pj_pop3_username"];
-			pop3_password.Value = (string) dr["pj_pop3_password"];
 			pop3_email_from.Value = (string) dr["pj_pop3_email_from"];
 
 			enable_custom_dropdown1.Checked = Convert.ToBoolean((int) dr["pj_enable_custom_dropdown1"]);
@@ -109,6 +111,11 @@ void Page_Load(Object sender, EventArgs e)
 			custom_dropdown_values2.Value = (string) dr["pj_custom_dropdown_values2"];
 			custom_dropdown_values3.Value = (string) dr["pj_custom_dropdown_values3"];
 
+			desc.Value = (string) dr["pj_description"];
+
+			repository_url.Value = (string) dr["pj_subversion_repository_url"];
+			svn_username.Value = (string) dr["pj_subversion_username"];
+			websvn_url.Value = (string) dr["pj_websvn_url"];
 
 			foreach (ListItem li in default_user.Items)
 			{
@@ -146,6 +153,7 @@ Boolean validate()
 	return good;
 }
 
+
 ///////////////////////////////////////////////////////////////////////
 void on_update (Object sender, EventArgs e)
 {
@@ -162,6 +170,9 @@ void on_update (Object sender, EventArgs e)
 			pj_pop3_username,
 			pj_pop3_password,
 			pj_pop3_email_from,
+			pj_description,
+			pj_subversion_repository_url, pj_subversion_username, pj_subversion_password,
+			pj_websvn_url,
 			pj_enable_custom_dropdown1,
 			pj_enable_custom_dropdown2,
 			pj_enable_custom_dropdown3,
@@ -171,77 +182,85 @@ void on_update (Object sender, EventArgs e)
 			pj_custom_dropdown_values1,
 			pj_custom_dropdown_values2,
 			pj_custom_dropdown_values3)
-			values (N'$nm', $ac, $dfu, $dfs, $aa, $as,
-			$pe, N'$pu',N'$pp',N'$pf',
+			values (N'$name', $active, $defaultuser, $defaultsel, $autoasg, $autosub,
+			$enablepop, N'$popuser',N'$poppass',N'$popfrom',
+			N'$desc', N'$repos', N'$svnuser', N'$svnpass', N'$websvn',
 			$ecd1,$ecd2,$ecd3,
 			N'$cdl1',N'$cdl2',N'$cdl3',
 			N'$cdv1',N'$cdv2',N'$cdv3')";
+
+			sql = sql.Replace("$poppass", pop3_password.Value.Replace("'","''"));
+			sql = sql.Replace("$svnpass", svn_username.Value.Replace("'","''"));
+
+
 		}
 		else // edit existing
 		{
 
+			sql = @"update projects set
+				pj_name = N'$name',
+				$POP3_PASSWORD
+				$SVN_PASSWORD
+				pj_active = $active,
+				pj_default_user = $defaultuser,
+				pj_default = $defaultsel,
+				pj_auto_assign_default_user = $autoasg,
+				pj_auto_subscribe_default_user = $autosub,
+				pj_enable_pop3 = $enablepop,
+				pj_pop3_username = N'$popuser',
+				pj_pop3_email_from = N'$popfrom',
+				pj_description = N'$desc',
+				pj_subversion_repository_url = N'$repos',
+				pj_subversion_username = N'$svnuser',
+				pj_websvn_url = N'$websvn',
+				pj_enable_custom_dropdown1 = $ecd1,
+				pj_enable_custom_dropdown2 = $ecd2,
+				pj_enable_custom_dropdown3 = $ecd3,
+				pj_custom_dropdown_label1 = N'$cdl1',
+				pj_custom_dropdown_label2 = N'$cdl2',
+				pj_custom_dropdown_label3 = N'$cdl3',
+				pj_custom_dropdown_values1 = N'$cdv1',
+				pj_custom_dropdown_values2 = N'$cdv2',
+				pj_custom_dropdown_values3 = N'$cdv3'
+				where pj_id = $id";
+			sql = sql.Replace("$id", Convert.ToString(id));
 
 			if (pop3_password.Value != "")
 			{
-				sql = @"update projects set
-					pj_name = N'$nm',
-					pj_active = $ac,
-					pj_default_user = $dfu,
-					pj_default = $dfs,
-					pj_auto_assign_default_user = $aa,
-					pj_auto_subscribe_default_user = $as,
-					pj_enable_pop3 = $pe,
-					pj_pop3_username = N'$pu',
-					pj_pop3_password = N'$pp',
-					pj_pop3_email_from = N'$pf',
-					pj_enable_custom_dropdown1 = $ecd1,
-					pj_enable_custom_dropdown2 = $ecd2,
-					pj_enable_custom_dropdown3 = $ecd3,
-					pj_custom_dropdown_label1 = N'$cdl1',
-					pj_custom_dropdown_label2 = N'$cdl2',
-					pj_custom_dropdown_label3 = N'$cdl3',
-					pj_custom_dropdown_values1 = N'$cdv1',
-					pj_custom_dropdown_values2 = N'$cdv2',
-					pj_custom_dropdown_values3 = N'$cdv3'
-					where pj_id = $id";
+				sql = sql.Replace("$POP3_PASSWORD", "pj_pop3_password = N'" +  pop3_password.Value.Replace("'","''") + "',");
 			}
 			else
 			{
-				sql = @"update projects set
-					pj_name = N'$nm',
-					pj_active = $ac,
-					pj_default_user = $dfu,
-					pj_default = $dfs,
-					pj_auto_assign_default_user = $aa,
-					pj_auto_subscribe_default_user = $as,
-					pj_enable_pop3 = $pe,
-					pj_pop3_username = N'$pu',
-					pj_pop3_email_from = N'$pf',
-					pj_enable_custom_dropdown1 = $ecd1,
-					pj_enable_custom_dropdown2 = $ecd2,
-					pj_enable_custom_dropdown3 = $ecd3,
-					pj_custom_dropdown_label1 = N'$cdl1',
-					pj_custom_dropdown_label2 = N'$cdl2',
-					pj_custom_dropdown_label3 = N'$cdl3',
-					pj_custom_dropdown_values1 = N'$cdv1',
-					pj_custom_dropdown_values2 = N'$cdv2',
-					pj_custom_dropdown_values3 = N'$cdv3'
-					where pj_id = $id";
+				sql = sql.Replace("$POP3_PASSWORD","");
 			}
 
-			sql = sql.Replace("$id", Convert.ToString(id));
+			if (svn_password.Value != "")
+			{
+				sql = sql.Replace("$SVN_PASSWORD", "pj_subversion_password = N'" +  svn_password.Value.Replace("'","''") + "',");
+			}
+			else
+			{
+				sql = sql.Replace("$SVN_PASSWORD","");
+			}
 
 		}
-		sql = sql.Replace("$nm", name.Value.Replace("'","''"));
-		sql = sql.Replace("$ac", Util.bool_to_string(active.Checked));
-		sql = sql.Replace("$dfu", default_user.SelectedItem.Value);
-		sql = sql.Replace("$aa", Util.bool_to_string(auto_assign.Checked));
-		sql = sql.Replace("$as", Util.bool_to_string(auto_subscribe.Checked));
-		sql = sql.Replace("$dfs", Util.bool_to_string(default_selection.Checked));
-		sql = sql.Replace("$pe", Util.bool_to_string(enable_pop3.Checked));
-		sql = sql.Replace("$pu", pop3_username.Value.Replace("'","''"));
-		sql = sql.Replace("$pp", pop3_password.Value.Replace("'","''"));
-		sql = sql.Replace("$pf", pop3_email_from.Value.Replace("'","''"));
+
+
+
+		sql = sql.Replace("$name", name.Value.Replace("'","''"));
+		sql = sql.Replace("$active", Util.bool_to_string(active.Checked));
+		sql = sql.Replace("$defaultuser", default_user.SelectedItem.Value);
+		sql = sql.Replace("$autoasg", Util.bool_to_string(auto_assign.Checked));
+		sql = sql.Replace("$autosub", Util.bool_to_string(auto_subscribe.Checked));
+		sql = sql.Replace("$defaultsel", Util.bool_to_string(default_selection.Checked));
+		sql = sql.Replace("$enablepop", Util.bool_to_string(enable_pop3.Checked));
+		sql = sql.Replace("$popuser", pop3_username.Value.Replace("'","''"));
+		sql = sql.Replace("$popfrom", pop3_email_from.Value.Replace("'","''"));
+
+		sql = sql.Replace("$desc", desc.Value.Replace("'","''"));
+		sql = sql.Replace("$repos", repository_url.Value.Replace("'","''"));
+		sql = sql.Replace("$svnuser", svn_username.Value.Replace("'","''"));
+		sql = sql.Replace("$websvn", websvn_url.Value.Replace("'","''"));
 
 		sql = sql.Replace("$ecd1", Util.bool_to_string(enable_custom_dropdown1.Checked));
 		sql = sql.Replace("$ecd2", Util.bool_to_string(enable_custom_dropdown2.Checked));
@@ -294,12 +313,63 @@ void on_update (Object sender, EventArgs e)
 <a id="permissions_href" runat="server" href="" style='font-weight: bold;'>per user permissions</a>
 <% } %>
 
+<script>
 
+var cls = (navigator.userAgent.indexOf("MSIE") > 0) ? "className" : "class";
+
+function show_main_settings()
+{
+	document.getElementById("tab1").style.display = "block";
+	document.getElementById("tab2").style.display = "none";
+	document.getElementById("tab3").style.display = "none";
+	document.getElementById("main_btn").setAttribute(cls, 'tab_btn_pushed');
+	document.getElementById("custom_btn").setAttribute(cls, 'tab_btn');
+	document.getElementById("subversion_btn").setAttribute(cls, 'tab_btn');
+}
+
+function show_custom_field_settings()
+{
+	document.getElementById("tab1").style.display = "none";
+	document.getElementById("tab2").style.display = "block";
+	document.getElementById("tab3").style.display = "none";
+	document.getElementById("main_btn").setAttribute(cls, 'tab_btn');
+	document.getElementById("custom_btn").setAttribute(cls, 'tab_btn_pushed');
+	document.getElementById("subversion_btn").setAttribute(cls, 'tab_btn');
+}
+
+
+function show_subversion_settings()
+{
+	document.getElementById("tab1").style.display = "none";
+	document.getElementById("tab2").style.display = "none";
+	document.getElementById("tab3").style.display = "block";
+	document.getElementById("main_btn").setAttribute(cls, 'tab_btn');
+	document.getElementById("custom_btn").setAttribute(cls, 'tab_btn');
+	document.getElementById("subversion_btn").setAttribute(cls, 'tab_btn_pushed');
+}
+
+
+</script>
+<br><br>
 <form class=frm runat="server">
+
+	<br>
+	<a id="main_btn" class="tab_btn_pushed" href="javascript: show_main_settings()">main settings</a>
+	<a id="custom_btn" class="tab_btn" href="javascript: show_custom_field_settings()">custom fields</a>
+	<a id="subversion_btn" class="tab_btn" href="javascript: show_subversion_settings()">subversion settings</a>
+	<br><br>
+
+<div id="tab1" style="display:block;">
 	<table border=0 cellpadding=3>
 
 	<tr>
-	<td class=lbl>Description:</td>
+	<td colspan=3>
+	&nbsp;
+	</td>
+	</tr>
+
+	<tr>
+	<td class=lbl>Project Name:</td>
 	<td><input runat="server" type=text class=txt id="name" maxlength=30 size=30></td>
 	<td runat="server" class=err id="name_err">&nbsp;</td>
 	</tr>
@@ -311,9 +381,15 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	<tr>
-	<td class=lbl>Default Selection:</td>
+	<td class=lbl>Default Selection in "projects" Dropdown:</td>
 	<td><asp:checkbox runat="server" class=txt id="default_selection"/></td>
 	<td>&nbsp</td>
+	</tr>
+
+	<tr>
+	<td colspan=3>
+	&nbsp;
+	</td>
 	</tr>
 
 	<tr>
@@ -327,12 +403,6 @@ void on_update (Object sender, EventArgs e)
 	<td class=lbl>Auto-Assign New <% Response.Write(Util.get_setting("PluralBugLabel","bug")); %>  to Default User:</td>
 	<td><asp:checkbox runat="server" class=txt id="auto_assign"/></td>
 	<td>&nbsp</td>
-	</tr>
-
-	<tr>
-	<td colspan=3>
-	&nbsp;
-	</td>
 	</tr>
 
 	<tr>
@@ -401,7 +471,25 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td colspan=3>
-	<hr>
+	&nbsp;
+	</td>
+	</tr>
+
+	<tr>
+	<td class=lbl>Description:</td>
+	<td><textarea runat="server" class=txt id="desc" rows=5 cols=40></textarea></td>
+	<td runat="server" class=err id="desc_err">&nbsp;</td>
+	</tr>
+
+
+	</table>
+</div>
+<div id="tab2" style="display:none;">
+	<table border=0 cellpadding=3>
+
+	<tr>
+	<td colspan=3>
+	&nbsp;
 	</td>
 	</tr>
 
@@ -429,6 +517,13 @@ void on_update (Object sender, EventArgs e)
 	<br>
 	"version 1.0|Version 1.1|Version 1.2"
 	</span>
+	</td>
+	</tr>
+
+
+	<tr>
+	<td colspan=3>
+	<hr>
 	</td>
 	</tr>
 
@@ -498,6 +593,59 @@ void on_update (Object sender, EventArgs e)
 	<td>&nbsp</td>
 	</tr>
 
+	</table>
+</div>
+<div id="tab3" style="display:none;">
+	<table border=0 cellpadding=3>
+
+	<tr>
+	<td colspan=3>
+	&nbsp;
+	</td>
+	</tr>
+
+	<tr>
+	<td colspan=3>
+	<b class=smallnote style="font-size: 11pt;">Settings here override Web.config settings for this project only</b>
+	</td>
+	</tr>
+
+	<tr>
+	<td colspan=3>
+	&nbsp;
+	</td>
+	</tr>
+
+	<tr>
+	<td class=lbl>Repository Url (with trailing slash):</td>
+	<td><input runat="server" type=text class=txt id="repository_url" maxlength=255 size=80></td>
+	<td runat="server" class=err id="repository_url_err">&nbsp;</td>
+	</tr>
+
+
+	<tr>
+	<td class=lbl>Username:</td>
+	<td><input runat="server" type=text class=txt id="svn_username" maxlength=100 size=30></td>
+	<td runat="server" class=err id="svn_username_err">&nbsp;</td>
+	</tr>
+
+
+	<tr>
+	<td class=lbl>Password:</td>
+	<td><input runat="server" type=password class=txt id="svn_password" maxlength=80 size=30></td>
+	<td runat="server" class=err id="svn_password_err">&nbsp;</td>
+	</tr>
+
+	<tr>
+	<td class=lbl>WebSvn Url:</td>
+	<td><input runat="server" type=text class=txt id="websvn_url" maxlength=100 size=80></td>
+	<td runat="server" class=err id="websvn_url_err">&nbsp;</td>
+	</tr>
+
+	</table>
+</div>
+
+	<table border=0>
 
 	<tr>
 	<td colspan=3>
@@ -510,7 +658,8 @@ void on_update (Object sender, EventArgs e)
 	</td></tr>
 
 	<tr>
-	<td colspan=2 align=center>
+	<td width=300px>&nbsp;
+	<td align=center>
 	<input runat="server" class=btn type=submit id="sub" value="Create or Edit" OnServerClick="on_update">
 	<td>&nbsp</td>
 	</td>
@@ -518,7 +667,7 @@ void on_update (Object sender, EventArgs e)
 	</td></tr></table>
 </form>
 </td></tr></table></div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

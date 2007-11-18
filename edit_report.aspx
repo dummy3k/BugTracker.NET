@@ -226,7 +226,7 @@ void on_update (Object sender, EventArgs e) {
         </td>
     </tr>
 </table>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

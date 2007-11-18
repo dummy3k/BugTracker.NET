@@ -22,7 +22,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
-	if (security.this_is_admin || security.this_can_edit_delete_bug_posts)
+	if (security.this_is_admin || security.this_can_edit_and_delete_posts)
 	{
 		//
 	}
@@ -102,7 +102,7 @@ or
 <p>
 <a id="confirm_href" runat="server" href="">confirm delete</a>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>
 
 

@@ -25,7 +25,9 @@ void Page_Load(Object sender, EventArgs e)
 	ds = dbutil.get_dataset(
 		@"select
 		pj_id [id],
-		'<a href=edit_user_permissions2.aspx?projects=y&id=' + convert(varchar,pj_id) + '>permissions</a>' [per user<br>permissions],
+		'<a href=edit_project.aspx?&id=' + convert(varchar,pj_id) + '>edit</a>' [$no_sort_edit],
+		'<a href=edit_user_permissions2.aspx?projects=y&id=' + convert(varchar,pj_id) + '>permissions</a>' [$no_sort_per user<br>permissions],
+		'<a href=delete_project.aspx?id=' + convert(varchar,pj_id) + '>delete</a>' [$no_sort_delete],
 		pj_name [project],
 		case when pj_active = 1 then 'Y' else 'N' end [active],
 		us_username [default user],
@@ -34,8 +36,7 @@ void Page_Load(Object sender, EventArgs e)
 		case when isnull(pj_enable_pop3,0) = 1 then 'Y' else 'N' end [receive items<br>via pop3],
 		pj_pop3_username [pop3 username],
 		pj_pop3_email_from [from email addressl],
-		case when pj_default = 1 then 'Y' else 'N' end [default],
-		pj_id [hidden]
+		case when pj_default = 1 then 'Y' else 'N' end [default]
 		from projects
 		left outer join users on us_id = pj_default_user
 		order by pj_name");
@@ -63,7 +64,7 @@ void Page_Load(Object sender, EventArgs e)
 if (ds.Tables[0].Rows.Count > 0)
 {
 	SortableHtmlTable.create_from_dataset(
-		Response, ds, "edit_project.aspx?id=", "delete_project.aspx?id=", false);
+		Response, ds, "", "", false);
 
 }
 else
@@ -72,5 +73,5 @@ else
 }
 %>
 </div>
-</body>
+<% Response.Write(Application["custom_footer"]); %></body>
 </html>

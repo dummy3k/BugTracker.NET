@@ -1,4 +1,5 @@
 <%@ Page language="C#" validateRequest="false"%>
+<%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="System.Text.RegularExpressions" %>
 <%@ Import Namespace="anmar.SharpMimeTools" %>
 <%@ Assembly Name="SharpMimeTools" %>
@@ -701,32 +702,35 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
 	Util.write_to_log("attachment:" + filename);
 
 	string missing_attachment_msg = "";
-	string upload_folder = "";
 
 	int max_upload_size = Convert.ToInt32(Util.get_setting("MaxUploadSize","100000"));
 	if (part.Size > max_upload_size)
 	{
 		missing_attachment_msg = "ERROR: email attachment exceeds size limit.";
 	}
-	else
-	{
 
-		try
+	string content_type = part.Header.TopLevelMediaType + "/" + part.Header.SubType;
+    string desc;
+    MemoryStream attachmentStream = new MemoryStream();
+    
+    if (missing_attachment_msg == "")
 		{
-			upload_folder = Util.get_upload_folder();
+        desc = "email attachment";
 		}
-		catch (Exception e)
+    else
 		{
-			missing_attachment_msg = "ERROR:" + e.Message;
-		}
+        desc = missing_attachment_msg;
 	}
-
+    part.DumpBody(attachmentStream);
+    attachmentStream.Position = 0;    
+    Bug.insert_post_attachment(bugid, attachmentStream, (int)attachmentStream.Length, filename, desc, content_type, parent_postid, false, true);
 
 	sql = @"insert into bug_posts
 			(bp_type, bp_bug, bp_file, bp_comment, bp_size, bp_date, bp_user, bp_content_type, bp_parent)
 			values ('file', $bg, N'$fi', N'$de', $si, getdate(), $us, N'$ct', $pp)
 			select scope_identity()";
 
+    /*
 	if (missing_attachment_msg == "")
 	{
 		sql = sql.Replace("$de", "email attachment");
@@ -778,7 +782,7 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
 			sql = sql.Replace("$de", e2.Message.Replace("'","''"));
 			dbutil.execute_nonquery(sql);
 		}
-	}
+	}*/
 
 }
 
