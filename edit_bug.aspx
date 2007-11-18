@@ -354,7 +354,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			// reported by
 			string s;
-			s = "Reported by <span class=static>" + btnet.Util.format_username(
+			s = "Created by <span class=static>" + btnet.Util.format_username(
 				(string) dr["reporter"],
 				(string) dr["reporter_fullname"]);
 
@@ -459,16 +459,6 @@ void Page_Load(Object sender, EventArgs e)
 
 			snapshot_timestamp.Value = Convert.ToDateTime(dr["snapshot_timestamp"]).ToString("yyyyMMdd HH\\:mm\\:ss\\:fff");
 
-			string attachment_link = "<a href='javascript:add_attachment("
-				+ Convert.ToString(id)
-				+ ")'>add attachment</a>&nbsp;&nbsp;&nbsp;&nbsp;<span class=smallnote>(save changes first)</span>";
-			attachment.InnerHtml = attachment_link;
-
-			string send_email_link = "<a href='javascript:send_email("
-				+ Convert.ToString(id)
-				+ ")'>send email</a>&nbsp;&nbsp;&nbsp;&nbsp;<span class=smallnote>(save changes first)</span>";
-			send_email.InnerHtml = send_email_link;
-
 			string toggle_images_link = "<a href='javascript:toggle_images("
 				+ Convert.ToString(id) + ")'>"
 				+ (images_inline ? "hide" : "show")
@@ -483,22 +473,36 @@ void Page_Load(Object sender, EventArgs e)
 				+ "</a>&nbsp;&nbsp;&nbsp;&nbsp;<span class=smallnote>(save changes first)</span>";
 			toggle_history.InnerHtml = toggle_history_link;
 
-			string history_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=view_bug_history.aspx?id="
+
+			string attachment_link = "<a href='javascript:add_attachment("
 				+ Convert.ToString(id)
-				+ ">history</a>";
+				+ ")'>add attachment</a>";
+			attachment.InnerHtml = attachment_link;
+
+			string send_email_link = "<a href='javascript:send_email("
+				+ Convert.ToString(id)
+				+ ")'>send email</a>";
+			send_email.InnerHtml = send_email_link;
+
+			string history_link = "<a target=_blank href=view_bug_history.aspx?id="
+				+ Convert.ToString(id)
+				+ ">view history</a>";
 			history.InnerHtml = history_link;
 
-			string subscribers_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=view_subscribers.aspx?id="
+			string subscribers_link = "<a target=_blank href=view_subscribers.aspx?id="
 				+ Convert.ToString(id)
-				+ ">subscribers</a>";
+				+ ">view/add subscribers</a>";
 			subscribers.InnerHtml = subscribers_link;
+
+
+
 
 			int relationship_cnt = 0;
 			if (id != 0)
 			{
 				relationship_cnt = (int) dr["relationship_cnt"];
 			}
-			string relationships_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=relationships.aspx?id="
+			string relationships_link = "<a target=_blank href=relationships.aspx?id="
 				+ Convert.ToString(id)
 				+ ">relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
 			relationships.InnerHtml = relationships_link;
@@ -510,9 +514,9 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					revision_cnt = (int) dr["revision_cnt"];
 				}
-				string revisions_link = "&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=view_svn_file_revisions.aspx?id="
+				string revisions_link = "<a target=_blank href=view_svn_file_revisions.aspx?id="
 					+ Convert.ToString(id)
-				+ ">revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
+				+ ">subversion revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
 				revisions.InnerHtml = revisions_link;
 			}
 			else
@@ -520,17 +524,6 @@ void Page_Load(Object sender, EventArgs e)
 				revisions.InnerHtml = "";
 			}
 
-
-			if ((string) dr["last_updated_user"] != "")
-			{
-				last_changed.InnerHtml = "Last changed by <b>"
-					+ btnet.Util.format_username(
-						(string) dr["last_updated_user"],
-						(string) dr["last_updated_fullname"])
-					+ "</b> on <b>"
-					+ btnet.Util.format_db_date(dr["last_updated_date"])
-					+ "</b>";
-			}
 
 			format_subcribe_cancel_link();
 
@@ -1526,18 +1519,6 @@ Boolean validate()
 
 
 ///////////////////////////////////////////////////////////////////////
-void format_last_update_text(DateTime last_update_date)
-{
-
-	last_changed.InnerHtml = "last changed by <b>"
-		+ btnet.Util.format_username(security.this_username, security.this_fullname)
-		+ "</b> on <b>"
-		+ btnet.Util.format_db_date(last_update_date)
-		+ "</b>";
-
-}
-
-///////////////////////////////////////////////////////////////////////
 void on_update (Object sender, EventArgs e)
 {
 
@@ -1622,26 +1603,6 @@ void on_update (Object sender, EventArgs e)
 		else // edit existing
 		{
 
-			if (fetch_permission_level(prev_project.Value) == Security.PERMISSION_REPORTER)
-			{
-
-				sql = @"declare @now datetime
-					set @now = getdate()
-					update bugs set
-					bg_last_updated_user = $lu,
-					bg_last_updated_date = @now
-					where bg_id = $id
-					select @now";
-
-				sql = sql.Replace("$lu", Convert.ToString(security.this_usid));
-				sql = sql.Replace("$id", Convert.ToString(id));
-
-				DateTime last_update_date = (DateTime) dbutil.execute_scalar(sql);
-
-				format_last_update_text(last_update_date);
-
-			}
-			else
 			{
 
 				string new_project;
@@ -1802,7 +1763,6 @@ void on_update (Object sender, EventArgs e)
 				if (date_from_db != date_from_webpage)
 				{
 					snapshot_timestamp.Value = date_from_db;
-					format_last_update_text(last_update_date);
 					btnet.Bug.auto_subscribe(id, Convert.ToInt32(new_project));
 					format_subcribe_cancel_link();
                     bug_fields_have_changed = record_changes();
@@ -1899,127 +1859,148 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 
 <div id="overDiv" style="position:absolute;visibility:hidden; z-index:1000;"></div>
 
-<div class=align><table border=0><tr><td>
+<div class=align>
+
 <% if (!security.this_adds_not_allowed) { %>
 <a href=edit_bug.aspx?id=0>add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
-<span id="print" runat="server">&nbsp;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;
-<span id="merge_bug" runat="server">&nbsp;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;
-<span id="delete_bug" runat="server">&nbsp;</span>
-&nbsp;&nbsp;&nbsp;&nbsp;
-<span id="custom" runat="server">&nbsp;</span>
 <span id="prev_next" runat="server">&nbsp;</span>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;
+<p>
 
-<span id=bugform>
+<table border=0>
+<tr>
+<td nowrap valign=top> <!-- links -->
+
+
+
+<span id="print" runat="server">&nbsp;</span>
+<br>
+<br>
+<span id="merge_bug" runat="server">&nbsp;</span>
+<br>
+<span id="delete_bug" runat="server">&nbsp;</span>
+<br>
+<br>
+<span id="history" runat="server">&nbsp;</span>
+<br>
+<span id="revisions" runat="server">&nbsp;</span>
+<br>
+<span id="subscribers" runat="server">&nbsp;</span>
+<br>
+<span id="subscriptions" runat="server">&nbsp;</span>
+<br>
+<br>
+<span id="relationships" runat="server">&nbsp;</span>
+<br>
+<span id="send_email" runat="server">&nbsp;</span>
+<br>
+<span id="attachment" runat="server">&nbsp;</span>
+<br>
+<br>
+<span id="custom" runat="server">&nbsp;</span>
+
+
+
+<td nowrap valign=top> <!-- form -->
+
+
 <form class=frm runat="server">
-	<table id=bugformtbl border=0 cellspacing=5>
+
+	<table border=0 cellpadding=3 cellspacing=0>
 
 	<tr>
-
-	<td colspan=3 align=left>
-	<span class=lbl><% Response.Write(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))); %> ID:&nbsp;</span>
-	<span runat="server" class=static id="bugid">&nbsp;</span>
-	&nbsp;&nbsp;&nbsp;&nbsp;
-	<span id="last_changed" runat="server" class=pst></span>
-	<td align=right>
-	<span id="history" runat="server"></span>
-	<span id="relationships" runat="server"></span>
-	<span id="revisions" runat="server"></span>
-	<span id="subscribers" runat="server"></span>
-	</td>
-	</tr>
+		<td nowrap colspan=2>
+			<span class=lbl><% Response.Write(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))); %> ID:&nbsp;</span>
+			<span runat="server" class=static id="bugid"></span>
+			&nbsp;&nbsp;&nbsp;
+			<span class=static id="static_short_desc" runat="server" style='width: 500px; display: none;'></span>
+			<input runat="server" type=text class=txt id="short_desc" size="100" maxlength="200">
+			&nbsp;&nbsp;&nbsp;
+			<span runat="server" class=err id="short_desc_err">&nbsp;</span>
 
 	<tr>
-	<td class=lbl>Short desc:</td>
-	<td align=left><span class=static id="static_short_desc" runat="server" style='width: 500px; display: none;'></span>
-	<input runat="server" type=text class=txt id="short_desc" size="80" maxlength="80"></td>
-	<td runat="server" class=err id="short_desc_err">&nbsp;</td>
-	</tr>
+		<td nowrap>
+			<span runat="server" id=reported_by></span>
 
-	<tr>
-	<td class=lbl colspan=3><span runat="server" id=reported_by>&nbsp;</span></td>
-<% if (id == 0 || permission_level == Security.PERMISSION_ALL) { %>
-	<td id="presets" align=right>Presets: <a title="Use previously saved settings for project, category, priority, etc..." href="javascript:get_presets()">use</a>&nbsp;/&nbsp;<a title="Save current settings for project, category, priority, etc., so that you can reuse later." href="javascript:set_presets()">save</a>
-<% } %>
-	</tr>
+		<% if (id == 0 || permission_level == Security.PERMISSION_ALL) { %>
+		<td nowrap align=right id="presets" >Presets:
+			<a title="Use previously saved settings for project, category, priority, etc..."
+				href="javascript:get_presets()">use</a>
+			&nbsp;/&nbsp;
+			<a title="Save current settings for project, category, priority, etc., so that you can reuse later."
+				href="javascript:set_presets()">save</a>
+		<% } %>
+
+	</table>
+
+	<table border=0 cellpadding=3 cellspacing=0>
 
 	<tr id="row1">
-	<td colspan=4 nowrap>
+		<td nowrap>
+			<span class=lbl id="project_label">Project:&nbsp;</span>
+		<td nowrap>
+			<span class=static id="current_project" runat="server">[no project]</span>
+			<span class=lbl id="static_project" runat="server" style='display: none;'></span>
 
-		<span class=lbl id="project_label">Project:&nbsp;</span>
+			<span class=lbl id="change_project_label" runat="server">&nbsp;&nbsp;&nbsp;&nbsp;Change project:&nbsp;</span>
 
-		<span class=static id="current_project" runat="server">[no project]</span>
-
-		&nbsp;&nbsp;
-		<span runat="server" id="change_project_label" class=lbl>
-		Change project:&nbsp;
-		</span>
-
-		<span class=lbl id="static_project" runat="server" style='display: none;'></span>
-		<asp:DropDownList id="project" runat="server"
-		AutoPostBack="True">
-		</asp:DropDownList>
-
-		&nbsp;&nbsp;&nbsp;&nbsp;
-
-		<span class=lbl id="category_label">Category:&nbsp;</span>
-		<span class=static id="static_category" runat="server" style='display: none;'></span>
-		<asp:DropDownList id="category" runat="server">
-		</asp:DropDownList>
-
-		&nbsp;&nbsp;&nbsp;&nbsp;
-
-		<span class=lbl id="priority_label">Priority:&nbsp;</span>
-		<span class=static id="static_priority" runat="server" style='display: none;'></span>
-		<asp:DropDownList id="priority" runat="server">
-		</asp:DropDownList>
-
-
-	</td>
-	</tr>
+			<asp:DropDownList id="project" runat="server"
+			AutoPostBack="True"></asp:DropDownList>
 
 	<tr id="row2">
-	<td colspan=4 nowrap>
+		<td nowrap>
+			<span class=lbl id="category_label">Category:&nbsp;</span>
+		<td nowrap>
+			<span class=static id="static_category" runat="server" style='display: none;'></span>
 
-		<span class=lbl id="assigned_to_label">Assigned to:&nbsp;</span>
+			<asp:DropDownList id="category" runat="server"></asp:DropDownList>
 
-		<span class=static id="assigned_to_username" runat="server">[not assigned]</span>
 
-		&nbsp;&nbsp;
-		<span  runat="server" id="reassign_label" class=lbl>Re-assign:&nbsp;</span>
-		<asp:DropDownList id="assigned_to" runat="server"
-		OnSelectedIndexChanged="on_assigned_to_changed">
-		</asp:DropDownList>
+	<tr id="row3">
+		<td nowrap>
+			<span class=lbl id="priority_label">Priority:&nbsp;</span>
+		<td nowrap>
+			<span class=static id="static_priority" runat="server" style='display: none;'></span>
 
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<span class=lbl id="status_label">Status:&nbsp;</span>
-		<span class=static id="static_status" runat="server" style='display: none;'></span>
-		<asp:DropDownList id="status" runat="server">
-		</asp:DropDownList>
+			<asp:DropDownList id="priority" runat="server"></asp:DropDownList>
 
-		<%
-		if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
-		{
-			%>
-			&nbsp;&nbsp;&nbsp;&nbsp;
+	<tr id="row4">
+		<td nowrap>
+			<span class=lbl id="assigned_to_label">Assigned to:&nbsp;</span>
+		<td nowrap>
+			<span class=static id="assigned_to_username" runat="server">[not assigned]</span>
+			<span  runat="server" id="reassign_label" class=lbl>&nbsp;&nbsp;&nbsp;&nbsp;Re-assign:&nbsp;</span>
+
+			<asp:DropDownList id="assigned_to" runat="server"
+			OnSelectedIndexChanged="on_assigned_to_changed"> </asp:DropDownList>
+
+	<tr id="row5">
+		<td nowrap>
+			<span class=lbl id="status_label">Status:&nbsp;</span>
+		<td nowrap>
+			<span class=static id="static_status" runat="server" style='display: none;'></span>
+			<asp:DropDownList id="status" runat="server"></asp:DropDownList>
+
+
+<%
+if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
+{
+%>
+	<tr id="row6">
+		<td nowrap>
 			<span class=lbl id="udf_label">
 			<% Response.Write(btnet.Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %>:&nbsp;</span>
+		<td nowrap>
 			<span class=static id="static_udf" runat="server" style='display: none;'></span>
 			<asp:DropDownList id="udf" runat="server">
 			</asp:DropDownList>
-			<%
-		}
-		%>
+<%
+}
+%>
 
-
-	</td>
-	</tr>
 
 	<%
 
@@ -2308,52 +2289,42 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 
 	%>
 
-	<tr>
-	<td colspan=4>
+	</table>
+	<table border=0 cellpadding=0 cellspacing=3 width=100%>
 
-	<span class=lbl>
-	<font size=0>
-	<span id="plus_label" runat="server">
-		<a name="toggle_link" href="#" onclick="<%= security.this_use_fckeditor ? "resize_iframe('fckeComment___Frame', 50);" : "resize_comment(10);" %>"><span id="toggle_link_plus">[+]</span></a>
-		&nbsp;<a name="toggle_link" href="#" onclick="<%= security.this_use_fckeditor ? "resize_iframe('fckeComment___Frame', -50);" : "resize_comment(-10);" %>"><span id="toggle_link_minus">[-]</span></a>
-	</span>
-	</font>
-	&nbsp;<span id="comment_label" runat="server">Comment:</span><br>
+	<tr><td>
+		<span id="plus_label" runat="server">
+			<font size=0>
+				<a href="#" onclick="<%= security.this_use_fckeditor ? "resize_iframe('fckeComment___Frame', 50);" : "resize_comment(10);" %>"><span id="toggle_link_plus">[+]</span></a>
+				&nbsp;
+				<a href="#" onclick="<%= security.this_use_fckeditor ? "resize_iframe('fckeComment___Frame', -50);" : "resize_comment(-10);" %>"><span id="toggle_link_minus">[-]</span></a>
+			</font>
+		</span>
+		&nbsp;
+		<span id="comment_label" runat="server">Comment:</span>
+		<br>
+		<textarea  id="comment" rows=4 cols=80 runat="server" class=txt></textarea>
+		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>
 
-	<textarea  id="comment" rows=4 cols=80 runat="server" class=txt></textarea>
-
-	<FCKeditorV2:FCKeditor  id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>
-
-	<br><span runat="server" class=err id="comment_err"></span>
-	</td>
-	</tr>
-
-	<tr>
-	<td colspan=3>
-	<asp:checkbox runat="server" class=txt id="internal_only"/>
-	<span runat="server" id="internal_only_label">Comment visible to internal users only</span>
-	</td>
-	</tr>
+	<tr><td>
+		<asp:checkbox runat="server" class=txt id="internal_only"/>
+		<span runat="server" id="internal_only_label">Comment visible to internal users only</span>
 
 
-	<tr><td colspan=4 align=left>
-	<span runat="server" class=err id="custom_field_msg">&nbsp;</span>
-	<span runat="server" class=err id="msg">&nbsp;</span>
-	</td></tr>
+	<tr><td align=left>
+		<span runat="server" class=err id="custom_field_msg">&nbsp;</span>
+		<span runat="server" class=err id="msg">&nbsp;</span>
 
 
-
-	<tr>
-	<td colspan=4 align=center>
-		<table border=0 cellspacing=0 cellpadding=0 width=100%><tr>
-		<td align=center width=100%>
-			<input runat="server" class=btn type=submit id="sub"
-			onclick="disable_me()" value="Create or Edit" OnServerClick="on_update">
-		</td>
-		<td align=right nowrap id="subscriptions" runat="server">&nbsp;</td>
-		</tr></table>
-	</td>
-	</tr>
+	<tr><td align=center>
+		<input
+			runat="server"
+			class=btn
+			type=submit
+			id="sub"
+			onclick="disable_me()"
+			value="Create or Edit"
+			OnServerClick="on_update">
 
 	</table>
 
@@ -2410,18 +2381,20 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 
 
 </form>
-</span>
-</td></tr></table>
+</table>
+
+
+
+
+
+
+
 
 <table border=0 cellspacing=3>
 
 <% if (!sub.Disabled)
 { %>
 	<tr><td nowrap>
-		<span id="attachment" runat="server"></span>
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<span id="send_email" runat="server"></span>
-		<p>
 		<span id="toggle_images" runat="server"></span>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<span id="toggle_history" runat="server"></span>

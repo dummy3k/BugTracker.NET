@@ -1,4 +1,4 @@
-body {font-family: verdana, arial; font-size: 10pt; background: #ffffef; }
+body {font-family: verdana, arial; font-size: 10pt; background: #fffffef; }
 td {font-size: 8pt;}
 p {font-size: 10pt;}
 
@@ -84,7 +84,7 @@ padding: 3px;
 .err {color: red; font-size: 10pt; font-weight: bold;}
 .btn {background: #ffeeaa; color: #0000ff; }
 
-.menubar {background: #ccfffe; padding: 0px; border-bottom: 1px solid #00cc00;}
+.menubar {background: #f0fff0; padding: 0px; border-bottom: 1px solid #00cc00;}
 
 .cmt {background: white; border: 1px #009900 solid; padding: 3px;}
 .cmt_text {font-family:courier; font-size: 10pt;}
@@ -103,7 +103,7 @@ font-weight: bold;
 }
 
 .lbl {font-size: 8pt;}
-.static {font-size: 8pt; padding: 3px; font-weight: bold;}
+.static {font-size: 8pt; xpadding: 3px; font-weight: bold;}
 
 .frm {
 padding: 6px;
@@ -111,7 +111,7 @@ border-left: 1px solid silver;
 border-top: 1px solid silver;
 border-right: 2px solid black;
 border-bottom: 3px solid black;
-background: #e9e9e9;
+background: #f3f3f3;
 }
 
 .align {text-align: left;}
@@ -201,3 +201,7 @@ border: 1px black solid;
 }
 
 .private {font-size: 7pt; color:red; font-weight: bold; letter-spacing: 3px;}
+
+
+select {font-size: 8pt;}
+option {font-size: 8pt;}
