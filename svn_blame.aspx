@@ -10,7 +10,6 @@
 DbUtil dbutil;
 Security security;
 
-string file_path;
 string blame;
 string text;
 

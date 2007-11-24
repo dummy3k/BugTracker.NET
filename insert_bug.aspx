@@ -401,7 +401,8 @@ void Page_Load(Object sender, EventArgs e)
 			from.Replace("'","''"),
 			"text/plain",
 			false, // internal only
-			null);
+			null, // custom columns
+            false);  // suppress notifications for now - wait till after the attachments
 
 		if (mime_message != null)
 		{
@@ -453,6 +454,11 @@ void Page_Load(Object sender, EventArgs e)
 			}
 		}
 
+        btnet.Bug.send_notifications(btnet.Bug.INSERT,
+                            new_ids.bugid,
+                            (int)dr["us_id"],
+                            Convert.ToBoolean((int)dr["us_admin"]));        
+        
 		Response.AddHeader("BTNET","OK:" + Convert.ToString(new_ids.bugid));
 		Response.Write ("OK:" + Convert.ToString(new_ids.bugid));
 		Response.End();
@@ -659,7 +665,6 @@ string determine_part_filename(SharpMimeMessage part)
 ///////////////////////////////////////////////////////////////////////
 void add_attachments(SharpMimeMessage mime_message, int bugid, int parent_postid)
 {
-
 	if (mime_message.IsMultipart)
 	{
 		foreach (SharpMimeMessage part in mime_message)
@@ -723,67 +728,22 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
 	}
     part.DumpBody(attachmentStream);
     attachmentStream.Position = 0;    
-    Bug.insert_post_attachment(bugid, attachmentStream, (int)attachmentStream.Length, filename, desc, content_type, parent_postid, false, true);
+    Bug.insert_post_attachment(
+        security, 
+        bugid, 
+        attachmentStream, 
+        (int)attachmentStream.Length, 
+        filename, 
+        desc, 
+        content_type, 
+        parent_postid, 
+        false,  // not hidden
+        false); // don't send notifications
 
 	sql = @"insert into bug_posts
 			(bp_type, bp_bug, bp_file, bp_comment, bp_size, bp_date, bp_user, bp_content_type, bp_parent)
 			values ('file', $bg, N'$fi', N'$de', $si, getdate(), $us, N'$ct', $pp)
 			select scope_identity()";
-
-    /*
-	if (missing_attachment_msg == "")
-	{
-		sql = sql.Replace("$de", "email attachment");
-	}
-	else
-	{
-		sql = sql.Replace("$de", missing_attachment_msg);
-	}
-
-	sql = sql.Replace("$bg", Convert.ToString(bugid));
-	sql = sql.Replace("$fi", filename.Replace("'","''"));
-	sql = sql.Replace("$si", Convert.ToString(part.Size));
-	sql = sql.Replace("$us", Convert.ToString(security.this_usid));
-	sql = sql.Replace("$pp", Convert.ToString(parent_postid));
-
-	string content_type = part.Header.TopLevelMediaType + "/" + part.Header.SubType;
-	sql = sql.Replace("$ct", content_type);
-
-	// save the attachment's identity
-
-	int bp_id = Convert.ToInt32(dbutil.execute_scalar(sql));
-
-	if (missing_attachment_msg == "")
-	{
-		string modified_filename =
-				Convert.ToString(bugid) + "_" // bug id
-				+ bp_id + "_"   // attachment id
-				+ filename;
-
-		try
-		{
-			part.DumpBody(upload_folder, modified_filename);
-
-			// get real size and update the db rec
-			System.IO.FileInfo fi = new System.IO.FileInfo(upload_folder + "\\" + modified_filename);
-			sql = @"update bug_posts
-				set bp_size = $sz
-				where bp_id = $bp";
-			sql = sql.Replace("$sz", Convert.ToString(fi.Length));
-			sql = sql.Replace("$bp", Convert.ToString(bp_id));
-			dbutil.execute_nonquery(sql);
-		}
-		catch (Exception e2)
-		{
-
-			// clean up
-			sql = @"update bug_posts set bp_comment = '$de' where bp_id = $ba";
-			sql = sql.Replace("$ba", Convert.ToString(bp_id));
-			sql = sql.Replace("$de", e2.Message.Replace("'","''"));
-			dbutil.execute_nonquery(sql);
-		}
-	}*/
-
 }
 
 

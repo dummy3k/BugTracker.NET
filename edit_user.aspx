@@ -1290,6 +1290,15 @@ function show_permissions_settings()
 	</td>
 	</tr>
 
+	<tr>
+	<td colspan=3>
+	<br><br>
+	<div class=smallnote style="width: 400px;">If you have only given view permissions to this user, set the forced project to any of the view-only projects.<br>
+	</div>
+	</td>
+	</tr>
+
+
 	<tr><td colspan=3>&nbsp;
 
 	<tr>

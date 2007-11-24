@@ -1704,7 +1704,7 @@ namespace btnet
 			}
 			else
 			{
-				Response.WriteFile(HttpContext.Current.Server.MapPath("./") + "btnet_custom.css");
+				Response.WriteFile(HttpContext.Current.Server.MapPath("./custom/") + "btnet_custom.css");
 			}
 
 			// underline links in the emails to make them more obvious
@@ -1877,12 +1877,15 @@ namespace btnet
 			bool this_external_user)
 		{
 
+			Response.Write ("<table id='posts_table' border=0 cellpadding=0 cellspacing=3>");
 			DataSet ds_posts = btnet.Bug.get_bug_posts(bugid);
 
 			int bp_id;
 			int prev_bp_id = -1;
 			foreach (DataRow dr in ds_posts.Tables[0].Rows)
 			{
+
+				Response.Write ("\n");
 
 				if (this_external_user)
 				{
@@ -1928,8 +1931,10 @@ namespace btnet
 					prev_bp_id = bp_id;
 				}
 
+				Response.Write ("\n");
+
 			}
-			Response.Write ("</table>");
+			Response.Write ("</table></table>");
 		}
 
 		///////////////////////////////////////////////////////////////////////
@@ -2073,22 +2078,23 @@ namespace btnet
 				// format links for responding to email
 				if (type == "received" )
 				{
+					if (this_is_admin
+					|| (this_can_edit_and_delete_posts
+					&& permission_level == Security.PERMISSION_ALL))
+					{
 					// This doesn't just work.  Need to make changes in edit/delete pages.
-					//if (this_is_admin
-					//|| (this_can_edit_and_delete_posts
-					//&& permission_level == Security.PERMISSION_ALL))
-					//{
 					//	Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
-					//	Response.Write (" href=edit_attachment.aspx?id="
+					//	Response.Write (" href=edit_comment.aspx?id="
 					//		+ string_post_id + "&bug_id=" + string_bug_id);
 					//	Response.Write (">edit</a>");
 
-					//	Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
-					//	Response.Write (" href=delete_attachment.aspx?id="
-					//		+ string_post_id + "&bug_id=" + string_bug_id);
-					//	Response.Write (">delete</a>");
+					// This delete leaves debris around, but it's better than nothing
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write (" href=delete_comment.aspx?id="
+							+ string_post_id + "&bug_id=" + string_bug_id);
+						Response.Write (">delete</a>");
 
-					//}
+					}
 
 					if (permission_level != Security.PERMISSION_READONLY)
 					{
@@ -2441,7 +2447,6 @@ namespace btnet
 				msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpserverport"] = smtp_server_port;
 			}
 
-            string email_path = "";
             if (attachment_bpids != null)
                 {
                 string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -2655,26 +2660,75 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public static int insert_post_attachment_copy(int bugid, int copy_bpid, string comment, int parent, bool hidden_from_external_users, bool send_notifications)
+        public static int insert_post_attachment_copy(
+            btnet.Security security,
+            int bugid,
+			int copy_bpid,
+			string comment,
+			int parent,
+			bool hidden_from_external_users,
+			bool send_notifications)
         {
-            return insert_post_attachment(bugid, null, -1, copy_bpid, null, comment, null, parent, hidden_from_external_users, send_notifications);
+            return insert_post_attachment_impl(
+                security,
+				bugid,
+				null,
+				-1,
+				copy_bpid,
+				null,
+				comment,
+				null,
+				parent,
+				hidden_from_external_users,
+				send_notifications);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public static int insert_post_attachment(int bugid, Stream content, int content_length, string file, string comment, string content_type, int parent, bool hidden_from_external_users, bool send_notifications)
+        public static int insert_post_attachment(
+            btnet.Security security,
+			int bugid,
+			Stream content,
+			int content_length,
+			string file,
+			string comment,
+			string content_type,
+			int parent,
+			bool hidden_from_external_users,
+			bool send_notifications)
         {
-            return insert_post_attachment(bugid, content, content_length, -1, file, comment, content_type, parent, hidden_from_external_users, send_notifications);
+            return insert_post_attachment_impl(
+                security,
+				bugid,
+				content,
+				content_length,
+				-1, // copy_bpid
+				file,
+				comment,
+				content_type,
+				parent,
+				hidden_from_external_users,
+				send_notifications);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        private static int insert_post_attachment(int bugid, Stream content, int content_length, int copy_bpid, string file, string comment, string content_type, int parent, bool hidden_from_external_users, bool send_notifications)
+        private static int insert_post_attachment_impl(
+            btnet.Security security,
+			int bugid,
+			Stream content,
+			int content_length,
+			int copy_bpid,
+			string file,
+			string comment,
+			string content_type,
+			int parent,
+			bool hidden_from_external_users,
+			bool send_notifications)
         {
             // Note that this method does not perform any security check nor does
             // it check that content_length is less than MaxUploadSize.
             // These are left up to the caller.
 
             DbUtil dbutil = new DbUtil();
-            Security security = new Security();
             string upload_folder = Util.get_upload_folder();
             string sql;
             bool store_attachments_in_database = (Util.get_setting("StoreAttachmentsInDatabase", "0") == "1");
@@ -2800,7 +2854,7 @@ namespace btnet
 
                 if (send_notifications)
                 {
-                    btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security.this_usid, security.this_is_admin);
+					btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security.this_usid, security.this_is_admin);
                 }
                 return bp_id;
             }
@@ -3143,7 +3197,8 @@ where bg_id = $id";
             string from,
             string content_type,
             bool internal_only,
-            System.Collections.Hashtable hash_custom_cols)
+            System.Collections.Hashtable hash_custom_cols,
+            bool send_notifications)
         {
 
             DbUtil dbutil = new DbUtil();
@@ -3249,10 +3304,13 @@ where bg_id = $id";
 
             btnet.Bug.auto_subscribe(bugid, projectid);
 
-            btnet.Bug.send_notifications(btnet.Bug.INSERT,
-                bugid,
-                this_usid,
-                this_is_admin);
+            if (send_notifications)
+            {
+                btnet.Bug.send_notifications(btnet.Bug.INSERT,
+                    bugid,
+                    this_usid,
+                    this_is_admin);
+            }
 
             return new NewIds(bugid, postid);
 

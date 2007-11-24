@@ -72,7 +72,7 @@ void Page_Load(Object sender, EventArgs e)
 				bp_email_from,
 				bp_date,
 				bp_type,
-                bp_content_type,				
+                bp_content_type,
 				bg_project,
 				isnull(us_signature,'') [us_signature],
 				isnull(pj_pop3_email_from,'') [pj_pop3_email_from],
@@ -215,13 +215,13 @@ void Page_Load(Object sender, EventArgs e)
 					{
 						if (security.this_use_fckeditor)
 						{
-                            if (Convert.ToString(dr["bp_content_type"]) != "text/html") 
+                            if (Convert.ToString(dr["bp_content_type"]) != "text/html")
                             {
 							fckeBody.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
 						}
 						else
 						{
-                                if (i == 0) 
+                                if (i == 0)
                                 {
                                     fckeBody.Value += "<hr>";
                                 }
@@ -537,7 +537,7 @@ int[] handle_attachments(int comment_id)
 			return null;
 		}
 
-        int bp_id = Bug.insert_post_attachment(Convert.ToInt32(bg_id.Value), attached_file.PostedFile.InputStream, content_length, filename, "email attachment", file_extension_to_content_type(Path.GetExtension(filename)), comment_id, false, false);
+        int bp_id = Bug.insert_post_attachment(security, Convert.ToInt32(bg_id.Value), attached_file.PostedFile.InputStream, content_length, filename, "email attachment", file_extension_to_content_type(Path.GetExtension(filename)), comment_id, false, false);
         attachments.Add(bp_id);
 	}
 
@@ -549,7 +549,7 @@ int[] handle_attachments(int comment_id)
         {
             int bp_id = Convert.ToInt32(item_attachment.Value);
 
-            Bug.insert_post_attachment_copy(Convert.ToInt32(bg_id.Value), bp_id, "email attachment", comment_id, false, false);
+            Bug.insert_post_attachment_copy(security, Convert.ToInt32(bg_id.Value), bp_id, "email attachment", comment_id, false, false);
             attachments.Add(bp_id);
         }
     }

@@ -135,6 +135,7 @@ insert into categories (ct_name) values('bug')
 insert into categories (ct_name) values('enhancement')
 insert into categories (ct_name) values('task')
 insert into categories (ct_name) values('question')
+insert into categories (ct_name) values('ticket')
 
 /* PROJECTS */
 

@@ -11,6 +11,7 @@ Distributed under the terms of the GNU General Public License
 int bugid;
 DbUtil dbutil;
 Security security;
+int added_attachment = 0;
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -22,6 +23,7 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
+	added_attachment = 0;
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "add attachment";
@@ -29,7 +31,7 @@ void Page_Load(Object sender, EventArgs e)
 	msg.InnerText = "";
 
 	string string_id = Util.sanitize_integer(Request.QueryString["id"]);
-	back_href.HRef = "edit_bug.aspx?id=" + string_id;
+//	back_href.HRef = "edit_bug.aspx?id=" + string_id;
 
 	if (string_id == null || string_id == "0")
 	{
@@ -90,7 +92,20 @@ void on_update(object Source, EventArgs e)
 
 	try
 	{
-        Bug.insert_post_attachment(bugid, attached_file.PostedFile.InputStream, content_length, filename, desc.Value, attached_file.PostedFile.ContentType, -1, internal_only.Checked, true);
+        Bug.insert_post_attachment(
+            security,
+			bugid,
+			attached_file.PostedFile.InputStream,
+			content_length,
+			filename,
+			desc.Value,
+			attached_file.PostedFile.ContentType,
+			-1, // parent
+			internal_only.Checked,
+			true);
+
+		added_attachment = 1;
+
 	}
 	catch (Exception ex)
 	{
@@ -98,7 +113,7 @@ void on_update(object Source, EventArgs e)
 		return;
 	}
 
-		Response.Redirect ("edit_bug.aspx?id=" + Convert.ToString(bugid), false);
+	//Response.Redirect ("edit_bug.aspx?id=" + Convert.ToString(bugid), false);
 }
 
 
@@ -109,46 +124,66 @@ void on_update(object Source, EventArgs e)
 <title id="titl" runat="server">btnet add attachment</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 </head>
-<body>
 
-<% security.write_menu(Response, Util.get_setting("PluralBugLabel","bugs")); %>
-<div class=align><table border=0><tr><td>
+<script>
 
-<a id="back_href" runat="server" href="">back to <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
+function body_on_load()
+{
 
-<form class=frm runat="server" enctype="multipart/form-data" action="add_attachment.aspx">
-	<table border=0>
+	opener.maybe_rewrite_posts(
+	<%
+		Response.Write(Convert.ToString(bugid));
+		Response.Write(",");
+		Response.Write(added_attachment);
+	%>
+	)
 
-	<tr>
-	<td class=lbl>Description:</td>
-	<td><input runat="server" type=text class=txt id="desc" maxlength=80 size=80></td>
-	<td runat="server" class=err id="desc_err">&nbsp;</td>
-	</tr>
+}
 
-	<tr>
-	<td class=lbl>File:</td>
-	<td><input runat="server" type=file class=txt id="attached_file" maxlength=255 size=60></td>
-	<td runat="server" class=err id="attached_file_err">&nbsp;</td>
-	</tr>
+</script>
 
-	<tr>
-	<td colspan=3>
-	<asp:checkbox runat="server" class=txt id="internal_only"/>
-	<span runat="server" id="internal_only_label">Visible to internal users only</span>
-	</td>
-	</tr>
 
-	<tr><td colspan=3 align=left>
-	<span runat="server" class=err id="msg">&nbsp;</span>
-	</td></tr>
+<body onload="body_on_load()">
 
-	<tr>
-	<td colspan=2 align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Upload" onserverclick="on_update">
-	</td>
-	</tr>
-    </table>
-</form>
-</td></tr></table></div>
+<div class=align>
+
+Add attachment to <% Response.Write(Convert.ToString(bugid)); %>
+<p>
+	<table border=0><tr><td>
+		<form class=frm runat="server" enctype="multipart/form-data" action="add_attachment.aspx">
+			<table border=0>
+
+			<tr>
+			<td class=lbl>Description:</td>
+			<td><input runat="server" type=text class=txt id="desc" maxlength=80 size=80></td>
+			<td runat="server" class=err id="desc_err">&nbsp;</td>
+			</tr>
+
+			<tr>
+			<td class=lbl>File:</td>
+			<td><input runat="server" type=file class=txt id="attached_file" maxlength=255 size=60></td>
+			<td runat="server" class=err id="attached_file_err">&nbsp;</td>
+			</tr>
+
+			<tr>
+			<td colspan=3>
+			<asp:checkbox runat="server" class=txt id="internal_only"/>
+			<span runat="server" id="internal_only_label">Visible to internal users only</span>
+			</td>
+			</tr>
+
+			<tr><td colspan=3 align=left>
+			<span runat="server" class=err id="msg">&nbsp;</span>
+			</td></tr>
+
+			<tr>
+			<td colspan=2 align=center>
+			<input runat="server" class=btn type=submit id="sub" value="Upload" onserverclick="on_update">
+			</td>
+			</tr>
+			</table>
+		</form>
+	</td></tr></table>
+</div>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

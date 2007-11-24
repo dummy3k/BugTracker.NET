@@ -155,12 +155,20 @@ void Page_Load(Object sender, EventArgs e)
 	sql = @"select bg_id [id],
 		bg_short_desc [desc ],
 		re_type [comment],
-		'<a href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view],
-		'<a href=relationships.aspx?action=remove&id=$bg'
+		'<a href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view]";
+
+		if (permission_level == Security.PERMISSION_ALL)
+		{
+
+			sql += @",'<a href=relationships.aspx?action=remove&id=$bg'
 		+ '&bugid2='
 		+ convert(varchar,re_bug2)
-		+ '>detach</a>' [detach]
-		from bugs
+			+ '>detach</a>' [detach]";
+
+		}
+
+
+		sql += @"from bugs
 		inner join bug_relationships on bg_id = re_bug2
 		where re_bug1 = $bg
 		order by bg_id desc";
@@ -180,9 +188,26 @@ void Page_Load(Object sender, EventArgs e)
 <title id="titl" runat="server">btnet related <% Response.Write(Util.get_setting("PluralBugLabel","bugs"));%></title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
+
+<script>
+
+function body_on_load()
+{
+
+	opener.set_relationship_cnt(
+	<%
+		Response.Write(Convert.ToString(bugid));
+		Response.Write(",");
+		Response.Write(Convert.ToString(ds.Tables[0].Rows.Count));
+	%>
+	)
+}
+
+</script>
 </head>
 
-<body onload=opener.set_relationship_cnt(<%Response.Write(Convert.ToString(ds.Tables[0].Rows.Count));%>)>
+<body onload="body_on_load()">
+
 <div class=align>
 Relationships for <% Response.Write(Convert.ToString(bugid)); %>
 <p>

@@ -1,49 +1,40 @@
-var iframe_doc;
-var dirty = false;
-
-function set_relationship_cnt(cnt)
+function on_body_unload()
 {
-	el = window.document.getElementById("relationship_cnt");
-	el.firstChild.nodeValue = cnt;
-}
-
-function open_popup_window(url, title, bugid)
-{
-	w = window.open(url + '?id=' + bugid, title + bugid, "menubar=0, scrollbars=1, toolbar=0, resizable=1,width=750,height=550")
-	w.focus()
-}
-
-function add_attachment(id)
-{
-	if (prompt == "1")
+	// don't leave stray child windows because it's too confusing which parent/opener they are talking back to
+	if (popup_window != null)
 	{
-		var result = confirm('Go to "Add Attachment" page?  Changes here will not be saved.');
-		if (result)
-		{
-			window.document.location = "add_attachment.aspx?id=" + id;
-		}
-	}
-	else
-	{
-		window.document.location = "add_attachment.aspx?id=" + id;
+		popup_window.close();
 	}
 }
 
-
-function send_email(id)
+function set_relationship_cnt(bugid, cnt)
 {
-	if (prompt == "1")
+	if (bugid == this_bugid) // don't really need this code now that we're closing child windows at unload time
 	{
-		var result = confirm('Go to "Send Email" page?  Changes here will not be saved.');
-		if (result)
-		{
-			window.document.location = "send_email.aspx?bg_id=" + id;
-		}
+		el = window.document.getElementById("relationship_cnt");
+		el.firstChild.nodeValue = cnt;
 	}
-	else
+}
+
+function maybe_rewrite_posts(bugid, updated_something)
+{
+	if (bugid == this_bugid && updated_something == 1)
 	{
-		window.document.location = "send_email.aspx?bg_id=" + id;
+		rewrite_posts(bugid)
 	}
+}
+
+var popup_window = null
+function open_popup_window(url, title, bugid, width, height)
+{
+	var url_and_vars = url + '?id=' + bugid
+	
+	popup_window = window.open(
+		url_and_vars,
+		'bug',
+		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=" + width + ",height=" + height)
+		
+	popup_window.focus()
 }
 
 
@@ -64,37 +55,138 @@ function send_email(id)
 }
 
 
-function toggle_images(id)
+var xmlHttp
+
+function GetXmlHttpObject()
 {
-	if (prompt == "1")
+	var objXMLHttp=null
+	if (window.XMLHttpRequest)
 	{
-		var result = confirm('Toggle inline display of images?  Changes here will not be saved.');
-		if (result)
-		{
-			window.document.location = "toggle_images.aspx?id=" + id;
-		}
+		objXMLHttp=new XMLHttpRequest()
 	}
-	else
+	else if (window.ActiveXObject)
 	{
-		window.document.location = "toggle_images.aspx?id=" + id;
+		objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
+	}
+	return objXMLHttp
+}
+
+
+function stateToggleImages()
+{
+	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+	{
+		if (xmlHttp.responseText != "")
+		{
+			var el = document.getElementById("posts")
+			el.innerHTML = xmlHttp.responseText;
+		}
 	}
 }
 
-function toggle_history(id)
+function rewrite_posts(bugid)
 {
-	if (prompt == "1")
+	var images_inline = get_cookie("images_inline")
+	var history_inline = get_cookie("history_inline")
+
+	xmlHttp=GetXmlHttpObject()
+	if (xmlHttp==null)
 	{
-		var result = confirm('Toggle inline display of history?  Changes here will not be saved.');
-		if (result)
-		{
-			window.document.location = "toggle_history.aspx?id=" + id;
-		}
+		return
+	}
+
+	var url = "write_posts.aspx?images_inline=" + images_inline
+		+ "&history_inline=" + history_inline
+		+ "&id=" + bugid
+
+	xmlHttp.onreadystatechange=stateToggleImages
+	xmlHttp.open("GET",url,true)
+	xmlHttp.send(null)
+
+}
+
+function toggle_notifications(bugid)
+{
+
+	var el = document.getElementById("get_stop_notifications");
+	var text = el.firstChild.nodeValue;
+	
+	xmlHttp=GetXmlHttpObject()
+	if (xmlHttp==null)
+	{
+		return
+	}
+
+	// build url
+	var url = "subscribe.aspx?id=" 
+		+ bugid
+		+ "&action="
+		
+		
+	if (text == "get notifications")
+		url += "1"
+	else
+		url += "0"
+
+	
+	xmlHttp.open("GET",url,true)
+	xmlHttp.send(null)
+
+	// modify text in web page	
+	if (text == "get notifications")
+	{
+		el.firstChild.nodeValue = "stop notifications"
 	}
 	else
 	{
-		window.document.location = "toggle_history.aspx?id=" + id;
+		el.firstChild.nodeValue = "get notifications"
 	}
+
 }
+
+
+function toggle_images2(bugid)
+{
+
+	var images_inline = get_cookie("images_inline")
+	if (images_inline == "1")
+	{
+		images_inline = "0"
+		document.getElementById("hideshow_images").firstChild.nodeValue = "show inline images"
+	}
+	else
+	{
+		images_inline = "1"
+		document.getElementById("hideshow_images").firstChild.nodeValue = "hide inline images"
+	}
+
+	set_cookie("images_inline",images_inline)
+
+	rewrite_posts(bugid)
+
+}
+
+function toggle_history2(bugid)
+{
+
+	var history_inline = get_cookie("history_inline")
+	if (history_inline == "1")
+	{
+		history_inline = "0"
+		document.getElementById("hideshow_history").firstChild.nodeValue = "show change history"
+	}
+	else
+	{
+		history_inline = "1"
+		document.getElementById("hideshow_history").firstChild.nodeValue = "hide change history"
+	}
+
+	set_cookie("history_inline",history_inline)
+
+	rewrite_posts(bugid)
+
+}
+
 
 function resize_comment(delta)
 {

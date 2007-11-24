@@ -34,7 +34,6 @@ void Page_Load(Object sender, EventArgs e)
 	sql = sql.Replace("$bg", Util.sanitize_integer(Request["id"]));
 	sql = sql.Replace("$us", Convert.ToString(security.this_usid));
 	dbutil.execute_nonquery(sql);
-	Response.Redirect ("edit_bug.aspx?id=" + Request["id"]);
 
 }
 

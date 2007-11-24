@@ -1,4 +1,5 @@
-<%@ Page language="C#"  validateRequest="false"%>
+<%@ Page language="C#" ValidateRequest="false" %>
+<%@ Import Namespace="System.Collections.Generic" %>
 <!--
 Copyright 2002-2007 Corey Trager
 Distributed under the terms of the GNU General Public License
@@ -13,6 +14,8 @@ bool show_udf;
 bool use_full_names = false;
 
 DataTable dt_users = null;
+
+string project_dropdown_select_cols = "";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -103,6 +106,44 @@ string format_in_not_in(string s)
 
 
 ///////////////////////////////////////////////////////////////////////
+List<ListItem> get_selected_projects()
+{
+    List<ListItem> selected_projects = new List<ListItem>();
+
+	foreach (ListItem li in project.Items)
+	{
+        if (li.Selected)
+			{
+            selected_projects.Add(li);
+		}
+	}
+
+    return selected_projects;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+DataRow get_selected_project_custom_dropdown_info(ListItem selected_project)
+{
+	// Read the project dropdown info from the db.
+	// Load the dropdowns as necessary
+
+	string sql = @"select
+		pj_enable_custom_dropdown1,
+		pj_enable_custom_dropdown2,
+		pj_enable_custom_dropdown3,
+		pj_custom_dropdown_label1,
+		pj_custom_dropdown_label2,
+		pj_custom_dropdown_label3,
+		pj_custom_dropdown_values1,
+		pj_custom_dropdown_values2,
+		pj_custom_dropdown_values3
+		from projects where pj_id = $project";
+
+	sql = sql.Replace("$project", selected_project.Value);
+	return dbutil.get_datarow(sql);
+}
+///////////////////////////////////////////////////////////////////////
 void do_query()
 {
 	prev_sort.Value = "-1";
@@ -116,6 +157,14 @@ void do_query()
 	string reported_by_clause = build_clause_from_listbox (reported_by, "bg_reported_user");
 	string assigned_to_clause = build_clause_from_listbox (assigned_to, "bg_assigned_to_user");
 	string project_clause = build_clause_from_listbox (project, "bg_project");
+
+	string project_custom_dropdown1_clause
+		= build_clause_from_listbox (project_custom_dropdown1, "bg_project_custom_dropdown_value1");
+	string project_custom_dropdown2_clause
+		= build_clause_from_listbox (project_custom_dropdown2, "bg_project_custom_dropdown_value2");
+	string project_custom_dropdown3_clause
+		= build_clause_from_listbox (project_custom_dropdown3, "bg_project_custom_dropdown_value3");
+
 	string category_clause = build_clause_from_listbox (category, "bg_category");
 	string priority_clause = build_clause_from_listbox (priority, "bg_priority");
 	string status_clause = build_clause_from_listbox (status, "bg_status");
@@ -191,6 +240,9 @@ void do_query()
 	where = build_where(where, reported_by_clause);
 	where = build_where(where, assigned_to_clause);
 	where = build_where(where, project_clause);
+	where = build_where(where, project_custom_dropdown1_clause);
+	where = build_where(where, project_custom_dropdown2_clause);
+	where = build_where(where, project_custom_dropdown3_clause);
 	where = build_where(where, category_clause);
 	where = build_where(where, priority_clause);
 	where = build_where(where, status_clause);
@@ -307,6 +359,75 @@ void do_query()
 
 		select += custom_cols_sql;
 
+		// Handle project custom dropdowns
+		List<ListItem> selected_projects = get_selected_projects();
+
+		string project_dropdown_select_cols_server_side = "";
+
+        string alias1 = null;
+        string alias2 = null;
+        string alias3 = null;
+        
+        foreach (ListItem selected_project in selected_projects)
+		{
+            if (selected_project.Value == "0")
+                continue;
+
+			DataRow dr_project = get_selected_project_custom_dropdown_info(selected_project);
+
+			if ((int) dr_project["pj_enable_custom_dropdown1"] == 1)
+			{
+                if (alias1 == null)
+                {
+                    alias1 = (string)dr_project["pj_custom_dropdown_label1"];
+                }
+                else
+                {
+                    alias1 = "dropdown1";
+                }
+			}
+			if ((int) dr_project["pj_enable_custom_dropdown2"] == 1)
+			{
+                if (alias2 == null)
+                {
+                    alias2 = (string)dr_project["pj_custom_dropdown_label2"];
+                }
+                else
+                {
+                    alias2 = "dropdown2";
+                }
+			}
+			if ((int) dr_project["pj_enable_custom_dropdown3"] == 1)
+			{
+                if (alias3 == null)
+                {
+                    alias3 = (string)dr_project["pj_custom_dropdown_label3"];
+                }
+                else
+                {
+                    alias3 = "dropdown3";
+                }
+			}
+		}
+
+        if (alias1 != null)
+        {
+            project_dropdown_select_cols_server_side
+                += ",\nisnull(bg_project_custom_dropdown_value1,'') [" + alias1 +"]";            
+        }
+        if (alias2 != null)
+        {
+            project_dropdown_select_cols_server_side
+                += ",\nisnull(bg_project_custom_dropdown_value2,'') [" + alias2 + "]";
+        }
+        if (alias3 != null)
+        {
+            project_dropdown_select_cols_server_side
+                += ",\nisnull(bg_project_custom_dropdown_value3,'') [" + alias3 + "]";
+        }
+
+		select += project_dropdown_select_cols_server_side;
+
 		select += @" from bugs
 			left outer join users rpt on rpt.us_id = bg_reported_user
 			left outer join users asg on asg.us_id = bg_assigned_to_user
@@ -356,9 +477,183 @@ void do_query()
 }
 
 ///////////////////////////////////////////////////////////////////////
-void Page_Load(Object sender, EventArgs e)
+void load_project_custom_dropdown(ListBox dropdown, string vals_string, Dictionary<String, String> duplicate_detection_dictionary)
+{
+	string[] vals_array = btnet.Util.split_string_using_pipes(vals_string);
+	for (int i = 0; i < vals_array.Length; i++)
+	{
+	    if (!duplicate_detection_dictionary.ContainsKey(vals_array[i]))
+	    {
+		dropdown.Items.Add(new ListItem(vals_array[i], "'" + vals_array[i].Replace("'","''") + "'"));
+		    duplicate_detection_dictionary.Add(vals_array[i], vals_array[i]);
+		}
+	}
+}
+
+void handle_project_custom_dropdowns()
 {
 
+	// How many projects selected?
+	List<ListItem> selected_projects = get_selected_projects();
+	Dictionary<String, String>[] dupe_detection_dictionaries = new Dictionary<String, String>[3];
+    Dictionary<String, String>[] previous_selection_dictionaries = new Dictionary<String, String>[3];
+	for (int i = 0; i < dupe_detection_dictionaries.Length; i++)
+	{
+        // Initialize Dictionary to accumulate ListItem values as they are added to the ListBox
+        // so that duplicate values from multiple projects are not added to the ListBox twice.
+	    dupe_detection_dictionaries[i] = new Dictionary<String, String>();
+        
+        previous_selection_dictionaries[i] = new Dictionary<String, String>();
+	}
+
+    // Preserve user's previous selections (necessary if this is called during a postback).    
+    foreach (ListItem li in project_custom_dropdown1.Items)
+    {
+        if (li.Selected)
+        {
+            previous_selection_dictionaries[0].Add(li.Value, li.Value);
+        }
+    }
+    foreach (ListItem li in project_custom_dropdown2.Items)
+    {
+        if (li.Selected)
+        {
+            previous_selection_dictionaries[1].Add(li.Value, li.Value);
+        }
+    }
+    foreach (ListItem li in project_custom_dropdown3.Items)
+    {
+        if (li.Selected)
+        {
+            previous_selection_dictionaries[2].Add(li.Value, li.Value);
+        }
+    }
+
+	project_dropdown_select_cols = "";
+
+    project_custom_dropdown1_label.InnerText = "";
+    project_custom_dropdown2_label.InnerText = "";
+    project_custom_dropdown3_label.InnerText = "";
+	
+    project_custom_dropdown1.Items.Clear();
+    project_custom_dropdown2.Items.Clear();
+    project_custom_dropdown3.Items.Clear();
+	
+	foreach (ListItem selected_project in selected_projects)
+	{
+		// Read the project dropdown info from the db.
+		// Load the dropdowns as necessary
+
+        if (selected_project.Value == "0")
+            continue;
+
+		DataRow dr_project = get_selected_project_custom_dropdown_info(selected_project);
+
+		if ((int) dr_project["pj_enable_custom_dropdown1"] == 1)
+		{
+            if (project_custom_dropdown1_label.InnerText == "")
+		    {
+			project_custom_dropdown1_label.InnerText = (string) dr_project["pj_custom_dropdown_label1"];
+			project_custom_dropdown1_label.Style["display"] = "inline";
+			project_custom_dropdown1.Style["display"] = "block";
+		}
+			else if (project_custom_dropdown1_label.InnerText != (string) dr_project["pj_custom_dropdown_label1"])
+		{
+			    project_custom_dropdown1_label.InnerText = "dropdown1";
+			}
+			load_project_custom_dropdown(project_custom_dropdown1, (string) dr_project["pj_custom_dropdown_values1"], dupe_detection_dictionaries[0]);
+		}
+
+		if ((int) dr_project["pj_enable_custom_dropdown2"] == 1)
+		{
+            if (project_custom_dropdown2_label.InnerText == "")
+		    {
+			project_custom_dropdown2_label.InnerText = (string) dr_project["pj_custom_dropdown_label2"];
+		}
+			else if (project_custom_dropdown2_label.InnerText != (string) dr_project["pj_custom_dropdown_label2"])
+		{
+			    project_custom_dropdown2_label.InnerText = "dropdown2";
+			}
+            load_project_custom_dropdown(project_custom_dropdown2, (string)dr_project["pj_custom_dropdown_values2"], dupe_detection_dictionaries[1]);
+		}
+
+		if ((int) dr_project["pj_enable_custom_dropdown3"] == 1)
+		{
+            if (project_custom_dropdown2_label.InnerText == "")
+		    {
+			project_custom_dropdown3_label.InnerText = (string) dr_project["pj_custom_dropdown_label3"];
+			project_custom_dropdown3_label.Style["display"] = "inline";
+			project_custom_dropdown3.Style["display"] = "block";
+                load_project_custom_dropdown(project_custom_dropdown3, (string)dr_project["pj_custom_dropdown_values3"], dupe_detection_dictionaries[2]);
+		}
+			else if (project_custom_dropdown3_label.InnerText != (string) dr_project["pj_custom_dropdown_label3"])
+		{
+                project_custom_dropdown3_label.InnerText = "dropdown3";
+		}
+            load_project_custom_dropdown(project_custom_dropdown3, (string)dr_project["pj_custom_dropdown_values3"], dupe_detection_dictionaries[2]);
+	}
+	}
+
+    if (project_custom_dropdown1_label.InnerText == "")
+	{
+		project_custom_dropdown1.Items.Clear();
+		project_custom_dropdown1_label.Style["display"] = "none";
+		project_custom_dropdown1.Style["display"] = "none";
+    }
+    else
+    {
+        project_custom_dropdown1_label.Style["display"] = "inline";
+        project_custom_dropdown1.Style["display"] = "block";
+        project_dropdown_select_cols
+            += ",\\nisnull(bg_project_custom_dropdown_value1,'') [" + project_custom_dropdown1_label.InnerText + "]";
+    }
+
+    if (project_custom_dropdown2_label.InnerText == "")
+    {
+		project_custom_dropdown2.Items.Clear();
+		project_custom_dropdown2_label.Style["display"] = "none";
+		project_custom_dropdown2.Style["display"] = "none";
+    }
+    else
+    {
+        project_custom_dropdown2_label.Style["display"] = "inline";
+        project_custom_dropdown2.Style["display"] = "block";
+        project_dropdown_select_cols
+            += ",\\nisnull(bg_project_custom_dropdown_value2,'') [" + project_custom_dropdown2_label.InnerText + "]";
+    }
+
+    if (project_custom_dropdown3_label.InnerText == "")
+    {
+		project_custom_dropdown3.Items.Clear();
+		project_custom_dropdown3_label.Style["display"] = "none";
+		project_custom_dropdown3.Style["display"] = "none";
+	}
+    else
+    {
+        project_custom_dropdown3_label.Style["display"] = "inline";
+        project_custom_dropdown3.Style["display"] = "block";
+        project_dropdown_select_cols
+            += ",\\nisnull(bg_project_custom_dropdown_value3,'') [" + project_custom_dropdown3_label.InnerText + "]";
+    }
+
+    // Restore user's previous selections.
+    foreach (ListItem li in project_custom_dropdown1.Items)
+    {
+        li.Selected = (previous_selection_dictionaries[0].ContainsKey(li.Value));
+    }
+    foreach (ListItem li in project_custom_dropdown2.Items)
+    {
+        li.Selected = (previous_selection_dictionaries[1].ContainsKey(li.Value));
+    }
+    foreach (ListItem li in project_custom_dropdown3.Items)
+    {
+        li.Selected = (previous_selection_dictionaries[2].ContainsKey(li.Value));
+    }
+}
+
+///////////////////////////////////////////////////////////////////////
+void Page_Load(Object sender, EventArgs e)
+{
 	Util.do_not_cache(Response);
 	dbutil = new DbUtil();
 	security = new Security();
@@ -377,14 +672,30 @@ void Page_Load(Object sender, EventArgs e)
 	if (!IsPostBack)
 	{
 		load_drop_downs();
+		project_custom_dropdown1_label.Style["display"] = "none";
+		project_custom_dropdown1.Style["display"] = "none";
+
+		project_custom_dropdown2_label.Style["display"] = "none";
+		project_custom_dropdown2.Style["display"] = "none";
+
+		project_custom_dropdown3_label.Style["display"] = "none";
+		project_custom_dropdown3.Style["display"] = "none";
 	}
 	else
 	{
-		if (hit_submit_button.Value == "1")
+		// If the user has selected exactly one project
+		// then show the project specific dropdowns
+		if (project_changed.Value == "1")
 		{
+			handle_project_custom_dropdowns();
+		}
+		else if (hit_submit_button.Value == "1")
+		{
+			handle_project_custom_dropdowns();
 			do_query();
 		}
-		else {
+		else
+		{
 			dv = (DataView) Session["bugs"];
 			if (dv == null)
 			{
@@ -395,6 +706,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	hit_submit_button.Value = "0";
+	project_changed.Value = "0";
 
 	if (security.this_is_admin || security.this_can_edit_sql)
 	{
@@ -485,6 +797,7 @@ void load_drop_downs()
 	}
 
 }
+
 
 
 
@@ -644,7 +957,6 @@ function build_where(where, clause)
 }
 
 
-
 function build_clause_from_options(options, column_name)
 {
 
@@ -749,6 +1061,14 @@ function on_change()
 	var reported_by_clause = build_clause_from_options (frm.reported_by.options, "bg_reported_user");
 	var assigned_to_clause = build_clause_from_options (frm.assigned_to.options, "bg_assigned_to_user");
 	var project_clause = build_clause_from_options (frm.project.options, "bg_project");
+
+	var project_custom_dropdown1_clause = build_clause_from_options (
+		frm.project_custom_dropdown1.options, "bg_project_custom_dropdown_value1");
+	var project_custom_dropdown2_clause = build_clause_from_options (
+		frm.project_custom_dropdown2.options, "bg_project_custom_dropdown_value2");
+	var project_custom_dropdown3_clause = build_clause_from_options (
+		frm.project_custom_dropdown3.options, "bg_project_custom_dropdown_value3");
+
 	var category_clause = build_clause_from_options (frm.category.options, "bg_category");
 	var priority_clause = build_clause_from_options (frm.priority.options, "bg_priority");
 	var status_clause = build_clause_from_options (frm.status.options, "bg_status");
@@ -864,6 +1184,9 @@ function on_change()
 	where = build_where(where, reported_by_clause);
 	where = build_where(where, assigned_to_clause);
 	where = build_where(where, project_clause);
+	where = build_where(where, project_custom_dropdown1_clause);
+	where = build_where(where, project_custom_dropdown2_clause);
+	where = build_where(where, project_custom_dropdown3_clause);
 	where = build_where(where, category_clause);
 	where = build_where(where, priority_clause);
 	where = build_where(where, status_clause);
@@ -926,7 +1249,10 @@ function on_change()
 %>
 
 <%
-	// do the joins related to "user" dropdowns
+
+
+
+	// add the custom fields to the columns
 	int user_dropdown_cnt = 1;
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
@@ -959,6 +1285,8 @@ function on_change()
 			}
 		}
 	}
+
+	Response.Write ("\nselect += \"" + project_dropdown_select_cols + "\"");
 %>
 
 		select += "\nfrom bugs\n";
@@ -1039,6 +1367,10 @@ function showhide_form()
 	}
 }
 
+function set_project_changed() {
+	on_change();
+	document.forms[1].project_changed.value = "1";
+}
 
 </script>
 
@@ -1055,123 +1387,147 @@ function showhide_form()
 
 <div class=align>
 
-<a style='float: right; margin-right: 150px;' href='javascript:showhide_form()' id='showhide'>hide form</a>
-
 <% if (!security.this_adds_not_allowed) { %>
 <a href=edit_bug.aspx>add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
 <% } %>
 
+<a style='margin-left: 40px;' href='javascript:showhide_form()' id='showhide'>hide form</a>
+
+
+
 <table border=0><tr><td>
 
 <tr><td>
-<span id=searchfrom>
-<form class=frm action="post" runat="server" onmouseover="hide_suggest()">
+<div id=searchfrom>
+<form class=frm method="post" runat="server" onmouseover="hide_suggest()">
 
-<table id=searchformtbl border=0 cellpadding=8>
+<table border=0 cellpadding=8 cellspacing=0>
+	<tr>
+		<td colspan="10"><span class=smallnote>Hold down Ctrl key to select multiple items.</span></td>
+	</tr>
 
-<tr>
-<td colspan="10"><span class=smallnote>Hold down Ctrl key to select multiple items.</span></td>
-</tr>
+	<tr>
+		<td nowrap><span class=lbl>reported by:</span><br>
+		<asp:ListBox Rows=6 SelectionMode="Multiple" id="reported_by" runat="server" onchange="on_change()">
+		</asp:ListBox>
+		</td>
 
-<tr>
+		<td nowrap><span class=lbl id="category_label">category:</span><br>
+		<asp:ListBox Rows=6 SelectionMode="Multiple" id="category" runat="server" onchange="on_change()">
+		</asp:ListBox>
 
-<td nowrap><span class=lbl>reported by:</span><br>
-<asp:ListBox Rows=6 SelectionMode="Multiple" id="reported_by" runat="server" onchange="on_change()">
-</asp:ListBox>
-</td>
+		<td nowrap><span class=lbl id="priority_label">priority:</span><br>
+		<asp:ListBox Rows=6 SelectionMode="Multiple" id="priority" runat="server" onchange="on_change()">
+		</asp:ListBox>
+		</td>
 
-<td nowrap><span class=lbl id="project_label">project:</span><br>
-<asp:ListBox Rows=6 SelectionMode="Multiple" id="project" runat="server" onchange="on_change()">
-</asp:ListBox>
+		<td nowrap><span class=lbl id="assigned_to_label">assigned to:</span><br>
+		<asp:ListBox Rows=6 SelectionMode="Multiple" id="assigned_to" runat="server" onchange="on_change()">
+		</asp:ListBox>
+		</td>
 
-<td nowrap><span class=lbl id="category_label">category:</span><br>
-<asp:ListBox Rows=6 SelectionMode="Multiple" id="category" runat="server" onchange="on_change()">
-</asp:ListBox>
+		<td nowrap><span class=lbl id="status_label">status:</span><br>
+		<asp:ListBox Rows=6 SelectionMode="Multiple" id="status" runat="server" onchange="on_change()">
+		</asp:ListBox>
+		</td>
+	</tr>
 
-<td nowrap><span class=lbl id="priority_label">priority:</span><br>
-<asp:ListBox Rows=6 SelectionMode="Multiple" id="priority" runat="server" onchange="on_change()">
-</asp:ListBox>
-</td>
-
-<td nowrap><span class=lbl id="assigned_to_label">assigned to:</span><br>
-<asp:ListBox Rows=6 SelectionMode="Multiple" id="assigned_to" runat="server" onchange="on_change()">
-</asp:ListBox>
-</td>
-
-<td nowrap><span class=lbl id="status_label">status:</span><br>
-<asp:ListBox Rows=6 SelectionMode="Multiple" id="status" runat="server" onchange="on_change()">
-</asp:ListBox>
-</td>
-
-
-</tr>
 </table>
+<table border=0 cellpadding=8 cellspacing=0>
+	<tr>
+		<td nowrap><span class=lbl id="project_label">project:</span><br>
+			<asp:ListBox Rows=6 SelectionMode="Multiple" id="project" runat="server" onchange="set_project_changed()"
+			AutoPostBack="true">
+			</asp:ListBox>
+		</td>
 
-<table border=0 cellpadding=8>
+		<td nowrap><span class=lbl id="project_custom_dropdown1_label" runat="server" style="display:none">?</span><br>
+			<asp:ListBox Rows=6 SelectionMode="Multiple" id="project_custom_dropdown1" runat="server" style="display:none" onchange="on_change()">
+			</asp:ListBox>
+		</td>
+		<td nowrap><span class=lbl id="project_custom_dropdown2_label" runat="server" style="display:none">?</span><br>
+			<asp:ListBox Rows=6 SelectionMode="Multiple" id="project_custom_dropdown2" runat="server" style="display:none" onchange="on_change()">
+			</asp:ListBox>
+		</td>
+		<td nowrap><span class=lbl id="project_custom_dropdown3_label"  runat="server" style="display:none">?</span><br>
+			<asp:ListBox Rows=6 SelectionMode="Multiple" id="project_custom_dropdown3" runat="server" style="display:none" onchange="on_change()">
+			</asp:ListBox>
+		</td>
+	</tr>
 
-<tr>
-<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> description contains:&nbsp;</span>
-<td colspan=2><input type=text id="like" runat="server" onkeydown="search_criteria_onkeydown(this,event)" onkeyup="search_criteria_onkeyup(this,event)"  size=50 autocomplete="off">
-
-
-<% if (show_udf)
-{
-%>
-<td nowrap rowspan=2><span class=lbl><% Response.Write (Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %></span><br>
-	<asp:ListBox Rows=4 SelectionMode="Multiple" id="udf" runat="server" onchange="on_change()">
-	</asp:ListBox>
-
-<%
-}
-%>
-
-
-
-<tr>
-<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments contain:&nbsp;</span>
-<td colspan=2><input type=text id="like2" runat="server" onkeyup="on_change()" size=50  autocomplete="off">
-
-
-<tr>
-<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments since:&nbsp;</span>
-<td colspan=2><input type=text id="comments_since" runat="server" onkeyup="on_change()" size=10>
-	<a style="font-size: 8pt;"
-	href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.comments_since',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
-	[select]
-	</a>
+</table>
+<table border=0 cellpadding=8 cellspacing=0>
+	<tr>
+		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> description contains:&nbsp;</span>
+		<td colspan=2><input type=text id="like" runat="server" onkeydown="search_criteria_onkeydown(this,event)" onkeyup="search_criteria_onkeyup(this,event)"  size=50 autocomplete="off">
 
 
-<tr>
-<td><span class=lbl>"Reported on" from date:&nbsp;</span>
-<td colspan=2><input runat="server" type="text" id="from_date" maxlength=10 size=10 onchange="on_change()">
-	<a style="font-size: 8pt;"
-	href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.from_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
-	[select]
-	</a>
+		<% if (show_udf)
+		{
+		%>
+		<td nowrap rowspan=2><span class=lbl><% Response.Write (Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %></span><br>
+			<asp:ListBox Rows=4 SelectionMode="Multiple" id="udf" runat="server" onchange="on_change()">
+			</asp:ListBox>
 
-	&nbsp;&nbsp;&nbsp;&nbsp;
-	<span class=lbl>to:&nbsp;</span>
-	<input runat="server" type="text" id="to_date" maxlength=10 size=10 onchange="on_change()">
-	<a style="font-size: 8pt;"
-	href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.to_date',    null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
-	[select]
-	</a>
+		<%
+		}
+		%>
+		</td>
+	</tr>
 
-<tr>
-<td><span class=lbl>"Last updated on" from date:&nbsp;</span>
-<td colspan=2><input runat="server" type="text" id="lu_from_date" maxlength=10 size=10 onchange="on_change()">
-	<a style="font-size: 8pt;"
-	href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_from_date',null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
-	[select]
-	</a>
+	<tr>
+		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments contain:&nbsp;</span>
+		<td colspan=2><input type=text id="like2" runat="server" onkeyup="on_change()" size=50  autocomplete="off">
+		</td>
+	</tr>
 
-	&nbsp;&nbsp;&nbsp;&nbsp;
-	<span class=lbl>to:&nbsp;</span>
-	<input runat="server" type="text" id="lu_to_date" maxlength=10 size=10 onchange="on_change()">
-	<a style="font-size: 8pt;"
-	href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_to_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
-	[select]
-	</a>
+
+	<tr>
+		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments since:&nbsp;</span>
+		<td colspan=2><input type=text id="comments_since" runat="server" onkeyup="on_change()" size=10>
+			<a style="font-size: 8pt;"
+			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.comments_since',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			[select]
+			</a>
+		</td>
+	</tr>
+
+
+	<tr>
+		<td><span class=lbl>"Reported on" from date:&nbsp;</span>
+		<td colspan=2><input runat="server" type="text" id="from_date" maxlength=10 size=10 onchange="on_change()">
+			<a style="font-size: 8pt;"
+			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.from_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			[select]
+			</a>
+
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<span class=lbl>to:&nbsp;</span>
+			<input runat="server" type="text" id="to_date" maxlength=10 size=10 onchange="on_change()">
+			<a style="font-size: 8pt;"
+			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.to_date',    null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			[select]
+			</a>
+		</td>
+	</tr>
+
+	<tr>
+		<td><span class=lbl>"Last updated on" from date:&nbsp;</span>
+		<td colspan=2><input runat="server" type="text" id="lu_from_date" maxlength=10 size=10 onchange="on_change()">
+			<a style="font-size: 8pt;"
+			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_from_date',null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			[select]
+			</a>
+
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<span class=lbl>to:&nbsp;</span>
+			<input runat="server" type="text" id="lu_to_date" maxlength=10 size=10 onchange="on_change()">
+			<a style="font-size: 8pt;"
+			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_to_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			[select]
+			</a>
+		</td>
+	</tr>
 
 
 
@@ -1329,30 +1685,37 @@ function showhide_form()
 	}
 %>
 
-<tr colspan=10>
-<td nowrap>
-Use "and" logic:<input type="radio" runat="server" name="and_or" value="and" id="and" onchange="on_change()" Checked>
-&nbsp;&nbsp;
-Use "or" logic:<input type="radio" runat="server" name="and_or" value="or" id="or" onchange="on_change()">
+	<tr>
+		<td colspan=10 nowrap>
+			Use "and" logic:<input type="radio" runat="server" name="and_or" value="and" id="and" onchange="on_change()" Checked>
+			&nbsp;&nbsp;
+			Use "or" logic:<input type="radio" runat="server" name="and_or" value="or" id="or" onchange="on_change()">
+		</td>
+	</tr>
 
-<tr>
-<td colspan=10 align=center>
-<input type=hidden runat="server" id="hit_submit_button" value="0">
-<input type=hidden runat="server" id="hit_save_query_button" value="0">
-<input class=btn type=submit onclick="set_hit_submit_button()" value="&nbsp;&nbsp;&nbsp;Search&nbsp;&nbsp;&nbsp;" runat="server">
-<script>
-function on_save_query() {
-	var frm = document.getElementById("save_query_form");
-	frm.sql_text.value =
-		document.getElementById("visible_sql_text").innerHTML;
+	<tr>
+		<td colspan=10 align=center>
+			<input type=hidden runat="server" id="project_changed" value="0">
+			<input type=hidden runat="server" id="hit_submit_button" value="0">
+			<input type=hidden runat="server" id="hit_save_query_button" value="0">
+			<input class=btn type=submit onclick="set_hit_submit_button()" value="&nbsp;&nbsp;&nbsp;Search&nbsp;&nbsp;&nbsp;" runat="server">
+		</td>
+	</tr>
 
-	frm.submit();
-}
-</script>
-<input style="float:right;" class=btn type=submit onclick="on_save_query()" value="Save search criteria as query">
+	<tr>
+		<td colspan=10 align=right>
+			<script>
+			function on_save_query() {
+				var frm = document.getElementById("save_query_form");
+				frm.sql_text.value =
+					document.getElementById("visible_sql_text").innerHTML;
 
-</td>
-</tr>
+				frm.submit();
+			}
+			</script>
+			<input class=btn type=submit onclick="on_save_query()" value="Save search criteria as query">
+		</td>
+	</tr>
 
 </table>
 
@@ -1360,7 +1723,7 @@ function on_save_query() {
 
 <input type=hidden id="query" runat="server" value="">
 </form>
-</span>
+</div>
 
 </td></tr></table></div>
 
@@ -1415,7 +1778,7 @@ else
 
 <p>
 <span id="visible_sql_label" runat="server">SQL:</span>
-<p>
+</p>
 <pre style="font-family: courier new; font-size: 8pt" id="visible_sql_text" runat="server">&nbsp;</pre>
 
 <!-- form 3 -->

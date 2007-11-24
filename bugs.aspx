@@ -66,7 +66,7 @@ void do_query()
 
 	if (bug_sql == null)
 	{
-		sql = @"select qu_id, qu_sql from queries where qu_default = 1";
+		sql = @"select top 1 qu_sql from queries where qu_default = 1";
 		bug_sql = (string)dbutil.execute_scalar(sql);
 		DataRow dr = dbutil.get_datarow(sql);
 		if (dr != null)

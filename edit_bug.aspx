@@ -333,6 +333,37 @@ void Page_Load(Object sender, EventArgs e)
 				display_bug_not_found(id);
 			}
 
+			// look at permission level and react accordingly
+			permission_level = (int)dr["pu_permission_level"];
+			// reduce permissions for guest
+			if (security.this_is_guest && permission_level == Security.PERMISSION_ALL)
+			{
+				permission_level = Security.PERMISSION_REPORTER;
+			}
+
+			if (permission_level == Security.PERMISSION_NONE)
+			{
+				Response.Write ("<link rel=StyleSheet href=btnet.css type=text/css>");
+				security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs"));
+				Response.Write("<p>&nbsp;</p><div class=align>");
+				Response.Write("<div class=err>You are not allowed to view this "
+					+ btnet.Util.get_setting("SingularBugLabel","bug")
+					+ "</div>");
+				Response.Write("<p><a href=bugs.aspx>View "
+					+ btnet.Util.capitalize_first_letter(btnet.Util.get_setting
+					("PluralBugLabel","bugs")) + "</a>");
+				Response.End();
+
+			}
+			else if (permission_level == Security.PERMISSION_READONLY
+			|| permission_level == Security.PERMISSION_REPORTER)
+			{
+
+				set_controls_to_readonly();
+
+			}
+
+
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
 				hash_custom_cols.Add((string)drcc["name"], dr[(string)drcc["name"]]);
@@ -459,42 +490,49 @@ void Page_Load(Object sender, EventArgs e)
 
 			snapshot_timestamp.Value = Convert.ToDateTime(dr["snapshot_timestamp"]).ToString("yyyyMMdd HH\\:mm\\:ss\\:fff");
 
-			string toggle_images_link = "<a href='javascript:toggle_images("
-				+ Convert.ToString(id) + ")'>"
+			string toggle_images_link = "<a href='javascript:toggle_images2("
+				+ Convert.ToString(id) + ")'><span id=hideshow_images>"
 				+ (images_inline ? "hide" : "show")
 				+ " inline images"
-				+ "</a>&nbsp;&nbsp;&nbsp;&nbsp;<span class=smallnote>(save changes first)</span>";
+				+ "</span></a>";
 			toggle_images.InnerHtml = toggle_images_link;
 
-			string toggle_history_link = "<a href='javascript:toggle_history("
-				+ Convert.ToString(id)	+ ")'>"
+			string toggle_history_link = "<a href='javascript:toggle_history2("
+				+ Convert.ToString(id)	+ ")'><span id=hideshow_history>"
 				+ (history_inline ? "hide" : "show")
 				+ " change history"
-				+ "</a>&nbsp;&nbsp;&nbsp;&nbsp;<span class=smallnote>(save changes first)</span>";
+				+ "</span></a>";
 			toggle_history.InnerHtml = toggle_history_link;
 
+			if (permission_level != Security.PERMISSION_READONLY)
+			{
+				string attachment_link = "<a href=\"javascript:open_popup_window('add_attachment.aspx','add attachment ',"
+					+ Convert.ToString(id)
+					+ ",600,300)\" title='Attach an image, document, or other file to this item'>add attachment</a>";
+				attachment.InnerHtml = attachment_link;
+			}
 
-			string attachment_link = "<a href='javascript:add_attachment("
-				+ Convert.ToString(id)
-				+ ")'>add attachment</a>";
-			attachment.InnerHtml = attachment_link;
 
-			string send_email_link = "<a href='javascript:send_email("
-				+ Convert.ToString(id)
-				+ ")'>send email</a>";
-			send_email.InnerHtml = send_email_link;
+			if (permission_level != Security.PERMISSION_READONLY)
+			{
+				string send_email_link = "<a href='javascript:send_email("
+					+ Convert.ToString(id)
+					+ ")' title='Send an email about this item'>send email</a>";
+				send_email.InnerHtml = send_email_link;
+			}
 
 			string history_link = "<a target=_blank href=view_bug_history.aspx?id="
 				+ Convert.ToString(id)
-				+ ">view history</a>";
+				+ " title='View history of changes to this item'>view history</a>";
 			history.InnerHtml = history_link;
 
-			string subscribers_link = "<a target=_blank href=view_subscribers.aspx?id="
-				+ Convert.ToString(id)
-				+ ">view/add subscribers</a>";
-			subscribers.InnerHtml = subscribers_link;
-
-
+			if (permission_level != Security.PERMISSION_READONLY)
+			{
+				string subscribers_link = "<a target=_blank href=view_subscribers.aspx?id="
+					+ Convert.ToString(id)
+					+ " title='View users who have subscribed to email notifications for this item'>subscribers</a>";
+				subscribers.InnerHtml = subscribers_link;
+			}
 
 
 			int relationship_cnt = 0;
@@ -502,9 +540,9 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				relationship_cnt = (int) dr["relationship_cnt"];
 			}
-			string relationships_link = "<a target=_blank href=relationships.aspx?id="
+			string relationships_link = "<a href=\"javascript:open_popup_window('relationships.aspx','relationships ',"
 				+ Convert.ToString(id)
-				+ ">relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
+				+ ",750,550)\" title='Create a relationship between this item and another item'>relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
 			relationships.InnerHtml = relationships_link;
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")
@@ -516,7 +554,7 @@ void Page_Load(Object sender, EventArgs e)
 				}
 				string revisions_link = "<a target=_blank href=view_svn_file_revisions.aspx?id="
 					+ Convert.ToString(id)
-				+ ">subversion revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
+				+ " title='View Subversion revisions related to this item'>svn revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
 				revisions.InnerHtml = revisions_link;
 			}
 			else
@@ -530,7 +568,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			print.InnerHtml = "<a target=_blank href=print_bug.aspx?id="
 				+ Convert.ToString(id)
-				+ ">print</a>";
+				+ " title='Display this item in a printer-friendly format'>print</a>";
 
 
 			// edit bug
@@ -539,7 +577,7 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				string merge_bug_link = "<a href=merge_bug.aspx?id="
 					+ Convert.ToString(id)
-					+ ">merge</a>";
+					+ " title='Merge this item and another item together'>merge</a>";
 
 				merge_bug.InnerHtml = merge_bug_link;
 			}
@@ -550,7 +588,7 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				string delete_bug_link = "<a href=delete_bug.aspx?id="
 					+ Convert.ToString(id)
-					+ ">delete</a>";
+					+ " title='Delete this item'>delete</a>";
 
 				delete_bug.InnerHtml = delete_bug_link;
 			}
@@ -571,37 +609,6 @@ void Page_Load(Object sender, EventArgs e)
 			}
 
 			format_prev_next_bug();
-
-			// look at permission level and react accordingly
-			permission_level = (int)dr["pu_permission_level"];
-
-			// reduce permissions for guest
-			if (security.this_is_guest && permission_level == Security.PERMISSION_ALL)
-			{
-				permission_level = Security.PERMISSION_REPORTER;
-			}
-
-			if (permission_level == Security.PERMISSION_NONE)
-			{
-				Response.Write ("<link rel=StyleSheet href=btnet.css type=text/css>");
-				security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs"));
-				Response.Write("<p>&nbsp;</p><div class=align>");
-				Response.Write("<div class=err>You are not allowed to view this "
-					+ btnet.Util.get_setting("SingularBugLabel","bug")
-					+ "</div>");
-				Response.Write("<p><a href=bugs.aspx>View "
-					+ btnet.Util.capitalize_first_letter(btnet.Util.get_setting
-					("PluralBugLabel","bugs")) + "</a>");
-				Response.End();
-
-			}
-			else if (permission_level == Security.PERMISSION_READONLY
-			|| permission_level == Security.PERMISSION_REPORTER)
-			{
-
-				set_controls_to_readonly();
-
-			}
 
 		}
 
@@ -811,19 +818,20 @@ void format_subcribe_cancel_link()
 		}
 		else
 		{
-			string subscription_link;
+			string subscription_link = "<a id='notifications' title='Get or stop getting email notifications about changes to this item.'"
+				+ " href='javascript:toggle_notifications("
+				+ Convert.ToString(id)
+				+ ")'><span id='get_stop_notifications'>";
+
 			if (subscribed > 0)
 			{
-				subscription_link = "<a title='Subscribe to receive notifications by email when this item is updated.' href=subscribe.aspx?action=0&id="
-					+ Convert.ToString(id)
-					+ ">cancel notifications subscription</a>";
+				subscription_link += "stop notifications</span></a>";
 			}
 			else
 			{
-				subscription_link = "<a title='Subscribe to receive notifications by email when this item is updated.' href=subscribe.aspx?action=1&id="
-					+ Convert.ToString(id)
-					+ ">subscribe to notifications</a>";
+				subscription_link += "get notifications</span></a>";
 			}
+
 			subscriptions.InnerHtml = subscription_link;
 		}
 	}
@@ -886,6 +894,9 @@ void set_controls_to_readonly()
 	}
 
 	set_project_to_readonly();
+
+	internal_only_label.Visible = false;
+	internal_only.Visible = false;
 
 }
 
@@ -1590,7 +1601,8 @@ void on_update (Object sender, EventArgs e)
 				null,
 				commentType,
 				internal_only.Checked,
-				hash_custom_cols);
+				hash_custom_cols,
+                true); // send notifications
 
 			id = new_ids.bugid;
 			new_id.Value = Convert.ToString(id);
@@ -1850,11 +1862,12 @@ void on_update (Object sender, EventArgs e)
 
 <script>
 var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditBugPage","0")); %>'
+var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 </script>
 
 
 </head>
-<body>
+<body onunload='on_body_unload()'>
 <% security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs")); %>
 
 <div id="overDiv" style="position:absolute;visibility:hidden; z-index:1000;"></div>
@@ -1868,47 +1881,31 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 <span id="prev_next" runat="server">&nbsp;</span>
 
 
-<p>
+<br><br>
 
-<table border=0>
+<table border=0 cellspacing=0 cellpadding=3>
 <tr>
 <td nowrap valign=top> <!-- links -->
-
-
-
-<span id="print" runat="server">&nbsp;</span>
-<br>
-<br>
-<span id="merge_bug" runat="server">&nbsp;</span>
-<br>
-<span id="delete_bug" runat="server">&nbsp;</span>
-<br>
-<br>
-<span id="history" runat="server">&nbsp;</span>
-<br>
-<span id="revisions" runat="server">&nbsp;</span>
-<br>
-<span id="subscribers" runat="server">&nbsp;</span>
-<br>
-<span id="subscriptions" runat="server">&nbsp;</span>
-<br>
-<br>
-<span id="relationships" runat="server">&nbsp;</span>
-<br>
-<span id="send_email" runat="server">&nbsp;</span>
-<br>
-<span id="attachment" runat="server">&nbsp;</span>
-<br>
-<br>
-<span id="custom" runat="server">&nbsp;</span>
-
-
+	<div id="edit_bug_menu">
+		<ul>
+			<li id="print" runat="server" />
+			<li id="merge_bug" runat="server" />
+			<li id="delete_bug" runat="server" />
+			<li id="history" runat="server" />
+			<li id="revisions" runat="server" />
+			<li id="subscribers" runat="server" />
+			<li id="subscriptions" runat="server" />
+			<li id="relationships" runat="server" />
+			<li id="send_email" runat="server" />
+			<li id="attachment" runat="server" />
+			<li id="custom" runat="server" />
+		</ul>
+	</div>
 
 <td nowrap valign=top> <!-- form -->
 
-
+<div id="bugform_div">
 <form class=frm runat="server">
-
 	<table border=0 cellpadding=3 cellspacing=0>
 
 	<tr>
@@ -1916,7 +1913,7 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 			<span class=lbl><% Response.Write(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))); %> ID:&nbsp;</span>
 			<span runat="server" class=static id="bugid"></span>
 			&nbsp;&nbsp;&nbsp;
-			<span class=static id="static_short_desc" runat="server" style='width: 500px; display: none;'></span>
+			<span class=static id="static_short_desc" runat="server" style='width:500px; display: none;'></span>
 			<input runat="server" type=text class=txt id="short_desc" size="100" maxlength="200">
 			&nbsp;&nbsp;&nbsp;
 			<span runat="server" class=err id="short_desc_err">&nbsp;</span>
@@ -2010,8 +2007,8 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	// Create the custom column INPUT elements
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
-		Response.Write ("<tr>");
-		Response.Write ("<td><span id=\"" + drcc["name"] +  "_label\">");
+		Response.Write ("\n<tr>");
+		Response.Write ("<td nowrap><span id=\"" + drcc["name"] +  "_label\">");
 		Response.Write (drcc["name"]);
 		Response.Write (":</span><td align=left>");
 
@@ -2205,9 +2202,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		{
 			if ((int)project_dr["pj_enable_custom_dropdown" + Convert.ToString(i)] == 1)
 			{
-				Response.Write ("<tr><td>");
+				Response.Write ("\n<tr><td nowrap>");
 				Response.Write (project_dr["pj_custom_dropdown_label" + Convert.ToString(i)]);
-				Response.Write ("<td>");
+				Response.Write ("<td nowrap>");
 
 
 				int permission_on_original = permission_level;
@@ -2290,9 +2287,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	%>
 
 	</table>
-	<table border=0 cellpadding=0 cellspacing=3 width=100%>
+	<table border=0 cellpadding=0 cellspacing=3 width=98%>
 
-	<tr><td>
+	<tr><td nowrap>
 		<span id="plus_label" runat="server">
 			<font size=0>
 				<a href="#" onclick="<%= security.this_use_fckeditor ? "resize_iframe('fckeComment___Frame', 50);" : "resize_comment(10);" %>"><span id="toggle_link_plus">[+]</span></a>
@@ -2306,17 +2303,17 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		<textarea  id="comment" rows=4 cols=80 runat="server" class=txt></textarea>
 		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>
 
-	<tr><td>
+	<tr><td  nowrap>
 		<asp:checkbox runat="server" class=txt id="internal_only"/>
 		<span runat="server" id="internal_only_label">Comment visible to internal users only</span>
 
 
-	<tr><td align=left>
+	<tr><td nowrap align=left>
 		<span runat="server" class=err id="custom_field_msg">&nbsp;</span>
 		<span runat="server" class=err id="msg">&nbsp;</span>
 
 
-	<tr><td align=center>
+	<tr><td nowrap align=center>
 		<input
 			runat="server"
 			class=btn
@@ -2381,43 +2378,38 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 
 </form>
+</div> <!-- bug form div -->
 </table>
 
+<br>
+<span id="toggle_images" runat="server"></span>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<span id="toggle_history" runat="server"></span>
+<br><br>
+
+<div id="posts">
+
+	<%
+	// COMMENTS
+	if (id != 0)
+	{
+		PrintBug.write_posts(
+			Response,
+			id,
+			permission_level,
+			true,
+			images_inline,
+			history_inline,
+			security.this_is_admin,
+			security.this_can_edit_and_delete_posts,
+			security.this_external_user);
+	}
+
+	%>
 
 
+</div>
 
-
-
-
-
-<table border=0 cellspacing=3>
-
-<% if (!sub.Disabled)
-{ %>
-	<tr><td nowrap>
-		<span id="toggle_images" runat="server"></span>
-		&nbsp;&nbsp;&nbsp;&nbsp;
-		<span id="toggle_history" runat="server"></span>
-	</td></tr>
-
-	<tr><td>
-
-<%
-}
-
-// COMMENTS
-
-if (id != 0)
-{
-	PrintBug.write_posts(Response, id, permission_level, true, images_inline, history_inline,
-		security.this_is_admin,
-		security.this_can_edit_and_delete_posts,
-		security.this_external_user);
-}
-
-%>
-
-</table>
 </div>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

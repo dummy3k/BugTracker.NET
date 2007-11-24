@@ -5,6 +5,79 @@ Release notes:
 -----------------------------------------------------------------------
 
 -----------------------------------------------------------------------
+Version 2.6.6  11/xx/2007
+-----------------------------------------------------------------------
+
+New Features:
+
+* Search now handles project custom dropdowns. Thanks to Jason 
+Kresowaty, who took my primitive implementation and fixed and finished 
+it.
+
+* The edit_bug.aspx page now has more "AJAX" behavior. Specifically,
+you can now do the following without having to first save your
+bug changes:
+	add attachments
+	dd relationships
+	toggle show/hide images 
+	toggle show/hide change history
+	get/stop notifications
+You still have to save your changes before clicking a link that
+would bring you to the send_email.aspx page.
+
+* You can now delete received emails if you are admin or have been 
+given the permission by an admin.
+
+* Some changes to btnet_base.css to make it easier for folks to
+customize the layout of edit_bug.aspx.
+
+Bug fixes:
+
+* Adding an attachment caused the user doing the adding to receive 
+notification even when "Send notifications even for items you add or 
+change" was not checked.
+
+* Emails with attachements and bugs posted by screen capture caused 
+an additional notification per attachment.
+
+* Along with this release I'm posting a new version of the screen
+capture utility, btnetsc.exe version 2.1.1.  There was a bug fix:
+
+Posting a screenshot to an EXISTING bug wrongly created a NEW bug 
+instead of adding an attachment to the specified existing bug.
+
+-----------------------------------------------------------------------
+Version 2.6.5  11/18/2007
+-----------------------------------------------------------------------
+
+
+* !!!!!IMPORTANT!!!!!    Print bug AND email notifications were both 
+broken by 2.6.4 because the logic was looking for btnet_custom.css in 
+the wrong folder.   If you don't want to move to this release, then you
+can put an additional copy of btnet_custom.css into the parent btnet
+folder to fix the problem.
+
+* Cosmetic changes in the add/edit bug form.  The goal is to make it
+easier to read for all three categories of users:
+- full add/edit permission
+- reporter only permission
+- view only permission
+
+In general, in the coming releases, I want to make BugTracker.NET
+better as a tracker that faces outside, customers, clients, users, 
+rather than just a tracker that is used internally.
+
+* "Comment visible to internal users only" shouldn't have been visible to
+view-only users
+
+* In relationships page, "detach" link shouldn't have been visible to 
+view-only users.
+
+* Hid links that view-only users shouldn't see: 
+add attachment
+send email
+
+-----------------------------------------------------------------------
 Version 2.6.4  11/17/2007
 -----------------------------------------------------------------------
 
@@ -87,7 +160,7 @@ Version 2.6.2  11/8/2007
 Along with this release of the web pages, there's a new release of the 
 screen capture utility, btnetsc_2.0.exe.  The new screen capture
 supports SSL.  If you aren't using SSL, you don't need to upgrade.
-Thanks to Jason Kresowaty, who  did all the work.
+Thanks to Jason Kresowaty, who did all the work.
 
 Bug fixes in this release:
 

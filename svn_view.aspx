@@ -7,7 +7,6 @@
 
 DbUtil dbutil;
 Security security;
-string repos_url = "";
 
 string repository_url = "";
 string svn_username = "";
