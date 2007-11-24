@@ -52,6 +52,33 @@ drop table [svn_revisions]
 if exists (select * from dbo.sysobjects where id = object_id(N'[bug_post_attachments]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [bug_post_attachments]
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[roles]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [roles]
+
+
+/* ROLE */
+
+create table roles
+(
+rl_id int identity primary key not null,
+rl_name nvarchar(80) not null,
+rl_non_admins_can_use int not null default(0),
+rl_external_user int not null default(0), /* external user can't view post marked internal */
+rl_can_be_assigned_to int not null default(1),
+rl_can_edit_sql int not null default(0),
+rl_can_delete_bug int not null default(0),
+rl_can_edit_and_delete_posts int not null default(0),
+rl_can_merge_bugs int not null default(0),
+rl_can_mass_edit_bugs int not null default(0),
+rl_can_use_reports int not null default(0),
+rl_can_edit_reports int not null default(0)
+)
+
+create unique index unique_rl_name on roles (rl_name)
+
+insert into roles (rl_name) values ('default')
+
+
 /* USER */
 
 create table users
@@ -80,7 +107,7 @@ us_use_fckeditor int not null default(0),
 us_enable_bug_list_popups int not null default(1),
 /* who created this user */
 us_created_user int not null default(1),
-
+us_role int not null default(1),
 us_external_user int not null default(0), /* external user can't view post marked internal */
 us_can_be_assigned_to int not null default(1),
 /* admins can do all these things - these are permissions for non-admins */
@@ -91,9 +118,9 @@ us_can_merge_bugs int not null default(0),
 us_can_mass_edit_bugs int not null default(0),
 us_can_use_reports int not null default(0),
 us_can_edit_reports int not null default(0)
-
 )
 
+create unique index unique_us_username on users (us_username)
 
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query)
@@ -131,6 +158,9 @@ ct_sort_seq int not null default(0),
 ct_default int not null default(0)
 )
 
+create unique index unique_ct_name on categories (ct_name)
+
+
 insert into categories (ct_name) values('bug')
 insert into categories (ct_name) values('enhancement')
 insert into categories (ct_name) values('task')
@@ -167,6 +197,8 @@ pj_subversion_username nvarchar(100) null,
 pj_subversion_password nvarchar(80) null,
 pj_websvn_url nvarchar(100) null
 )
+
+create unique index unique_pj_name on projects (pj_name)
 
 insert into projects (pj_name) values('project 1')
 insert into projects (pj_name) values('project 2')
@@ -279,6 +311,9 @@ udf_name nvarchar(60) not null,
 udf_sort_seq int not null default(0),
 udf_default int not null default(0)
 )
+
+create unique index unique_udf_name on user_defined_attribute (udf_name)
+
 insert into user_defined_attribute (udf_name) values ('whatever')
 insert into user_defined_attribute (udf_name) values ('anything')
 
@@ -293,6 +328,8 @@ st_sort_seq int not null default(0),
 st_style nvarchar(30) null,
 st_default int not null default(0)
 )
+
+create unique index unique_st_name on statuses (st_name)
 
 insert into statuses (st_name, st_sort_seq, st_style) values ('new', 1, 'st1')
 insert into statuses (st_name, st_sort_seq, st_style) values ('in progress', 2, 'st2')
@@ -311,6 +348,8 @@ pr_background_color nvarchar(14) not null,
 pr_style nvarchar(30) null,
 pr_default int not null default(0)
 )
+
+create unique index unique_pr_name on priorities (pr_name)
 
 insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) values ('high', 1, '#ff9999', 'pr1_')
 insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) values ('med', 2, '#ffdddd', 'pr2_')
@@ -371,6 +410,8 @@ rp_sql ntext not null,
 rp_chart_type varchar(8) not null
 )
 
+create unique index unique_rp_desc on reports (rp_desc)
+
 /* Some examples to get you started */
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)
@@ -415,6 +456,9 @@ create table queries
 	qu_default int null,
 	qu_user int null
 )
+
+create unique index unique_qu_desc on queries (qu_desc)
+
 
 /*
 

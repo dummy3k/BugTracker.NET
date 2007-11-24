@@ -39,6 +39,8 @@ void Page_Load(Object sender, EventArgs e)
 <p>
 <li class=listitem><a href=users.aspx>users</a>
 <p>
+<li class=listitem><a href=roles.aspx>user roles</a>
+<p>
 <li class=listitem><a href=projects.aspx>projects</a>
 <p>
 <li class=listitem><a href=categories.aspx>categories</a>
@@ -62,7 +64,7 @@ This links to query.aspx.&nbsp;&nbsp;Query.aspx is not safe on a public web serv
 
 <p>
 <table border=0><tr><td>
-	<div class="cmt" style="padding: 15px; font-size: 11pt; border: 1px solid black;">
+	<div style="padding: 15px; font-size: 11pt; border: 1px solid gray; background: #eeffee;">
 	Control other important options by editing the file "Web.config" in the IIS virtual directory.
 	<p>
 	<a target="_blank" style="font-size: 11pt;" href="view_web_config.aspx">View Web.config file</a>

@@ -41,6 +41,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			u.us_username [username],
 			isnull(u.us_firstname,'') + ' ' + isnull(u.us_lastname,'') [name],
+			rl_name [role],
 			case when u.us_admin = 1 then 'Y' else 'N' end [admin],
 			case when pu_user is null then 'N' else 'Y' end [project<br>admin],
 			case when u.us_active = 1 then 'Y' else 'N' end [active],
@@ -60,6 +61,7 @@ void Page_Load(Object sender, EventArgs e)
 			u2.us_username [created<br>by]
 
 			from users u
+			inner join roles on u.us_role = rl_id
 			left outer join queries on u.us_default_query = qu_id
 			left outer join projects on u.us_forced_project = pj_id
 			left outer join users u2 on u.us_created_user = u2.us_id
@@ -85,6 +87,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			u.us_username [username],
 			isnull(u.us_firstname,'') + ' ' + isnull(u.us_lastname,'') [name],
+			rl_name [role],
 			case when u.us_admin = 1 then 'Y' else 'N' end [admin],
 			case when pu_user is null then 'N' else 'Y' end [project<br>admin],
 			case when u.us_active = 1 then 'Y' else 'N' end [active],
@@ -102,6 +105,7 @@ void Page_Load(Object sender, EventArgs e)
 			case when u.us_enable_notifications = 1 then 'Y' else 'N' end [notif-<br>ications]
 
 			from users u
+			inner join roles on us_role = rl_id
 			left outer join queries on us_default_query = qu_id
 			left outer join projects on us_forced_project = pj_id
 			left outer join #t on us_id = pu_user

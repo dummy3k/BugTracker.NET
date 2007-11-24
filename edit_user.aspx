@@ -129,6 +129,16 @@ void Page_Load(Object sender, EventArgs e)
 			order by qu_desc;";
 
 // Table 2
+
+		sql += @"/* populate role dropdown */
+			select rl_id, rl_name
+			from roles
+			where rl_non_admins_can_use = 1
+			or $this_is_admin = 1
+			order by rl_name;";
+
+
+// Table 3
 		if (id !=0)
 		{
 
@@ -153,6 +163,7 @@ void Page_Load(Object sender, EventArgs e)
 				us_auto_subscribe_own_bugs,
 				us_auto_subscribe_reported_bugs,
 				us_default_query,
+				us_role,
 				isnull(us_signature,'') [us_signature],
 				isnull(us_forced_project,0) [us_forced_project],
 				us_created_user,
@@ -174,6 +185,8 @@ void Page_Load(Object sender, EventArgs e)
 
 		sql = sql.Replace("$us",Convert.ToString(id));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
+		sql = sql.Replace("$this_is_admin", Util.bool_to_string(security.this_is_admin));
+
 		DataSet ds = dbutil.get_dataset(sql);
 
 		// query dropdown
@@ -184,10 +197,17 @@ void Page_Load(Object sender, EventArgs e)
 
 		// forced project dropdown
 		forced_project.DataSource = ds.Tables[0].DefaultView;
-	;	forced_project.DataTextField = "pj_name";
+		forced_project.DataTextField = "pj_name";
 		forced_project.DataValueField = "pj_id";
 		forced_project.DataBind();
 		forced_project.Items.Insert(0, new ListItem("[no forced project]", "0"));
+
+		// forced project dropdown
+		role.DataSource = ds.Tables[2].DefaultView;
+		role.DataTextField = "rl_name";
+		role.DataValueField = "rl_id";
+		role.DataBind();
+		role.Items.Insert(0, new ListItem("[select role]", "0"));
 
 		// populate permissions grid
 		MyDataGrid.DataSource=ds.Tables[0].DefaultView;
@@ -222,7 +242,7 @@ void Page_Load(Object sender, EventArgs e)
 			sub.Value = "Update";
 
 			// get the values for this existing user
-			DataRow dr = ds.Tables[2].Rows[0];
+			DataRow dr = ds.Tables[3].Rows[0];
 
 			// check if project admin is allowed to edit this user
 			if (!security.this_is_admin)
@@ -295,6 +315,17 @@ void Page_Load(Object sender, EventArgs e)
 			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["us_can_be_assigned_to"]);
 
 
+			// role
+			foreach (ListItem li in role.Items)
+			{
+				if (Convert.ToInt32(li.Value) == (int) dr["us_role"])
+				{
+					li.Selected = true;
+					break;
+				}
+			}
+
+			// query
 			foreach (ListItem li in query.Items)
 			{
 				if (Convert.ToInt32(li.Value) == (int) dr["us_default_query"])
@@ -385,6 +416,16 @@ Boolean validate()
 		confirm_pw_err.InnerText = "";
 	}
 
+	if (role.SelectedIndex < 1)
+	{
+		good = false;
+		role_err.InnerText = "You must select a role";
+	}
+	else
+	{
+		role_err.InnerText = "";
+	}
+
 	if (!Util.is_int(bugs_per_page.Value))
 	{
 		good = false;
@@ -441,6 +482,7 @@ string replace_vars_in_sql_statement(string sql)
 	sql = sql.Replace("$ao", Util.bool_to_string(auto_subscribe_own.Checked));
 	sql = sql.Replace("$ar", Util.bool_to_string(auto_subscribe_reported.Checked));
 	sql = sql.Replace("$dq", query.SelectedItem.Value);
+	sql = sql.Replace("$role", role.SelectedItem.Value);
 	sql = sql.Replace("$sg", signature.InnerText.Replace("'","''"));
 	sql = sql.Replace("$fp", forced_project.SelectedItem.Value);
 	sql = sql.Replace("$id", Convert.ToString(id));
@@ -509,6 +551,7 @@ us_auto_subscribe,
 us_auto_subscribe_own_bugs,
 us_auto_subscribe_reported_bugs,
 us_default_query,
+us_role,
 us_signature,
 us_forced_project,
 
@@ -531,7 +574,7 @@ N'$un', N'$pw', N'$fn', N'$ln',
 $bp, $fk, $pp, N'$em',
 $ac, $ad, $en,  $ss,
 $rn, $an, $sn, $as,
-$ao, $ar, $dq, N'$sg',
+$ao, $ar, $dq, $role, N'$sg',
 $fp,
 $ext, $ces, $cdb,
 $cep, $cmb, $cme,
@@ -605,6 +648,7 @@ us_auto_subscribe = $as,
 us_auto_subscribe_own_bugs = $ao,
 us_auto_subscribe_reported_bugs = $ar,
 us_default_query = $dq,
+us_role = $role,
 us_signature = N'$sg',
 us_forced_project = $fp,
 
@@ -1067,6 +1111,17 @@ function show_permissions_settings()
 	<td><input runat="server" autofill=no type=password class=txt id="confirm_pw" maxlength=20 size=20></td>
 	<td runat="server" class=err id="confirm_pw_err">&nbsp;</td>
 	</tr>
+
+
+	<tr>
+	<td class=lbl>Role:</td>
+	<td>
+		<asp:DropDownList id="role" runat="server">
+		</asp:DropDownList>
+	</td>
+	<td runat="server" class=err id="role_err">&nbsp;</td>
+	</tr>
+
 
 	<tr>
 	<td class=lbl>First Name:</td>
