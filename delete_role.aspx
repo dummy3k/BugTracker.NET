@@ -38,7 +38,8 @@ void Page_Load(Object sender, EventArgs e)
 	else
 	{
 		sql = @"declare @cnt int
-			select @cnt = count(1) from users where us_role = $1
+			select @cnt = count(1) from users where us_role = $1;
+			select @cnt = @cnt + count(1) from queries where qu_role = $1;
 			select rl_name, @cnt [cnt] from roles where rl_id = $1";
 		sql = sql.Replace("$1", id);
 
@@ -48,7 +49,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			Response.Write ("You can't delete role \""
 				+ Convert.ToString(dr["rl_name"])
-				+ "\" because some users still reference it.");
+				+ "\" because some users or queries still reference it.");
 			Response.End();
 		}
 		else

@@ -45,7 +45,22 @@ void Page_Load(Object sender, EventArgs e)
 		if (security.this_is_admin || security.this_can_edit_sql)
 		{
 			// these guys can do everything
-			public_query.Checked = true;
+			vis_everybody.Checked = true;
+
+			sql = @"/* populate role dropdown */
+				select rl_id, rl_name
+				from roles
+				order by rl_name;";
+
+			DataSet ds_roles = dbutil.get_dataset(sql);
+
+			// forced project dropdown
+			role.DataSource = ds_roles.Tables[0].DefaultView;
+			role.DataTextField = "rl_name";
+			role.DataValueField = "rl_id";
+			role.DataBind();
+			role.Items.Insert(0, new ListItem("[select role]", "0"));
+
 		}
 		else
 		{
@@ -53,13 +68,10 @@ void Page_Load(Object sender, EventArgs e)
 			sql_text_label.Visible = false;
 			explanation.Visible = false;
 
-			public_query.Enabled = false;
-			private_query.Checked = true;
+			vis_everybody.Enabled = false;
+			vis_role.Enabled = false;
+			vis_user.Checked = true;
 
-			default_query.Visible = false;
-			default_query.Checked = false;
-			default_query_label.Visible = false;
-			default_query_note.Visible = false;
 		}
 
 
@@ -79,7 +91,7 @@ void Page_Load(Object sender, EventArgs e)
 			// Get this entry's data from the db and fill in the form
 
 			sql = @"select
-				qu_desc, qu_sql, isnull(qu_user,0) [qu_user], qu_default
+				qu_desc, qu_sql, isnull(qu_user,0) [qu_user], isnull(qu_role,0) [qu_role]
 				from queries where qu_id = $1";
 
 
@@ -97,7 +109,6 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				sql_text.Value = (string) dr["qu_sql"];
 			}
-			default_query.Checked = Convert.ToBoolean((int) dr["qu_default"]);
 
 			if ((int) dr["qu_user"] != security.this_usid)
 			{
@@ -111,11 +122,11 @@ void Page_Load(Object sender, EventArgs e)
 					Response.End();
 				}
 
-				public_query.Checked = true;
+				vis_everybody.Checked = true;
 			}
 			else
 			{
-				private_query.Checked = true;
+				vis_everybody.Checked = true;
 			}
 
 		}
@@ -142,38 +153,22 @@ Boolean validate()
 	}
 
 
-	default_err.InnerText = "";
-	if (default_query.Checked)
+	if (vis_role.Checked)
 	{
-		if (public_query.Checked)
+		if (role.SelectedIndex < 1)
 		{
-
-			if (id == 0)
-			{
-				sql = @"select count(1) from queries where qu_default = 1 and isnull(qu_user,0) = 0";
-			}
-			else
-			{
-				sql = @"select count(1) from queries where qu_default = 1 and isnull(qu_user,0) = 0 and qu_id <> $id";
-				sql = sql.Replace("$id",Convert.ToString(id));
-			}
-
-			int number_of_default_queries = (int) dbutil.execute_scalar(sql);
-
-			if (number_of_default_queries != 0)
-			{
-				default_err.InnerText = "There already is a public default query.  There can be ony one.";
-				good = false;
-			}
-
+			good = false;
+			role_err.InnerText = "You must select a role.";
 		}
 		else
 		{
-			default_err.InnerText = "A private query cannot be a default query.";
-			good = false;
+			role_err.InnerText = "";
 		}
 	}
-
+	else
+	{
+		role_err.InnerText = "";
+	}
 
 	if (id == 0)
 	{
@@ -219,8 +214,8 @@ void on_update (Object sender, EventArgs e)
 		if (id == 0)  // insert new
 		{
 			sql = @"insert into queries
-				(qu_desc, qu_sql, qu_default, qu_user)
-				values (N'$de', N'$sq', $df, $us)";
+				(qu_desc, qu_sql, qu_default, qu_user, qu_role)
+				values (N'$de', N'$sq', 0, $us, $rl)";
 		}
 		else // edit existing
 		{
@@ -228,8 +223,8 @@ void on_update (Object sender, EventArgs e)
 			sql = @"update queries set
 				qu_desc = N'$de',
 				qu_sql = N'$sq',
-				qu_default = $df,
-				qu_user = $us
+				qu_user = $us,
+				qu_role = $rl
 				where qu_id = $id";
 
 			sql = sql.Replace("$id", Convert.ToString(id));
@@ -244,15 +239,21 @@ void on_update (Object sender, EventArgs e)
 		{
 			sql = sql.Replace("$sq", sql_text.Value.Replace("'","''"));
 		}
-		sql = sql.Replace("$df", Util.bool_to_string(default_query.Checked));
 
-		if (public_query.Checked)
+		if (vis_everybody.Checked)
 		{
 			sql = sql.Replace("$us", "0");
+			sql = sql.Replace("$rl", "0");
+		}
+		else if (vis_user.Checked)
+		{
+			sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$rl", "0");
 		}
 		else
 		{
-			sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$rl", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$us", "0");
 		}
 
 		dbutil.execute_nonquery(sql);
@@ -287,7 +288,7 @@ void on_update (Object sender, EventArgs e)
 <div class=align><table border=0><tr><td>
 <a href=queries.aspx>back to queries</a>
 <form class=frm runat="server">
-	<table border=0>
+	<table border=0 cellspacing=8 cellpadding=0>
 
 	<tr>
 	<td class=lbl>Description:</td>
@@ -298,22 +299,16 @@ void on_update (Object sender, EventArgs e)
 	<tr>
 	<td class=lbl>Visibility:</td>
 	<td>
-		<asp:RadioButton text="Public" runat="server" class=txt GroupName="visibility" id="public_query"/>
+		<asp:RadioButton text="Everybody" runat="server" class=txt GroupName="visibility" id="vis_everybody"/>
 		&nbsp;&nbsp;&nbsp;
-		<asp:RadioButton text="Private" runat="server" class=txt GroupName="visibility" id="private_query"/>
+		<asp:RadioButton text="Just You" runat="server" class=txt GroupName="visibility" id="vis_user"/>
 		&nbsp;&nbsp;&nbsp;
-		<span class=smallnote>Public = visibile to everybody.&nbsp;&nbsp;Private = visible just to you..</span>
+		<asp:RadioButton text="Users with Role" runat="server" class=txt GroupName="visibility" id="vis_role"/>
+		<asp:DropDownList id="role" runat="server">
+		</asp:DropDownList>
+		&nbsp;&nbsp;
+		<span runat="server" class=err id="role_err">&nbsp;</span>
 	</td>
-	<td runat="server" class=err id="public_err">&nbsp;</td>
-	</tr>
-
-	<tr>
-	<td class=lbl id="default_query_label" runat="server">Default:</td>
-	<td><asp:checkbox runat="server" class=txt id="default_query"/>
-	&nbsp;&nbsp;&nbsp;<span class="smallnote" runat="server" id="default_query_note">Only used if no user setting specified</span>
-	</td>
-	<td><span runat="server" class=err id="default_err"></span></td>
-	</tr>
 
 	<tr>
 	<td class=lbl id="sql_text_label" runat="server">SQL:</td>
@@ -332,15 +327,15 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	<tr>
-	<td>&nbsp</td>
-	<td colspan=2 class=cmt>
+	<td colspan=3 class=cmt>
 		<span id="explanation" runat="server">
 			In order to work with the bugs.aspx page, your SQL must be structured in a particular way.
 			<br><br>
-			The first column must be a color starting with "#" or it will be interpreted as a CSS style class.
+			The first column must be either a color starting with "#" or a CSS style class. If it does not start with "#" it will be interpreted as a CSS style class.
 			<br>
-			Write your query so as to get your background color from the priority's background color<br>
-			or your CSS style class from either the priority or status.   See the admin pages.
+			<br>
+			View <a target="_blank" href="edit_styles.aspx">example</a> on how to use priority and/or status
+			to determine the CSS style.
 			<br>
 			<br>
 			The second column must be "bg_id".
@@ -362,6 +357,7 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	</table>
+	<p>
 </form>
 </td></tr></table>
 <% Response.Write(Application["custom_footer"]); %></body>

@@ -415,6 +415,8 @@ alter table projects add pj_websvn_url nvarchar(100) null
 /* after running this sql, users will have the same permissions they
 had before */
 
+alter table queries add qu_role int null
+
 alter table users add us_role int not null default(1)
 go
 

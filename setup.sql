@@ -454,7 +454,8 @@ create table queries
 	qu_desc nvarchar(200) not null,
 	qu_sql ntext not null,
 	qu_default int null,
-	qu_user int null
+	qu_user int null,
+	qu_role int null
 )
 
 create unique index unique_qu_desc on queries (qu_desc)

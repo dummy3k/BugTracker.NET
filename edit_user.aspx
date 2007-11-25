@@ -609,7 +609,7 @@ us_auto_subscribe_reported_bugs = $ar,
 us_default_query = $dq,
 us_role = $role,
 us_signature = N'$sg',
-us_forced_project = $fp,
+us_forced_project = $fp
 where us_id = $id";
 
 
