@@ -203,7 +203,7 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td><asp:checkbox runat="server" class=txt id="non_admins_can_use"/></td>
-	<td class=lbl>Non-admins allowed to add users can use this role</td>
+	<td class=lbl>Non-admins allowed to add users can use this role when adding users</td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -257,6 +257,13 @@ void on_update (Object sender, EventArgs e)
 	<td class=lbl>Can create/edit reports</td>
 	<td>&nbsp</td>
 	</tr>
+
+	<tr>
+	<td colspan=3>
+	&nbsp;
+	</td>
+	</tr>
+
 	<tr>
 	<td><asp:checkbox runat="server" class=txt id="can_be_assigned_to"/></td>
 	<td class=lbl>Appears in "assigned to" dropdown in edit bug page</td>

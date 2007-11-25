@@ -71,6 +71,13 @@ void Page_Load(Object sender, EventArgs e)
 			vis_everybody.Enabled = false;
 			vis_role.Enabled = false;
 			vis_user.Checked = true;
+			role.Enabled = false;
+
+			role.Visible = false;
+			vis_everybody.Visible = false;
+			vis_role.Visible = false;
+			vis_user.Visible = false;
+			visibility_label.Visible = false;
 
 		}
 
@@ -297,8 +304,8 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	<tr>
-	<td class=lbl>Visibility:</td>
-	<td>
+	<td class=lbl runat="server" id="visibility_label">Visibility:</td>
+	<td colspan=2>
 		<asp:RadioButton text="Everybody" runat="server" class=txt GroupName="visibility" id="vis_everybody"/>
 		&nbsp;&nbsp;&nbsp;
 		<asp:RadioButton text="Just You" runat="server" class=txt GroupName="visibility" id="vis_user"/>
@@ -327,32 +334,30 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	<tr>
-	<td colspan=3 class=cmt>
-		<span id="explanation" runat="server">
-			In order to work with the bugs.aspx page, your SQL must be structured in a particular way.
-			<br><br>
-			The first column must be either a color starting with "#" or a CSS style class. If it does not start with "#" it will be interpreted as a CSS style class.
+	<td id="explanation" colspan=3 class=cmt runat="server">
+		In order to work with the bugs.aspx page, your SQL must be structured in a particular way.
+		<br><br>
+		The first column must be either a color starting with "#" or a CSS style class. If it does not start with "#" it will be interpreted as a CSS style class.
+		<br>
+		<br>
+		View <a target="_blank" href="edit_styles.aspx">example</a> on how to use priority and/or status
+		to determine the CSS style.
+		<br>
+		<br>
+		The second column must be "bg_id".
+		<br>
+		You can use the pseudo-variable $ME in your query which will be replaced by your user ID.
+		<br>
+		For example:
+		<br>
+		<ul>
+			select isnull(pr_background_color,'#ffffff'), bg_id [id], bg_short_desc<br>
+			from bugs
 			<br>
+			left outer join priorities on bg_priority = pr_id
 			<br>
-			View <a target="_blank" href="edit_styles.aspx">example</a> on how to use priority and/or status
-			to determine the CSS style.
-			<br>
-			<br>
-			The second column must be "bg_id".
-			<br>
-			You can use the pseudo-variable $ME in your query which will be replaced by your user ID.
-			<br>
-			For example:
-			<br>
-			<ul>
-				select isnull(pr_background_color,'#ffffff'), bg_id [id], bg_short_desc<br>
-				from bugs
-				<br>
-				left outer join priorities on bg_priority = pr_id
-				<br>
-				where bg_assigned_to_user = $ME
-			</ul>
-		</span>
+			where bg_assigned_to_user = $ME
+		</ul>
 	</td>
 	</tr>
 
