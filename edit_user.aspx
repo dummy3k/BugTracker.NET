@@ -525,7 +525,6 @@ us_default_query,
 us_role,
 us_signature,
 us_forced_project,
-
 us_created_user)
 
 values (
@@ -535,11 +534,7 @@ $ac, $ad, $en,  $ss,
 $rn, $an, $sn, $as,
 $ao, $ar, $dq, $role, N'$sg',
 $fp,
-$ext, $ces, $cdb,
-$cep, $cmb, $cme,
-$cur, $cer, $cba,
 $createdby
-
 );
 
 select scope_identity()";
