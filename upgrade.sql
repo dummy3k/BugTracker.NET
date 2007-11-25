@@ -402,3 +402,131 @@ alter table projects add pj_subversion_repository_url nvarchar(255) null
 alter table projects add pj_subversion_username nvarchar(100) null
 alter table projects add pj_subversion_password nvarchar(80) null
 alter table projects add pj_websvn_url nvarchar(100) null
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.6.6 to 2.6.7
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+/* after running this sql, users will have the same permissions they
+had before */
+
+alter table users add us_role int not null default(1)
+go
+
+create table roles
+(
+rl_id int identity primary key not null,
+rl_name nvarchar(80) not null,
+rl_non_admins_can_use int not null default(0),
+rl_external_user int not null default(0), /* external user can't view post marked internal */
+rl_can_be_assigned_to int not null default(1),
+rl_can_edit_sql int not null default(0),
+rl_can_delete_bug int not null default(0),
+rl_can_edit_and_delete_posts int not null default(0),
+rl_can_merge_bugs int not null default(0),
+rl_can_mass_edit_bugs int not null default(0),
+rl_can_use_reports int not null default(0),
+rl_can_edit_reports int not null default(0)
+)
+
+create unique index unique_rl_name on roles (rl_name)
+
+/* Generate some roles.  Manufacture their names based on the users' permissions */
+insert into roles
+(rl_name,
+rl_external_user,
+rl_can_be_assigned_to,
+rl_can_edit_sql,
+rl_can_delete_bug,
+rl_can_edit_and_delete_posts,
+rl_can_merge_bugs,
+rl_can_mass_edit_bugs,
+rl_can_use_reports,
+rl_can_edit_reports)
+select distinct
+'r-' +
+case when us_external_user = 1             then 'extern,' else '' end +
+case when us_can_be_assigned_to = 1        then 'assgnbl,' else '' end +
+case when us_can_edit_sql = 1              then 'edt_sql,' else '' end +
+case when us_can_delete_bug = 1            then 'del_bug,' else '' end +
+case when us_can_edit_and_delete_posts = 1 then 'edt_post,' else '' end +
+case when us_can_merge_bugs = 1            then 'mrge,' else '' end +
+case when us_can_mass_edit_bugs = 1        then 'mass_edit,' else '' end +
+case when us_can_use_reports = 1           then 'use_rpt,' else '' end +
+case when us_can_edit_reports = 1          then 'edt_rpt' else '' end,
+
+us_external_user,
+us_can_be_assigned_to,
+us_can_edit_sql,
+us_can_delete_bug,
+us_can_edit_and_delete_posts,
+us_can_merge_bugs,
+us_can_mass_edit_bugs,
+us_can_use_reports,
+us_can_edit_reports
+from users
+
+/* Update the users so that their us_role column points to the roles we just created */
+
+DECLARE @us_id int
+DECLARE @role_name nvarchar(80)
+DECLARE @role_id int
+
+DECLARE my_cursor CURSOR FOR
+SELECT us_id,
+'r-' +
+case when us_external_user = 1             then 'extern,' else '' end +
+case when us_can_be_assigned_to = 1        then 'assgnbl,' else '' end +
+case when us_can_edit_sql = 1              then 'edt_sql,' else '' end +
+case when us_can_delete_bug = 1            then 'del_bug,' else '' end +
+case when us_can_edit_and_delete_posts = 1 then 'edt_post,' else '' end +
+case when us_can_merge_bugs = 1            then 'mrge,' else '' end +
+case when us_can_mass_edit_bugs = 1        then 'mass_edit,' else '' end +
+case when us_can_use_reports = 1           then 'use_rpt,' else '' end +
+case when us_can_edit_reports = 1          then 'edt_rpt' else '' end
+FROM users
+
+OPEN my_cursor
+
+FETCH NEXT FROM my_cursor
+INTO @us_id, @role_name
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+   select @role_id = rl_id from roles where rl_name = @role_name
+   update users set us_role = @role_id where us_id = @us_id	
+   FETCH NEXT FROM my_cursor
+   INTO @us_id, @role_name
+END
+
+CLOSE my_cursor
+DEALLOCATE my_cursor
+
+/*
+Several columns on the user table are now obsolete. They aren't hurting anything, but 
+you can drop the obsolete columns using the SQL below and some patience.
+When you run the sql below it will fail with an error saying
+"failed because one or more objects access this column"
+because of the columns have default values.  You can drop the defaults one by one
+as you learn their names using this syntax:
+alter table users drop constraint [DF__ the generated name goes here]
+*/
+
+/*
+alter table users drop column us_external_user
+alter table users drop column us_can_be_assigned_to
+alter table users drop column us_can_edit_sql
+alter table users drop column us_can_delete_bug
+alter table users drop column us_can_edit_and_delete_posts
+alter table users drop column us_can_merge_bugs
+alter table users drop column us_can_mass_edit_bugs
+alter table users drop column us_can_use_reports
+alter table users drop column us_can_edit_reports
+*/
+

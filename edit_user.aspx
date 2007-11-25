@@ -166,16 +166,7 @@ void Page_Load(Object sender, EventArgs e)
 				us_role,
 				isnull(us_signature,'') [us_signature],
 				isnull(us_forced_project,0) [us_forced_project],
-				us_created_user,
-				us_external_user,
-				us_can_edit_sql,
-				us_can_delete_bug,
-				us_can_edit_and_delete_posts,
-				us_can_merge_bugs,
-				us_can_mass_edit_bugs,
-				us_can_use_reports,
-				us_can_edit_reports,
-				us_can_be_assigned_to
+				us_created_user
 				from users
 				where us_id = $us";
 
@@ -304,15 +295,6 @@ void Page_Load(Object sender, EventArgs e)
             auto_subscribe.Checked = Convert.ToBoolean((int)dr["us_auto_subscribe"]);
 			auto_subscribe_own.Checked = Convert.ToBoolean((int) dr["us_auto_subscribe_own_bugs"]);
 			auto_subscribe_reported.Checked = Convert.ToBoolean((int) dr["us_auto_subscribe_reported_bugs"]);
-			external_user.Checked = Convert.ToBoolean((int)dr["us_external_user"]);
-			can_edit_sql.Checked = Convert.ToBoolean((int)dr["us_can_edit_sql"]);
-			can_delete_bug.Checked = Convert.ToBoolean((int)dr["us_can_delete_bug"]);
-			can_edit_and_delete_posts.Checked = Convert.ToBoolean((int)dr["us_can_edit_and_delete_posts"]);
-			can_merge_bugs.Checked = Convert.ToBoolean((int)dr["us_can_merge_bugs"]);
-			can_mass_edit_bugs.Checked = Convert.ToBoolean((int)dr["us_can_mass_edit_bugs"]);
-			can_use_reports.Checked = Convert.ToBoolean((int)dr["us_can_use_reports"]);
-			can_edit_reports.Checked = Convert.ToBoolean((int)dr["us_can_edit_reports"]);
-			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["us_can_be_assigned_to"]);
 
 
 			// role
@@ -487,17 +469,6 @@ string replace_vars_in_sql_statement(string sql)
 	sql = sql.Replace("$fp", forced_project.SelectedItem.Value);
 	sql = sql.Replace("$id", Convert.ToString(id));
 
-	sql = sql.Replace("$ext", Util.bool_to_string(external_user.Checked));
-	sql = sql.Replace("$ces", Util.bool_to_string(can_edit_sql.Checked));
-	sql = sql.Replace("$cdb", Util.bool_to_string(can_delete_bug.Checked));
-
-	sql = sql.Replace("$cep", Util.bool_to_string(can_edit_and_delete_posts.Checked));
-	sql = sql.Replace("$cmb", Util.bool_to_string(can_merge_bugs.Checked));
-	sql = sql.Replace("$cme", Util.bool_to_string(can_mass_edit_bugs.Checked));
-
-	sql = sql.Replace("$cur", Util.bool_to_string(can_use_reports.Checked));
-	sql = sql.Replace("$cer", Util.bool_to_string(can_edit_reports.Checked));
-	sql = sql.Replace("$cba", Util.bool_to_string(can_be_assigned_to.Checked));
 
 	// only admins can create admins.
 	if (security.this_is_admin)
@@ -554,18 +525,6 @@ us_default_query,
 us_role,
 us_signature,
 us_forced_project,
-
-us_external_user,
-us_can_edit_sql,
-us_can_delete_bug,
-
-us_can_edit_and_delete_posts,
-us_can_merge_bugs,
-us_can_mass_edit_bugs,
-
-us_can_use_reports,
-us_can_edit_reports,
-us_can_be_assigned_to,
 
 us_created_user)
 
@@ -651,19 +610,6 @@ us_default_query = $dq,
 us_role = $role,
 us_signature = N'$sg',
 us_forced_project = $fp,
-
-us_external_user = $ext,
-us_can_edit_sql = $ces,
-us_can_delete_bug = $cdb,
-
-us_can_edit_and_delete_posts = $cep,
-us_can_merge_bugs = $cmb,
-us_can_mass_edit_bugs = $cme,
-
-us_can_use_reports = $cur,
-us_can_edit_reports = $cer,
-us_can_be_assigned_to = $cba
-
 where us_id = $id";
 
 
@@ -1402,64 +1348,6 @@ function show_permissions_settings()
 	<td>&nbsp;</td>
 	</tr>
 	<tr><td colspan=3>&nbsp;
-
-	<tr>
-	<td colspan=3>
-	<br><br>
-	<div class=smallnote style="width: 400px;">Use the following settings to control permissions for non-admins.<br>Admins have all permissions regardless of these settings.<br>
-	</div>
-	</td>
-	</tr>
-
-
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="external_user"/></td>
-	<td class=lbl>External user&nbsp;&nbsp; <span class=smallnote>(External users cannot view posts marked "Visible for internal usrs only")</span></td>
-	<td>&nbsp</td>
-	</tr>
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_edit_sql"/></td>
-	<td class=lbl>Can edit sql and create/edit queries for everybody</td>
-	<td>&nbsp</td>
-	</tr>
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_delete_bug"/></td>
-	<td class=lbl>Can delete bugs</td>
-	<td>&nbsp</td>
-	</tr>
-
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_edit_and_delete_posts"/></td>
-	<td class=lbl>Can edit and delete comments and attachments</td>
-	<td>&nbsp</td>
-	</tr>
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_merge_bugs"/></td>
-	<td class=lbl>Can merge two bugs into one</td>
-	<td>&nbsp</td>
-	</tr>
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_mass_edit_bugs"/></td>
-	<td class=lbl>Can mass edit bugs on search page</td>
-	<td>&nbsp</td>
-	</tr>
-
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_use_reports"/></td>
-	<td class=lbl>Can use reports</td>
-	<td>&nbsp</td>
-	</tr>
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_edit_reports"/></td>
-	<td class=lbl>Can create/edit reports</td>
-	<td>&nbsp</td>
-	</tr>
-	<tr>
-	<td><asp:checkbox runat="server" class=txt id="can_be_assigned_to"/></td>
-	<td class=lbl>Appears in "assigned to" dropdown in edit bug page</td>
-	<td>&nbsp</td>
-	</tr>
-
 
 	</table>
 	</div>
