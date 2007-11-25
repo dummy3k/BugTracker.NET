@@ -367,7 +367,7 @@ void do_query()
         string alias1 = null;
         string alias2 = null;
         string alias3 = null;
-        
+
         foreach (ListItem selected_project in selected_projects)
 		{
             if (selected_project.Value == "0")
@@ -413,7 +413,7 @@ void do_query()
         if (alias1 != null)
         {
             project_dropdown_select_cols_server_side
-                += ",\nisnull(bg_project_custom_dropdown_value1,'') [" + alias1 +"]";            
+                += ",\nisnull(bg_project_custom_dropdown_value1,'') [" + alias1 +"]";
         }
         if (alias2 != null)
         {
@@ -502,11 +502,11 @@ void handle_project_custom_dropdowns()
         // Initialize Dictionary to accumulate ListItem values as they are added to the ListBox
         // so that duplicate values from multiple projects are not added to the ListBox twice.
 	    dupe_detection_dictionaries[i] = new Dictionary<String, String>();
-        
+
         previous_selection_dictionaries[i] = new Dictionary<String, String>();
 	}
 
-    // Preserve user's previous selections (necessary if this is called during a postback).    
+    // Preserve user's previous selections (necessary if this is called during a postback).
     foreach (ListItem li in project_custom_dropdown1.Items)
     {
         if (li.Selected)
@@ -534,11 +534,11 @@ void handle_project_custom_dropdowns()
     project_custom_dropdown1_label.InnerText = "";
     project_custom_dropdown2_label.InnerText = "";
     project_custom_dropdown3_label.InnerText = "";
-	
+
     project_custom_dropdown1.Items.Clear();
     project_custom_dropdown2.Items.Clear();
     project_custom_dropdown3.Items.Clear();
-	
+
 	foreach (ListItem selected_project in selected_projects)
 	{
 		// Read the project dropdown info from the db.
@@ -1713,7 +1713,9 @@ function set_project_changed() {
 				frm.submit();
 			}
 			</script>
+<% if (!security.this_is_guest)  { %>
 			<input class=btn type=submit onclick="on_save_query()" value="Save search criteria as query">
+<% } %>
 		</td>
 	</tr>
 
