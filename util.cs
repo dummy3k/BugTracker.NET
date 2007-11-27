@@ -94,7 +94,7 @@ namespace btnet
 				{
 					asp_net_context.Application[Request.ServerVariables["REMOTE_ADDR"]] = pages_viewed;
 				}
-			}
+		}
 
 
 			HttpCookie cookie = Request.Cookies["se_id"];
@@ -108,7 +108,7 @@ namespace btnet
 			string target = "default.aspx?url=" + original_url + "&qs=" + HttpUtility.UrlEncode(original_querystring);
 
 			if (cookie == null)
-			{
+		{
 				Util.write_to_log ("se_id cookie is null, so redirecting");
 				Util.write_to_log ("Trouble logging in?  Your browser might be failing to send back its cookie.");
 				Util.write_to_log ("See Help forum at http://sourceforge.net/forum/forum.php?forum_id=226938");
@@ -167,6 +167,7 @@ namespace btnet
 			{
 				Response.Redirect(target);
 			}
+
 
 			this_usid = Convert.ToInt32(dr["us_id"]);
 			this_username = (string) dr["us_username"];
@@ -298,7 +299,11 @@ namespace btnet
 			Response.Write("<td width=20>&nbsp;</td>");
 			write_menu_item(Response, this_link, Util.get_setting("PluralBugLabel","bugs"), "bugs.aspx");
 			write_menu_item(Response, this_link, "search", "search.aspx");
-			write_menu_item(Response, this_link, "queries", "queries.aspx");
+
+			if (!this_is_guest)
+			{
+				write_menu_item(Response, this_link, "queries", "queries.aspx");
+			}
 
 			if (this_is_admin)
 			{
@@ -323,7 +328,7 @@ namespace btnet
 
 			if (auth_method == "plain")
 			{
-				write_menu_item(Response, this_link, "logoff", "logoff.aspx");
+					write_menu_item(Response, this_link, "logoff", "logoff.aspx");
 			}
 
 			if (Util.get_setting("CustomMenuLinkLabel","") != "")
