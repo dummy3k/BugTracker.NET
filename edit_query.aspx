@@ -105,6 +105,19 @@ void Page_Load(Object sender, EventArgs e)
 			sql = sql.Replace("$1", Convert.ToString(id));
 			DataRow dr = dbutil.get_datarow(sql);
 
+			if ((int) dr["qu_user"] != security.this_usid)
+			{
+				if (security.this_is_admin || security.this_can_edit_sql)
+				{
+					// these guys can do everything
+				}
+				else
+				{
+					Response.Write ("You are not allowed to edit this query");
+					Response.End();
+				}
+			}
+
 			// Fill in this form
 			desc.Value = (string) dr["qu_desc"];
 
@@ -117,24 +130,28 @@ void Page_Load(Object sender, EventArgs e)
 				sql_text.Value = (string) dr["qu_sql"];
 			}
 
-			if ((int) dr["qu_user"] != security.this_usid)
+			if ((int) dr["qu_user"] == 0 && (int) dr["qu_role"] == 0)
 			{
-				if (security.this_is_admin || security.this_can_edit_sql)
-				{
-					// these guys can do everything
-				}
-				else
-				{
-					Response.Write ("You are not allowed to edit this item");
-					Response.End();
-				}
-
 				vis_everybody.Checked = true;
+			}
+			else if ((int) dr["qu_user"] == security.this_usid)
+			{
+				vis_user.Checked = true;
 			}
 			else
 			{
-				vis_everybody.Checked = true;
+				vis_role.Checked = true;
+				foreach (ListItem li in role.Items)
+				{
+					if (Convert.ToInt32(li.Value) == (int) dr["qu_role"])
+					{
+						li.Selected = true;
+						break;
+					}
+				}
 			}
+
+
 
 		}
 	}
@@ -259,7 +276,7 @@ void on_update (Object sender, EventArgs e)
 		}
 		else
 		{
-			sql = sql.Replace("$rl", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$rl", Convert.ToString(role.SelectedItem.Value));
 			sql = sql.Replace("$us", "0");
 		}
 

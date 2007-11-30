@@ -23,7 +23,6 @@ void do_query()
 		// from drop down
 		qu_id_string = Request["query"];
 		Session["SelectedBugQuery"] = qu_id_string;
-
 	}
 	else
 	{
@@ -63,10 +62,10 @@ void do_query()
 		}
 	}
 
-
+	// as a last resort, grab some query
 	if (bug_sql == null)
 	{
-		sql = @"select top 1 qu_sql from queries where qu_default = 1";
+		sql = @"select top 1 qu_sql from queries order by case when qu_default = 1 then 1 else 0 end desc";
 		bug_sql = (string)dbutil.execute_scalar(sql);
 		DataRow dr = dbutil.get_datarow(sql);
 		if (dr != null)
@@ -78,7 +77,7 @@ void do_query()
 
 	if (bug_sql == null)
 	{
-		Response.Write ("Error!.  No query!<p>Missing a default query?<p>Please contact your BugTracker.NET administrator.");
+		Response.Write ("Error!. No queries available for you to use!<p>Please contact your BugTracker.NET administrator.");
 		Response.End();
 	}
 
@@ -142,7 +141,7 @@ void Page_Load(Object sender, EventArgs e)
 	// if first time
 	if (!IsPostBack) {
 
-		// populate drop down
+		// populate query drop down
 		sql = @"declare @us_role int
 			select @us_role = us_role from users where us_id = $us
 

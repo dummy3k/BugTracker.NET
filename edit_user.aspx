@@ -122,10 +122,15 @@ void Page_Load(Object sender, EventArgs e)
 // Table 1
 
 		sql += @"/* populate query dropdown */
+		    declare @role int
+		    set @role = null
+		    select @role = us_role from users where us_id = $us
+
 			select qu_id, qu_desc
 			from queries
-			where isnull(qu_user,0) = 0
+			where (isnull(qu_user,0) = 0 and isnull(qu_role,0) = 0)
 			or isnull(qu_user,0) = $us
+			or isnull(qu_role,0) = isnull(@role,-1)
 			order by qu_desc;";
 
 // Table 2
@@ -177,6 +182,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("$us",Convert.ToString(id));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 		sql = sql.Replace("$this_is_admin", Util.bool_to_string(security.this_is_admin));
+
 
 		DataSet ds = dbutil.get_dataset(sql);
 
@@ -356,7 +362,44 @@ void Page_Load(Object sender, EventArgs e)
 
 		} // add or edit
 	} // if !postback
+	else
+	{
 
+		string sql = @"/* populate query dropdown */
+			select qu_id, qu_desc
+			from queries
+			where (isnull(qu_user,0) = 0 and isnull(qu_role,0) = 0)
+			or isnull(qu_user,0) = $us
+			or isnull(qu_role,0) = $role
+			order by qu_desc;";
+
+		if (role.SelectedIndex > 0)
+		{
+			sql = sql.Replace("$role",Convert.ToString(role.SelectedItem.Value));
+		}
+		else
+		{
+			sql = sql.Replace("$role", "-1");
+		}
+
+		if (id > 0)
+		{
+			sql = sql.Replace("$us",Convert.ToString(id));
+		}
+		else
+		{
+			sql = sql.Replace("$us","-1");
+		}
+
+		DataSet ds = dbutil.get_dataset(sql);
+
+		// query dropdown
+		query.DataSource = ds.Tables[0].DefaultView;
+		query.DataTextField = "qu_desc";
+		query.DataValueField = "qu_id";
+		query.DataBind();
+
+	}
 }
 
 
@@ -1053,17 +1096,6 @@ function show_permissions_settings()
 	<td runat="server" class=err id="confirm_pw_err">&nbsp;</td>
 	</tr>
 
-
-	<tr>
-	<td class=lbl>Role:</td>
-	<td>
-		<asp:DropDownList id="role" runat="server">
-		</asp:DropDownList>
-	</td>
-	<td runat="server" class=err id="role_err">&nbsp;</td>
-	</tr>
-
-
 	<tr>
 	<td class=lbl>First Name:</td>
 	<td><input runat="server" type=text class=txt id="firstname" maxlength=20 size=20></td>
@@ -1119,6 +1151,14 @@ function show_permissions_settings()
 	</td>
 	</tr>
 
+	<tr>
+	<td class=lbl>Role:</td>
+	<td>
+		<asp:DropDownList id="role" runat="server" AutoPostBack="true">
+		</asp:DropDownList>
+	</td>
+	<td runat="server" class=err id="role_err">&nbsp;</td>
+	</tr>
 
 	<tr>
 	<td class=lbl>Default <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %> Query:</td>

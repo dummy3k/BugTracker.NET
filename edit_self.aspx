@@ -34,10 +34,14 @@ void Page_Load(Object sender, EventArgs e)
 	{
 
 
-		sql = @"select qu_id, qu_desc
+		sql = @"declare @role int
+			select @role = us_role from users where us_id = $us
+
+			select qu_id, qu_desc
 			from queries
-			where isnull(qu_user,0) = 0
+			where (isnull(qu_user,0) = 0 and isnull(qu_role,0) = 0)
 			or isnull(qu_user,0) = $us
+			or isnull(qu_role,0) = @role
 			order by qu_desc";
 
 		sql = sql.Replace("$us",Convert.ToString(security.this_usid));
