@@ -58,13 +58,13 @@ void Page_Load(Object sender, EventArgs e)
 <li class=listitem><a target=_blank href=query.aspx>run ad-hoc query</a>
 &nbsp;&nbsp;
 <span style="border: solid red 1px; padding: 2px; margin: 3px; xbackground: yellow; color: red; font-size: 9px;">
-This links to query.aspx.&nbsp;&nbsp;Query.aspx is not safe on a public web server.</span><br>
+This links to query.aspx.&nbsp;&nbsp;Query.aspx is not safe on a public web server.&nbsp;&nbsp;Delete it if you are deploying on a public web server.</span><br>
 </ul>
 </td></tr></table>
 
-<p>
+<p>&nbsp;<p>
 <table border=0><tr><td>
-	<div style="padding: 15px; font-size: 11pt; border: 1px solid gray; background: #eeffee;">
+	<div style="padding: 15px; font-size: 11pt; border: 2px dotted red; background: #eeffee;">
 	Control other important options by editing the file "Web.config" in the IIS virtual directory.
 	<p>
 	<a target="_blank" style="font-size: 11pt;" href="view_web_config.aspx">View Web.config file</a>

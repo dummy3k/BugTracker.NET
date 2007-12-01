@@ -5,7 +5,39 @@ Release notes:
 -----------------------------------------------------------------------
 
 -----------------------------------------------------------------------
-Version 2.6.6  11/xx/2007
+Version 2.6.7  12/01/2007
+-----------------------------------------------------------------------
+
+* Added "organizations". See admin page. Some of the permissions that 
+used to be on the third tab of the add/edit user page page are now on
+the add/edit organization page. If you are looking for something like a
+user "role", use "organization". Actually, this new "organization"
+entity doesn't really do much yet, but its the basis for the next round
+of changes, to make BugTracker.NET a better tool for an internal team
+to collaborate with external customers.
+
+* A query can now be visible either to 
+1) everybody, 
+or
+2) just one user
+or
+3) just one organization.
+
+If anybody wants to modify the code, and upgrade.sql too, so that the 
+query-role relationship is many-to-many, so that one query can be 
+associated with multiple organizations, I'd welcome that. Send it to 
+ctrager@yahoo.com
+
+* Repaired the very poorly documented "guest" user feature that's been
+in the app for a couple years. It still needs documentation.
+Set up a user with the username of "guest" and limited either view only,
+or reporter only permissions. He will be different than other users 
+because he will not be able to save searches as queries or change his 
+own settings. In this way, several people can share the same 
+"guest" account. 
+
+-----------------------------------------------------------------------
+Version 2.6.6  11/25/2007
 -----------------------------------------------------------------------
 
 New Features:
