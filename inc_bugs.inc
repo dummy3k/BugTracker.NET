@@ -399,6 +399,7 @@ void display_bugs(bool show_checkbox)
 
 	sql += @"select ct_name from categories order by ct_sort_seq, ct_name;
 		select pr_name from priorities order by pr_sort_seq, pr_name
+		select og_name from orgs order by og_name
 		select st_name from statuses order by st_sort_seq, st_name
 		select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 
@@ -432,21 +433,25 @@ void display_bugs(bool show_checkbox)
 			{
 				display_filter_select ("[project]", ds_filters.Tables[0]);
 			}
+			else if (dc.ColumnName == "organization")
+			{
+				display_filter_select ("[organization]", ds_filters.Tables[1]);
+			}
 			else if (dc.ColumnName == "category")
 			{
-				display_filter_select ("[category]", ds_filters.Tables[1]);
+				display_filter_select ("[category]", ds_filters.Tables[2]);
 			}
 			else if (dc.ColumnName == "priority")
 			{
-				display_filter_select ("[priority]", ds_filters.Tables[2]);
+				display_filter_select ("[priority]", ds_filters.Tables[3]);
 			}
 			else if (dc.ColumnName == "status")
 			{
-				display_filter_select ("[status]", ds_filters.Tables[3]);
+				display_filter_select ("[status]", ds_filters.Tables[4]);
 			}
 			else if (dc.ColumnName == udf_column_name)
 			{
-				display_filter_select ("[" + udf_column_name + "]", ds_filters.Tables[4]);
+				display_filter_select ("[" + udf_column_name + "]", ds_filters.Tables[5]);
 			}
 			else if (dc.ColumnName == "reported by")
 			{

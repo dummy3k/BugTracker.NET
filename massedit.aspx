@@ -69,6 +69,12 @@ void Page_Load(Object sender, EventArgs e)
 				if (updates != "") {updates += ",\n";}
 				updates += "bg_project = " + project;
 			}
+			string org = Request["mass_org"];
+			if (org!= "-1" && Util.is_int(org))
+			{
+				if (updates != "") {updates += ",\n";}
+				updates += "bg_org = " + org;
+			}
 
 			string category = Request["mass_category"];
 			if (category != "-1" && Util.is_int(category))
@@ -148,7 +154,7 @@ void Page_Load(Object sender, EventArgs e)
 </script>
 <html>
 <head>
-<title id="titl" runat="server">btnet edit category</title>
+<title id="titl" runat="server">btnet mass edit</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 </head>
 <body>

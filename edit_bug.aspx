@@ -224,6 +224,19 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				default_value = "0";
 			}
+
+			foreach (ListItem li in org.Items)
+			{
+				if (li.Value == default_value)
+				{
+					li.Selected = true;
+				}
+				else
+				{
+					li.Selected = false;
+				}
+			}
+
 			foreach (ListItem li in category.Items)
 			{
 				if (li.Value == default_value)
@@ -355,14 +368,6 @@ void Page_Load(Object sender, EventArgs e)
 				Response.End();
 
 			}
-			else if (permission_level == Security.PERMISSION_READONLY
-			|| permission_level == Security.PERMISSION_REPORTER)
-			{
-
-				set_controls_to_readonly();
-
-			}
-
 
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
@@ -400,6 +405,18 @@ void Page_Load(Object sender, EventArgs e)
 			foreach (ListItem li in project.Items)
 			{
 				if (Convert.ToInt32(li.Value) == (int) dr["project"])
+				{
+					li.Selected = true;
+				}
+				else
+				{
+					li.Selected = false;
+				}
+			}
+
+			foreach (ListItem li in org.Items)
+			{
+				if (Convert.ToInt32(li.Value) == (int) dr["organization"])
 				{
 					li.Selected = true;
 				}
@@ -469,6 +486,13 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
+			if (permission_level == Security.PERMISSION_READONLY
+			|| permission_level == Security.PERMISSION_REPORTER)
+			{
+
+				set_controls_to_readonly();
+
+			}
 
 			// save for next bug
 			if (project.SelectedItem != null)
@@ -479,6 +503,7 @@ void Page_Load(Object sender, EventArgs e)
 			// save current values in previous, so that later we can write the audit trail when things change
 			prev_short_desc.Value = (string) dr["short_desc"];
 			prev_project.Value = Convert.ToString((int)dr["project"]);
+			prev_org.Value = Convert.ToString((int)dr["organization"]);
 			prev_category.Value = Convert.ToString((int)dr["category"]);
 			prev_priority.Value = Convert.ToString((int)dr["priority"]);
 			prev_assigned_to.Value = Convert.ToString((int)dr["assigned_to_user"]);
@@ -861,6 +886,7 @@ void set_controls_to_readonly()
 		static_short_desc.Style["display"] = "";
 	}
 
+	static_org.Style["display"] = "";
 	static_category.Style["display"] = "";
 	static_priority.Style["display"] = "";
 	static_status.Style["display"] = "";
@@ -868,6 +894,7 @@ void set_controls_to_readonly()
 
 	// fill in the static vars
 	static_short_desc.InnerText = short_desc.Value;
+	static_org.InnerText = org.SelectedItem.Text;
 	static_category.InnerText = category.SelectedItem.Text;
 	static_priority.InnerText = priority.SelectedItem.Text;
 	static_status.InnerText = status.SelectedItem.Text;
@@ -877,6 +904,8 @@ void set_controls_to_readonly()
 	{
 		short_desc.Style["display"] = "none";
 	}
+
+	org.Style["display"] = "none";
 	category.Style["display"] = "none";
 	priority.Style["display"] = "none";
 	reassign_label.Style["display"] = "none";
@@ -997,15 +1026,18 @@ void load_drop_downs()
 	sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel","2"));
 
 	// 1
-	sql += "\nselect ct_id, ct_name from categories order by ct_sort_seq, ct_name;";
+	sql += "\nselect og_id, og_name from orgs order by og_name;";
 
 	// 2
-	sql += "\nselect pr_id, pr_name from priorities order by pr_sort_seq, pr_name;";
+	sql += "\nselect ct_id, ct_name from categories order by ct_sort_seq, ct_name;";
 
 	// 3
-	sql += "\nselect st_id, st_name from statuses order by st_sort_seq, st_name;";
+	sql += "\nselect pr_id, pr_name from priorities order by pr_sort_seq, pr_name;";
 
 	// 4
+	sql += "\nselect st_id, st_name from statuses order by st_sort_seq, st_name;";
+
+	// 5
 	sql += "\nselect udf_id, udf_name from user_defined_attribute order by udf_sort_seq, udf_name;";
 
 	// do a batch of sql statements
@@ -1037,25 +1069,31 @@ void load_drop_downs()
 		project.Items.Insert(0, new ListItem("[no project]", "0"));
 	}
 
-	category.DataSource = ds_dropdowns.Tables[1];
+	org.DataSource = ds_dropdowns.Tables[1];
+	org.DataTextField = "og_name";
+	org.DataValueField = "og_id";
+	org.DataBind();
+	org.Items.Insert(0, new ListItem("[no organization]", "0"));
+
+	category.DataSource = ds_dropdowns.Tables[2];
 	category.DataTextField = "ct_name";
 	category.DataValueField = "ct_id";
 	category.DataBind();
 	category.Items.Insert(0, new ListItem("[no category]", "0"));
 
-	priority.DataSource  = ds_dropdowns.Tables[2];
+	priority.DataSource  = ds_dropdowns.Tables[3];
 	priority.DataTextField = "pr_name";
 	priority.DataValueField = "pr_id";
 	priority.DataBind();
 	priority.Items.Insert(0, new ListItem("[no priority]", "0"));
 
-	status.DataSource = ds_dropdowns.Tables[3];
+	status.DataSource = ds_dropdowns.Tables[4];
 	status.DataTextField = "st_name";
 	status.DataValueField = "st_id";
 	status.DataBind();
 	status.Items.Insert(0, new ListItem("[no status]", "0"));
 
-	udf.DataSource  = ds_dropdowns.Tables[4];
+	udf.DataSource  = ds_dropdowns.Tables[5];
 	udf.DataTextField = "udf_name";
 	udf.DataValueField = "udf_id";
 	udf.DataBind();
@@ -1088,6 +1126,7 @@ bool did_something_change()
 	|| comment.Value.Length > 0
 	|| fckeComment.Value.Length > 0
 	|| prev_project.Value != project.SelectedItem.Value
+	|| prev_org.Value != org.SelectedItem.Value
 	|| prev_category.Value != category.SelectedItem.Value
 	|| prev_priority.Value != priority.SelectedItem.Value
 	|| prev_assigned_to.Value != assigned_to.SelectedItem.Value
@@ -1177,6 +1216,21 @@ bool record_changes()
 		prev_project.Value = project.SelectedItem.Value;
 		current_project.InnerText = project.SelectedItem.Text;
 
+	}
+
+	if (prev_org.Value != org.SelectedItem.Value)
+	{
+
+		from = get_dropdown_text_from_value(org, prev_org.Value);
+
+		do_update = true;
+		sql += base_sql.Replace(
+			"$3",
+			"changed organization from \""
+			+ from.Replace("'","''") + "\" to \""
+			+ org.SelectedItem.Text.Replace("'","''") + "\"");
+
+		prev_org.Value = org.SelectedItem.Value;
 	}
 
 	if (prev_category.Value != category.SelectedItem.Value)
@@ -1591,10 +1645,11 @@ void on_update (Object sender, EventArgs e)
 				security.this_usid,
 				security.this_is_admin,
 				Convert.ToInt32(project.SelectedItem.Value),
+				Convert.ToInt32(org.SelectedItem.Value),
 				Convert.ToInt32(category.SelectedItem.Value),
 				Convert.ToInt32(priority.SelectedItem.Value),
-				Convert.ToInt32(assigned_to.SelectedItem.Value),
 				Convert.ToInt32(status.SelectedItem.Value),
+				Convert.ToInt32(assigned_to.SelectedItem.Value),
 				Convert.ToInt32(udf.SelectedItem.Value),
 				Request["pcd1"],
 				Request["pcd2"],
@@ -1683,6 +1738,7 @@ void on_update (Object sender, EventArgs e)
 						update bugs set
 						bg_short_desc = N'$sd',
 						bg_project = $pj,
+						bg_org = $og,
 						bg_category = $ct,
 						bg_priority = $pr,
 						bg_assigned_to_user = $au,
@@ -1703,6 +1759,7 @@ void on_update (Object sender, EventArgs e)
 				sql = sql.Replace("$lu", Convert.ToString(security.this_usid));
 				sql = sql.Replace("$id", Convert.ToString(id));
 				sql = sql.Replace("$pj", new_project);
+				sql = sql.Replace("$og", org.SelectedItem.Value);
 				sql = sql.Replace("$ct", category.SelectedItem.Value);
 				sql = sql.Replace("$pr", priority.SelectedItem.Value);
 				sql = sql.Replace("$au", new_assigned_to);
@@ -1951,6 +2008,15 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 	<tr id="row2">
 		<td nowrap>
+			<span class=lbl id="org_label">Organization:&nbsp;</span>
+		<td nowrap>
+			<span class=static id="static_org" runat="server" style='display: none;'></span>
+
+			<asp:DropDownList id="org" runat="server"></asp:DropDownList>
+
+
+	<tr id="row3">
+		<td nowrap>
 			<span class=lbl id="category_label">Category:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="static_category" runat="server" style='display: none;'></span>
@@ -1958,7 +2024,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 			<asp:DropDownList id="category" runat="server"></asp:DropDownList>
 
 
-	<tr id="row3">
+	<tr id="row4">
 		<td nowrap>
 			<span class=lbl id="priority_label">Priority:&nbsp;</span>
 		<td nowrap>
@@ -1966,7 +2032,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 			<asp:DropDownList id="priority" runat="server"></asp:DropDownList>
 
-	<tr id="row4">
+	<tr id="row5">
 		<td nowrap>
 			<span class=lbl id="assigned_to_label">Assigned to:&nbsp;</span>
 		<td nowrap>
@@ -1976,7 +2042,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 			<asp:DropDownList id="assigned_to" runat="server"
 			OnSelectedIndexChanged="on_assigned_to_changed"> </asp:DropDownList>
 
-	<tr id="row5">
+	<tr id="row6">
 		<td nowrap>
 			<span class=lbl id="status_label">Status:&nbsp;</span>
 		<td nowrap>
@@ -1988,7 +2054,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 {
 %>
-	<tr id="row6">
+	<tr id="row7">
 		<td nowrap>
 			<span class=lbl id="udf_label">
 			<% Response.Write(btnet.Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %>:&nbsp;</span>
@@ -2330,6 +2396,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	<input type=hidden id="new_id" runat="server" value="0">
 	<input type=hidden id="prev_short_desc" runat="server">
 	<input type=hidden id="prev_project" runat="server">
+	<input type=hidden id="prev_org" runat="server">
 	<input type=hidden id="prev_category" runat="server">
 	<input type=hidden id="prev_priority" runat="server">
 	<input type=hidden id="prev_assigned_to" runat="server">

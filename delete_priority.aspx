@@ -21,7 +21,7 @@ void Page_Load(Object sender, EventArgs e)
 	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "delete priorty";
+		+ "delete priority";
 
 	string id = Util.sanitize_integer(Request["id"]);
 	string confirm = Request.QueryString["confirm"];

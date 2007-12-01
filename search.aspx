@@ -165,6 +165,7 @@ void do_query()
 	string project_custom_dropdown3_clause
 		= build_clause_from_listbox (project_custom_dropdown3, "bg_project_custom_dropdown_value3");
 
+	string org_clause = build_clause_from_listbox (org, "bg_org");
 	string category_clause = build_clause_from_listbox (category, "bg_category");
 	string priority_clause = build_clause_from_listbox (priority, "bg_priority");
 	string status_clause = build_clause_from_listbox (status, "bg_status");
@@ -243,6 +244,7 @@ void do_query()
 	where = build_where(where, project_custom_dropdown1_clause);
 	where = build_where(where, project_custom_dropdown2_clause);
 	where = build_where(where, project_custom_dropdown3_clause);
+	where = build_where(where, org_clause);
 	where = build_where(where, category_clause);
 	where = build_where(where, priority_clause);
 	where = build_where(where, status_clause);
@@ -294,7 +296,7 @@ void do_query()
 	{
 
 		string select = @"select isnull(pr_background_color,'#ffffff') [color], bg_id [id],
-			bg_short_desc [desc], isnull(pj_name,'') [project], isnull(ct_name,'') [category], ";
+			bg_short_desc [desc], isnull(pj_name,'') [project], isnull(og_name,'') [organization], isnull(ct_name,'') [category], ";
 
 		if (use_full_names)
 		{
@@ -432,6 +434,7 @@ void do_query()
 			left outer join users rpt on rpt.us_id = bg_reported_user
 			left outer join users asg on asg.us_id = bg_assigned_to_user
 			left outer join projects on pj_id = bg_project
+			left outer join orgs on og_id = bg_org
 			left outer join categories on ct_id = bg_category
 			left outer join priorities on pr_id = bg_priority
 			left outer join statuses on st_id = bg_status
@@ -749,6 +752,7 @@ void load_drop_downs()
 	}
 
 	sql += @"
+	select og_id, og_name from orgs order by og_name;
 	select ct_id, ct_name from categories order by ct_sort_seq, ct_name;
 	select pr_id, pr_name from priorities order by pr_sort_seq, pr_name;
 	select st_id, st_name from statuses order by st_sort_seq, st_name;
@@ -762,20 +766,25 @@ void load_drop_downs()
 	project.DataBind();
 	project.Items.Insert(0, new ListItem("[no project]", "0"));
 
+	org.DataSource = ds_dropdowns.Tables[1];
+	org.DataTextField = "og_name";
+	org.DataValueField = "og_id";
+	org.DataBind();
+	org.Items.Insert(0, new ListItem("[no organization]", "0"));
 
-	category.DataSource = ds_dropdowns.Tables[1];
+	category.DataSource = ds_dropdowns.Tables[2];
 	category.DataTextField = "ct_name";
 	category.DataValueField = "ct_id";
 	category.DataBind();
 	category.Items.Insert(0, new ListItem("[no category]", "0"));
 
-	priority.DataSource = ds_dropdowns.Tables[2];
+	priority.DataSource = ds_dropdowns.Tables[3];
 	priority.DataTextField = "pr_name";
 	priority.DataValueField = "pr_id";
 	priority.DataBind();
 	priority.Items.Insert(0, new ListItem("[no priority]", "0"));
 
-	status.DataSource = ds_dropdowns.Tables[3];
+	status.DataSource = ds_dropdowns.Tables[4];
 	status.DataTextField = "st_name";
 	status.DataValueField = "st_id";
 	status.DataBind();
@@ -789,7 +798,7 @@ void load_drop_downs()
 
 	if (show_udf)
 	{
-		udf.DataSource = ds_dropdowns.Tables[4];
+		udf.DataSource = ds_dropdowns.Tables[5];
 		udf.DataTextField = "udf_name";
 		udf.DataValueField = "udf_id";
 		udf.DataBind();
@@ -865,6 +874,7 @@ function validate_mass()
 	}
 
 	if (frm.mass_project.selectedIndex==0
+	&& frm.mass_org.selectedIndex==0
 	&& frm.mass_category.selectedIndex==0
 	&& frm.mass_priority.selectedIndex==0
 	&& frm.mass_assigned_to.selectedIndex==0
@@ -926,6 +936,7 @@ function load_massedit_selects()
 {
 
 	load_one_massedit_select ("project","mass_project");
+	load_one_massedit_select ("org","mass_org");
 	load_one_massedit_select ("category","mass_category");
 	load_one_massedit_select ("priority","mass_priority");
 	load_one_massedit_select ("assigned_to","mass_assigned_to");
@@ -1069,6 +1080,7 @@ function on_change()
 	var project_custom_dropdown3_clause = build_clause_from_options (
 		frm.project_custom_dropdown3.options, "bg_project_custom_dropdown_value3");
 
+	var org_clause = build_clause_from_options (frm.org.options, "bg_org");
 	var category_clause = build_clause_from_options (frm.category.options, "bg_category");
 	var priority_clause = build_clause_from_options (frm.priority.options, "bg_priority");
 	var status_clause = build_clause_from_options (frm.status.options, "bg_status");
@@ -1187,6 +1199,7 @@ function on_change()
 	where = build_where(where, project_custom_dropdown1_clause);
 	where = build_where(where, project_custom_dropdown2_clause);
 	where = build_where(where, project_custom_dropdown3_clause);
+	where = build_where(where, org_clause);
 	where = build_where(where, category_clause);
 	where = build_where(where, priority_clause);
 	where = build_where(where, status_clause);
@@ -1207,7 +1220,7 @@ function on_change()
 
 %>
 		var select = "select isnull(pr_background_color,'#ffffff') [color], bg_id [id],\n";
-		select += "bg_short_desc [desc], isnull(pj_name,'') [project], isnull(ct_name,'') [category],\n";
+		select += "bg_short_desc [desc], isnull(pj_name,'') [project], isnull(og_name,'') [organization], isnull(ct_name,'') [category],\n";
 <%
 		if (use_full_names)
 		{
@@ -1293,6 +1306,7 @@ function on_change()
 		select += "left outer join users rpt on rpt.us_id = bg_reported_user\n";
 		select += "left outer join users asg on asg.us_id = bg_assigned_to_user\n";
 		select += "left outer join projects on pj_id = bg_project\n";
+		select += "left outer join orgs on ct_id = bg_org\n";
 		select += "left outer join categories on ct_id = bg_category\n";
 		select += "left outer join priorities on pr_id = bg_priority\n";
 		select += "left outer join statuses on st_id = bg_status\n";
@@ -1415,6 +1429,7 @@ function set_project_changed() {
 		<td nowrap><span class=lbl id="category_label">category:</span><br>
 		<asp:ListBox Rows=6 SelectionMode="Multiple" id="category" runat="server" onchange="on_change()">
 		</asp:ListBox>
+		</td>
 
 		<td nowrap><span class=lbl id="priority_label">priority:</span><br>
 		<asp:ListBox Rows=6 SelectionMode="Multiple" id="priority" runat="server" onchange="on_change()">
@@ -1435,6 +1450,12 @@ function set_project_changed() {
 </table>
 <table border=0 cellpadding=8 cellspacing=0>
 	<tr>
+
+		<td nowrap><span class=lbl id="org_label">organization:</span><br>
+		<asp:ListBox Rows=6 SelectionMode="Multiple" id="org" runat="server" onchange="on_change()">
+		</asp:ListBox>
+		</td>
+
 		<td nowrap><span class=lbl id="project_label">project:</span><br>
 			<asp:ListBox Rows=6 SelectionMode="Multiple" id="project" runat="server" onchange="set_project_changed()"
 			AutoPostBack="true">
@@ -1753,6 +1774,7 @@ else
 			Response.Write("<a href=javascript:select_all(false)>deselect all</a>");
 			Response.Write("<tr>");
 			Response.Write("<td><span class=lbl>project:</span><br><select name=mass_project id=mass_project></select>");
+			Response.Write("<td><span class=lbl>organization:</span><br><select name=mass_org id=mass_org></select>");
 			Response.Write("<td><span class=lbl>category:</span><br><select name=mass_category id=mass_category></select>");
 			Response.Write("<td><span class=lbl>priority:</span><br><select name=mass_priority id=mass_priority></select>");
 			Response.Write("<td><span class=lbl>assigned to:</span><br><select name=mass_assigned_to id=mass_assigned_to></select>");

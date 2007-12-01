@@ -1106,10 +1106,11 @@ namespace btnet
 				'bg_short_desc',
 				'bg_reported_user',
 				'bg_reported_date',
-				'bg_status',
-				'bg_priority',
-				'bg_category',
 				'bg_project',
+				'bg_org',
+				'bg_category',
+				'bg_priority',
+				'bg_status',
 				'bg_assigned_to_user',
 				'bg_last_updated_user',
 				'bg_last_updated_date',
@@ -1748,6 +1749,7 @@ namespace btnet
 				+ "&nbsp;");
 			Response.Write ("<tr><td>Reported On<td>" + btnet.Util.format_db_date(dr["reported_date"]) + "&nbsp;");
 			Response.Write ("<tr><td>Project<td>" + dr["current_project"] + "&nbsp;");
+			Response.Write ("<tr><td>Organization<td>" + dr["og_name"] + "&nbsp;");
 			Response.Write ("<tr><td>Category<td>" + dr["category_name"] + "&nbsp;");
 			Response.Write ("<tr><td>Priority<td>" + dr["priority_name"] + "&nbsp;");
 			Response.Write ("<tr><td>Assigned<td>"
@@ -3027,6 +3029,9 @@ bg_last_updated_date [last_updated_date],
 isnull(bg_project,0) [project],
 isnull(pj_name,'[no project]') [current_project],
 
+isnull(bg_org,0) [organization],
+isnull(og_name,'') [og_name],
+
 isnull(bg_category,0) [category],
 isnull(ct_name,'') [category_name],
 
@@ -3059,10 +3064,11 @@ getdate() [snapshot_timestamp]
 $custom_cols_placeholder
 from bugs
 left outer join user_defined_attribute on bg_user_defined_attribute = udf_id
-left outer join statuses on bg_status = st_id
-left outer join priorities on bg_priority = pr_id
-left outer join categories on bg_category = ct_id
 left outer join projects on bg_project = pj_id
+left outer join orgs on bg_org = og_id
+left outer join categories on bg_category = ct_id
+left outer join priorities on bg_priority = pr_id
+left outer join statuses on bg_status = st_id
 left outer join users asg on bg_assigned_to_user = asg.us_id
 left outer join users ru on bg_reported_user = ru.us_id
 left outer join users lu on bg_last_updated_user = lu.us_id
@@ -3191,10 +3197,11 @@ where bg_id = $id";
             int this_usid,
             bool this_is_admin,
             int projectid,
+            int orgid,
             int categoryid,
             int priorityid,
-            int assigned_to_userid,
             int statusid,
+            int assigned_to_userid,
             int udfid,
             string project_custom_dropdown_value1,
             string project_custom_dropdown_value2,
@@ -3221,25 +3228,29 @@ where bg_id = $id";
 					bg_reported_date,
 					bg_last_updated_date,
 					bg_project,
+					bg_org,
 					bg_category,
 					bg_priority,
-					bg_assigned_to_user,
 					bg_status,
+					bg_assigned_to_user,
 					bg_user_defined_attribute,
 					bg_project_custom_dropdown_value1,
 					bg_project_custom_dropdown_value2,
 					bg_project_custom_dropdown_value3
 					$custom_cols_placeholder1)
-					values (N'$sd', $ru,  $ru, getdate(), getdate(), $pj, $ct, $pr, $au, $st, $udf,
+					values (N'$short_desc', $reported_user,  $reported_user, getdate(), getdate(),
+					$project, $org,
+					$category, $priority, $status, $assigned_user, $udf,
 					N'$pcd1',N'$pcd2',N'$pcd3' $custom_cols_placeholder2)";
 
-            sql = sql.Replace("$sd", short_desc.Replace("'", "''"));
-            sql = sql.Replace("$ru", Convert.ToString(this_usid));
-            sql = sql.Replace("$pj", Convert.ToString(projectid));
-            sql = sql.Replace("$ct", Convert.ToString(categoryid));
-            sql = sql.Replace("$pr", Convert.ToString(priorityid));
-            sql = sql.Replace("$au", Convert.ToString(assigned_to_userid));
-            sql = sql.Replace("$st", Convert.ToString(statusid));
+            sql = sql.Replace("$short_desc", short_desc.Replace("'", "''"));
+            sql = sql.Replace("$reported_user", Convert.ToString(this_usid));
+            sql = sql.Replace("$project", Convert.ToString(projectid));
+            sql = sql.Replace("$org", Convert.ToString(orgid));
+            sql = sql.Replace("$category", Convert.ToString(categoryid));
+            sql = sql.Replace("$priority", Convert.ToString(priorityid));
+            sql = sql.Replace("$status", Convert.ToString(statusid));
+            sql = sql.Replace("$assigned_user", Convert.ToString(assigned_to_userid));
             sql = sql.Replace("$udf", Convert.ToString(udfid));
             sql = sql.Replace("$pcd1", project_custom_dropdown_value1);
             sql = sql.Replace("$pcd2", project_custom_dropdown_value2);
@@ -3527,9 +3538,10 @@ where bg_id = $id";
                     subject = subject.Replace("$TRACKINGID$", tracking_id);
 
                     subject = subject.Replace("$PROJECT$", (string)bug_dr["current_project"]);
-                    subject = subject.Replace("$STATUS$", (string)bug_dr["status_name"]);
+                    subject = subject.Replace("$ORGANIZATION$", (string)bug_dr["og_name"]);
                     subject = subject.Replace("$CATEGORY$", (string)bug_dr["category_name"]);
                     subject = subject.Replace("$PRIORITY$", (string)bug_dr["priority_name"]);
+                    subject = subject.Replace("$STATUS$", (string)bug_dr["status_name"]);
                     subject = subject.Replace("$ASSIGNED_TO$", (string)bug_dr["assigned_to_username"]);
 
 

@@ -77,7 +77,10 @@ og_can_edit_reports int not null default(0)
 create unique index unique_og_name on orgs (og_name)
 
 insert into orgs (og_name) values ('default')
-
+insert into orgs (og_name) values ('dept one')
+insert into orgs (og_name) values ('dept two')
+insert into orgs (og_name) values ('customer one')
+insert into orgs (og_name) values ('customer two')
 
 /* USER */
 
@@ -214,6 +217,7 @@ bg_reported_user int not null,
 bg_reported_date datetime not null,
 bg_status int not null,
 bg_priority int not null,
+bg_org int not null,
 bg_category int not null,
 bg_project int not null,
 bg_assigned_to_user int null,

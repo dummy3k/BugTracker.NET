@@ -248,6 +248,7 @@ void Page_Load(Object sender, EventArgs e)
 			}
 		}
 
+		int orgid = 0;
 		int categoryid = 0;
 		int priorityid = 0;
 		int assignedid = 0;
@@ -265,6 +266,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (ProcessVariablesInEmails) // use this setting even for the query string variables
 		{
+			if (Request["$ORGANIZATION$"] != null && Request["$ORGANIZATION$"] != "") {orgid = Convert.ToInt32(Request["$ORGANIZATION$"]);}
 			if (Request["$CATEGORY$"] != null && Request["$CATEGORY$"] != "") {categoryid = Convert.ToInt32(Request["$CATEGORY$"]);}
 			if (Request["$PRIORITY$"] != null && Request["$PRIORITY$"] != "") {priorityid = Convert.ToInt32(Request["$PRIORITY$"]);}
 			if (Request["$ASSIGNEDTO$"] != null && Request["$ASSIGNEDTO$"] != "") {assignedid = Convert.ToInt32(Request["$ASSIGNEDTO$"]);}
@@ -281,6 +283,16 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			if (ProcessVariablesInEmails)
 			{
+				if (lines[i].IndexOf("$ORGANIZATION$:") > -1)
+				{
+					try
+					{
+						orgid = Convert.ToInt32(lines[i].Substring(lines[i].IndexOf("$ORGANIZATION$:") + 11));
+					}
+					catch (Exception)
+					{
+					}
+				}
 				if (lines[i].IndexOf("$CATEGORY$:") > -1)
 				{
 					try
@@ -361,16 +373,19 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 		sql = @"declare @pj int
+		declare @og int
 		declare @ct int
 		declare @pr int
 		declare @st int
 		declare @udf int
 		set @pj = 0
+		set @og = 0
 		set @ct = 0
 		set @pr = 0
 		set @st = 0
 		set @udf = 0
 		select @pj = pj_id from projects where pj_default = 1 order by pj_name
+		select @og = og_id from orgs where og_default = 1 order by og_name
 		select @ct = ct_id from categories where ct_default = 1 order by ct_name
 		select @pr = pr_id from priorities where pr_default = 1 order by pr_name
 		select @st = st_id from statuses where st_default = 1 order by st_name
@@ -380,6 +395,7 @@ void Page_Load(Object sender, EventArgs e)
 		DataRow defaults = dbutil.get_datarow(sql);
 
 		if (projectid == 0) {projectid = (int) defaults["pj"];}
+		if (orgid == 0) {orgid = (int) defaults["og"];}
 		if (categoryid == 0) {categoryid = (int) defaults["ct"];}
 		if (priorityid == 0) {priorityid = (int) defaults["pr"];}
 		if (statusid == 0) {statusid = (int) defaults["st"];}
@@ -391,10 +407,11 @@ void Page_Load(Object sender, EventArgs e)
 			(int) dr["us_id"],
 			Convert.ToBoolean((int) dr["us_admin"]),
 			projectid,
+			orgid,
 			categoryid,
+			statusid,
 			priorityid,
 			assignedid,
-			statusid,
 			udfid,
 			"","","", // project specific dropdown values
 			adjusted_comment,
@@ -457,8 +474,8 @@ void Page_Load(Object sender, EventArgs e)
         btnet.Bug.send_notifications(btnet.Bug.INSERT,
                             new_ids.bugid,
                             (int)dr["us_id"],
-                            Convert.ToBoolean((int)dr["us_admin"]));        
-        
+                            Convert.ToBoolean((int)dr["us_admin"]));
+
 		Response.AddHeader("BTNET","OK:" + Convert.ToString(new_ids.bugid));
 		Response.Write ("OK:" + Convert.ToString(new_ids.bugid));
 		Response.End();
@@ -717,7 +734,7 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
 	string content_type = part.Header.TopLevelMediaType + "/" + part.Header.SubType;
     string desc;
     MemoryStream attachmentStream = new MemoryStream();
-    
+
     if (missing_attachment_msg == "")
 		{
         desc = "email attachment";
@@ -727,16 +744,16 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
         desc = missing_attachment_msg;
 	}
     part.DumpBody(attachmentStream);
-    attachmentStream.Position = 0;    
+    attachmentStream.Position = 0;
     Bug.insert_post_attachment(
-        security, 
-        bugid, 
-        attachmentStream, 
-        (int)attachmentStream.Length, 
-        filename, 
-        desc, 
-        content_type, 
-        parent_postid, 
+        security,
+        bugid,
+        attachmentStream,
+        (int)attachmentStream.Length,
+        filename,
+        desc,
+        content_type,
+        parent_postid,
         false,  // not hidden
         false); // don't send notifications
 
