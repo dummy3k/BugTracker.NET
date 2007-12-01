@@ -52,31 +52,31 @@ drop table [svn_revisions]
 if exists (select * from dbo.sysobjects where id = object_id(N'[bug_post_attachments]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [bug_post_attachments]
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[roles]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
-drop table [roles]
+if exists (select * from dbo.sysobjects where id = object_id(N'[orgs]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [orgs]
 
 
-/* ROLE */
+/* org */
 
-create table roles
+create table orgs
 (
-rl_id int identity primary key not null,
-rl_name nvarchar(80) not null,
-rl_non_admins_can_use int not null default(0),
-rl_external_user int not null default(0), /* external user can't view post marked internal */
-rl_can_be_assigned_to int not null default(1),
-rl_can_edit_sql int not null default(0),
-rl_can_delete_bug int not null default(0),
-rl_can_edit_and_delete_posts int not null default(0),
-rl_can_merge_bugs int not null default(0),
-rl_can_mass_edit_bugs int not null default(0),
-rl_can_use_reports int not null default(0),
-rl_can_edit_reports int not null default(0)
+og_id int identity primary key not null,
+og_name nvarchar(80) not null,
+og_non_admins_can_use int not null default(0),
+og_external_user int not null default(0), /* external user can't view post marked internal */
+og_can_be_assigned_to int not null default(1),
+og_can_edit_sql int not null default(0),
+og_can_delete_bug int not null default(0),
+og_can_edit_and_delete_posts int not null default(0),
+og_can_merge_bugs int not null default(0),
+og_can_mass_edit_bugs int not null default(0),
+og_can_use_reports int not null default(0),
+og_can_edit_reports int not null default(0)
 )
 
-create unique index unique_rl_name on roles (rl_name)
+create unique index unique_og_name on orgs (og_name)
 
-insert into roles (rl_name) values ('default')
+insert into orgs (og_name) values ('default')
 
 
 /* USER */
@@ -107,7 +107,7 @@ us_use_fckeditor int not null default(0),
 us_enable_bug_list_popups int not null default(1),
 /* who created this user */
 us_created_user int not null default(1),
-us_role int not null default(1),
+us_org int not null default(1),
 us_external_user int not null default(0), /* external user can't view post marked internal */
 us_can_be_assigned_to int not null default(1),
 /* admins can do all these things - these are permissions for non-admins */
@@ -455,10 +455,10 @@ create table queries
 	qu_sql ntext not null,
 	qu_default int null,
 	qu_user int null,
-	qu_role int null
+	qu_org int null
 )
 
-create unique index unique_qu_desc on queries (qu_desc)
+create unique index unique_qu_desc on queries (qu_desc, qu_user, qu_org)
 
 
 /*

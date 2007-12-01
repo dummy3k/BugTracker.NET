@@ -39,7 +39,7 @@ void Page_Load(Object sender, EventArgs e)
 <p>
 <li class=listitem><a href=users.aspx>users</a>
 <p>
-<li class=listitem><a href=roles.aspx>user roles</a>
+<li class=listitem><a href=orgs.aspx>organizations</a>
 <p>
 <li class=listitem><a href=projects.aspx>projects</a>
 <p>

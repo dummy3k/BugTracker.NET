@@ -676,9 +676,9 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		sql = @"/* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
 			from users
-			inner join roles on us_role = rl_id
+			inner join orgs on us_org = og_id
 			where us_active = 1
-			and rl_can_be_assigned_to = 1
+			and og_can_be_assigned_to = 1
 			and us_id in
 				(select pu_user from project_user_xref
 				where pu_project = $pj
@@ -690,9 +690,9 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		sql = @"/* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
 			from users
-			inner join roles on us_role = rl_id
+			inner join orgs on us_org = og_id
 			where us_active = 1
-			and rl_can_be_assigned_to = 1
+			and og_can_be_assigned_to = 1
 			and us_id not in
 				(select pu_user from project_user_xref
 				where pu_project = $pj

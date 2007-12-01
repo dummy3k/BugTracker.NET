@@ -34,9 +34,9 @@ void Page_Load(Object sender, EventArgs e)
 		sql =  @"select
 			qu_desc [query],
 			case
-				when isnull(qu_user,0) = 0 and isnull(qu_role,0) is null then 'everybody'
+				when isnull(qu_user,0) = 0 and isnull(qu_org,0) is null then 'everybody'
 				when isnull(qu_user,0) <> 0 then 'user:' + us_username
-				when isnull(qu_role,0) <> 0 then 'role:' + rl_name
+				when isnull(qu_org,0) <> 0 then 'org:' + og_name
 				else ' '
 				end [visibility],
 			'<a href=bugs.aspx?qu_id=' + convert(varchar,qu_id) + '>view list</a>' [view list],
@@ -48,7 +48,7 @@ void Page_Load(Object sender, EventArgs e)
 			qu_sql [sql]
 			from queries
 			left outer join users on qu_user = us_id
-			left outer join roles on qu_role = rl_id
+			left outer join orgs on qu_org = og_id
 			where isnull(qu_user,0) = $us
 			or isnull(qu_user,0) = 0
 			order by qu_desc";

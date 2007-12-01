@@ -47,19 +47,19 @@ void Page_Load(Object sender, EventArgs e)
 			// these guys can do everything
 			vis_everybody.Checked = true;
 
-			sql = @"/* populate role dropdown */
-				select rl_id, rl_name
-				from roles
-				order by rl_name;";
+			sql = @"/* populate org dropdown */
+				select og_id, og_name
+				from orgs
+				order by og_name;";
 
-			DataSet ds_roles = dbutil.get_dataset(sql);
+			DataSet ds_orgs = dbutil.get_dataset(sql);
 
 			// forced project dropdown
-			role.DataSource = ds_roles.Tables[0].DefaultView;
-			role.DataTextField = "rl_name";
-			role.DataValueField = "rl_id";
-			role.DataBind();
-			role.Items.Insert(0, new ListItem("[select role]", "0"));
+			org.DataSource = ds_orgs.Tables[0].DefaultView;
+			org.DataTextField = "og_name";
+			org.DataValueField = "og_id";
+			org.DataBind();
+			org.Items.Insert(0, new ListItem("[select org]", "0"));
 
 		}
 		else
@@ -69,13 +69,13 @@ void Page_Load(Object sender, EventArgs e)
 			explanation.Visible = false;
 
 			vis_everybody.Enabled = false;
-			vis_role.Enabled = false;
+			vis_org.Enabled = false;
 			vis_user.Checked = true;
-			role.Enabled = false;
+			org.Enabled = false;
 
-			role.Visible = false;
+			org.Visible = false;
 			vis_everybody.Visible = false;
-			vis_role.Visible = false;
+			vis_org.Visible = false;
 			vis_user.Visible = false;
 			visibility_label.Visible = false;
 
@@ -98,7 +98,7 @@ void Page_Load(Object sender, EventArgs e)
 			// Get this entry's data from the db and fill in the form
 
 			sql = @"select
-				qu_desc, qu_sql, isnull(qu_user,0) [qu_user], isnull(qu_role,0) [qu_role]
+				qu_desc, qu_sql, isnull(qu_user,0) [qu_user], isnull(qu_org,0) [qu_org]
 				from queries where qu_id = $1";
 
 
@@ -130,7 +130,7 @@ void Page_Load(Object sender, EventArgs e)
 				sql_text.Value = (string) dr["qu_sql"];
 			}
 
-			if ((int) dr["qu_user"] == 0 && (int) dr["qu_role"] == 0)
+			if ((int) dr["qu_user"] == 0 && (int) dr["qu_org"] == 0)
 			{
 				vis_everybody.Checked = true;
 			}
@@ -140,10 +140,10 @@ void Page_Load(Object sender, EventArgs e)
 			}
 			else
 			{
-				vis_role.Checked = true;
-				foreach (ListItem li in role.Items)
+				vis_org.Checked = true;
+				foreach (ListItem li in org.Items)
 				{
-					if (Convert.ToInt32(li.Value) == (int) dr["qu_role"])
+					if (Convert.ToInt32(li.Value) == (int) dr["qu_org"])
 					{
 						li.Selected = true;
 						break;
@@ -177,21 +177,21 @@ Boolean validate()
 	}
 
 
-	if (vis_role.Checked)
+	if (vis_org.Checked)
 	{
-		if (role.SelectedIndex < 1)
+		if (org.SelectedIndex < 1)
 		{
 			good = false;
-			role_err.InnerText = "You must select a role.";
+			org_err.InnerText = "You must select a org.";
 		}
 		else
 		{
-			role_err.InnerText = "";
+			org_err.InnerText = "";
 		}
 	}
 	else
 	{
-		role_err.InnerText = "";
+		org_err.InnerText = "";
 	}
 
 	if (id == 0)
@@ -238,7 +238,7 @@ void on_update (Object sender, EventArgs e)
 		if (id == 0)  // insert new
 		{
 			sql = @"insert into queries
-				(qu_desc, qu_sql, qu_default, qu_user, qu_role)
+				(qu_desc, qu_sql, qu_default, qu_user, qu_org)
 				values (N'$de', N'$sq', 0, $us, $rl)";
 		}
 		else // edit existing
@@ -248,7 +248,7 @@ void on_update (Object sender, EventArgs e)
 				qu_desc = N'$de',
 				qu_sql = N'$sq',
 				qu_user = $us,
-				qu_role = $rl
+				qu_org = $rl
 				where qu_id = $id";
 
 			sql = sql.Replace("$id", Convert.ToString(id));
@@ -276,7 +276,7 @@ void on_update (Object sender, EventArgs e)
 		}
 		else
 		{
-			sql = sql.Replace("$rl", Convert.ToString(role.SelectedItem.Value));
+			sql = sql.Replace("$rl", Convert.ToString(org.SelectedItem.Value));
 			sql = sql.Replace("$us", "0");
 		}
 
@@ -327,11 +327,11 @@ void on_update (Object sender, EventArgs e)
 		&nbsp;&nbsp;&nbsp;
 		<asp:RadioButton text="Just You" runat="server" class=txt GroupName="visibility" id="vis_user"/>
 		&nbsp;&nbsp;&nbsp;
-		<asp:RadioButton text="Users with Role" runat="server" class=txt GroupName="visibility" id="vis_role"/>
-		<asp:DropDownList id="role" runat="server">
+		<asp:RadioButton text="Users with org" runat="server" class=txt GroupName="visibility" id="vis_org"/>
+		<asp:DropDownList id="org" runat="server">
 		</asp:DropDownList>
 		&nbsp;&nbsp;
-		<span runat="server" class=err id="role_err">&nbsp;</span>
+		<span runat="server" class=err id="org_err">&nbsp;</span>
 	</td>
 
 	<tr>

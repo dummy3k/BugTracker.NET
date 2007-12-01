@@ -122,25 +122,25 @@ void Page_Load(Object sender, EventArgs e)
 // Table 1
 
 		sql += @"/* populate query dropdown */
-		    declare @role int
-		    set @role = null
-		    select @role = us_role from users where us_id = $us
+		    declare @org int
+		    set @org = null
+		    select @org = us_org from users where us_id = $us
 
 			select qu_id, qu_desc
 			from queries
-			where (isnull(qu_user,0) = 0 and isnull(qu_role,0) = 0)
+			where (isnull(qu_user,0) = 0 and isnull(qu_org,0) = 0)
 			or isnull(qu_user,0) = $us
-			or isnull(qu_role,0) = isnull(@role,-1)
+			or isnull(qu_org,0) = isnull(@org,-1)
 			order by qu_desc;";
 
 // Table 2
 
-		sql += @"/* populate role dropdown */
-			select rl_id, rl_name
-			from roles
-			where rl_non_admins_can_use = 1
+		sql += @"/* populate org dropdown */
+			select og_id, og_name
+			from orgs
+			where og_non_admins_can_use = 1
 			or $this_is_admin = 1
-			order by rl_name;";
+			order by og_name;";
 
 
 // Table 3
@@ -168,7 +168,7 @@ void Page_Load(Object sender, EventArgs e)
 				us_auto_subscribe_own_bugs,
 				us_auto_subscribe_reported_bugs,
 				us_default_query,
-				us_role,
+				us_org,
 				isnull(us_signature,'') [us_signature],
 				isnull(us_forced_project,0) [us_forced_project],
 				us_created_user
@@ -200,11 +200,11 @@ void Page_Load(Object sender, EventArgs e)
 		forced_project.Items.Insert(0, new ListItem("[no forced project]", "0"));
 
 		// forced project dropdown
-		role.DataSource = ds.Tables[2].DefaultView;
-		role.DataTextField = "rl_name";
-		role.DataValueField = "rl_id";
-		role.DataBind();
-		role.Items.Insert(0, new ListItem("[select role]", "0"));
+		org.DataSource = ds.Tables[2].DefaultView;
+		org.DataTextField = "og_name";
+		org.DataValueField = "og_id";
+		org.DataBind();
+		org.Items.Insert(0, new ListItem("[select org]", "0"));
 
 		// populate permissions grid
 		MyDataGrid.DataSource=ds.Tables[0].DefaultView;
@@ -303,10 +303,10 @@ void Page_Load(Object sender, EventArgs e)
 			auto_subscribe_reported.Checked = Convert.ToBoolean((int) dr["us_auto_subscribe_reported_bugs"]);
 
 
-			// role
-			foreach (ListItem li in role.Items)
+			// org
+			foreach (ListItem li in org.Items)
 			{
-				if (Convert.ToInt32(li.Value) == (int) dr["us_role"])
+				if (Convert.ToInt32(li.Value) == (int) dr["us_org"])
 				{
 					li.Selected = true;
 					break;
@@ -368,18 +368,18 @@ void Page_Load(Object sender, EventArgs e)
 		string sql = @"/* populate query dropdown */
 			select qu_id, qu_desc
 			from queries
-			where (isnull(qu_user,0) = 0 and isnull(qu_role,0) = 0)
+			where (isnull(qu_user,0) = 0 and isnull(qu_org,0) = 0)
 			or isnull(qu_user,0) = $us
-			or isnull(qu_role,0) = $role
+			or isnull(qu_org,0) = $org
 			order by qu_desc;";
 
-		if (role.SelectedIndex > 0)
+		if (org.SelectedIndex > 0)
 		{
-			sql = sql.Replace("$role",Convert.ToString(role.SelectedItem.Value));
+			sql = sql.Replace("$org",Convert.ToString(org.SelectedItem.Value));
 		}
 		else
 		{
-			sql = sql.Replace("$role", "-1");
+			sql = sql.Replace("$org", "-1");
 		}
 
 		if (id > 0)
@@ -441,14 +441,14 @@ Boolean validate()
 		confirm_pw_err.InnerText = "";
 	}
 
-	if (role.SelectedIndex < 1)
+	if (org.SelectedIndex < 1)
 	{
 		good = false;
-		role_err.InnerText = "You must select a role";
+		org_err.InnerText = "You must select a org";
 	}
 	else
 	{
-		role_err.InnerText = "";
+		org_err.InnerText = "";
 	}
 
 	if (!Util.is_int(bugs_per_page.Value))
@@ -507,7 +507,7 @@ string replace_vars_in_sql_statement(string sql)
 	sql = sql.Replace("$ao", Util.bool_to_string(auto_subscribe_own.Checked));
 	sql = sql.Replace("$ar", Util.bool_to_string(auto_subscribe_reported.Checked));
 	sql = sql.Replace("$dq", query.SelectedItem.Value);
-	sql = sql.Replace("$role", role.SelectedItem.Value);
+	sql = sql.Replace("$org", org.SelectedItem.Value);
 	sql = sql.Replace("$sg", signature.InnerText.Replace("'","''"));
 	sql = sql.Replace("$fp", forced_project.SelectedItem.Value);
 	sql = sql.Replace("$id", Convert.ToString(id));
@@ -565,7 +565,7 @@ us_auto_subscribe,
 us_auto_subscribe_own_bugs,
 us_auto_subscribe_reported_bugs,
 us_default_query,
-us_role,
+us_org,
 us_signature,
 us_forced_project,
 us_created_user)
@@ -575,7 +575,7 @@ N'$un', N'$pw', N'$fn', N'$ln',
 $bp, $fk, $pp, N'$em',
 $ac, $ad, $en,  $ss,
 $rn, $an, $sn, $as,
-$ao, $ar, $dq, $role, N'$sg',
+$ao, $ar, $dq, $org, N'$sg',
 $fp,
 $createdby
 );
@@ -645,7 +645,7 @@ us_auto_subscribe = $as,
 us_auto_subscribe_own_bugs = $ao,
 us_auto_subscribe_reported_bugs = $ar,
 us_default_query = $dq,
-us_role = $role,
+us_org = $org,
 us_signature = N'$sg',
 us_forced_project = $fp
 where us_id = $id";
@@ -1152,12 +1152,12 @@ function show_permissions_settings()
 	</tr>
 
 	<tr>
-	<td class=lbl>Role:</td>
+	<td class=lbl>org:</td>
 	<td>
-		<asp:DropDownList id="role" runat="server" AutoPostBack="true">
+		<asp:DropDownList id="org" runat="server">
 		</asp:DropDownList>
 	</td>
-	<td runat="server" class=err id="role_err">&nbsp;</td>
+	<td runat="server" class=err id="org_err">&nbsp;</td>
 	</tr>
 
 	<tr>

@@ -24,7 +24,7 @@ void Page_Load(Object sender, EventArgs e)
 	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "edit role";
+		+ "edit organization";
 
 	msg.InnerText = "";
 
@@ -52,22 +52,22 @@ void Page_Load(Object sender, EventArgs e)
 
 			// Get this entry's data from the db and fill in the form
 
-			sql = @"select * from roles where rl_id = $rl_id";
-			sql = sql.Replace("$rl_id", Convert.ToString(id));
+			sql = @"select * from orgs where og_id = $og_id";
+			sql = sql.Replace("$og_id", Convert.ToString(id));
 			DataRow dr = dbutil.get_datarow(sql);
 
 			// Fill in this form
-			name.Value = (string) dr["rl_name"];
-			non_admins_can_use.Checked = Convert.ToBoolean((int)dr["rl_non_admins_can_use"]);
-			external_user.Checked = Convert.ToBoolean((int)dr["rl_external_user"]);
-			can_edit_sql.Checked = Convert.ToBoolean((int)dr["rl_can_edit_sql"]);
-			can_delete_bug.Checked = Convert.ToBoolean((int)dr["rl_can_delete_bug"]);
-			can_edit_and_delete_posts.Checked = Convert.ToBoolean((int)dr["rl_can_edit_and_delete_posts"]);
-			can_merge_bugs.Checked = Convert.ToBoolean((int)dr["rl_can_merge_bugs"]);
-			can_mass_edit_bugs.Checked = Convert.ToBoolean((int)dr["rl_can_mass_edit_bugs"]);
-			can_use_reports.Checked = Convert.ToBoolean((int)dr["rl_can_use_reports"]);
-			can_edit_reports.Checked = Convert.ToBoolean((int)dr["rl_can_edit_reports"]);
-			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["rl_can_be_assigned_to"]);
+			name.Value = (string) dr["og_name"];
+			non_admins_can_use.Checked = Convert.ToBoolean((int)dr["og_non_admins_can_use"]);
+			external_user.Checked = Convert.ToBoolean((int)dr["og_external_user"]);
+			can_edit_sql.Checked = Convert.ToBoolean((int)dr["og_can_edit_sql"]);
+			can_delete_bug.Checked = Convert.ToBoolean((int)dr["og_can_delete_bug"]);
+			can_edit_and_delete_posts.Checked = Convert.ToBoolean((int)dr["og_can_edit_and_delete_posts"]);
+			can_merge_bugs.Checked = Convert.ToBoolean((int)dr["og_can_merge_bugs"]);
+			can_mass_edit_bugs.Checked = Convert.ToBoolean((int)dr["og_can_mass_edit_bugs"]);
+			can_use_reports.Checked = Convert.ToBoolean((int)dr["og_can_use_reports"]);
+			can_edit_reports.Checked = Convert.ToBoolean((int)dr["og_can_edit_reports"]);
+			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["og_can_be_assigned_to"]);
 		}
 	}
 
@@ -103,18 +103,18 @@ void on_update (Object sender, EventArgs e)
 	{
 		if (id == 0)  // insert new
 		{
-			sql = @"insert into roles
-			(rl_name,
-			rl_non_admins_can_use,
-			rl_external_user,
-			rl_can_edit_sql,
-			rl_can_delete_bug,
-			rl_can_edit_and_delete_posts,
-			rl_can_merge_bugs,
-			rl_can_mass_edit_bugs,
-			rl_can_use_reports,
-			rl_can_edit_reports,
-			rl_can_be_assigned_to)
+			sql = @"insert into orgs
+			(og_name,
+			og_non_admins_can_use,
+			og_external_user,
+			og_can_edit_sql,
+			og_can_delete_bug,
+			og_can_edit_and_delete_posts,
+			og_can_merge_bugs,
+			og_can_mass_edit_bugs,
+			og_can_use_reports,
+			og_can_edit_reports,
+			og_can_be_assigned_to)
 			values (N'$nam', $non,
 			$ext, $ces, $cdb,
 			$cep, $cmb, $cme,
@@ -123,21 +123,21 @@ void on_update (Object sender, EventArgs e)
 		else // edit existing
 		{
 
-			sql = @"update roles set
-			rl_name = N'$nam',
-			rl_non_admins_can_use = $non,
-			rl_external_user = $ext,
-			rl_can_edit_sql = $ces,
-			rl_can_delete_bug = $cdb,
-			rl_can_edit_and_delete_posts = $cep,
-			rl_can_merge_bugs = $cmb,
-			rl_can_mass_edit_bugs = $cme,
-			rl_can_use_reports = $cur,
-			rl_can_edit_reports = $cer,
-			rl_can_be_assigned_to = $cba
-			where rl_id = $rl_id";
+			sql = @"update orgs set
+			og_name = N'$nam',
+			og_non_admins_can_use = $non,
+			og_external_user = $ext,
+			og_can_edit_sql = $ces,
+			og_can_delete_bug = $cdb,
+			og_can_edit_and_delete_posts = $cep,
+			og_can_merge_bugs = $cmb,
+			og_can_mass_edit_bugs = $cme,
+			og_can_use_reports = $cur,
+			og_can_edit_reports = $cer,
+			og_can_be_assigned_to = $cba
+			where og_id = $og_id";
 
-			sql = sql.Replace("$rl_id", Convert.ToString(id));
+			sql = sql.Replace("$og_id", Convert.ToString(id));
 
 		}
 
@@ -155,18 +155,18 @@ void on_update (Object sender, EventArgs e)
 
 
 		dbutil.execute_nonquery(sql);
-		Server.Transfer ("roles.aspx");
+		Server.Transfer ("orgs.aspx");
 
 	}
 	else
 	{
 		if (id == 0)  // insert new
 		{
-			msg.InnerText = "role was not created.";
+			msg.InnerText = "organization was not created.";
 		}
 		else // edit existing
 		{
-			msg.InnerText = "role was not updated.";
+			msg.InnerText = "organization was not updated.";
 		}
 
 	}
@@ -177,7 +177,7 @@ void on_update (Object sender, EventArgs e)
 
 <html>
 <head>
-<title id="titl" runat="server">btnet edit role</title>
+<title id="titl" runat="server">btnet edit org</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 </head>
 <body>
@@ -185,12 +185,12 @@ void on_update (Object sender, EventArgs e)
 
 
 <div class=align><table border=0><tr><td>
-<a href=roles.aspx>back to roles</a>
+<a href=orgs.aspx>back to organizations</a>
 <form class=frm runat="server">
 	<table border=0>
 
 	<tr>
-	<td class=lbl>Role Name:</td>
+	<td class=lbl>Organization Name:</td>
 	<td><input runat="server" type=text class=txt id="name" maxlength=30 size=30></td>
 	<td runat="server" class=err id="name_err">&nbsp;</td>
 	</tr>
@@ -203,7 +203,7 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td><asp:checkbox runat="server" class=txt id="non_admins_can_use"/></td>
-	<td class=lbl>Non-admins allowed to add users can use this role when adding users</td>
+	<td class=lbl>Non-admins allowed to add users can use this org when adding users</td>
 	<td>&nbsp</td>
 	</tr>
 

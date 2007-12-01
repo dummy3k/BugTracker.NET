@@ -415,41 +415,41 @@ alter table projects add pj_websvn_url nvarchar(100) null
 /* after running this sql, users will have the same permissions they
 had before */
 
-alter table queries add qu_role int null
+alter table queries add qu_org int null
 
-alter table users add us_role int not null default(1)
+alter table users add us_org int not null default(1)
 go
 
-create table roles
+create table orgs
 (
-rl_id int identity primary key not null,
-rl_name nvarchar(80) not null,
-rl_non_admins_can_use int not null default(0),
-rl_external_user int not null default(0), /* external user can't view post marked internal */
-rl_can_be_assigned_to int not null default(1),
-rl_can_edit_sql int not null default(0),
-rl_can_delete_bug int not null default(0),
-rl_can_edit_and_delete_posts int not null default(0),
-rl_can_merge_bugs int not null default(0),
-rl_can_mass_edit_bugs int not null default(0),
-rl_can_use_reports int not null default(0),
-rl_can_edit_reports int not null default(0)
+og_id int identity primary key not null,
+og_name nvarchar(80) not null,
+og_non_admins_can_use int not null default(0),
+og_external_user int not null default(0), /* external user can't view post marked internal */
+og_can_be_assigned_to int not null default(1),
+og_can_edit_sql int not null default(0),
+og_can_delete_bug int not null default(0),
+og_can_edit_and_delete_posts int not null default(0),
+og_can_merge_bugs int not null default(0),
+og_can_mass_edit_bugs int not null default(0),
+og_can_use_reports int not null default(0),
+og_can_edit_reports int not null default(0)
 )
 
-create unique index unique_rl_name on roles (rl_name)
+create unique index unique_og_name on orgs (og_name)
 
-/* Generate some roles.  Manufacture their names based on the users' permissions */
-insert into roles
-(rl_name,
-rl_external_user,
-rl_can_be_assigned_to,
-rl_can_edit_sql,
-rl_can_delete_bug,
-rl_can_edit_and_delete_posts,
-rl_can_merge_bugs,
-rl_can_mass_edit_bugs,
-rl_can_use_reports,
-rl_can_edit_reports)
+/* Generate some orgs.  Manufacture their names based on the users' permissions */
+insert into orgs
+(og_name,
+og_external_user,
+og_can_be_assigned_to,
+og_can_edit_sql,
+og_can_delete_bug,
+og_can_edit_and_delete_posts,
+og_can_merge_bugs,
+og_can_mass_edit_bugs,
+og_can_use_reports,
+og_can_edit_reports)
 select distinct
 'r-' +
 case when us_external_user = 1             then 'extern,' else '' end +
@@ -473,11 +473,11 @@ us_can_use_reports,
 us_can_edit_reports
 from users
 
-/* Update the users so that their us_role column points to the roles we just created */
+/* Update the users so that their us_org column points to the orgs we just created */
 
 DECLARE @us_id int
-DECLARE @role_name nvarchar(80)
-DECLARE @role_id int
+DECLARE @org_name nvarchar(80)
+DECLARE @org_id int
 
 DECLARE my_cursor CURSOR FOR
 SELECT us_id,
@@ -496,15 +496,15 @@ FROM users
 OPEN my_cursor
 
 FETCH NEXT FROM my_cursor
-INTO @us_id, @role_name
+INTO @us_id, @org_name
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
 
-   select @role_id = rl_id from roles where rl_name = @role_name
-   update users set us_role = @role_id where us_id = @us_id	
+   select @org_id = og_id from orgs where og_name = @org_name
+   update users set us_org = @org_id where us_id = @us_id	
    FETCH NEXT FROM my_cursor
-   INTO @us_id, @role_name
+   INTO @us_id, @org_name
 END
 
 CLOSE my_cursor

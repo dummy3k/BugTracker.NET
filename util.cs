@@ -135,21 +135,21 @@ namespace btnet
 				isnull(us_bugs_per_page,10) us_bugs_per_page,
 				us_use_fckeditor,
 				us_enable_bug_list_popups,
-				rl_external_user,
-				rl_can_edit_sql,
-				rl_can_delete_bug,
-				rl_can_edit_and_delete_posts,
-				rl_can_merge_bugs,
-				rl_can_mass_edit_bugs,
-				rl_can_use_reports,
-				rl_can_edit_reports,
-				rl_can_be_assigned_to,
+				og_external_user,
+				og_can_edit_sql,
+				og_can_delete_bug,
+				og_can_edit_and_delete_posts,
+				og_can_merge_bugs,
+				og_can_mass_edit_bugs,
+				og_can_use_reports,
+				og_can_edit_reports,
+				og_can_be_assigned_to,
 				isnull(us_forced_project, 0 ) us_forced_project,
 				isnull(pu_permission_level, $dpl) pu_permission_level,
 				@project_admin [project_admin]
 				from sessions
 				inner join users on se_user = us_id
-				inner join roles on us_role = rl_id
+				inner join orgs on us_org = og_id
 				left outer join project_user_xref
 					on pu_project = us_forced_project
 					and pu_user = us_id
@@ -177,15 +177,15 @@ namespace btnet
 			this_use_fckeditor = Convert.ToBoolean(dr["us_use_fckeditor"]);
 			this_enable_popups = Convert.ToInt32(dr["us_enable_bug_list_popups"]);
 
-            this_external_user = Convert.ToBoolean(dr["rl_external_user"]);
-            this_can_edit_sql = Convert.ToBoolean(dr["rl_can_edit_sql"]);
-            this_can_delete_bug = Convert.ToBoolean(dr["rl_can_delete_bug"]);
-            this_can_edit_and_delete_posts = Convert.ToBoolean(dr["rl_can_edit_and_delete_posts"]);
-            this_can_merge_bugs = Convert.ToBoolean(dr["rl_can_merge_bugs"]);
-            this_can_mass_edit_bugs = Convert.ToBoolean(dr["rl_can_mass_edit_bugs"]);
-            this_can_use_reports = Convert.ToBoolean(dr["rl_can_use_reports"]);
-            this_can_edit_reports = Convert.ToBoolean(dr["rl_can_edit_reports"]);
-            this_can_be_assigned_to = Convert.ToBoolean(dr["rl_can_be_assigned_to"]);
+            this_external_user = Convert.ToBoolean(dr["og_external_user"]);
+            this_can_edit_sql = Convert.ToBoolean(dr["og_can_edit_sql"]);
+            this_can_delete_bug = Convert.ToBoolean(dr["og_can_delete_bug"]);
+            this_can_edit_and_delete_posts = Convert.ToBoolean(dr["og_can_edit_and_delete_posts"]);
+            this_can_merge_bugs = Convert.ToBoolean(dr["og_can_merge_bugs"]);
+            this_can_mass_edit_bugs = Convert.ToBoolean(dr["og_can_mass_edit_bugs"]);
+            this_can_use_reports = Convert.ToBoolean(dr["og_can_use_reports"]);
+            this_can_edit_reports = Convert.ToBoolean(dr["og_can_edit_reports"]);
+            this_can_be_assigned_to = Convert.ToBoolean(dr["og_can_be_assigned_to"]);
 
 			if (((string)dr["us_firstname"]).Trim().Length == 0)
 			{
