@@ -542,3 +542,4 @@ alter table users drop column us_can_edit_reports
 -----------------------------------------------------------------------
 
 alter table bugs add bg_org int not null default(0)
+alter table orgs add og_other_orgs_permission_level int not null default(2)

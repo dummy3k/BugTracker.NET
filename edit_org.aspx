@@ -41,10 +41,17 @@ void Page_Load(Object sender, EventArgs e)
 	if (!IsPostBack)
 	{
 
+		other_orgs_permission_level.Items.Insert(0, new ListItem("None", "0"));
+		other_orgs_permission_level.Items.Insert(1, new ListItem("Read Only", "1"));
+		other_orgs_permission_level.Items.Insert(2, new ListItem("Add/Edit", "2"));
+
+
 		// add or edit?
 		if (id == 0)
 		{
 			sub.Value = "Create";
+			other_orgs_permission_level.SelectedIndex = 2;
+			can_be_assigned_to.Checked = true;
 		}
 		else
 		{
@@ -68,6 +75,7 @@ void Page_Load(Object sender, EventArgs e)
 			can_use_reports.Checked = Convert.ToBoolean((int)dr["og_can_use_reports"]);
 			can_edit_reports.Checked = Convert.ToBoolean((int)dr["og_can_edit_reports"]);
 			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["og_can_be_assigned_to"]);
+			other_orgs_permission_level.SelectedIndex = (int)dr["og_other_orgs_permission_level"];
 		}
 	}
 
@@ -114,11 +122,12 @@ void on_update (Object sender, EventArgs e)
 			og_can_mass_edit_bugs,
 			og_can_use_reports,
 			og_can_edit_reports,
-			og_can_be_assigned_to)
+			og_can_be_assigned_to,
+			og_other_orgs_permission_level)
 			values (N'$nam', $non,
 			$ext, $ces, $cdb,
 			$cep, $cmb, $cme,
-			$cur, $cer, $cba)";
+			$cur, $cer, $cba, $otherorgs)";
 		}
 		else // edit existing
 		{
@@ -134,7 +143,8 @@ void on_update (Object sender, EventArgs e)
 			og_can_mass_edit_bugs = $cme,
 			og_can_use_reports = $cur,
 			og_can_edit_reports = $cer,
-			og_can_be_assigned_to = $cba
+			og_can_be_assigned_to = $cba,
+			og_other_orgs_permission_level = $otherorgs
 			where og_id = $og_id";
 
 			sql = sql.Replace("$og_id", Convert.ToString(id));
@@ -152,6 +162,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$cur", Util.bool_to_string(can_use_reports.Checked));
 		sql = sql.Replace("$cer", Util.bool_to_string(can_edit_reports.Checked));
 		sql = sql.Replace("$cba", Util.bool_to_string(can_be_assigned_to.Checked));
+		sql = sql.Replace("$otherorgs", Convert.ToString(other_orgs_permission_level.SelectedIndex));
 
 
 		dbutil.execute_nonquery(sql);
@@ -262,6 +273,14 @@ void on_update (Object sender, EventArgs e)
 	<td colspan=3>
 	&nbsp;
 	</td>
+	</tr>
+
+	<tr>
+		<td>
+		<asp:DropDownList id="other_orgs_permission_level" runat="server"></asp:DropDownList>
+		</td>
+		<td class=lbl>Permission level for bugs associated with other (or no) organizations</td>
+		<td>&nbsp</td>
 	</tr>
 
 	<tr>

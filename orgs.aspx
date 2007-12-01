@@ -26,7 +26,11 @@ void Page_Load(Object sender, EventArgs e)
 		'<a href=delete_org.aspx?id=' + convert(varchar,og_id) + '>delete</a>' [$no_sort_delete],
 		og_name[desc],
 		case when og_non_admins_can_use = 1 then 'Y' else 'N' end [non-admin<br>can use],
-		case when og_external_user = 1 then 'Y' else 'N' end [external<br>(i.e, customer, not employee)],
+		case
+			when og_other_orgs_permission_level = 0 then 'None'
+			when og_other_orgs_permission_level = 1 then 'Read Only'
+			else 'Add/Edit' end [other orgs<br>permission<br>level],
+		case when og_external_user = 1 then 'Y' else 'N' end [external<br>(i.e, customer,<br>not employee)],
 		case when og_can_edit_sql = 1 then 'Y' else 'N' end [can<br>edit sql],
 		case when og_can_delete_bug = 1 then 'Y' else 'N' end [can<br>delete item],
 		case when og_can_edit_and_delete_posts = 1 then 'Y' else 'N' end [can<br>edit/del posts],

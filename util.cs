@@ -61,6 +61,7 @@ namespace btnet
 		public const int PERMISSION_REPORTER = 3;
 		public const int PERMISSION_ALL = 2;
 
+        public int this_other_orgs_permission_level = PERMISSION_ALL;
 
 		///////////////////////////////////////////////////////////////////////
 		public void check_security(DbUtil dbutil, HttpContext asp_net_context, int level)
@@ -144,6 +145,7 @@ namespace btnet
 				og_can_use_reports,
 				og_can_edit_reports,
 				og_can_be_assigned_to,
+				og_other_orgs_permission_level,
 				isnull(us_forced_project, 0 ) us_forced_project,
 				isnull(pu_permission_level, $dpl) pu_permission_level,
 				@project_admin [project_admin]
@@ -186,6 +188,7 @@ namespace btnet
             this_can_use_reports = Convert.ToBoolean(dr["og_can_use_reports"]);
             this_can_edit_reports = Convert.ToBoolean(dr["og_can_edit_reports"]);
             this_can_be_assigned_to = Convert.ToBoolean(dr["og_can_be_assigned_to"]);
+            this_other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
 
 			if (((string)dr["us_firstname"]).Trim().Length == 0)
 			{

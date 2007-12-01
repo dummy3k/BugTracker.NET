@@ -71,7 +71,8 @@ og_can_edit_and_delete_posts int not null default(0),
 og_can_merge_bugs int not null default(0),
 og_can_mass_edit_bugs int not null default(0),
 og_can_use_reports int not null default(0),
-og_can_edit_reports int not null default(0)
+og_can_edit_reports int not null default(0),
+og_other_orgs_permission_level int not null default(2) -- 0=none, 1=read, 2=edit
 )
 
 create unique index unique_og_name on orgs (og_name)
