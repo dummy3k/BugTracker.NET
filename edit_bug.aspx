@@ -348,6 +348,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			// look at permission level and react accordingly
 			permission_level = (int)dr["pu_permission_level"];
+
 			// reduce permissions for guest
 			if (security.this_is_guest && permission_level == Security.PERMISSION_ALL)
 			{
@@ -875,43 +876,76 @@ void set_project_to_readonly()
 }
 
 ///////////////////////////////////////////////////////////////////////
-void set_controls_to_readonly()
+void set_org_to_readonly()
 {
+	static_org.Style["display"] = "";
+	org.Style["display"] = "none";
+	static_org.InnerText = org.SelectedItem.Text;
 
-	// get rid of the drop downs
+}
 
+///////////////////////////////////////////////////////////////////////
+void set_shortdesc_to_readonly()
+{
 	// turn on the spans to hold the data
 	if (id != 0)
 	{
 		static_short_desc.Style["display"] = "";
-	}
-
-	static_org.Style["display"] = "";
-	static_category.Style["display"] = "";
-	static_priority.Style["display"] = "";
-	static_status.Style["display"] = "";
-	static_udf.Style["display"] = "";
-
-	// fill in the static vars
-	static_short_desc.InnerText = short_desc.Value;
-	static_org.InnerText = org.SelectedItem.Text;
-	static_category.InnerText = category.SelectedItem.Text;
-	static_priority.InnerText = priority.SelectedItem.Text;
-	static_status.InnerText = status.SelectedItem.Text;
-	static_udf.InnerText = udf.SelectedItem.Text;
-
-	if (id != 0)
-	{
 		short_desc.Style["display"] = "none";
 	}
 
-	org.Style["display"] = "none";
+	static_short_desc.InnerText = short_desc.Value;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////
+void set_category_to_readonly()
+{
+	static_category.Style["display"] = "";
 	category.Style["display"] = "none";
+	static_category.InnerText = category.SelectedItem.Text;
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_priority_to_readonly()
+{
+	static_priority.Style["display"] = "";
 	priority.Style["display"] = "none";
+	static_priority.InnerText = priority.SelectedItem.Text;
+
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_status_to_readonly()
+{
+	static_status.Style["display"] = "";
+	status.Style["display"] = "none";
+	static_status.InnerText = status.SelectedItem.Text;
+}
+
+
+///////////////////////////////////////////////////////////////////////
+void set_assigned_to_readonly()
+{
 	reassign_label.Style["display"] = "none";
 	assigned_to.Style["display"] = "none";
-	status.Style["display"] = "none";
+
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_udf_to_readonly()
+{
+	static_udf.Style["display"] = "";
 	udf.Style["display"] = "none";
+	static_udf.InnerText = udf.SelectedItem.Text;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////
+void set_controls_to_readonly()
+{
 
 	// even turn off commenting updating for read only
 	if (permission_level == Security.PERMISSION_READONLY)
@@ -925,6 +959,13 @@ void set_controls_to_readonly()
 	}
 
 	set_project_to_readonly();
+	set_org_to_readonly();
+	set_category_to_readonly();
+	set_priority_to_readonly();
+	set_status_to_readonly();
+	set_assigned_to_readonly();
+	set_udf_to_readonly();
+	set_shortdesc_to_readonly();
 
 	internal_only_label.Visible = false;
 	internal_only.Visible = false;

@@ -800,7 +800,7 @@ namespace btnet
 
 			int pos = sql.IndexOf("WhErE"); // first look for a "special" where, case sensitive, in case there are multiple where's to choose from
 
-			if (pos == -1) sql.ToUpper().IndexOf("WHERE");
+			if (pos == -1) pos = sql.ToUpper().IndexOf("WHERE");
 			if (pos != -1)
 			{
 				bug_sql = bug_sql.Substring(0,pos+5) +
@@ -1067,7 +1067,7 @@ where pj_id not in
 if $og_external_user = 1 -- external
 and $og_other_orgs_permission_level = 0 -- other orgs
 begin
-	select #temp.*
+	select a.*
 	into #temp2
 	from #temp a
 	inner join users b on a.us_id = b.us_id
@@ -1109,7 +1109,10 @@ drop table #temp";
 				sql = sql.Replace("$fullnames","1 = 1");
 			}
 
-			sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+			sql = sql.Replace("$this_usid",Convert.ToString(security.this_usid));
+			sql = sql.Replace("$this_org",Convert.ToString(security.this_org));
+			sql = sql.Replace("$og_external_user",Convert.ToString(security.this_external_user ? 1 : 0));
+			sql = sql.Replace("$og_other_orgs_permission_level",Convert.ToString(security.this_other_orgs_permission_level));
 
 			return dbutil.get_dataset(sql).Tables[0];
 
@@ -2613,6 +2616,7 @@ drop table #temp";
             // subscribe per-project auto_subscribers
             // subscribe per auto_subscribe_own_bugs
             string sql = @"
+
 delete from bug_subscriptions
 where bs_bug = $id
 and bs_user in
@@ -2623,24 +2627,28 @@ and bs_user in
 	and isnull(pu_permission_level,$dpl) = 0)
 
 delete from bug_subscriptions
-inner join users on bs_user
-inner join orgs on us_org = og_id
 where bs_bug = $id
-and og_other_orgs_permission_level = 0
-and bs_org <> og_id
+and bs_user in
+	(select us_id from users
+	 inner join orgs on us_org = og_id
+	 inner join bugs on bg_id = $id
+	 where og_other_orgs_permission_level = 0
+	 and bg_org <> og_id)
 
 insert into bug_subscriptions (bs_bug, bs_user)
 select $id, us_id
 from users
+inner join orgs on us_org = og_id
+inner join bugs on bg_id = $id
 left outer join project_user_xref on pu_project = $pj and pu_user = us_id
 where us_auto_subscribe = 1
 and
 	case
 		when
-			us != bg_org
+			us_org <> bg_org
 			and og_other_orgs_permission_level < 2
 			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-				og_other_orgs_permission_level
+				then og_other_orgs_permission_level
 		else
 			isnull(pu_permission_level,$dpl)
 	end <> 0
@@ -2649,6 +2657,7 @@ and us_id not in
 (select bs_user from bug_subscriptions
 where bs_bug = $id)
 
+/*
 insert into bug_subscriptions (bs_bug, bs_user)
 select $id, pj_default_user
 from projects
@@ -2664,14 +2673,16 @@ where bs_bug = $id)
 insert into bug_subscriptions (bs_bug, bs_user)
 select $id, pu_user from project_user_xref
 inner join users on pu_user = us_id
+inner join orgs on us_org = og_id
+inner join bugs on bg_id = $id
 where pu_auto_subscribe = 1
 and
 	case
 		when
-			us != bg_org
+			us_org <> bg_org
 			and og_other_orgs_permission_level < 2
 			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-				og_other_orgs_permission_level
+				then og_other_orgs_permission_level
 		else
 			isnull(pu_permission_level,$dpl)
 	end <> 0
@@ -2685,6 +2696,7 @@ insert into bug_subscriptions (bs_bug, bs_user)
 select $id, us_id
 from users
 inner join bugs on bg_id = $id
+inner join orgs on us_org = og_id
 left outer join project_user_xref on pu_project = $pj and pu_user = us_id
 where ((us_auto_subscribe_own_bugs = 1 and bg_assigned_to_user = us_id)
 	or
@@ -2692,17 +2704,19 @@ where ((us_auto_subscribe_own_bugs = 1 and bg_assigned_to_user = us_id)
 and
 	case
 		when
-			us != bg_org
+			us_org <> bg_org
 			and og_other_orgs_permission_level < 2
 			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-				og_other_orgs_permission_level
+				then og_other_orgs_permission_level
 		else
 			isnull(pu_permission_level,$dpl)
 	end <> 0
 and us_active = 1
 and us_id not in
 (select bs_user from bug_subscriptions
-where bs_bug = $id)";
+where bs_bug = $id)
+*/
+";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             sql = sql.Replace("$pj", Convert.ToString(projectid));
@@ -3153,7 +3167,7 @@ isnull(bs_id,0) [subscribed],
 
 case
 	when
-		$this_org != bg_org
+		$this_org <> bg_org
 		and userorg.og_other_orgs_permission_level < 2
 		and userorg.og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
 			then userorg.og_other_orgs_permission_level
@@ -3264,20 +3278,15 @@ where bg_id = $id";
             // fetch the revised permission level
             string sql = @"
 declare @bg_org int
-declare @permission_level int
-set @permission_level = -1
 
-select @permission_level = isnull(pu_permission_level,$dpl),
-	@bg_org = bg_org
+select isnull(pu_permission_level,$dpl),
+	bg_org
 	from bugs
-	inner join project_user_xref
+	left outer join project_user_xref
 	on pu_project = bg_project
 	and pu_user = $us
-	where bg_id = $bg
-
-if @permission_level = -1 set @permission_level = $dpl
-
-select @permission_level, @bg_org";
+	where bg_id = $bg";
+;
 
             sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
             sql = sql.Replace("$bg", Convert.ToString(bugid));
@@ -3515,6 +3524,17 @@ select @permission_level, @bg_org";
 
         }
 
+        ///////////////////////////////////////////////////////////////////////
+        public static string send_notifications(int insert_or_update, int bugid, Security security, int just_to_this)
+        {
+            return send_notifications(insert_or_update,
+                bugid,
+                security,
+                just_to_this,
+                false,  // status changed
+                false,  // assigend to changed
+                0);  // prev assigned to
+        }
 
         ///////////////////////////////////////////////////////////////////////
         public static string send_notifications(int insert_or_update, int bugid, Security security)
@@ -3584,10 +3604,10 @@ and us_email <> ''
 and
 	case
 		when
-			us != bg_org
+			us_org <> bg_org
 			and og_other_orgs_permission_level < 2
 			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-				og_other_orgs_permission_level
+				then og_other_orgs_permission_level
 		else
 			isnull(pu_permission_level,$dpl)
 	end <> 0
@@ -3620,10 +3640,10 @@ or ($cl <= us_subscribed_notifications))
 and
 case
 	when
-		us != bg_org
+		us_org <> bg_org
 		and og_other_orgs_permission_level < 2
 		and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-			og_other_orgs_permission_level
+			then og_other_orgs_permission_level
 	else
 		isnull(pu_permission_level,$dpl)
 end <> 0

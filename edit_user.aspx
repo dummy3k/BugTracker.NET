@@ -362,44 +362,6 @@ void Page_Load(Object sender, EventArgs e)
 
 		} // add or edit
 	} // if !postback
-	else
-	{
-
-		string sql = @"/* populate query dropdown */
-			select qu_id, qu_desc
-			from queries
-			where (isnull(qu_user,0) = 0 and isnull(qu_org,0) = 0)
-			or isnull(qu_user,0) = $us
-			or isnull(qu_org,0) = $org
-			order by qu_desc;";
-
-		if (org.SelectedIndex > 0)
-		{
-			sql = sql.Replace("$org",Convert.ToString(org.SelectedItem.Value));
-		}
-		else
-		{
-			sql = sql.Replace("$org", "-1");
-		}
-
-		if (id > 0)
-		{
-			sql = sql.Replace("$us",Convert.ToString(id));
-		}
-		else
-		{
-			sql = sql.Replace("$us","-1");
-		}
-
-		DataSet ds = dbutil.get_dataset(sql);
-
-		// query dropdown
-		query.DataSource = ds.Tables[0].DefaultView;
-		query.DataTextField = "qu_desc";
-		query.DataValueField = "qu_id";
-		query.DataBind();
-
-	}
 }
 
 
@@ -530,7 +492,6 @@ string replace_vars_in_sql_statement(string sql)
 ///////////////////////////////////////////////////////////////////////
 void on_update (Object sender, EventArgs e)
 {
-
 	Boolean good = validate();
 
 	if (good)
