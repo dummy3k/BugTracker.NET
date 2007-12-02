@@ -47,7 +47,7 @@ void Page_Load(Object sender, EventArgs e)
 		// replace magic variables
 		bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.this_usid));
 
-		bug_sql = Util.alter_sql_per_project_permissions(bug_sql,security.this_usid);
+		bug_sql = Util.alter_sql_per_project_permissions(bug_sql,security);
 
 		ds = dbutil.get_dataset (bug_sql);
 		dv = new DataView(ds.Tables[0]);

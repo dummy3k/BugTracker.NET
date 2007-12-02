@@ -58,11 +58,8 @@ void Page_Load(Object sender, EventArgs e)
 				sql = sql.Replace("$us",Request["userid"]);
 				dbutil.execute_nonquery(sql);
 
-				// send a notification to this user
-				btnet.Bug.send_notifications(btnet.Bug.UPDATE,
-					bugid,
-					security.this_usid,
-					security.this_is_admin);
+				// send a notification to this user only
+                btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security, 1);
 			}
 		}
 	}

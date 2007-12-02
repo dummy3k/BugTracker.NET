@@ -5,6 +5,26 @@ Release notes:
 -----------------------------------------------------------------------
 
 -----------------------------------------------------------------------
+Version 2.6.8  12/xx/2007
+-----------------------------------------------------------------------
+
+Fixed bug with view only, reporter - dropdowns weren't right
+
+Added "Organization" to bug
+
+Added "Permission Level for other organizations"
+
+WhErE
+
+change setup.sql queries to include org
+
+test insert_bug.aspx
+
+test notifications, subscriptions
+
+inspect all pu_permission_level
+
+-----------------------------------------------------------------------
 Version 2.6.7  12/01/2007
 -----------------------------------------------------------------------
 

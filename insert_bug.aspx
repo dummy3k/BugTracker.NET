@@ -111,8 +111,9 @@ void Page_Load(Object sender, EventArgs e)
 
 	// authenticate user
 
-	sql = @"select us_id, us_admin
+	sql = @"select us_id, us_admin, us_org, og_other_orgs_permission_level
 		from users
+		inner join orgs on us_org = og_id
 		where us_username = N'$us'
 		and (us_password = N'$pw' or us_password = N'$en')
 		and us_active = 1";
@@ -132,6 +133,9 @@ void Page_Load(Object sender, EventArgs e)
 
 	security = new Security();
 	security.this_usid = (int) dr["us_id"];
+	security.this_is_admin = Convert.ToBoolean(dr["us_id"]);
+	security.this_org = (int) dr["us_org"];
+	security.this_other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
 
 	int projectid = 0;
 	if (Util.is_int(projectid_string))
@@ -404,8 +408,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		btnet.Bug.NewIds new_ids = btnet.Bug.insert_bug(
 			short_desc,
-			(int) dr["us_id"],
-			Convert.ToBoolean((int) dr["us_admin"]),
+			security,
 			projectid,
 			orgid,
 			categoryid,
@@ -471,10 +474,7 @@ void Page_Load(Object sender, EventArgs e)
 			}
 		}
 
-        btnet.Bug.send_notifications(btnet.Bug.INSERT,
-                            new_ids.bugid,
-                            (int)dr["us_id"],
-                            Convert.ToBoolean((int)dr["us_admin"]));
+        btnet.Bug.send_notifications(btnet.Bug.INSERT, new_ids.bugid, security);
 
 		Response.AddHeader("BTNET","OK:" + Convert.ToString(new_ids.bugid));
 		Response.Write ("OK:" + Convert.ToString(new_ids.bugid));
@@ -538,7 +538,7 @@ void Page_Load(Object sender, EventArgs e)
 			add_attachments(mime_message, bugid, postid);
 		}
 
-		btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, (int) dr["us_id"], security.this_is_admin);
+		btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security);
 
 		Response.AddHeader("BTNET","OK:" + Convert.ToString(bugid));
 		Response.Write ("OK:" + Convert.ToString(bugid));

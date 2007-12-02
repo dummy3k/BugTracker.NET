@@ -325,7 +325,7 @@ void display_bugs(bool show_checkbox)
 
 	if (dt_users == null)
 	{
-		dt_users = Util.get_related_users(security.this_usid, dbutil);
+		dt_users = Util.get_related_users(security, dbutil);
 	}
 
 	string paging_string = get_paging_string();

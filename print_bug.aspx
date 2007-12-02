@@ -25,7 +25,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	int bugid = Convert.ToInt32(string_bugid);
 
-	dr = btnet.Bug.get_bug_datarow(bugid, security.this_usid);
+	dr = btnet.Bug.get_bug_datarow(bugid, security);
 
 	if (dr == null)
 	{

@@ -62,6 +62,7 @@ namespace btnet
 		public const int PERMISSION_ALL = 2;
 
         public int this_other_orgs_permission_level = PERMISSION_ALL;
+        public int this_org = 0;
 
 		///////////////////////////////////////////////////////////////////////
 		public void check_security(DbUtil dbutil, HttpContext asp_net_context, int level)
@@ -146,6 +147,7 @@ namespace btnet
 				og_can_edit_reports,
 				og_can_be_assigned_to,
 				og_other_orgs_permission_level,
+				og_id,
 				isnull(us_forced_project, 0 ) us_forced_project,
 				isnull(pu_permission_level, $dpl) pu_permission_level,
 				@project_admin [project_admin]
@@ -189,6 +191,7 @@ namespace btnet
             this_can_edit_reports = Convert.ToBoolean(dr["og_can_edit_reports"]);
             this_can_be_assigned_to = Convert.ToBoolean(dr["og_can_be_assigned_to"]);
             this_other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
+            this_org = (int) dr["og_id"];
 
 			if (((string)dr["us_firstname"]).Trim().Length == 0)
 			{
@@ -753,7 +756,7 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		public static string alter_sql_per_project_permissions(string sql, int usid)
+		public static string alter_sql_per_project_permissions(string sql, Security security)
 		{
 
 			string project_permissions_sql;
@@ -773,19 +776,31 @@ namespace btnet
 				project_permissions_sql = @" (bg_project not in (
 					select pu_project
 					from project_user_xref
-					where pu_user = $us
+					where pu_user = $user
 					and pu_permission_level = 0)) ";
 			}
 
+			if (security.this_other_orgs_permission_level == 0)
+			{
+				project_permissions_sql += @"
+					and bg_org = $this_org ";
+
+			}
+
 			project_permissions_sql
-				= project_permissions_sql.Replace("$us",Convert.ToString(usid));
+				= project_permissions_sql.Replace("$this_org",Convert.ToString(security.this_org));
+
+			project_permissions_sql
+				= project_permissions_sql.Replace("$user",Convert.ToString(security.this_usid));
 
 
 			// figure out where to alter sql for project permissions
 
 			string bug_sql = sql;
 
-			int pos = sql.ToUpper().IndexOf("WHERE");
+			int pos = sql.IndexOf("WhErE"); // first look for a "special" where, case sensitive, in case there are multiple where's to choose from
+
+			if (pos == -1) sql.ToUpper().IndexOf("WHERE");
 			if (pos != -1)
 			{
 				bug_sql = bug_sql.Substring(0,pos+5) +
@@ -979,7 +994,7 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		public static DataTable get_related_users(int userid, DbUtil dbutil)
+		public static DataTable get_related_users(Security security, DbUtil dbutil)
 		{
 			string sql = "";
 
@@ -988,25 +1003,41 @@ namespace btnet
 				// only show users who have explicit permission
 				// for projects that this user has permissions for
 
-				sql = @"/* get related users */ select us_id,
-				case when $fullnames then
-					case rtrim(us_firstname)
-						when null then isnull(us_lastname, '')
-						when '' then isnull(us_lastname, '')
-						else isnull(us_lastname + ', ' + us_firstname,'')
-					end
-				else us_username end us_username
-				from users
-				where us_id in
-					(select pu1.pu_user from project_user_xref pu1
-					where pu1.pu_project in
-						(select pu2.pu_project from project_user_xref pu2
-						where pu2.pu_user = $us
-						and pu2.pu_permission_level <> 0
-						)
-					and pu1.pu_permission_level <> 0
-					)
-				order by us_username";
+				sql = @"
+/* get related users 1 */
+
+select us_id,
+case when $fullnames then
+	case rtrim(us_firstname)
+		when null then isnull(us_lastname, '')
+		when '' then isnull(us_lastname, '')
+		else isnull(us_lastname + ', ' + us_firstname,'')
+	end
+else us_username end us_username,
+us_org,
+og_external_user
+into #temp
+from users
+inner join orgs on us_org = og_id
+where us_id in
+	(select pu1.pu_user from project_user_xref pu1
+	where pu1.pu_project in
+		(select pu2.pu_project from project_user_xref pu2
+		where pu2.pu_user = $this_usid
+		and pu2.pu_permission_level <> 0
+		)
+	and pu1.pu_permission_level <> 0
+	)
+
+if $og_external_user = 1 -- external
+and $og_other_orgs_permission_level = 0 -- other orgs
+	delete from #temp where us_org <> $this_org and us_id <> $this_usid
+
+select us_id, us_username from #temp order by us_username
+drop table #temp";
+
+
+
 			}
 			else
 			{
@@ -1015,29 +1046,57 @@ namespace btnet
 
 				// the cartesian join in the first select is intentional
 
-				sql=@"/* get related users */ select  pj_id, us_id,
-				case when $fullnames then
-					case rtrim(us_firstname)
-						when null then isnull(us_lastname, '')
-						when '' then isnull(us_lastname, '')
-						else isnull(us_lastname + ', ' + us_firstname,'')
-					end
-				else us_username end us_username
-				into #temp
-				from projects, users
-				where pj_id not in
-				(
-					select pu_project from project_user_xref
-					where pu_permission_level = 0 and pu_user = $us
-				)
-				select distinct us_id, us_username from #temp
-				left outer join project_user_xref on pj_id = pu_project
-				and us_id = pu_user
-				where isnull(pu_permission_level,2) <> 0
-				order by us_username
-				drop table #temp";
+				sql=@"
+/* get related users 2 */
+select  pj_id, us_id,
+case when $fullnames then
+	case rtrim(us_firstname)
+		when null then isnull(us_lastname, '')
+		when '' then isnull(us_lastname, '')
+		else isnull(us_lastname + ', ' + us_firstname,'')
+	end
+else us_username end us_username
+into #temp
+from projects, users
+where pj_id not in
+(
+	select pu_project from project_user_xref
+	where pu_permission_level = 0 and pu_user = $this_usid
+)
+
+if $og_external_user = 1 -- external
+and $og_other_orgs_permission_level = 0 -- other orgs
+begin
+	select #temp.*
+	into #temp2
+	from #temp a
+	inner join users b on a.us_id = b.us_id
+	inner join orgs on b.us_id = og_id
+	where og_external_user = 0 or b.us_org = $this_org
+
+	select * from #temp order by us_username
+	drop table #temp2
+end
+else
+begin
+
+	select distinct us_id, us_username
+		from #temp
+		left outer join project_user_xref on pj_id = pu_project
+		and us_id = pu_user
+		where isnull(pu_permission_level,2) <> 0
+		order by us_username
+
+end
+
+drop table #temp";
+
+
+
 
 			}
+
+
 
 			if (Util.get_setting("UseFullNames","0") == "0")
 			{
@@ -1050,7 +1109,7 @@ namespace btnet
 				sql = sql.Replace("$fullnames","1 = 1");
 			}
 
-			sql = sql.Replace("$us",Convert.ToString(userid));
+			sql = sql.Replace("$us",Convert.ToString(security.this_usid));
 
 			return dbutil.get_dataset(sql).Tables[0];
 
@@ -2553,62 +2612,97 @@ namespace btnet
             // subscribe project's default user
             // subscribe per-project auto_subscribers
             // subscribe per auto_subscribe_own_bugs
-            string sql = @"delete from bug_subscriptions
-						where bs_bug = $id
-						and bs_user in
-							(select x.pu_user
-							from projects
-							left outer join project_user_xref x on pu_project = pj_id
-							where pu_project = $pj
-							and isnull(pu_permission_level,$dpl) = 0)
+            string sql = @"
+delete from bug_subscriptions
+where bs_bug = $id
+and bs_user in
+	(select x.pu_user
+	from projects
+	left outer join project_user_xref x on pu_project = pj_id
+	where pu_project = $pj
+	and isnull(pu_permission_level,$dpl) = 0)
 
-						insert into bug_subscriptions (bs_bug, bs_user)
-						select $id, us_id
-						from users
-						left outer join project_user_xref on pu_project = $pj and pu_user = us_id
-						where us_auto_subscribe = 1
-						and isnull(pu_permission_level,$dpl) <> 0
-						and us_active = 1
-						and us_id not in
-						(select bs_user from bug_subscriptions
-						where bs_bug = $id)
+delete from bug_subscriptions
+inner join users on bs_user
+inner join orgs on us_org = og_id
+where bs_bug = $id
+and og_other_orgs_permission_level = 0
+and bs_org <> og_id
 
-						insert into bug_subscriptions (bs_bug, bs_user)
-						select $id, pj_default_user
-						from projects
-						inner join users on pj_default_user = us_id
-						where pj_id = $pj
-						and pj_default_user <> 0
-						and pj_auto_subscribe_default_user = 1
-						and us_active = 1
-						and pj_default_user not in
-						(select bs_user from bug_subscriptions
-						where bs_bug = $id)
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, us_id
+from users
+left outer join project_user_xref on pu_project = $pj and pu_user = us_id
+where us_auto_subscribe = 1
+and
+	case
+		when
+			us != bg_org
+			and og_other_orgs_permission_level < 2
+			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+				og_other_orgs_permission_level
+		else
+			isnull(pu_permission_level,$dpl)
+	end <> 0
+and us_active = 1
+and us_id not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)
 
-						insert into bug_subscriptions (bs_bug, bs_user)
-						select $id, pu_user from project_user_xref
-						inner join users on pu_user = us_id
-						where pu_auto_subscribe = 1
-						and isnull(pu_permission_level,$dpl) <> 0
-						and us_active = 1
-						and pu_project = $pj
-						and pu_user not in
-						(select bs_user from bug_subscriptions
-						where bs_bug = $id)
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, pj_default_user
+from projects
+inner join users on pj_default_user = us_id
+where pj_id = $pj
+and pj_default_user <> 0
+and pj_auto_subscribe_default_user = 1
+and us_active = 1
+and pj_default_user not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)
 
-						insert into bug_subscriptions (bs_bug, bs_user)
-						select $id, us_id
-						from users
-						inner join bugs on bg_id = $id
-						left outer join project_user_xref on pu_project = $pj and pu_user = us_id
-						where ((us_auto_subscribe_own_bugs = 1 and bg_assigned_to_user = us_id)
-							or
-							(us_auto_subscribe_reported_bugs = 1 and bg_reported_user = us_id))
-						and isnull(pu_permission_level,$dpl) <> 0
-						and us_active = 1
-						and us_id not in
-						(select bs_user from bug_subscriptions
-						where bs_bug = $id)";
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, pu_user from project_user_xref
+inner join users on pu_user = us_id
+where pu_auto_subscribe = 1
+and
+	case
+		when
+			us != bg_org
+			and og_other_orgs_permission_level < 2
+			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+				og_other_orgs_permission_level
+		else
+			isnull(pu_permission_level,$dpl)
+	end <> 0
+and us_active = 1
+and pu_project = $pj
+and pu_user not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)
+
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, us_id
+from users
+inner join bugs on bg_id = $id
+left outer join project_user_xref on pu_project = $pj and pu_user = us_id
+where ((us_auto_subscribe_own_bugs = 1 and bg_assigned_to_user = us_id)
+	or
+	(us_auto_subscribe_reported_bugs = 1 and bg_reported_user = us_id))
+and
+	case
+		when
+			us != bg_org
+			and og_other_orgs_permission_level < 2
+			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+				og_other_orgs_permission_level
+		else
+			isnull(pu_permission_level,$dpl)
+	end <> 0
+and us_active = 1
+and us_id not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             sql = sql.Replace("$pj", Convert.ToString(projectid));
@@ -2865,7 +2959,7 @@ namespace btnet
 
                 if (send_notifications)
                 {
-					btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security.this_usid, security.this_is_admin);
+					btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security);
                 }
                 return bp_id;
             }
@@ -2977,19 +3071,19 @@ namespace btnet
         ///////////////////////////////////////////////////////////////////////
         public static DataRow get_bug_datarow(
             int bugid,
-            int this_usid)
+            Security security)
         {
 
             DbUtil dbutil = new DbUtil();
             DataSet ds_custom_cols = btnet.Util.get_custom_columns(dbutil);
-            return get_bug_datarow(bugid, this_usid, ds_custom_cols);
+            return get_bug_datarow(bugid, security, ds_custom_cols);
         }
 
 
         ///////////////////////////////////////////////////////////////////////
         public static DataRow get_bug_datarow(
             int bugid,
-            int this_usid,
+            Security security,
             DataSet ds_custom_cols)
         {
             string sql = @" /* get_bug_datarow */
@@ -3033,7 +3127,7 @@ isnull(bg_project,0) [project],
 isnull(pj_name,'[no project]') [current_project],
 
 isnull(bg_org,0) [organization],
-isnull(og_name,'') [og_name],
+isnull(bugorg.og_name,'') [og_name],
 
 isnull(bg_category,0) [category],
 isnull(ct_name,'') [category_name],
@@ -3056,7 +3150,16 @@ case rtrim(asg.us_firstname)
 end [assigned_to_fullname],
 
 isnull(bs_id,0) [subscribed],
-isnull(pu_permission_level,$dpl) [pu_permission_level],
+
+case
+	when
+		$this_org != bg_org
+		and userorg.og_other_orgs_permission_level < 2
+		and userorg.og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+			then userorg.og_other_orgs_permission_level
+	else
+		isnull(pu_permission_level,$dpl)
+end [pu_permission_level],
 
 isnull(bg_project_custom_dropdown_value1,'') [bg_project_custom_dropdown_value1],
 isnull(bg_project_custom_dropdown_value2,'') [bg_project_custom_dropdown_value2],
@@ -3066,18 +3169,20 @@ isnull(bg_project_custom_dropdown_value3,'') [bg_project_custom_dropdown_value3]
 getdate() [snapshot_timestamp]
 $custom_cols_placeholder
 from bugs
+inner join users this_user on us_id = $this_usid
+inner join orgs userorg on this_user.us_org = userorg.og_id
 left outer join user_defined_attribute on bg_user_defined_attribute = udf_id
 left outer join projects on bg_project = pj_id
-left outer join orgs on bg_org = og_id
+left outer join orgs bugorg on bg_org = bugorg.og_id
 left outer join categories on bg_category = ct_id
 left outer join priorities on bg_priority = pr_id
 left outer join statuses on bg_status = st_id
 left outer join users asg on bg_assigned_to_user = asg.us_id
 left outer join users ru on bg_reported_user = ru.us_id
 left outer join users lu on bg_last_updated_user = lu.us_id
-left outer join bug_subscriptions on bs_bug = bg_id and bs_user = $us
+left outer join bug_subscriptions on bs_bug = bg_id and bs_user = $this_usid
 left outer join project_user_xref on pj_id = pu_project
-	and pu_user = $us
+	and pu_user = $this_usid
 where bg_id = $id";
 
             if (ds_custom_cols.Tables[0].Rows.Count == 0)
@@ -3097,7 +3202,8 @@ where bg_id = $id";
             }
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
-            sql = sql.Replace("$us", Convert.ToString(this_usid));
+            sql = sql.Replace("$this_usid", Convert.ToString(security.this_usid));
+            sql = sql.Replace("$this_org", Convert.ToString(security.this_org));
             sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
 
             DbUtil dbutil = new DbUtil();
@@ -3156,28 +3262,49 @@ where bg_id = $id";
             */
 
             // fetch the revised permission level
-            string sql = @"declare @permission_level int
-				set @permission_level = -1
-				select @permission_level = isnull(pu_permission_level,$dpl)
-				from bugs
-				inner join project_user_xref
-				on pu_project = bg_project
-				and pu_user = $us
-				where bg_id = $bg
-				if @permission_level = -1 set @permission_level = $dpl
-				select @permission_level";
+            string sql = @"
+declare @bg_org int
+declare @permission_level int
+set @permission_level = -1
+
+select @permission_level = isnull(pu_permission_level,$dpl),
+	@bg_org = bg_org
+	from bugs
+	inner join project_user_xref
+	on pu_project = bg_project
+	and pu_user = $us
+	where bg_id = $bg
+
+if @permission_level = -1 set @permission_level = $dpl
+
+select @permission_level, @bg_org";
 
             sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
             sql = sql.Replace("$bg", Convert.ToString(bugid));
             sql = sql.Replace("$us", Convert.ToString(security.this_usid));
             DbUtil dbutil = new DbUtil();
-            int pl = (int)dbutil.execute_scalar(sql);
+            DataRow dr = dbutil.get_datarow(sql);
+            int pl = (int) dr[0];
+            int bg_org = (int) dr[1];
 
             // reduce permissions for guest
             if (security.this_is_guest && pl == Security.PERMISSION_ALL)
             {
                 pl = Security.PERMISSION_REPORTER;
             }
+
+			// maybe reduce permissions
+			if (bg_org != security.this_org)
+			{
+				if (security.this_other_orgs_permission_level == Security.PERMISSION_NONE
+				|| security.this_other_orgs_permission_level == Security.PERMISSION_READONLY)
+				{
+					if (security.this_other_orgs_permission_level < pl)
+					{
+						pl = security.this_other_orgs_permission_level;
+					}
+				}
+			}
 
             return pl;
         }
@@ -3197,8 +3324,7 @@ where bg_id = $id";
         ///////////////////////////////////////////////////////////////////////
         public static NewIds insert_bug(
             string short_desc,
-            int this_usid,
-            bool this_is_admin,
+            Security security,
             int projectid,
             int orgid,
             int categoryid,
@@ -3247,7 +3373,7 @@ where bg_id = $id";
 					N'$pcd1',N'$pcd2',N'$pcd3' $custom_cols_placeholder2)";
 
             sql = sql.Replace("$short_desc", short_desc.Replace("'", "''"));
-            sql = sql.Replace("$reported_user", Convert.ToString(this_usid));
+            sql = sql.Replace("$reported_user", Convert.ToString(security.this_usid));
             sql = sql.Replace("$project", Convert.ToString(projectid));
             sql = sql.Replace("$org", Convert.ToString(orgid));
             sql = sql.Replace("$category", Convert.ToString(categoryid));
@@ -3320,16 +3446,13 @@ where bg_id = $id";
 
 
             int bugid = Convert.ToInt32(dbutil.execute_scalar(sql));
-            int postid = btnet.Bug.insert_comment(bugid, this_usid, comments, from, content_type, internal_only);
+            int postid = btnet.Bug.insert_comment(bugid, security.this_usid, comments, from, content_type, internal_only);
 
             btnet.Bug.auto_subscribe(bugid, projectid);
 
             if (send_notifications)
             {
-                btnet.Bug.send_notifications(btnet.Bug.INSERT,
-                    bugid,
-                    this_usid,
-                    this_is_admin);
+                btnet.Bug.send_notifications(btnet.Bug.INSERT, bugid, security);
             }
 
             return new NewIds(bugid, postid);
@@ -3394,12 +3517,11 @@ where bg_id = $id";
 
 
         ///////////////////////////////////////////////////////////////////////
-        public static string send_notifications(int insert_or_update, int bugid, int this_usid, bool this_is_admin)
+        public static string send_notifications(int insert_or_update, int bugid, Security security)
         {
             return send_notifications(insert_or_update,
                 bugid,
-                this_usid,
-                this_is_admin,
+                security,
                 0,  // just to this
                 false,  // status changed
                 false,  // assigend to changed
@@ -3410,8 +3532,7 @@ where bg_id = $id";
         ///////////////////////////////////////////////////////////////////////
         public static string send_notifications(int insert_or_update,
             int bugid,
-            int this_usid,
-            bool this_is_admin,
+            Security security,
             int just_to_this_userid,
             bool status_changed,
             bool assigned_to_changed,
@@ -3447,19 +3568,31 @@ where bg_id = $id";
 
                 if (just_to_this_userid > 0)
                 {
-                    sql = @"select us_email
-							from bug_subscriptions
-							inner join users on bs_user = us_id
-							inner join bugs on bg_id = bs_bug
-							left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
-							where us_email is not null
-							and us_enable_notifications = 1
-							-- $status_change
-							and us_active = 1
-							and us_email <> ''
-							and isnull(pu_permission_level,$dpl) <> 0
-							and bs_bug = $id
-							and us_id = $just_this_usid";
+                    sql = @"
+/* get notification email for just one user  */
+select us_email
+from bug_subscriptions
+inner join users on bs_user = us_id
+inner join orgs on us_org = og_id
+inner join bugs on bg_id = bs_bug
+left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
+where us_email is not null
+and us_enable_notifications = 1
+-- $status_change
+and us_active = 1
+and us_email <> ''
+and
+	case
+		when
+			us != bg_org
+			and og_other_orgs_permission_level < 2
+			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+				og_other_orgs_permission_level
+		else
+			isnull(pu_permission_level,$dpl)
+	end <> 0
+and bs_bug = $id
+and us_id = $just_this_usid";
 
                     sql = sql.Replace("$just_this_usid", Convert.ToString(just_to_this_userid));
                 }
@@ -3467,30 +3600,42 @@ where bg_id = $id";
                 {
 
                     // MAW -- 2006/01/27 -- Added different notifications if reported or assigned-to
-                    sql = @"select us_email
-							from bug_subscriptions
-							inner join users on bs_user = us_id
-							inner join bugs on bg_id = bs_bug
-							left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
-							where us_email is not null
-							and us_enable_notifications = 1
-							-- $status_change
-							and us_active = 1
-							and us_email <> ''
-							and (   ($cl <= us_reported_notifications and bg_reported_user = bs_user)
-								 or ($cl <= us_assigned_notifications and bg_assigned_to_user = bs_user)
-								 or ($cl <= us_assigned_notifications and $pau = bs_user)
-								 or ($cl <= us_subscribed_notifications))
-							and isnull(pu_permission_level,$dpl) <> 0
-							and bs_bug = $id
-							and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
+                    sql = @"
+/* get notification emails for all subscribers */
+select us_email
+from bug_subscriptions
+inner join users on bs_user = us_id
+inner join orgs on us_org = og_id
+inner join bugs on bg_id = bs_bug
+left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
+where us_email is not null
+and us_enable_notifications = 1
+-- $status_change
+and us_active = 1
+and us_email <> ''
+and (   ($cl <= us_reported_notifications and bg_reported_user = bs_user)
+or ($cl <= us_assigned_notifications and bg_assigned_to_user = bs_user)
+or ($cl <= us_assigned_notifications and $pau = bs_user)
+or ($cl <= us_subscribed_notifications))
+and
+case
+	when
+		us != bg_org
+		and og_other_orgs_permission_level < 2
+		and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+			og_other_orgs_permission_level
+	else
+		isnull(pu_permission_level,$dpl)
+end <> 0
+and bs_bug = $id
+and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
                 }
 
                 sql = sql.Replace("$cl", changeLevel.ToString());
                 sql = sql.Replace("$pau", prev_assigned_to_user.ToString());
                 sql = sql.Replace("$id", Convert.ToString(bugid));
                 sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
-                sql = sql.Replace("$us", Convert.ToString(this_usid));
+                sql = sql.Replace("$us", Convert.ToString(security.this_usid));
 
                 DbUtil dbutil = new DbUtil();
                 DataSet subscribers = dbutil.get_dataset(sql);
@@ -3499,7 +3644,7 @@ where bg_id = $id";
                 {
 
                     // Get bug html
-                    DataRow bug_dr = btnet.Bug.get_bug_datarow(bugid, this_usid);
+                    DataRow bug_dr = btnet.Bug.get_bug_datarow(bugid, security);
 
                     // Create a fake response and let the code
                     // write the html to that response
@@ -3511,7 +3656,7 @@ where bg_id = $id";
 					btnet.Util.get_setting("AbsoluteUrlPrefix","http://127.0.0.1/") + "\"/>");
 					my_response.Write("</head>");
 
-                    PrintBug.print_bug(my_response, bug_dr, this_is_admin, true /* external_user */);
+                    PrintBug.print_bug(my_response, bug_dr, security.this_is_admin, true /* external_user */);
                     // at this point "writer" has the bug html
 
 

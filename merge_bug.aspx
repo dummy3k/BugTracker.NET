@@ -271,10 +271,7 @@ void on_update(object Source, EventArgs e)
 			}
 		}
 
-		btnet.Bug.send_notifications(btnet.Bug.UPDATE,
-			Convert.ToInt32(prev_into_bug.Value),
-			security.this_usid,
-			security.this_is_admin);
+		btnet.Bug.send_notifications(btnet.Bug.UPDATE, Convert.ToInt32(prev_into_bug.Value), security);
 
 		Response.Redirect ("edit_bug.aspx?id=" + prev_into_bug.Value);
 

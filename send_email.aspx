@@ -392,7 +392,7 @@ string get_bug_text(int bugid)
 {
 		// Get bug html
 
-		DataRow bug_dr = btnet.Bug.get_bug_datarow(bugid, security.this_usid);
+		DataRow bug_dr = btnet.Bug.get_bug_datarow(bugid, security);
 
 		// Create a fake response and let the code
 		// write the html to that response
@@ -495,10 +495,7 @@ void on_update(object Source, EventArgs e)
 		attachments,
 		return_receipt.Checked);
 
-	btnet.Bug.send_notifications(btnet.Bug.UPDATE,
-		Convert.ToInt32(bg_id.Value),
-		security.this_usid,
-		security.this_is_admin);
+	btnet.Bug.send_notifications(btnet.Bug.UPDATE, Convert.ToInt32(bg_id.Value), security);
 
 	if (result == "")
 	{

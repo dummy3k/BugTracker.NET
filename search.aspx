@@ -472,7 +472,7 @@ void do_query()
 		sql = search_sql.Replace("$WHERE$", where);
 	}
 
-	sql = Util.alter_sql_per_project_permissions(sql, security.this_usid);
+	sql = Util.alter_sql_per_project_permissions(sql, security);
 
 	DataSet ds = dbutil.get_dataset(sql);
 	dv = new DataView (ds.Tables[0]);
@@ -670,7 +670,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	ds_custom_cols = Util.get_custom_columns(dbutil);
 
-	dt_users = Util.get_related_users(security.this_usid, dbutil);
+	dt_users = Util.get_related_users(security, dbutil);
 
 	if (!IsPostBack)
 	{

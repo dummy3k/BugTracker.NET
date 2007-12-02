@@ -174,7 +174,7 @@ void Page_Load(Object sender, EventArgs e)
 		order by bg_id desc";
 
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
-	sql = Util.alter_sql_per_project_permissions(sql, security.this_usid);
+	sql = Util.alter_sql_per_project_permissions(sql, security);
 
 	ds = dbutil.get_dataset(sql);
 

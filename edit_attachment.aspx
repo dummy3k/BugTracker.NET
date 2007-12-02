@@ -111,7 +111,7 @@ void on_update (Object sender, EventArgs e)
 
 		if (!internal_only.Checked)
 		{
-			btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security.this_usid, security.this_is_admin);
+			btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security);
 		}
 
 		Response.Redirect ("edit_bug.aspx?id=" + Convert.ToString(bugid));

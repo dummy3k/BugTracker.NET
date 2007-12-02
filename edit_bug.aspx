@@ -339,7 +339,7 @@ void Page_Load(Object sender, EventArgs e)
 			// Get this entry's data from the db and fill in the form
 
 
-			dr = btnet.Bug.get_bug_datarow(id, security.this_usid, ds_custom_cols);
+			dr = btnet.Bug.get_bug_datarow(id, security, ds_custom_cols);
 
 			if (dr == null)
 			{
@@ -1642,8 +1642,7 @@ void on_update (Object sender, EventArgs e)
 
 			btnet.Bug.NewIds new_ids = btnet.Bug.insert_bug(
 				short_desc.Value,
-				security.this_usid,
-				security.this_is_admin,
+				security,
 				Convert.ToInt32(project.SelectedItem.Value),
 				Convert.ToInt32(org.SelectedItem.Value),
 				Convert.ToInt32(category.SelectedItem.Value),
@@ -1859,11 +1858,7 @@ void on_update (Object sender, EventArgs e)
 			string result = "";
 			if (bug_fields_have_changed || (bugpost_fields_have_changed && !internal_only.Checked))
 			{
-				result = btnet.Bug.send_notifications(btnet.Bug.UPDATE,
-					id,
-					security.this_usid,
-					security.this_is_admin,
-					0,
+				result = btnet.Bug.send_notifications(btnet.Bug.UPDATE,	id,	security, 0,
 					status_changed,
 					assigned_to_changed,
 					prev_assigned_to_user);
