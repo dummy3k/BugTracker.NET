@@ -77,11 +77,11 @@ og_other_orgs_permission_level int not null default(2) -- 0=none, 1=read, 2=edit
 
 create unique index unique_og_name on orgs (og_name)
 
-insert into orgs (og_name) values ('default')
-insert into orgs (og_name) values ('dept one')
-insert into orgs (og_name) values ('dept two')
-insert into orgs (og_name) values ('customer one')
-insert into orgs (og_name) values ('customer two')
+insert into orgs (og_name) values ('default',0,2)
+insert into orgs (og_name) values ('dept one',0.2)
+insert into orgs (og_name) values ('dept two',0,2)
+insert into orgs (og_name) values ('customer one',1,0)
+insert into orgs (og_name) values ('customer two',1,0)
 
 /* USER */
 
@@ -111,32 +111,26 @@ us_use_fckeditor int not null default(0),
 us_enable_bug_list_popups int not null default(1),
 /* who created this user */
 us_created_user int not null default(1),
-us_org int not null default(1),
-us_external_user int not null default(0), /* external user can't view post marked internal */
-us_can_be_assigned_to int not null default(1),
-/* admins can do all these things - these are permissions for non-admins */
-us_can_edit_sql int not null default(0),
-us_can_delete_bug int not null default(0),
-us_can_edit_and_delete_posts int not null default(0),
-us_can_merge_bugs int not null default(0),
-us_can_mass_edit_bugs int not null default(0),
-us_can_use_reports int not null default(0),
-us_can_edit_reports int not null default(0)
+us_org int not null default(1)
 )
 
 create unique index unique_us_username on users (us_username)
 
 insert into users (
-us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query)
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
 values ('admin', 'System', 'Administrator', 'admin', 1, 1)
 
 insert into users (
-us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query)
-values ('fred', 'Fred', 'Flintstone', 'admin', 0, 2)
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
+values ('developer', 'Fred', 'Flintstone', 'admin', 0, 2)
 
 insert into users (
-us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query)
-values ('wilma', 'Wilma', 'Flintstone', 'admin', 0, 3)
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
+values ('tester', 'Wilma', 'Flintstone', 'admin', 0, 3)
+
+insert into users (
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
+values ('customer1', 'Barney', 'Rubble', 'admin', 0, 3)
 
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query)
@@ -476,92 +470,97 @@ Here are examples to get you started.
 */
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
-'show all bugs',
+'all bugs',
 'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
-+ ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
-+ ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
-+ ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
-+ ' from bugs '
-+ ' left outer join users rpt on rpt.us_id = bg_reported_user'
-+ ' left outer join users asg on asg.us_id = bg_assigned_to_user'
-+ ' left outer join users lu on lu.us_id = bg_last_updated_user'
-+ ' left outer join projects on pj_id = bg_project'
-+ ' left outer join categories on ct_id = bg_category'
-+ ' left outer join priorities on pr_id = bg_priority'
-+ ' left outer join statuses on st_id = bg_status'
-+ ' order by bg_id desc',
++ char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
++ char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
++ char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
++ char(10) + ' from bugs '
++ char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
++ char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
++ char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
++ char(10) + ' left outer join projects on pj_id = bg_project'
++ char(10) + ' left outer join orgs on og_id = bg_org'
++ char(10) + ' left outer join categories on ct_id = bg_category'
++ char(10) + ' left outer join priorities on pr_id = bg_priority'
++ char(10) + ' left outer join statuses on st_id = bg_status'
++ char(10) + ' order by bg_id desc',
 1)
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
-'show all not-closed bugs - for developers',
+'open bugs',
 'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
-+ ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
-+ ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
-+ ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
-+ ' from bugs '
-+ ' left outer join users rpt on rpt.us_id = bg_reported_user'
-+ ' left outer join users asg on asg.us_id = bg_assigned_to_user'
-+ ' left outer join users lu on lu.us_id = bg_last_updated_user'
-+ ' left outer join projects on pj_id = bg_project'
-+ ' left outer join categories on ct_id = bg_category'
-+ ' left outer join priorities on pr_id = bg_priority'
-+ ' left outer join statuses on st_id = bg_status'
-+ ' where bg_status <> 5 order by bg_id desc',
++ char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
++ char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
++ char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
++ char(10) + ' from bugs '
++ char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
++ char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
++ char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
++ char(10) + ' left outer join projects on pj_id = bg_project'
++ char(10) + ' left outer join orgs on og_id = bg_org'
++ char(10) + ' left outer join categories on ct_id = bg_category'
++ char(10) + ' left outer join priorities on pr_id = bg_priority'
++ char(10) + ' left outer join statuses on st_id = bg_status'
++ char(10) + ' where bg_status <> 5 order by bg_id desc',
 0)
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
-'show my open bugs - for developer with tunnel vision',
+'open bugs assigned to me',
 'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
-+ ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
-+ ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
-+ ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
-+ ' from bugs '
-+ ' left outer join users rpt on rpt.us_id = bg_reported_user'
-+ ' left outer join users asg on asg.us_id = bg_assigned_to_user'
-+ ' left outer join users lu on lu.us_id = bg_last_updated_user'
-+ ' left outer join projects on pj_id = bg_project'
-+ ' left outer join categories on ct_id = bg_category'
-+ ' left outer join priorities on pr_id = bg_priority'
-+ ' left outer join statuses on st_id = bg_status'
-+ ' where bg_status <> 5 and bg_assigned_to_user = $ME order by bg_id desc',
++ char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
++ char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
++ char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
++ char(10) + ' from bugs '
++ char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
++ char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
++ char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
++ char(10) + ' left outer join projects on pj_id = bg_project'
++ char(10) + ' left outer join orgs on og_id = bg_org'
++ char(10) + ' left outer join categories on ct_id = bg_category'
++ char(10) + ' left outer join priorities on pr_id = bg_priority'
++ char(10) + ' left outer join statuses on st_id = bg_status'
++ char(10) + ' where bg_status <> 5 and bg_assigned_to_user = $ME order by bg_id desc',
 0)
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
-'show checked in bugs - for QA Analyst',
+'checked in bugs - for QA',
 'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
-+ ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
-+ ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
-+ ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
-+ ' from bugs '
-+ ' left outer join users rpt on rpt.us_id = bg_reported_user'
-+ ' left outer join users asg on asg.us_id = bg_assigned_to_user'
-+ ' left outer join users lu on lu.us_id = bg_last_updated_user'
-+ ' left outer join projects on pj_id = bg_project'
-+ ' left outer join categories on ct_id = bg_category'
-+ ' left outer join priorities on pr_id = bg_priority'
-+ ' left outer join statuses on st_id = bg_status'
-+ ' where bg_status = 3 order by bg_id desc',
++ char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
++ char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
++ char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
++ char(10) + ' from bugs '
++ char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
++ char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
++ char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
++ char(10) + ' left outer join projects on pj_id = bg_project'
++ char(10) + ' left outer join orgs on og_id = bg_org'
++ char(10) + ' left outer join categories on ct_id = bg_category'
++ char(10) + ' left outer join priorities on pr_id = bg_priority'
++ char(10) + ' left outer join statuses on st_id = bg_status'
++ char(10) + ' where bg_status = 3 order by bg_id desc',
 0)
 
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'demo use of css classes',
 'select isnull(pr_style + st_style,''datad''), bg_id [id], bg_short_desc [desc], isnull(pr_name,'''') [priority], isnull(st_name,'''') [status]'
-+ ' from bugs '
-+ ' left outer join priorities on pr_id = bg_priority '
-+ ' left outer join statuses on st_id = bg_status '
-+ ' order by bg_id desc',
++ char(10) + ' from bugs '
++ char(10) + ' left outer join priorities on pr_id = bg_priority '
++ char(10) + ' left outer join statuses on st_id = bg_status '
++ char(10) + ' order by bg_id desc',
 0)
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
-'demo showing last comment',
+'demo last comment as column',
 'select ''#ffffff'', bg_id [id], bg_short_desc [desc], ' 
-+ ' substring(bp_comment,1,40) [last comment], bp_date [last comment date]'
-+ ' from bugs'
-+ ' left outer join bug_posts on bg_id = bp_bug'
-+ ' and bp_type = ''comment''' 
-+ ' and bp_date in (select max(bp_date) from bug_posts where bp_bug = bg_id)'
-+ ' order by bg_id desc',
++ char(10) + ' substring(bp_comment,1,40) [last comment], bp_date [last comment date]'
++ char(10) + ' from bugs'
++ char(10) + ' left outer join bug_posts on bg_id = bp_bug'
++ char(10) + ' and bp_type = ''comment''' 
++ char(10) + ' and bp_date in (select max(bp_date) from bug_posts where bp_bug = bg_id)'
++ char(10) + ' WhErE 1 = 1'
++ char(10) + ' order by bg_id desc',
 0)
 
 

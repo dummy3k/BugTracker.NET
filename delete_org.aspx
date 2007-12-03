@@ -40,6 +40,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql = @"declare @cnt int
 			select @cnt = count(1) from users where us_org = $1;
 			select @cnt = @cnt + count(1) from queries where qu_org = $1;
+			select @cnt = @cnt + count(1) from bugs where bg_org = $1;
 			select og_name, @cnt [cnt] from orgs where og_id = $1";
 		sql = sql.Replace("$1", id);
 
@@ -49,7 +50,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			Response.Write ("You can't delete organization \""
 				+ Convert.ToString(dr["og_name"])
-				+ "\" because some users or queries still reference it.");
+				+ "\" because some bugs, users, queries still reference it.");
 			Response.End();
 		}
 		else

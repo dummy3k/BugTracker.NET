@@ -14,35 +14,24 @@ Added "Organization" to bug
 
 Added "Permission Level for other organizations"
 
-WhErE
-
-change setup.sql queries to include org
+document "WhErE"
 
 test insert_bug.aspx
 
-test notifications, subscriptions
-
-inspect all pu_permission_level
-
 more on screen explanation
- (External users cannot view posts marked "Visible for internal usrs only")  	
+ (External users cannot view posts marked "Visible for internal users only")  	
 external users can't see other other external users
-
-don't allow delete of org if referenced by bugs
-
-don't allow a user who can't see other orgs to see other orgs in dropdowns
-
-queries are wrong
-
-changes queries, add new column
-
-in edit user page, use javascript, not trip to server, to change what shows in query dropdown?
-
-if external user who is segreated adds bug, have to do it for his own org
-he shouldn't even be able to see another project
-
-sql in auto subscribe is commented - test subscriptions first, then notifications
  
+forced project  - explain it better, mention the  "read only" effect
+
+test with default bug permission = 0
+
+add some javascript to edit query
+
+add initial demo that demos two mutuall excluse customers
+add viewer 
+add reporter
+add guest
 
 -----------------------------------------------------------------------
 Version 2.6.7  12/01/2007

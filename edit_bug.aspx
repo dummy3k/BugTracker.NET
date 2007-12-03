@@ -157,25 +157,23 @@ void Page_Load(Object sender, EventArgs e)
 
 			string initial_project = (string) Session["project"];
 
-			sql = "select isnull(us_forced_project,0) from users where us_id = $us;"; // 0
-			sql = sql.Replace("$us", Convert.ToString(security.this_usid));
-			sql += "\nselect top 1 pj_id from projects where pj_default = 1 order by pj_name;"; // 1
-			sql += "\nselect top 1 ct_id from categories where ct_default = 1 order by ct_name;";  // 2
-			sql += "\nselect top 1 pr_id from priorities where pr_default = 1 order by pr_name;"; // 3
-			sql += "\nselect top 1 st_id from statuses where st_default = 1 order by st_name;"; // 4
-			sql += "\nselect top 1 udf_id from user_defined_attribute where udf_default = 1 order by udf_name;"; // 5
+			sql += "\nselect top 1 pj_id from projects where pj_default = 1 order by pj_name;"; // 0
+			sql += "\nselect top 1 ct_id from categories where ct_default = 1 order by ct_name;";  // 1
+			sql += "\nselect top 1 pr_id from priorities where pr_default = 1 order by pr_name;"; // 2
+			sql += "\nselect top 1 st_id from statuses where st_default = 1 order by st_name;"; // 3
+			sql += "\nselect top 1 udf_id from user_defined_attribute where udf_default = 1 order by udf_name;"; // 4
 
 			DataSet ds_defaults = dbutil.get_dataset(sql);
 
-			int current_forced_project =  (int) ds_defaults.Tables[0].Rows[0][0];
+			string default_value;
 
-			if (current_forced_project != 0)
+			// project
+			if (security.this_forced_project != 0)
 			{
-				initial_project = Convert.ToString(current_forced_project);
+				initial_project = Convert.ToString(security.this_forced_project);
 				set_project_to_readonly();
 			}
 
-			string default_value;
 
 			if (initial_project != null && initial_project != "0")
 			{
@@ -194,9 +192,9 @@ void Page_Load(Object sender, EventArgs e)
 			}
 			else
 			{
-				if (ds_defaults.Tables[1].Rows.Count > 0)
+				if (ds_defaults.Tables[0].Rows.Count > 0)
 				{
-					default_value = Convert.ToString((int) ds_defaults.Tables[1].Rows[0][0]);
+					default_value = Convert.ToString((int) ds_defaults.Tables[0].Rows[0][0]);
 				}
 				else
 				{
@@ -215,14 +213,22 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
+			// org
 
-			if (ds_defaults.Tables[2].Rows.Count > 0)
+			if (security.this_other_orgs_permission_level == 0)
 			{
-				default_value = Convert.ToString((int) ds_defaults.Tables[2].Rows[0][0]);
+				default_value = Convert.ToString((int)security.this_org);
 			}
 			else
 			{
-				default_value = "0";
+				if (ds_defaults.Tables[1].Rows.Count > 0)
+				{
+					default_value = Convert.ToString((int) ds_defaults.Tables[1].Rows[0][0]);
+				}
+				else
+				{
+					default_value = "0";
+				}
 			}
 
 			foreach (ListItem li in org.Items)
@@ -237,6 +243,13 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
+			if (security.this_other_orgs_permission_level == 0)
+			{
+				set_org_to_readonly();
+			}
+
+
+			// category
 			foreach (ListItem li in category.Items)
 			{
 				if (li.Value == default_value)
@@ -249,9 +262,9 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-			if (ds_defaults.Tables[3].Rows.Count > 0)
+			if (ds_defaults.Tables[2].Rows.Count > 0)
 			{
-				default_value = Convert.ToString((int) ds_defaults.Tables[3].Rows[0][0]);
+				default_value = Convert.ToString((int) ds_defaults.Tables[2].Rows[0][0]);
 			}
 			else
 			{
@@ -281,9 +294,9 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-			if (ds_defaults.Tables[4].Rows.Count > 0)
+			if (ds_defaults.Tables[3].Rows.Count > 0)
 			{
-				default_value = Convert.ToString((int) ds_defaults.Tables[4].Rows[0][0]);
+				default_value = Convert.ToString((int) ds_defaults.Tables[3].Rows[0][0]);
 			}
 			else
 			{
@@ -301,9 +314,9 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-			if (ds_defaults.Tables[5].Rows.Count > 0)
+			if (ds_defaults.Tables[4].Rows.Count > 0)
 			{
-				default_value = Convert.ToString((int) ds_defaults.Tables[5].Rows[0][0]);
+				default_value = Convert.ToString((int) ds_defaults.Tables[4].Rows[0][0]);
 			}
 			else
 			{
@@ -493,6 +506,16 @@ void Page_Load(Object sender, EventArgs e)
 
 				set_controls_to_readonly();
 
+			}
+
+			if (security.this_forced_project != 0)
+			{
+				set_project_to_readonly();
+			}
+
+			if (security.this_other_orgs_permission_level == 0)
+			{
+				set_org_to_readonly();
 			}
 
 			// save for next bug
@@ -1084,22 +1107,6 @@ void load_drop_downs()
 	// do a batch of sql statements
 	DataSet ds_dropdowns = dbutil.get_dataset(sql);
 
-/*
-	// if no projects, then don't allow user to add
-	if (ds_dropdowns.Tables[0].Rows.Count == 0)
-	{
-		Response.Write ("<link rel=StyleSheet href=btnet.css type=text/css>");
-		security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs"));
-		Response.Write("<p>&nbsp;</p><div class=align>");
-		Response.Write("<div class=err>Error: ");
-		Response.Write(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")));
-		Response.Write(" You don't have permissions to add items to any project.</div>");
-		Response.Write("<p><a href=bugs.aspx>View ");
-		Response.Write(btnet.Util.get_setting("PluralBugLabel","bugs"));
-		Response.Write("</a>");
-		Response.End();
-	}
-*/
 	project.DataSource = ds_dropdowns.Tables[0];
 	project.DataTextField = "pj_name";
 	project.DataValueField = "pj_id";

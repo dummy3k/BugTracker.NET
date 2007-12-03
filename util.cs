@@ -63,6 +63,7 @@ namespace btnet
 
         public int this_other_orgs_permission_level = PERMISSION_ALL;
         public int this_org = 0;
+        public int this_forced_project = 0;
 
 		///////////////////////////////////////////////////////////////////////
 		public void check_security(DbUtil dbutil, HttpContext asp_net_context, int level)
@@ -135,6 +136,7 @@ namespace btnet
 				us_username, us_firstname, us_lastname,
 				isnull(us_email,'') us_email,
 				isnull(us_bugs_per_page,10) us_bugs_per_page,
+				isnull(us_forced_project,0) us_forced_project,
 				us_use_fckeditor,
 				us_enable_bug_list_popups,
 				og_external_user,
@@ -192,6 +194,7 @@ namespace btnet
             this_can_be_assigned_to = Convert.ToBoolean(dr["og_can_be_assigned_to"]);
             this_other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
             this_org = (int) dr["og_id"];
+            this_forced_project = (int) dr["us_forced_project"];
 
 			if (((string)dr["us_firstname"]).Trim().Length == 0)
 			{
@@ -2657,7 +2660,7 @@ and us_id not in
 (select bs_user from bug_subscriptions
 where bs_bug = $id)
 
-/*
+
 insert into bug_subscriptions (bs_bug, bs_user)
 select $id, pj_default_user
 from projects
@@ -2714,9 +2717,7 @@ and
 and us_active = 1
 and us_id not in
 (select bs_user from bug_subscriptions
-where bs_bug = $id)
-*/
-";
+where bs_bug = $id)";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             sql = sql.Replace("$pj", Convert.ToString(projectid));
