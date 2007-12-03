@@ -157,7 +157,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			string initial_project = (string) Session["project"];
 
-			sql += "\nselect top 1 pj_id from projects where pj_default = 1 order by pj_name;"; // 0
+			sql = "\nselect top 1 pj_id from projects where pj_default = 1 order by pj_name;"; // 0
 			sql += "\nselect top 1 ct_id from categories where ct_default = 1 order by ct_name;";  // 1
 			sql += "\nselect top 1 pr_id from priorities where pr_default = 1 order by pr_name;"; // 2
 			sql += "\nselect top 1 st_id from statuses where st_default = 1 order by st_name;"; // 3

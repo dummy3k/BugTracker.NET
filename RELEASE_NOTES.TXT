@@ -28,11 +28,6 @@ test with default bug permission = 0
 
 add some javascript to edit query
 
-add initial demo that demos two mutuall excluse customers
-add viewer 
-add reporter
-add guest
-
 -----------------------------------------------------------------------
 Version 2.6.7  12/01/2007
 -----------------------------------------------------------------------

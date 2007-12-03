@@ -77,11 +77,11 @@ og_other_orgs_permission_level int not null default(2) -- 0=none, 1=read, 2=edit
 
 create unique index unique_og_name on orgs (og_name)
 
-insert into orgs (og_name) values ('default',0,2)
-insert into orgs (og_name) values ('dept one',0.2)
-insert into orgs (og_name) values ('dept two',0,2)
-insert into orgs (og_name) values ('customer one',1,0)
-insert into orgs (og_name) values ('customer two',1,0)
+insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('default',0,1,2)
+insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('developers',0,1,2)
+insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('testers',0,1,2)
+insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('client one',1,0,0)
+insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('client two',1,0,0)
 
 /* USER */
 
@@ -118,24 +118,39 @@ create unique index unique_us_username on users (us_username)
 
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
-values ('admin', 'System', 'Administrator', 'admin', 1, 1)
+values ('admin', 'System', 'Administrator', 'admin', 1, 1, 1)
 
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
-values ('developer', 'Fred', 'Flintstone', 'admin', 0, 2)
+values ('developer', 'Al', 'Kaline', 'admin', 0, 2, 2)
 
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
-values ('tester', 'Wilma', 'Flintstone', 'admin', 0, 3)
+values ('tester', 'Norman', 'Cash', 'admin', 0, 4, 4)
 
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
-values ('customer1', 'Barney', 'Rubble', 'admin', 0, 3)
+values ('customer1', 'Bill', 'Freehan', 'admin', 0, 1, 4)
+
+insert into users (
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_org)
+values ('customer2', 'Denny', 'McClain', 'admin', 0, 1, 5)
 
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query)
-values ('email', 'For POP3', 'See Web.config', 'x', 0, 1)
+values ('email', 'for POP3', 'btnet_service.exe', 'x', 0, 1)
 
+insert into users (
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_forced_project)
+values ('viewer', 'Read', 'Only', 'admin', 0, 1, 1)
+
+insert into users (
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_forced_project)
+values ('reporter', 'Report And', 'Comment Only', 'admin', 0, 1, 1)
+
+insert into users (
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_forced_project)
+values ('guest', 'Special', 'cannot save searches, settings', 'guest', 0, 1, 1)
 
 /* SESSIONS */
 
@@ -300,6 +315,12 @@ pu_admin int not null default(0),
 create unique index pu_index_1 on project_user_xref (pu_project, pu_user)
 create unique index pu_index_2 on project_user_xref (pu_user, pu_project)
 
+insert into project_user_xref (pu_project, pu_user, pu_permission_level) values (1,7,1)
+insert into project_user_xref (pu_project, pu_user, pu_permission_level) values (2,7,1)
+insert into project_user_xref (pu_project, pu_user, pu_permission_level) values (1,8,3)
+insert into project_user_xref (pu_project, pu_user, pu_permission_level) values (2,8,0)
+insert into project_user_xref (pu_project, pu_user, pu_permission_level) values (1,9,1)
+insert into project_user_xref (pu_project, pu_user, pu_permission_level) values (2,9,1)
 
 /* USER DEFINED ATTRIBUTE */
 
@@ -330,11 +351,11 @@ st_default int not null default(0)
 
 create unique index unique_st_name on statuses (st_name)
 
-insert into statuses (st_name, st_sort_seq, st_style) values ('new', 1, 'st1')
-insert into statuses (st_name, st_sort_seq, st_style) values ('in progress', 2, 'st2')
-insert into statuses (st_name, st_sort_seq, st_style) values ('checked in', 3, 'st3')
-insert into statuses (st_name, st_sort_seq, st_style) values ('re-opened', 4, 'st4')
-insert into statuses (st_name, st_sort_seq, st_style) values ('closed', 5, 'st5')
+insert into statuses (st_name, st_sort_seq, st_style, st_default) values ('new', 1, 'st1', 1)
+insert into statuses (st_name, st_sort_seq, st_style, st_default) values ('in progress', 2, 'st2', 0)
+insert into statuses (st_name, st_sort_seq, st_style, st_default) values ('checked in', 3, 'st3', 0)
+insert into statuses (st_name, st_sort_seq, st_style, st_default) values ('re-opened', 4, 'st4', 0)
+insert into statuses (st_name, st_sort_seq, st_style, st_default) values ('closed', 5, 'st5', 0)
 
 /* PRIORITIES */
 
