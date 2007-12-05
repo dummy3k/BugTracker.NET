@@ -77,7 +77,7 @@ og_other_orgs_permission_level int not null default(2) -- 0=none, 1=read, 2=edit
 
 create unique index unique_og_name on orgs (og_name)
 
-insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('default',0,1,2)
+insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('org1',0,1,2)
 insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('developers',0,1,2)
 insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('testers',0,1,2)
 insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_orgs_permission_level) values ('client one',1,0,0)

@@ -184,7 +184,7 @@ string svn_cat(string file_path, int revision)
 ///////////////////////////////////////////////////////////////////////
 void visual_diff(string file_path, int revision, int old_revision)
 {
-	Regex regex = new Regex("\r\n");
+	Regex regex = new Regex("\n");
 	string line = "";
 
 
@@ -212,7 +212,7 @@ void visual_diff(string file_path, int revision, int old_revision)
 
 
 	// first, split everything into lines
-	string[] diff_lines = regex.Split(diff_text);
+	string[] diff_lines = regex.Split(diff_text.Replace("\r\n","\n"));
 
     string old_file_path = file_path;
 
@@ -238,8 +238,8 @@ void visual_diff(string file_path, int revision, int old_revision)
 	string right_text = HttpUtility.HtmlEncode(svn_cat(file_path, revision));
 
     // first, split everything into lines
-	string[] left_lines = regex.Split(left_text);
-	string[] right_lines = regex.Split(right_text);
+	string[] left_lines = regex.Split(left_text.Replace("\r\n","\n"));
+	string[] right_lines = regex.Split(right_text.Replace("\r\n","\n"));
 
 
 	// for formatting line numbers

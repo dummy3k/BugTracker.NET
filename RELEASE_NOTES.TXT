@@ -8,6 +8,8 @@ Release notes:
 Version 2.6.8  12/xx/2007
 -----------------------------------------------------------------------
 
+Fixed bug with svn_blame, svn_diff
+
 Fixed bug with view only, reporter - dropdowns weren't right
 
 Added "Organization" to bug
@@ -16,7 +18,8 @@ Added "Permission Level for other organizations"
 
 document "WhErE"
 
-test insert_bug.aspx
+updated btnet_edit_bug.css so as to more clearly demo what it can do
+for example, use more of the horizontal space.
 
 more on screen explanation
  (External users cannot view posts marked "Visible for internal users only")  	
@@ -26,7 +29,11 @@ forced project  - explain it better, mention the  "read only" effect
 
 test with default bug permission = 0
 
-add some javascript to edit query
+add some javascript to edit query, elsewhere, 
+
+test that things can be hidden with css
+
+don't forget to checkin, diff, files in "custom" folder
 
 -----------------------------------------------------------------------
 Version 2.6.7  12/01/2007

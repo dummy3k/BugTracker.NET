@@ -377,19 +377,16 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 		sql = @"declare @pj int
-		declare @og int
 		declare @ct int
 		declare @pr int
 		declare @st int
 		declare @udf int
 		set @pj = 0
-		set @og = 0
 		set @ct = 0
 		set @pr = 0
 		set @st = 0
 		set @udf = 0
 		select @pj = pj_id from projects where pj_default = 1 order by pj_name
-		select @og = og_id from orgs where og_default = 1 order by og_name
 		select @ct = ct_id from categories where ct_default = 1 order by ct_name
 		select @pr = pr_id from priorities where pr_default = 1 order by pr_name
 		select @st = st_id from statuses where st_default = 1 order by st_name
@@ -399,7 +396,7 @@ void Page_Load(Object sender, EventArgs e)
 		DataRow defaults = dbutil.get_datarow(sql);
 
 		if (projectid == 0) {projectid = (int) defaults["pj"];}
-		if (orgid == 0) {orgid = (int) defaults["og"];}
+		if (orgid == 0) {orgid = security.this_org;}
 		if (categoryid == 0) {categoryid = (int) defaults["ct"];}
 		if (priorityid == 0) {priorityid = (int) defaults["pr"];}
 		if (statusid == 0) {statusid = (int) defaults["st"];}
@@ -412,8 +409,8 @@ void Page_Load(Object sender, EventArgs e)
 			projectid,
 			orgid,
 			categoryid,
-			statusid,
 			priorityid,
+			statusid,
 			assignedid,
 			udfid,
 			"","","", // project specific dropdown values

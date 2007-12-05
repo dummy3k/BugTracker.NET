@@ -103,8 +103,8 @@ void write_blame()
     XmlNodeList commits = doc.GetElementsByTagName("commit");
 
 	// split the source text into lines
-	Regex regex = new Regex("\r\n");
-	string[] lines = regex.Split(text);
+	Regex regex = new Regex("\n");
+	string[] lines = regex.Split(text.Replace("\r\n","\n"));
 
     for (int i = 0; i < commits.Count; i++)
     {

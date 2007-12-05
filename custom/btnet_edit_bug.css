@@ -1,60 +1,36 @@
 /* This is just used to customize edit_bug.aspx */
 
 /*
-There are two rows of dropdowns on the edit_bugs.aspx page.  You can
-use these styles to hide them if you aren't using them..
+You can hide fields you aren't using.
 */
 
 /*
 #row1 {display:none;}
 #row2 {display:none;}
 #presets {display:none;}
+#category_label {display:none;}
+#category {display:none;}
 */
 
 
 /*
-The custom fields have unique ids too.   Here I'm moving the custom
-fields away from where they normally show.
+If you would rather use more horizonatal space, less vertical,
+the following css demos making the form wider and moving 
+category and status onto the same line as priority.
+*/
+/*
+#bugform_div form {width: 900px;}
+#row3 {position: absolute; top: 193px; left: 360px;}
+#row6 {position: absolute; top: 193px; left: 550px;}
 */
 
-/*
-#foobar_label {font-size: 12pt; color: red; position: relative; top: 32px;}
-#foobar {font-size: 12pt; color: orange;     position: relative; top: 32px;}
 
-#foobar2_label {font-size: 12pt; color: red; position: relative; top: -32px;}
-#foobar2 {font-size: 12pt; color: green;     position: relative; top: -32px;}
+
+/*
+Custom fields also have ids that you can reference.
 */
-
-
 /*
-
-The following css demonstrates how to make the bug form wider and with
-more alignment.
-
-*/
-
-/*
-#bugform #ctl00 {width: 830;}
-
-#bugform #bugformtbl {width: 830;}
-
-#change_project_label {position: absolute; left: 210px;}
-#reassign_label {position: absolute; left: 210px;}
-
-#project {position: absolute; left: 308px;}
-#assigned_to {position: absolute; left: 308px;}
-
-#category_label {position: absolute; left: 450px;}
-#status_label {position: absolute; left: 450px;}
-
-#category {position: absolute; left: 515px;}
-#status {position: absolute; left: 515px;}
-
-#priority_label {position: absolute; left: 640px;}
-#udf_label {position: absolute; left: 640px;}
-
-#priority {position: absolute; left: 725px;}
-#udf {position: absolute; left: 725px;}
-
+#foobar_label {font-weight:bold; color: red;}
+#foobar {font-weight:bold; color: red;}
 */
 
