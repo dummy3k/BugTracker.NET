@@ -7,11 +7,11 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DataSet ds;
 DbUtil dbutil;
 Security security;
-int bugid;
 string sql;
+int bugid;
+DataSet ds;
 
 void Page_Load(Object sender, EventArgs e)
 {
@@ -67,21 +67,11 @@ void Page_Load(Object sender, EventArgs e)
 
 	// clean up bug subscriptions that no longer fit the security restrictions
 
-	sql = @"
+	btnet.Bug.auto_subscribe(bugid);
 
-		declare @project int
-		select @project = bg_project from bugs where bg_id = $bg
+	// show who is subscribed
 
-		delete from bug_subscriptions
-		where bs_bug = $bg
-		and bs_user in
-			(select x.pu_user
-			from projects
-			left outer join project_user_xref x on pu_project = pj_id
-			where pu_project = @project
-			and isnull(pu_permission_level,$dpl) = 0)
-
-		select
+	sql = @"select
 		us_username [user],
 		us_lastname + ', ' + us_firstname [name],
 		us_email [email],
@@ -94,14 +84,18 @@ void Page_Load(Object sender, EventArgs e)
 		order by 1";
 
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
-	sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
-
 	ds = dbutil.get_dataset(sql);
 
 
-	sql = @"declare @project int;
-	select @project = bg_project from bugs where bg_id = $bg;
-	";
+
+
+	// Get list of users who could be subscribed to this bug.
+
+	sql = @"
+declare @project int;
+declare @org int;
+select @project = bg_project, @org = bg_org from bugs where bg_id = $bg;";
+
 
 	// Only users explicitly allowed will be listed
 	if (Util.get_setting("DefaultPermissionLevel","2") == "0")
@@ -121,6 +115,12 @@ void Page_Load(Object sender, EventArgs e)
 				where bs_bug = $bg
 				and us_enable_notifications = 1
 				and us_active = 1)
+			and us_id not in (
+				select us_id from users
+				inner join orgs on us_org = og_id
+				where us_org <> @org
+				and og_other_orgs_permission_level = 0)
+
 			order by us_username; ";
 	}
 	// Only users explictly DISallowed will be omitted
@@ -141,6 +141,11 @@ void Page_Load(Object sender, EventArgs e)
 				where bs_bug = $bg
 				and us_enable_notifications = 1
 				and us_active = 1)
+			and us_id not in (
+				select us_id from users
+				inner join orgs on us_org = og_id
+				where us_org <> @org
+				and og_other_orgs_permission_level = 0)
 			order by us_username; ";
 	}
 
@@ -156,8 +161,6 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
-
-
 
 	//DataSet ds_users =
 	userid.DataSource = dbutil.get_dataview(sql);

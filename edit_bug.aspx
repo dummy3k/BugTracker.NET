@@ -1881,7 +1881,7 @@ void on_update (Object sender, EventArgs e)
 				if (date_from_db != date_from_webpage)
 				{
 					snapshot_timestamp.Value = date_from_db;
-					btnet.Bug.auto_subscribe(id, Convert.ToInt32(new_project));
+					btnet.Bug.auto_subscribe(id);
 					format_subcribe_cancel_link();
                     bug_fields_have_changed = record_changes();
 				}

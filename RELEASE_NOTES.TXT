@@ -8,32 +8,56 @@ Release notes:
 Version 2.6.8  12/xx/2007
 -----------------------------------------------------------------------
 
-Fixed bug with svn_blame, svn_diff
+Upgrade your database for this version using the SQL here:
+    alter table bugs add bg_org int not null default(0)
+    alter table orgs add og_other_orgs_permission_level int not null default(2)
 
-Fixed bug with view only, reporter - dropdowns weren't right
+* Fixed bug 843284 "svn diff, blame can't handle unix style line endings"
 
-Added "Organization" to bug
+* Fixed recently introduced bug where view-only users were seeing the 
+wrong values in the dropdowns.
 
-Added "Permission Level for other organizations"
+* Fixed bug with edit_user.aspx. It was losing the user's default query
+selection.
 
-document "WhErE"
+* Fixed bug with adding subscribers in view_subscribers.aspx. Only the
+newly added subscriber should get a notification.
 
-updated btnet_edit_bug.css so as to more clearly demo what it can do
-for example, use more of the horizontal space.
+* Fixed bug for when there are two "WHERE" clauses in the SQL and it's
+the second one that needs to be altered for the permissions. It's a
+workaround.  First the logic looks for "WhErE", with the upper/lower 
+case letters exactly like that.  Note the weird capitalization.  For an
+example, see setup.sql, "demo last comment as column".
 
+
+New features:
+
+* You can now associate a bug to an "Organization".  Typically, an
+"Organization" would be your company's customer, but it could also
+be a department within your company, or whatever group of users you want.
+
+* Added "Permission level for bugs associated with other (or no) 
+organizations".  This allows you to restrict a gorup of users to
+just being able to see bugs associated with that group.  Typically,
+you would use this to restrict a customer, or an individual, to
+only seeing bugs associated with that customer or individual.
+
+
+
+TO DO:
 more on screen explanation
  (External users cannot view posts marked "Visible for internal users only")  	
 external users can't see other other external users
  
 forced project  - explain it better, mention the  "read only" effect
 
-test with default bug permission = 0
+IMPORTANT!
+test with default bug permission = 0 <<< look for where this matters
 
 add some javascript to edit query, elsewhere, 
 
 test that things can be hidden with css
 
-don't forget to checkin, diff, files in "custom" folder
 
 -----------------------------------------------------------------------
 Version 2.6.7  12/01/2007

@@ -995,7 +995,6 @@ namespace btnet
 			return rePipes.Split(s);
 		}
 
-
 		///////////////////////////////////////////////////////////////////////
 		public static DataTable get_related_users(Security security, DbUtil dbutil)
 		{
@@ -1093,9 +1092,6 @@ begin
 end
 
 drop table #temp";
-
-
-
 
 			}
 
@@ -2610,7 +2606,7 @@ drop table #temp";
 
 
         ///////////////////////////////////////////////////////////////////////
-        public static void auto_subscribe(int bugid, int projectid)
+        public static void auto_subscribe(int bugid)
         {
 
             // clean up bug subscriptions that no longer fit security rules
@@ -2619,6 +2615,8 @@ drop table #temp";
             // subscribe per-project auto_subscribers
             // subscribe per auto_subscribe_own_bugs
             string sql = @"
+declare @pj int
+select @pj = bg_project from bugs where bg_id = $id
 
 delete from bug_subscriptions
 where bs_bug = $id
@@ -2626,7 +2624,7 @@ and bs_user in
 	(select x.pu_user
 	from projects
 	left outer join project_user_xref x on pu_project = pj_id
-	where pu_project = $pj
+	where pu_project = @pj
 	and isnull(pu_permission_level,$dpl) = 0)
 
 delete from bug_subscriptions
@@ -2643,7 +2641,7 @@ select $id, us_id
 from users
 inner join orgs on us_org = og_id
 inner join bugs on bg_id = $id
-left outer join project_user_xref on pu_project = $pj and pu_user = us_id
+left outer join project_user_xref on pu_project = @pj and pu_user = us_id
 where us_auto_subscribe = 1
 and
 	case
@@ -2660,12 +2658,11 @@ and us_id not in
 (select bs_user from bug_subscriptions
 where bs_bug = $id)
 
-
 insert into bug_subscriptions (bs_bug, bs_user)
 select $id, pj_default_user
 from projects
 inner join users on pj_default_user = us_id
-where pj_id = $pj
+where pj_id = @pj
 and pj_default_user <> 0
 and pj_auto_subscribe_default_user = 1
 and us_active = 1
@@ -2690,7 +2687,7 @@ and
 			isnull(pu_permission_level,$dpl)
 	end <> 0
 and us_active = 1
-and pu_project = $pj
+and pu_project = @pj
 and pu_user not in
 (select bs_user from bug_subscriptions
 where bs_bug = $id)
@@ -2700,7 +2697,7 @@ select $id, us_id
 from users
 inner join bugs on bg_id = $id
 inner join orgs on us_org = og_id
-left outer join project_user_xref on pu_project = $pj and pu_user = us_id
+left outer join project_user_xref on pu_project = @pj and pu_user = us_id
 where ((us_auto_subscribe_own_bugs = 1 and bg_assigned_to_user = us_id)
 	or
 	(us_auto_subscribe_reported_bugs = 1 and bg_reported_user = us_id))
@@ -2720,7 +2717,6 @@ and us_id not in
 where bs_bug = $id)";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
-            sql = sql.Replace("$pj", Convert.ToString(projectid));
             sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
 
             DbUtil dbutil = new DbUtil();
@@ -3458,7 +3454,7 @@ select isnull(pu_permission_level,$dpl),
             int bugid = Convert.ToInt32(dbutil.execute_scalar(sql));
             int postid = btnet.Bug.insert_comment(bugid, security.this_usid, comments, from, content_type, internal_only);
 
-            btnet.Bug.auto_subscribe(bugid, projectid);
+            btnet.Bug.auto_subscribe(bugid);
 
             if (send_notifications)
             {
