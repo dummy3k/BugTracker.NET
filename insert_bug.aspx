@@ -415,7 +415,7 @@ void Page_Load(Object sender, EventArgs e)
 			udfid,
 			"","","", // project specific dropdown values
 			adjusted_comment,
-			from.Replace("'","''"),
+			from,
 			"text/plain",
 			false, // internal only
 			null, // custom columns

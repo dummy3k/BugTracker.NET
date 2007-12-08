@@ -1112,7 +1112,7 @@ void load_drop_downs()
 	project.DataValueField = "pj_id";
 	project.DataBind();
 
-	if (btnet.Util.get_setting("DefaultPermissionLevel","2") != "0")
+	if (btnet.Util.get_setting("DefaultPermissionLevel","2") == "2")
 	{
 		project.Items.Insert(0, new ListItem("[no project]", "0"));
 	}

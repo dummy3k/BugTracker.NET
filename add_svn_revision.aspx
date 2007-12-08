@@ -220,9 +220,9 @@ function set_action(val)
 <input type="hidden" id="hidden_bugid" value="0" runat="server" />
 <input type="hidden" id="action" name="action" value="" runat="server" />
 <p>
-<input class=btn type="submit" onclick="return set_action('view')" value="View Revision Info" runat="server">
+<input class="btn" type="button" onclick="return set_action('view')" value="View Revision Info" runat="server">
 <p>
-<input class="btn" type="submit" onclick="return set_action('add')" value="Attach Above Revision to Bug" runat="server">
+<input class="btn" type="button" onclick="return set_action('add')" value="Attach Above Revision to Bug" runat="server">
 </form>
 </td></tr></table>
 <pre>

@@ -771,7 +771,7 @@ namespace btnet
 				project_permissions_sql = @" (bg_project in (
 					select pu_project
 					from project_user_xref
-					where pu_user = $us
+					where pu_user = $user
 					and pu_permission_level > 0)) ";
 			}
 			else
@@ -3467,18 +3467,34 @@ select isnull(pu_permission_level,$dpl),
 
 
         ///////////////////////////////////////////////////////////////////////
-        public static int insert_comment(int bugid, int this_usid, string comments, string from, string content_type, bool internal_only)
+        public static int insert_comment(
+			int bugid,
+			int this_usid,
+			string comments,
+			string from,
+			string content_type,
+			bool internal_only)
         {
 
             if (comments != "")
             {
-                string sql = @"declare @now datetime
-						set @now = getdate()
-						insert into bug_posts
-						(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_type, bp_content_type,
-						bp_hidden_from_external_users)
-						values($id, $us, @now, N'$cm', N'$cs', N'$fr', N'$ty', N'$ct', $internal)
-						select scope_identity();";
+                string sql = @"
+declare @now datetime
+set @now = getdate()
+insert into bug_posts
+(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_type, bp_content_type,
+bp_hidden_from_external_users)
+values(
+$id,
+$us,
+@now,
+N'$comment',
+N'$comment_search',
+N'$from',
+N'$type',
+N'$content_type',
+$internal)
+select scope_identity();";
 
                 string s = comments.Replace("'", "''");
 
@@ -3493,20 +3509,20 @@ select isnull(pu_permission_level,$dpl),
 						bg_last_updated_user = $us
 						where bg_id = $id";
 
-                    sql = sql.Replace("$fr", from);
-                    sql = sql.Replace("$ty", "received"); // received email
+                    sql = sql.Replace("$from", from.Replace("'","''"));
+                    sql = sql.Replace("$type", "received"); // received email
                 }
                 else
                 {
-                    sql = sql.Replace("N'$fr'", "null");
-                    sql = sql.Replace("$ty", "comment"); // bug comment
+                    sql = sql.Replace("N'$from'", "null");
+                    sql = sql.Replace("$type", "comment"); // bug comment
                 }
 
                 sql = sql.Replace("$id", Convert.ToString(bugid));
                 sql = sql.Replace("$us", Convert.ToString(this_usid));
-                sql = sql.Replace("$cm", s);
-                sql = sql.Replace("$cs", s);
-                sql = sql.Replace("$ct", content_type);
+                sql = sql.Replace("$comment", s);
+                sql = sql.Replace("$comment_search", s);
+                sql = sql.Replace("$content_type", content_type);
               	sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only));
 
 

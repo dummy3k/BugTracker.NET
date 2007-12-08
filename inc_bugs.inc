@@ -397,11 +397,19 @@ void display_bugs(bool show_checkbox)
 	sql = sql.Replace("$us",Convert.ToString(security.this_usid));
 	sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 
-	sql += @"select ct_name from categories order by ct_sort_seq, ct_name;
-		select pr_name from priorities order by pr_sort_seq, pr_name
-		select og_name from orgs order by og_name
-		select st_name from statuses order by st_sort_seq, st_name
-		select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
+	if (security.this_other_orgs_permission_level != 0)
+	{
+		sql += "select og_name from orgs order by og_name;";
+	}
+	else
+	{
+		sql += "select og_name from orgs where og_id = " + Convert.ToInt32(security.this_org);
+	}
+	sql += @"
+select ct_name from categories order by ct_sort_seq, ct_name;
+select pr_name from priorities order by pr_sort_seq, pr_name
+select st_name from statuses order by st_sort_seq, st_name
+select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 
 	ds_filters = dbutil.get_dataset(sql);
 

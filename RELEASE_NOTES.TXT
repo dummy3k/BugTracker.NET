@@ -29,6 +29,12 @@ workaround.  First the logic looks for "WhErE", with the upper/lower
 case letters exactly like that.  Note the weird capitalization.  For an
 example, see setup.sql, "demo last comment as column".
 
+* Fixed bug with add_svn_file_revisions.aspx. It was submitting the
+data twice.  Thanks to Walt Crosby for the fix.
+
+* Fixed bug 1707551 "[No project] = no edit" - when somebody adds a
+bug and doesn't set the project, then nobody can get to it in order
+to add the project if the DefaultPermissionLevel is not 2.
 
 New features:
 
@@ -41,23 +47,6 @@ organizations".  This allows you to restrict a gorup of users to
 just being able to see bugs associated with that group.  Typically,
 you would use this to restrict a customer, or an individual, to
 only seeing bugs associated with that customer or individual.
-
-
-
-TO DO:
-more on screen explanation
- (External users cannot view posts marked "Visible for internal users only")  	
-external users can't see other other external users
- 
-forced project  - explain it better, mention the  "read only" effect
-
-IMPORTANT!
-test with default bug permission = 0 <<< look for where this matters
-
-add some javascript to edit query, elsewhere, 
-
-test that things can be hidden with css
-
 
 -----------------------------------------------------------------------
 Version 2.6.7  12/01/2007
