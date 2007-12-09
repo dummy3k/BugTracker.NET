@@ -589,7 +589,6 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 					string cls = "wht";
 					if (flag == 1) cls = "red";
 					else if (flag == 2) cls = "grn";
-					else if (flag == 3) cls = "blu";
 					
 					Response.Write("<td class=bugd><span class=" 
 						+ cls 

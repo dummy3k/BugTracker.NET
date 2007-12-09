@@ -171,11 +171,6 @@ function flag(el, bugid)
 	}
 	else if (which == 'grn')
 	{
-		which = 'blu'
-		which_int = 3;
-	}
-	else if (which == 'blu')
-	{
 		which = 'wht';
 		which_int = 0;
 	}

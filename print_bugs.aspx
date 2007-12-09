@@ -163,7 +163,6 @@ void print_as_html()
 				string cls = "wht";
 				if (flag == 1) cls = "red";
 				else if (flag == 2) cls = "grn";
-				else if (flag == 3) cls = "blu";
 
 				Response.Write("<td class=datad><span class=" + cls + ">");
 
