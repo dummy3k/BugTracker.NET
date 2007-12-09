@@ -85,10 +85,6 @@ function get_bug_comment(bugid)
 		return
 	}
 
-	var url = ajax_url + bugid
-	xmlHttp.onreadystatechange=stateChanged
-	xmlHttp.open("GET",url,true)
-	xmlHttp.send(null)
 }
 
 function stateChanged()
@@ -157,3 +153,38 @@ function on_mouse_out()
 	current_element = null
 }
 
+var cls = (navigator.userAgent.indexOf("MSIE") > 0) ? "className" : "class";
+function flag(el, bugid)
+{
+	var which = el.getAttribute(cls)
+	var which_int = 0;
+
+	if (which == 'wht') 
+	{
+		which = 'red'
+		which_int = 1;
+	}
+	else if (which == 'red')
+	{
+		which = 'grn'
+		which_int = 2;
+	}
+	else if (which == 'grn')
+	{
+		which = 'blu'
+		which_int = 3;
+	}
+	else if (which == 'blu')
+	{
+		which = 'wht';
+		which_int = 0;
+	}
+
+	el.setAttribute(cls,which)
+	
+	var url = "flag.aspx?bugid=" + bugid + "&flag=" + which_int
+	xmlHttp = GetXmlHttpObject();
+	xmlHttp.open("GET",url,true)
+	xmlHttp.send(null)
+
+}

@@ -55,6 +55,8 @@ drop table [bug_post_attachments]
 if exists (select * from dbo.sysobjects where id = object_id(N'[orgs]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [orgs]
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[bug_user_flags]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [bug_user_flags]
 
 /* org */
 
@@ -282,8 +284,21 @@ bs_bug int not null,
 bs_user int not null,
 )
 
+
 create index bs_index_1 on bug_subscriptions (bs_user, bs_bug)
 create index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
+
+/* BUG USER FLAGS */
+
+create table bug_user_flags
+(
+fl_bug int not null,
+fl_user int not null,
+fl_flag int not null
+)
+
+create unique index fl_index_1 on bug_user_flags (fl_bug, fl_user)
+
 
 /* BUG RELATIONSHIPS */
 

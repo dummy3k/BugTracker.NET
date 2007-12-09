@@ -94,6 +94,8 @@ void print_as_excel()
 	first_column = true;
 	for (col = 1; col < dv.Table.Columns.Count; col++)
 	{
+		if (dv.Table.Columns[col].ColumnName == "$FLAG") continue;
+
 		if (!first_column)
 		{
 			Response.Write ("\t");
@@ -106,9 +108,12 @@ void print_as_excel()
 	// bug rows
 	foreach (DataRowView drv in dv)
 	{
+
 		first_column = true;
 		for (col = 1; col < dv.Table.Columns.Count; col++)
 		{
+			if (dv.Table.Columns[col].ColumnName == "$FLAG") continue;
+
 			if (!first_column)
 			{
 				Response.Write ("\t");
@@ -129,13 +134,21 @@ void print_as_html()
 
 	Response.Write ("<head><link rel='StyleSheet' href='btnet.css' type='text/css'></head>");
 
-	Response.Write ("<table border=1 cellspacing=0 cellpadding=3>");
+	Response.Write ("<table class=bugt border=1>");
 	int col;
 
 	for (col = 1; col < dv.Table.Columns.Count; col++)
 	{
-		Response.Write ("<td class=datah>\n");
-		Response.Write (dv.Table.Columns[col].ColumnName);
+
+		Response.Write ("<td class=bugh>\n");
+		if (dv.Table.Columns[col].ColumnName == "$FLAG")
+		{
+			Response.Write("!");
+		}
+		else
+		{
+			Response.Write (dv.Table.Columns[col].ColumnName);
+		}
 		Response.Write ("</td>");
 	}
 
@@ -144,27 +157,40 @@ void print_as_html()
 		Response.Write ("<tr>");
 		for (col = 1; col < dv.Table.Columns.Count; col++)
 		{
-			string datatype = dv.Table.Columns[col].DataType.ToString();
-
-			if (Util.is_numeric_datatype(datatype))
+			if (dv.Table.Columns[col].ColumnName == "$FLAG")
 			{
-				Response.Write ("<td class=datad align=right>");
+				int flag = (int) drv[col];
+				string cls = "wht";
+				if (flag == 1) cls = "red";
+				else if (flag == 2) cls = "grn";
+				else if (flag == 3) cls = "blu";
+
+				Response.Write("<td class=datad><span class=" + cls + ">");
+
 			}
 			else
 			{
-				Response.Write ("<td class=datad>");
-			}
+				string datatype = dv.Table.Columns[col].DataType.ToString();
 
-			// write the data
-			if (drv[col].ToString() == "")
-			{
-				Response.Write ("&nbsp;");
-			}
-			else
-			{
-				Response.Write (Server.HtmlEncode(drv[col].ToString()).Replace("\n","<br>"));
-			}
+				if (Util.is_numeric_datatype(datatype))
+				{
+					Response.Write ("<td class=bugd align=right>");
+				}
+				else
+				{
+					Response.Write ("<td class=bugd>");
+				}
 
+				// write the data
+				if (drv[col].ToString() == "")
+				{
+					Response.Write ("&nbsp;");
+				}
+				else
+				{
+					Response.Write (Server.HtmlEncode(drv[col].ToString()).Replace("\n","<br>"));
+				}
+			}
 			Response.Write ("</td>");
 		}
 		Response.Write ("</tr>");

@@ -322,7 +322,7 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 ///////////////////////////////////////////////////////////////////////
 void display_bugs(bool show_checkbox)
 {
-
+	
 	if (dt_users == null)
 	{
 		dt_users = Util.get_related_users(security, dbutil);
@@ -346,7 +346,8 @@ void display_bugs(bool show_checkbox)
 
 		if (db_column_count == 0)
 		{
-			// skip color
+			// skip color/style
+			
 			if (show_checkbox)
 			{
 				Response.Write ("<td class=bugh><font size=0>sel</font>");
@@ -360,14 +361,20 @@ void display_bugs(bool show_checkbox)
 			string s = "<a href='javascript: on_sort($col)'>";
 			s = s.Replace("$col", Convert.ToString(db_column_count-1));
 			Response.Write (s);
-			Response.Write (dc.ColumnName);
+			if (dc.ColumnName == "$FLAG")
+			{
+				Response.Write ("[!]");
+			}
+			else
+			{
+				Response.Write (dc.ColumnName);
+			}
 			Response.Write ("</a>");
 
 			if (dc.ColumnName.ToLower().IndexOf("desc") == 0) {
 				// remember this column so that we can make it a link
 				description_column = db_column_count; // zero based here
 			}
-
 
 			Response.Write ("</td>\n");
 
@@ -576,41 +583,59 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 			else
 			{
 
-				string datatype = dv.Table.Columns[i].DataType.ToString();
-
-				if (Util.is_numeric_datatype(datatype))
+				if (dv.Table.Columns[i].ColumnName == "$FLAG")
 				{
-					Response.Write ("<td "  + class_or_color + " align=right>");
+					int flag = (int) dr[i];
+					string cls = "wht";
+					if (flag == 1) cls = "red";
+					else if (flag == 2) cls = "grn";
+					else if (flag == 3) cls = "blu";
+					
+					Response.Write("<td class=bugd><span class=" 
+						+ cls 
+						+ " onclick='flag(this, " 
+						+ Convert.ToString(dr[1])
+						+ ")'></span></td>");
 				}
 				else
 				{
-					Response.Write ("<td " + class_or_color + " >");
-				}
+				
+					string datatype = dv.Table.Columns[i].DataType.ToString();
 
-				// write the data
-				if (dr[i].ToString() == "")
-				{
-					Response.Write ("&nbsp;");
-				}
-				else
-				{
-					if (datatype == "System.DateTime")
+					if (Util.is_numeric_datatype(datatype))
 					{
-						Response.Write (Util.format_db_date(dr[i]));
+						Response.Write ("<td "  + class_or_color + " align=right>");
 					}
 					else
 					{
-						if (i == description_column)
+						Response.Write ("<td " + class_or_color + " >");
+					}
+
+					// write the data
+					if (dr[i].ToString() == "")
+					{
+						Response.Write ("&nbsp;");
+					}
+					else
+					{
+						if (datatype == "System.DateTime")
 						{
-							// write description as a link
-							Response.Write ("<a onmouseover=on_mouse_over(this) onmouseout=on_mouse_out() href=edit_bug.aspx?id="
-								+ Convert.ToString(dr[1]) + ">");
-							Response.Write (Server.HtmlEncode(dr[i].ToString()));
-							Response.Write ("</a>");
+							Response.Write (Util.format_db_date(dr[i]));
 						}
 						else
 						{
-							Response.Write (Server.HtmlEncode(dr[i].ToString()).Replace("\n","<br>"));
+							if (i == description_column)
+							{
+								// write description as a link
+								Response.Write ("<a onmouseover=on_mouse_over(this) onmouseout=on_mouse_out() href=edit_bug.aspx?id="
+									+ Convert.ToString(dr[1]) + ">");
+								Response.Write (Server.HtmlEncode(dr[i].ToString()));
+								Response.Write ("</a>");
+							}
+							else
+							{
+								Response.Write (Server.HtmlEncode(dr[i].ToString()).Replace("\n","<br>"));
+							}
 						}
 					}
 				}
@@ -620,7 +645,7 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 			}
 		}
 
-		Response.Write ("</tr>");
+		Response.Write ("</tr>\n");
 
 		j++;
 	}
