@@ -19,6 +19,12 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
+	int bugid = Convert.ToInt32(Request["id"]);
+	int permission_level = Bug.get_bug_permission_level(bugid, security);
+	if (permission_level == Security.PERMISSION_NONE)
+	{
+		Response.End();
+	}
 
 	if (Request.QueryString["action"] == "1")
 	{

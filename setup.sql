@@ -507,11 +507,12 @@ Here are examples to get you started.
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'all bugs',
-'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
+'select isnull(pr_background_color,''#ffffff''), bg_id [id], isnull(fl_flag,0) [$FLAG], '
 + char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
 + char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
 + char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
 + char(10) + ' from bugs '
++ char(10) + ' left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME '
 + char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
 + char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
 + char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
@@ -525,11 +526,12 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'open bugs',
-'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
+'select isnull(pr_background_color,''#ffffff''), bg_id [id], isnull(fl_flag,0) [$FLAG], '
 + char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
 + char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
 + char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
 + char(10) + ' from bugs '
++ char(10) + ' left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME '
 + char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
 + char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
 + char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
@@ -543,11 +545,12 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'open bugs assigned to me',
-'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
+'select isnull(pr_background_color,''#ffffff''), bg_id [id], isnull(fl_flag,0) [$FLAG], '
 + char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
 + char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
 + char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
 + char(10) + ' from bugs '
++ char(10) + ' left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME '
 + char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
 + char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
 + char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
@@ -561,11 +564,12 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'checked in bugs - for QA',
-'select isnull(pr_background_color,''#ffffff''), bg_id [id], '
+'select isnull(pr_background_color,''#ffffff''), bg_id [id], isnull(fl_flag,0) [$FLAG], '
 + char(10) + ' bg_short_desc [desc], isnull(pj_name,'''') [project], isnull(og_name,'''') [organization], isnull(ct_name,'''') [category], rpt.us_username [reported by],'
 + char(10) + ' bg_reported_date [reported on], isnull(pr_name,'''') [priority], isnull(asg.us_username,'''') [assigned to],'
 + char(10) + ' isnull(st_name,'''') [status], isnull(lu.us_username,'''') [last updated by], bg_last_updated_date [last updated on]'
 + char(10) + ' from bugs '
++ char(10) + ' left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME '
 + char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user'
 + char(10) + ' left outer join users asg on asg.us_id = bg_assigned_to_user'
 + char(10) + ' left outer join users lu on lu.us_id = bg_last_updated_user'
@@ -580,8 +584,9 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'demo use of css classes',
-'select isnull(pr_style + st_style,''datad''), bg_id [id], bg_short_desc [desc], isnull(pr_name,'''') [priority], isnull(st_name,'''') [status]'
+'select isnull(pr_style + st_style,''datad''), bg_id [id], isnull(fl_flag,0) [$FLAG], bg_short_desc [desc], isnull(pr_name,'''') [priority], isnull(st_name,'''') [status]'
 + char(10) + ' from bugs '
++ char(10) + ' left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME '
 + char(10) + ' left outer join priorities on pr_id = bg_priority '
 + char(10) + ' left outer join statuses on st_id = bg_status '
 + char(10) + ' order by bg_id desc',

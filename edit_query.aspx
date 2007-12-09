@@ -362,18 +362,24 @@ void on_update (Object sender, EventArgs e)
 		<br>
 		<br>
 		The second column must be "bg_id".
-		<br>
-		You can use the pseudo-variable $ME in your query which will be replaced by your user ID.
+		<br><br>
+		You can use the magic word "$ME" in your query which will be replaced by your user ID.
 		<br>
 		For example:
 		<br>
 		<ul>
 			select isnull(pr_background_color,'#ffffff'), bg_id [id], bg_short_desc<br>
-			from bugs
-			<br>
-			left outer join priorities on bg_priority = pr_id
-			<br>
+			from bugs<br>
+			left outer join priorities on bg_priority = pr_id<br>
 			where bg_assigned_to_user = $ME
+		</ul>
+		<br>
+		Another magic word is "$FLAG", which is what controls whether a query shows the "!" column that lets an individual user flag items for himself.<br>
+		To use it, add the SQL shown below to your select columns and do a "left outer join" to the bug_user_flags table.
+		<ul>
+			Select ...., isnull(fl_flag,0) [$FLAG],...<br>
+			from bugs<br>
+			left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME
 		</ul>
 	</td>
 	</tr>

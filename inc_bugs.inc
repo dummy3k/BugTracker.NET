@@ -361,6 +361,7 @@ void display_bugs(bool show_checkbox)
 			string s = "<a href='javascript: on_sort($col)'>";
 			s = s.Replace("$col", Convert.ToString(db_column_count-1));
 			Response.Write (s);
+			
 			if (dc.ColumnName == "$FLAG")
 			{
 				Response.Write ("[!]");
@@ -369,6 +370,7 @@ void display_bugs(bool show_checkbox)
 			{
 				Response.Write (dc.ColumnName);
 			}
+			
 			Response.Write ("</a>");
 
 			if (dc.ColumnName.ToLower().IndexOf("desc") == 0) {

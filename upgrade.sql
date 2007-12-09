@@ -543,3 +543,21 @@ alter table users drop column us_can_edit_reports
 
 alter table bugs add bg_org int not null default(0)
 alter table orgs add og_other_orgs_permission_level int not null default(2)
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.6.8 to 2.6.9
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+create table bug_user_flags
+(
+fl_bug int not null,
+fl_user int not null,
+fl_flag int not null
+)
+
+create unique index fl_index_1 on bug_user_flags (fl_bug, fl_user)

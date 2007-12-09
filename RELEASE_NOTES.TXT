@@ -8,8 +8,8 @@ Release notes:
 Version 2.6.9  12/XX/2007
 -----------------------------------------------------------------------
 
-* flag stuff (don't forget to update upgrade.sql)
-update queries too.
+* flag stuff 
+
 
 
 * field level permissions?

@@ -24,8 +24,13 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-
 	int bugid = Convert.ToInt32(Util.sanitize_integer(Request["bugid"]));
+
+	int permission_level = Bug.get_bug_permission_level(bugid, security);
+	if (permission_level == Security.PERMISSION_NONE)
+	{
+		Response.End();
+	}
 
 	for (int i = 0; i < dv.Count; i++)
 	{
