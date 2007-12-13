@@ -277,31 +277,6 @@ List<ListItem> get_selected_projects()
 
 
 ///////////////////////////////////////////////////////////////////////
-
-DataRow get_selected_project_custom_dropdown_info(ListItem selected_project)
-{
-
-	// Read the project dropdown info from the db.
-	// Load the dropdowns as necessary
-
-	string sql = @"select
-		isnull(pj_enable_custom_dropdown1,0) pj_enable_custom_dropdown1,
-		isnull(pj_enable_custom_dropdown2,0) pj_enable_custom_dropdown2,
-		isnull(pj_enable_custom_dropdown3,0) pj_enable_custom_dropdown3,
-		pj_custom_dropdown_label1,
-		pj_custom_dropdown_label2,
-		pj_custom_dropdown_label3,
-		pj_custom_dropdown_values1,
-		pj_custom_dropdown_values2,
-		pj_custom_dropdown_values3
-		from projects where pj_id = $project";
-
-	sql = sql.Replace("$project", selected_project.Value);
-	return dbutil.get_datarow(sql);
-
-}
-
-///////////////////////////////////////////////////////////////////////
 void do_query()
 {
 	prev_sort.Value = "-1";
