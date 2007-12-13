@@ -8,11 +8,42 @@ Release notes:
 Version 2.6.9  12/XX/2007
 -----------------------------------------------------------------------
 
-* flag stuff 
+Bugs:
+
+* Fixed bug in search "left outer join orgs on ct_id = bg_org"
+should read "left outer join orgs on og_id = bg_org".
+
+* Fixed javascript error with svn_log.aspx. Thanks to Walt Crosby for 
+being persistent about reporting the bug and supplying the correct code.
+
+* Added missing permission check to subscribe.aspx.
+
+* Added isnull() to check for project custom fields in search.aspx,
+in case you have nulls in those fields.
+
+New Feature:
+
+Add ability for each user to mark bugs with a personal flag, like, 
+"Flag for follow-up".  Use the new magic "$FLAG" macro in your
+queries as shown below. You also need the left outer join 
+with the bug_user_flags table.
+
+Select ...., isnull(fl_flag,0) [$FLAG],...
+from bugs
+left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME
+
+Also:
+
+Improved performance of search with regards to project custom 
+dropdowns.  The page no longer makes a trip to the server if you are
+NOT using project custom dropdowns.
 
 
 
-* field level permissions?
+* email style, comments have no border?
+
+* add logic to bypass trip to server if custom fields aren't being used
+* document organizations
 
 -----------------------------------------------------------------------
 Version 2.6.8  12/07/2007

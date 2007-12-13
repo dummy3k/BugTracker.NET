@@ -19,6 +19,160 @@ string project_dropdown_select_cols = "";
 
 
 ///////////////////////////////////////////////////////////////////////
+class ProjectDropdown
+{
+	public bool enabled = false;
+	public string label = "";
+	public string values = "";
+};
+
+class BtnetProject
+{
+	public int id;
+	public Dictionary<int, ProjectDropdown> map_dropdowns = new Dictionary<int, ProjectDropdown>();
+};
+
+Dictionary<int, BtnetProject> map_projects = new Dictionary<int, BtnetProject>();
+
+///////////////////////////////////////////////////////////////////////
+void Page_Load(Object sender, EventArgs e)
+{
+	Util.do_not_cache(Response);
+	dbutil = new DbUtil();
+	security = new Security();
+	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+
+	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+		+ "search";
+
+	show_udf = (Util.get_setting("ShowUserDefinedBugAttribute","1") == "1");
+	use_full_names = (Util.get_setting("UseFullNames","0") == "1");
+
+	ds_custom_cols = Util.get_custom_columns(dbutil);
+
+	dt_users = Util.get_related_users(security, dbutil);
+
+	if (!IsPostBack)
+	{
+		load_drop_downs();
+		project_custom_dropdown1_label.Style["display"] = "none";
+		project_custom_dropdown1.Style["display"] = "none";
+
+		project_custom_dropdown2_label.Style["display"] = "none";
+		project_custom_dropdown2.Style["display"] = "none";
+
+		project_custom_dropdown3_label.Style["display"] = "none";
+		project_custom_dropdown3.Style["display"] = "none";
+
+		// are there any project dropdowns?
+
+		string sql = @"
+select count(1)
+from projects
+where isnull(pj_enable_custom_dropdown1,0) = 1
+or isnull(pj_enable_custom_dropdown2,0) = 1
+or isnull(pj_enable_custom_dropdown3,0) = 1";
+
+		int projects_with_custom_dropdowns = (int) dbutil.execute_scalar(sql);
+
+		if (projects_with_custom_dropdowns == 0)
+		{
+			project.AutoPostBack = false;
+		}
+
+	}
+	else
+	{
+
+		// get the project dropdowns
+
+		string sql = @"
+select
+pj_id,
+isnull(pj_enable_custom_dropdown1,0) pj_enable_custom_dropdown1,
+isnull(pj_enable_custom_dropdown2,0) pj_enable_custom_dropdown2,
+isnull(pj_enable_custom_dropdown3,0) pj_enable_custom_dropdown3,
+isnull(pj_custom_dropdown_label1,'') pj_custom_dropdown_label1,
+isnull(pj_custom_dropdown_label2,'') pj_custom_dropdown_label2,
+isnull(pj_custom_dropdown_label3,'') pj_custom_dropdown_label3,
+isnull(pj_custom_dropdown_values1,'') pj_custom_dropdown_values1,
+isnull(pj_custom_dropdown_values2,'') pj_custom_dropdown_values2,
+isnull(pj_custom_dropdown_values3,'') pj_custom_dropdown_values3
+from projects
+where isnull(pj_enable_custom_dropdown1,0) = 1
+or isnull(pj_enable_custom_dropdown2,0) = 1
+or isnull(pj_enable_custom_dropdown3,0) = 1";
+
+		DataSet ds_projects = dbutil.get_dataset(sql);
+
+		foreach (DataRow dr in ds_projects.Tables[0].Rows)
+		{
+			BtnetProject btnet_project = new BtnetProject();
+
+			ProjectDropdown dropdown;
+
+			dropdown = new ProjectDropdown();
+			dropdown.enabled = Convert.ToBoolean((int)dr["pj_enable_custom_dropdown1"]);
+			dropdown.label = (string)dr["pj_custom_dropdown_label1"];
+			dropdown.values = (string)dr["pj_custom_dropdown_values1"];
+			btnet_project.map_dropdowns[1] = dropdown;
+
+			dropdown = new ProjectDropdown();
+			dropdown.enabled = Convert.ToBoolean((int)dr["pj_enable_custom_dropdown2"]);
+			dropdown.label = (string)dr["pj_custom_dropdown_label2"];
+			dropdown.values = (string)dr["pj_custom_dropdown_values2"];
+			btnet_project.map_dropdowns[2] = dropdown;
+
+			dropdown = new ProjectDropdown();
+			dropdown.enabled = Convert.ToBoolean((int)dr["pj_enable_custom_dropdown3"]);
+			dropdown.label = (string)dr["pj_custom_dropdown_label3"];
+			dropdown.values = (string)dr["pj_custom_dropdown_values3"];
+			btnet_project.map_dropdowns[3] = dropdown;
+
+			map_projects[(int) dr["pj_id"]] = btnet_project;
+
+		}
+
+		// which button did the user hit?
+
+		if (project_changed.Value == "1" && project.AutoPostBack == true)
+		{
+			handle_project_custom_dropdowns();
+		}
+		else if (hit_submit_button.Value == "1")
+		{
+			handle_project_custom_dropdowns();
+			do_query();
+		}
+		else
+		{
+			dv = (DataView) Session["bugs"];
+			if (dv == null)
+			{
+				do_query();
+			}
+			sort_dataview();
+		}
+	}
+
+	hit_submit_button.Value = "0";
+	project_changed.Value = "0";
+
+	if (security.this_is_admin || security.this_can_edit_sql)
+	{
+
+	}
+	else
+	{
+		visible_sql_label.Style["display"] = "none";
+		visible_sql_text.Style["display"] = "none";
+	}
+
+}
+
+
+
+///////////////////////////////////////////////////////////////////////
 string build_where(string where, string clause)
 {
 	if (clause == "")
@@ -123,15 +277,17 @@ List<ListItem> get_selected_projects()
 
 
 ///////////////////////////////////////////////////////////////////////
+
 DataRow get_selected_project_custom_dropdown_info(ListItem selected_project)
 {
+
 	// Read the project dropdown info from the db.
 	// Load the dropdowns as necessary
 
 	string sql = @"select
-		pj_enable_custom_dropdown1,
-		pj_enable_custom_dropdown2,
-		pj_enable_custom_dropdown3,
+		isnull(pj_enable_custom_dropdown1,0) pj_enable_custom_dropdown1,
+		isnull(pj_enable_custom_dropdown2,0) pj_enable_custom_dropdown2,
+		isnull(pj_enable_custom_dropdown3,0) pj_enable_custom_dropdown3,
 		pj_custom_dropdown_label1,
 		pj_custom_dropdown_label2,
 		pj_custom_dropdown_label3,
@@ -142,7 +298,9 @@ DataRow get_selected_project_custom_dropdown_info(ListItem selected_project)
 
 	sql = sql.Replace("$project", selected_project.Value);
 	return dbutil.get_datarow(sql);
+
 }
+
 ///////////////////////////////////////////////////////////////////////
 void do_query()
 {
@@ -375,40 +533,50 @@ void do_query()
             if (selected_project.Value == "0")
                 continue;
 
-			DataRow dr_project = get_selected_project_custom_dropdown_info(selected_project);
+			int pj_id = Convert.ToInt32(selected_project.Value);
 
-			if ((int) dr_project["pj_enable_custom_dropdown1"] == 1)
+			if (map_projects.ContainsKey(pj_id))
 			{
-                if (alias1 == null)
-                {
-                    alias1 = (string)dr_project["pj_custom_dropdown_label1"];
-                }
-                else
-                {
-                    alias1 = "dropdown1";
-                }
-			}
-			if ((int) dr_project["pj_enable_custom_dropdown2"] == 1)
-			{
-                if (alias2 == null)
-                {
-                    alias2 = (string)dr_project["pj_custom_dropdown_label2"];
-                }
-                else
-                {
-                    alias2 = "dropdown2";
-                }
-			}
-			if ((int) dr_project["pj_enable_custom_dropdown3"] == 1)
-			{
-                if (alias3 == null)
-                {
-                    alias3 = (string)dr_project["pj_custom_dropdown_label3"];
-                }
-                else
-                {
-                    alias3 = "dropdown3";
-                }
+
+				BtnetProject btnet_project = map_projects[pj_id];
+
+				if (btnet_project.map_dropdowns[1].enabled)
+				{
+					if (alias1 == null)
+					{
+						alias1 = btnet_project.map_dropdowns[1].label;
+					}
+					else
+					{
+						alias1 = "dropdown1";
+					}
+				}
+
+				if (btnet_project.map_dropdowns[2].enabled)
+				{
+					if (alias2 == null)
+					{
+						alias2 = btnet_project.map_dropdowns[2].label;
+					}
+					else
+					{
+						alias2 = "dropdown2";
+					}
+				}
+
+				if (btnet_project.map_dropdowns[3].enabled)
+				{
+					if (alias3 == null)
+					{
+						alias3 = btnet_project.map_dropdowns[3].label;
+					}
+					else
+					{
+						alias3 = "dropdown3";
+					}
+				}
+
+
 			}
 		}
 
@@ -550,51 +718,59 @@ void handle_project_custom_dropdowns()
         if (selected_project.Value == "0")
             continue;
 
-		DataRow dr_project = get_selected_project_custom_dropdown_info(selected_project);
+		int pj_id = Convert.ToInt32(selected_project.Value);
 
-		if ((int) dr_project["pj_enable_custom_dropdown1"] == 1)
+		if (map_projects.ContainsKey(pj_id))
 		{
-            if (project_custom_dropdown1_label.InnerText == "")
-		    {
-			project_custom_dropdown1_label.InnerText = (string) dr_project["pj_custom_dropdown_label1"];
-			project_custom_dropdown1_label.Style["display"] = "inline";
-			project_custom_dropdown1.Style["display"] = "block";
-		}
-			else if (project_custom_dropdown1_label.InnerText != (string) dr_project["pj_custom_dropdown_label1"])
-		{
-			    project_custom_dropdown1_label.InnerText = "dropdown1";
+
+			BtnetProject btnet_project = map_projects[pj_id];
+
+			if (btnet_project.map_dropdowns[1].enabled)
+			{
+				if (project_custom_dropdown1_label.InnerText == "")
+				{
+					project_custom_dropdown1_label.InnerText = btnet_project.map_dropdowns[1].label;
+					project_custom_dropdown1_label.Style["display"] = "inline";
+					project_custom_dropdown1.Style["display"] = "block";
+				}
+				else if (project_custom_dropdown1_label.InnerText != btnet_project.map_dropdowns[1].label)
+				{
+					project_custom_dropdown1_label.InnerText = "dropdown1";
+				}
+				load_project_custom_dropdown(project_custom_dropdown1, btnet_project.map_dropdowns[1].values, dupe_detection_dictionaries[0]);
 			}
-			load_project_custom_dropdown(project_custom_dropdown1, (string) dr_project["pj_custom_dropdown_values1"], dupe_detection_dictionaries[0]);
-		}
 
-		if ((int) dr_project["pj_enable_custom_dropdown2"] == 1)
-		{
-            if (project_custom_dropdown2_label.InnerText == "")
-		    {
-			project_custom_dropdown2_label.InnerText = (string) dr_project["pj_custom_dropdown_label2"];
-		}
-			else if (project_custom_dropdown2_label.InnerText != (string) dr_project["pj_custom_dropdown_label2"])
-		{
-			    project_custom_dropdown2_label.InnerText = "dropdown2";
+			if (btnet_project.map_dropdowns[2].enabled)
+			{
+				if (project_custom_dropdown2_label.InnerText == "")
+				{
+					project_custom_dropdown2_label.InnerText = btnet_project.map_dropdowns[2].label;
+					project_custom_dropdown2_label.Style["display"] = "inline";
+					project_custom_dropdown2.Style["display"] = "block";
+				}
+				else if (project_custom_dropdown2_label.InnerText != btnet_project.map_dropdowns[2].label)
+				{
+					project_custom_dropdown2_label.InnerText = "dropdown2";
+				}
+				load_project_custom_dropdown(project_custom_dropdown2, btnet_project.map_dropdowns[2].values, dupe_detection_dictionaries[1]);
 			}
-            load_project_custom_dropdown(project_custom_dropdown2, (string)dr_project["pj_custom_dropdown_values2"], dupe_detection_dictionaries[1]);
-		}
 
-		if ((int) dr_project["pj_enable_custom_dropdown3"] == 1)
-		{
-            if (project_custom_dropdown2_label.InnerText == "")
-		    {
-			project_custom_dropdown3_label.InnerText = (string) dr_project["pj_custom_dropdown_label3"];
-			project_custom_dropdown3_label.Style["display"] = "inline";
-			project_custom_dropdown3.Style["display"] = "block";
-                load_project_custom_dropdown(project_custom_dropdown3, (string)dr_project["pj_custom_dropdown_values3"], dupe_detection_dictionaries[2]);
+			if (btnet_project.map_dropdowns[3].enabled)
+			{
+				if (project_custom_dropdown3_label.InnerText == "")
+				{
+					project_custom_dropdown3_label.InnerText = btnet_project.map_dropdowns[3].label;
+					project_custom_dropdown3_label.Style["display"] = "inline";
+					project_custom_dropdown3.Style["display"] = "block";
+					load_project_custom_dropdown(project_custom_dropdown3, btnet_project.map_dropdowns[3].values, dupe_detection_dictionaries[2]);
+				}
+				else if (project_custom_dropdown3_label.InnerText != btnet_project.map_dropdowns[3].label)
+				{
+					project_custom_dropdown3_label.InnerText = "dropdown3";
+				}
+				load_project_custom_dropdown(project_custom_dropdown3, btnet_project.map_dropdowns[3].values, dupe_detection_dictionaries[2]);
+			}
 		}
-			else if (project_custom_dropdown3_label.InnerText != (string) dr_project["pj_custom_dropdown_label3"])
-		{
-                project_custom_dropdown3_label.InnerText = "dropdown3";
-		}
-            load_project_custom_dropdown(project_custom_dropdown3, (string)dr_project["pj_custom_dropdown_values3"], dupe_detection_dictionaries[2]);
-	}
 	}
 
     if (project_custom_dropdown1_label.InnerText == "")
@@ -652,75 +828,6 @@ void handle_project_custom_dropdowns()
     {
         li.Selected = (previous_selection_dictionaries[2].ContainsKey(li.Value));
     }
-}
-
-///////////////////////////////////////////////////////////////////////
-void Page_Load(Object sender, EventArgs e)
-{
-	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
-	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
-
-	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "search";
-
-	show_udf = (Util.get_setting("ShowUserDefinedBugAttribute","1") == "1");
-	use_full_names = (Util.get_setting("UseFullNames","0") == "1");
-
-	ds_custom_cols = Util.get_custom_columns(dbutil);
-
-	dt_users = Util.get_related_users(security, dbutil);
-
-	if (!IsPostBack)
-	{
-		load_drop_downs();
-		project_custom_dropdown1_label.Style["display"] = "none";
-		project_custom_dropdown1.Style["display"] = "none";
-
-		project_custom_dropdown2_label.Style["display"] = "none";
-		project_custom_dropdown2.Style["display"] = "none";
-
-		project_custom_dropdown3_label.Style["display"] = "none";
-		project_custom_dropdown3.Style["display"] = "none";
-	}
-	else
-	{
-		// If the user has selected exactly one project
-		// then show the project specific dropdowns
-		if (project_changed.Value == "1")
-		{
-			handle_project_custom_dropdowns();
-		}
-		else if (hit_submit_button.Value == "1")
-		{
-			handle_project_custom_dropdowns();
-			do_query();
-		}
-		else
-		{
-			dv = (DataView) Session["bugs"];
-			if (dv == null)
-			{
-				do_query();
-			}
-			sort_dataview();
-		}
-	}
-
-	hit_submit_button.Value = "0";
-	project_changed.Value = "0";
-
-	if (security.this_is_admin || security.this_can_edit_sql)
-	{
-
-	}
-	else
-	{
-		visible_sql_label.Style["display"] = "none";
-		visible_sql_text.Style["display"] = "none";
-	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1306,7 +1413,7 @@ function on_change()
 		select += "left outer join users rpt on rpt.us_id = bg_reported_user\n";
 		select += "left outer join users asg on asg.us_id = bg_assigned_to_user\n";
 		select += "left outer join projects on pj_id = bg_project\n";
-		select += "left outer join orgs on ct_id = bg_org\n";
+		select += "left outer join orgs on og_id = bg_org\n";
 		select += "left outer join categories on ct_id = bg_category\n";
 		select += "left outer join priorities on pr_id = bg_priority\n";
 		select += "left outer join statuses on st_id = bg_status\n";

@@ -226,6 +226,9 @@ function sel_for_diff(rev)
 	{
 		document.getElementById("do_diff_enabled").style.display = "block"
 		document.getElementById("do_diff_disabled").style.display = "none"
+		frm.rev_0.value = rev_0.value
+		frm.rev_1.value = rev_1.value
+
 	}
 	else
 	{
@@ -237,9 +240,11 @@ function sel_for_diff(rev)
 
 function on_do_diff()
 {
+	var rev_0 = document.getElementById("rev_0")
+	var rev_1 = document.getElementById("rev_1")
+
 	if (rev_1.value != 0 && rev_0.value != 0 && rev_1.value != rev_0.value)
 	{
-		frm = document.getElementById("frm")
 		frm.submit()
 	}
 	else

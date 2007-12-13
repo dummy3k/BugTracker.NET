@@ -2392,229 +2392,229 @@ drop table #temp";
 	// Email
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
-    public class Email {
-        ///////////////////////////////////////////////////////////////////////
-        public static string send_email( // 5 args
-            string to,
-            string from,
-            string cc,
-            string subject,
-            string body)
-        {
-            return send_email(
-                to,
-                from,
-                cc,
-                subject,
-                body,
-                System.Web.Mail.MailFormat.Text,
-                System.Web.Mail.MailPriority.Normal,
-                null,
-                false);
-        }
+	public class Email {
+		///////////////////////////////////////////////////////////////////////
+		public static string send_email( // 5 args
+			string to,
+			string from,
+			string cc,
+			string subject,
+			string body)
+		{
+			return send_email(
+				to,
+				from,
+				cc,
+				subject,
+				body,
+				System.Web.Mail.MailFormat.Text,
+				System.Web.Mail.MailPriority.Normal,
+				null,
+				false);
+		}
 
-        ///////////////////////////////////////////////////////////////////////
-        public static string send_email( // 6 args
-            string to,
-            string from,
-            string cc,
-            string subject,
-            string body,
-            System.Web.Mail.MailFormat body_format)
-        {
-            return send_email(
-                to,
-                from,
-                cc,
-                subject,
-                body,
-                body_format,
-                System.Web.Mail.MailPriority.Normal,
-                null,
-                false);
-        }
+		///////////////////////////////////////////////////////////////////////
+		public static string send_email( // 6 args
+			string to,
+			string from,
+			string cc,
+			string subject,
+			string body,
+			System.Web.Mail.MailFormat body_format)
+		{
+			return send_email(
+				to,
+				from,
+				cc,
+				subject,
+				body,
+				body_format,
+				System.Web.Mail.MailPriority.Normal,
+				null,
+				false);
+		}
 
-        ///////////////////////////////////////////////////////////////////////
-        public static string send_email(
-            string to,
-            string from,
-            string cc,
-            string subject,
-            string body,
-            System.Web.Mail.MailFormat body_format,
-            System.Web.Mail.MailPriority priority,
-            int[] attachment_bpids,
-            bool return_receipt)
-        {
-            ArrayList files_to_delete = new ArrayList();
-            ArrayList directories_to_delete = new ArrayList();
-            System.Web.Mail.MailMessage msg = new System.Web.Mail.MailMessage();
-            msg.To = to;
-            msg.From = from;
-            msg.Cc = cc;
-            msg.Subject = subject;
-            msg.Priority = priority;
+		///////////////////////////////////////////////////////////////////////
+		public static string send_email(
+			string to,
+			string from,
+			string cc,
+			string subject,
+			string body,
+			System.Web.Mail.MailFormat body_format,
+			System.Web.Mail.MailPriority priority,
+			int[] attachment_bpids,
+			bool return_receipt)
+		{
+			ArrayList files_to_delete = new ArrayList();
+			ArrayList directories_to_delete = new ArrayList();
+			System.Web.Mail.MailMessage msg = new System.Web.Mail.MailMessage();
+			msg.To = to;
+			msg.From = from;
+			msg.Cc = cc;
+			msg.Subject = subject;
+			msg.Priority = priority;
 
-            // This fixes a bug for a couple people, but make it configurable, just in case.
-            if (Util.get_setting("BodyEncodingUTF8", "1") == "1")
-            {
-                msg.BodyEncoding = Encoding.UTF8;
-            }
-
-
-            if (return_receipt)
-            {
-                msg.Headers.Add("Disposition-Notification-To", from);
-            }
-
-            // workaround for a bug I don't understand...
-            if (Util.get_setting("SmtpForceReplaceOfBareLineFeeds", "0") == "1")
-            {
-                body = body.Replace("\n", "\r\n");
-            }
-
-            msg.Body = body;
-            msg.BodyFormat = body_format;
+			// This fixes a bug for a couple people, but make it configurable, just in case.
+			if (Util.get_setting("BodyEncodingUTF8", "1") == "1")
+			{
+				msg.BodyEncoding = Encoding.UTF8;
+			}
 
 
-            string smtp_server = Util.get_setting("SmtpServer", "");
-            if (smtp_server != "")
-            {
-                System.Web.Mail.SmtpMail.SmtpServer = smtp_server;
-            }
+			if (return_receipt)
+			{
+				msg.Headers.Add("Disposition-Notification-To", from);
+			}
 
-            string smtp_password = Util.get_setting("SmtpServerAuthenticatePassword", "");
+			// workaround for a bug I don't understand...
+			if (Util.get_setting("SmtpForceReplaceOfBareLineFeeds", "0") == "1")
+			{
+				body = body.Replace("\n", "\r\n");
+			}
 
-            if (smtp_password != "")
-            {
-                msg.Fields["http://schemas.microsoft.com/cdo/configuration/sendpassword"] = smtp_password;
-                msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpauthenticate"] = 1;
-                msg.Fields["http://schemas.microsoft.com/cdo/configuration/sendusername"] =
-                    Util.get_setting("SmtpServerAuthenticateUser", "");
-            }
-
-            string smtp_pickup = Util.get_setting("SmtpServerPickupDirectory", "");
-            if (smtp_pickup != "")
-            {
-                msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpserverpickupdirectory"] = smtp_pickup;
-            }
+			msg.Body = body;
+			msg.BodyFormat = body_format;
 
 
-            string send_using = Util.get_setting("SmtpSendUsing", "");
-            if (send_using != "")
-            {
-                msg.Fields["http://schemas.microsoft.com/cdo/configuration/sendusing"] = send_using;
-            }
+			string smtp_server = Util.get_setting("SmtpServer", "");
+			if (smtp_server != "")
+			{
+				System.Web.Mail.SmtpMail.SmtpServer = smtp_server;
+			}
+
+			string smtp_password = Util.get_setting("SmtpServerAuthenticatePassword", "");
+
+			if (smtp_password != "")
+			{
+				msg.Fields["http://schemas.microsoft.com/cdo/configuration/sendpassword"] = smtp_password;
+				msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpauthenticate"] = 1;
+				msg.Fields["http://schemas.microsoft.com/cdo/configuration/sendusername"] =
+					Util.get_setting("SmtpServerAuthenticateUser", "");
+			}
+
+			string smtp_pickup = Util.get_setting("SmtpServerPickupDirectory", "");
+			if (smtp_pickup != "")
+			{
+				msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpserverpickupdirectory"] = smtp_pickup;
+			}
 
 
-            string smtp_use_ssl = Util.get_setting("SmtpUseSSL", "");
-            if (smtp_use_ssl == "1")
-            {
-                msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpusessl"] = "true";
-            }
+			string send_using = Util.get_setting("SmtpSendUsing", "");
+			if (send_using != "")
+			{
+				msg.Fields["http://schemas.microsoft.com/cdo/configuration/sendusing"] = send_using;
+			}
 
-            string smtp_server_port = Util.get_setting("SmtpServerPort", "");
-            if (smtp_server_port != "")
-            {
+
+			string smtp_use_ssl = Util.get_setting("SmtpUseSSL", "");
+			if (smtp_use_ssl == "1")
+			{
+				msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpusessl"] = "true";
+			}
+
+			string smtp_server_port = Util.get_setting("SmtpServerPort", "");
+			if (smtp_server_port != "")
+			{
 				msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpserverport"] = smtp_server_port;
 			}
 
-            if (attachment_bpids != null)
-                {
-                string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-                Directory.CreateDirectory(tempDirectory);
-                directories_to_delete.Add(tempDirectory);
+			if (attachment_bpids != null)
+			{
+				string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+				Directory.CreateDirectory(tempDirectory);
+				directories_to_delete.Add(tempDirectory);
 
-                foreach (int attachment_bpid in attachment_bpids)
-                    {
-                    byte[] buffer = new byte[16 * 1024];
-                    string dest_path_and_filename;
-                    Bug.BugPostAttachment bpa = Bug.get_bug_post_attachment(attachment_bpid);
-                    using (bpa.content)
-                        {
-                        dest_path_and_filename = Path.Combine(tempDirectory, bpa.file);
-                        using (FileStream out_stream = new FileStream(dest_path_and_filename, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                    {
-                            int bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
-                            while (bytes_read != 0)
-                            {
-                                out_stream.Write(buffer, 0, bytes_read);
+				foreach (int attachment_bpid in attachment_bpids)
+				{
+					byte[] buffer = new byte[16 * 1024];
+					string dest_path_and_filename;
+					Bug.BugPostAttachment bpa = Bug.get_bug_post_attachment(attachment_bpid);
+					using (bpa.content)
+					{
+						dest_path_and_filename = Path.Combine(tempDirectory, bpa.file);
+						using (FileStream out_stream = new FileStream(dest_path_and_filename, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+						{
+							int bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
+							while (bytes_read != 0)
+							{
+								out_stream.Write(buffer, 0, bytes_read);
 
-                                bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
-                    }
-                    }
+								bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
+							}
+						}
 
-                }
+					}
 
-                    System.Web.Mail.MailAttachment mail_attachment = new System.Web.Mail.MailAttachment(
-                        dest_path_and_filename,
-                        System.Web.Mail.MailEncoding.Base64);
-                    msg.Attachments.Add(mail_attachment);
-                    files_to_delete.Add(dest_path_and_filename);
-                }
-            }
+					System.Web.Mail.MailAttachment mail_attachment = new System.Web.Mail.MailAttachment(
+						dest_path_and_filename,
+						System.Web.Mail.MailEncoding.Base64);
+					msg.Attachments.Add(mail_attachment);
+					files_to_delete.Add(dest_path_and_filename);
+				}
+			}
 
 
-            try
-            {
-                System.Web.Mail.SmtpMail.Send(msg);
+			try
+			{
+				System.Web.Mail.SmtpMail.Send(msg);
 
-                // We delete late here because testing showed that SmtpMail class
-                // got confused when we deleted too soon.
-                if (files_to_delete.Count > 0)
-                {
-                    foreach (string file in files_to_delete)
-                    {
-                        File.Delete(file);
-                    }
-                }
+				// We delete late here because testing showed that SmtpMail class
+				// got confused when we deleted too soon.
+				if (files_to_delete.Count > 0)
+				{
+					foreach (string file in files_to_delete)
+					{
+						File.Delete(file);
+					}
+				}
 
-                if (directories_to_delete.Count > 0)
-                {
-                    foreach (string directory in directories_to_delete)
-                    {
-                        Directory.Delete(directory);
-                    }
-                }
+				if (directories_to_delete.Count > 0)
+				{
+					foreach (string directory in directories_to_delete)
+					{
+						Directory.Delete(directory);
+					}
+				}
 
-                return "";
-            }
-            catch (Exception e)
-            {
-                Util.write_to_log("There was a problem sending email.   Check settings in Web.config.");
-                Util.write_to_log("TO:" + to);
-                Util.write_to_log("FROM:" + from);
-                Util.write_to_log("SUBJECT:" + subject);
-                Util.write_to_log(e.GetBaseException().Message.ToString());
-                return (e.GetBaseException().Message);
-            }
+				return "";
+			}
+			catch (Exception e)
+			{
+				Util.write_to_log("There was a problem sending email.   Check settings in Web.config.");
+				Util.write_to_log("TO:" + to);
+				Util.write_to_log("FROM:" + from);
+				Util.write_to_log("SUBJECT:" + subject);
+				Util.write_to_log(e.GetBaseException().Message.ToString());
+				return (e.GetBaseException().Message);
+			}
 
-        }
+		}
 
-    } // end Email
+	} // end Email
 
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
 	// Bug
 	///////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////
-    public class Bug
-    {
+	public class Bug
+	{
 
-        public const int INSERT = 1;
-        public const int UPDATE = 2;
+		public const int INSERT = 1;
+		public const int UPDATE = 2;
 
 
-        ///////////////////////////////////////////////////////////////////////
-        public static void auto_subscribe(int bugid)
-        {
+		///////////////////////////////////////////////////////////////////////
+		public static void auto_subscribe(int bugid)
+		{
 
-            // clean up bug subscriptions that no longer fit security rules
-            // subscribe per auto_subscribe
-            // subscribe project's default user
-            // subscribe per-project auto_subscribers
-            // subscribe per auto_subscribe_own_bugs
-            string sql = @"
+			// clean up bug subscriptions that no longer fit security rules
+			// subscribe per auto_subscribe
+			// subscribe project's default user
+			// subscribe per-project auto_subscribers
+			// subscribe per auto_subscribe_own_bugs
+			string sql = @"
 declare @pj int
 select @pj = bg_project from bugs where bg_id = $id
 
