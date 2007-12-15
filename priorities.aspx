@@ -14,9 +14,8 @@ Security security;
 void Page_Load(Object sender, EventArgs e)
 {
 
-	dbutil = new DbUtil();
-
 	Util.do_not_cache(Response);
+	dbutil = new DbUtil();
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
 

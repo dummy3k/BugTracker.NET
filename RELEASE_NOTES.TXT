@@ -4,6 +4,28 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
+* Fixed bug with flags - added code so that flag.aspx doesn't cache.
+
+
+* call mary brinton, jeremy, 
+* no single quotes in custom fields or values
+* same with project dorpdowns
+* better capture error in bug.aspx if query has sql err
+* excel export
+* test for apostrophe's
+* clone bug, new buttons there
+* more ajax-ee?
+* more explicit settings to turn on and off projects, organizations
+* more tool tips
+* # of days in status
+* field level permissions
+* deactivated users
+* per project defaults
+* escalation/reminder
+* better bug grouping
+* LDAP?
+* bitnami
+
 -----------------------------------------------------------------------
 Version 2.6.9  12/14/2007
 -----------------------------------------------------------------------
