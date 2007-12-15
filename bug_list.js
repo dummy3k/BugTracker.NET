@@ -85,6 +85,10 @@ function get_bug_comment(bugid)
 		return
 	}
 
+	var url = ajax_url + bugid
+	xmlHttp.onreadystatechange=stateChanged
+	xmlHttp.open("GET",url,true)
+	xmlHttp.send(null)
 }
 
 function stateChanged()

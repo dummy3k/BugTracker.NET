@@ -1835,7 +1835,9 @@ void on_update (Object sender, EventArgs e)
 				sql = sql.Replace("$pcd2", pcd2.Replace("'","''"));
 				sql = sql.Replace("$pcd3", pcd3.Replace("'","''"));
 
-				if (ds_custom_cols.Tables[0].Rows.Count == 0)
+
+
+				if (ds_custom_cols.Tables[0].Rows.Count == 0 || permission_level != Security.PERMISSION_ALL)
 				{
 					sql = sql.Replace("$custom_cols_placeholder","");
 				}

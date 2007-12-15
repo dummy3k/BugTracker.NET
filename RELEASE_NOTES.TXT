@@ -5,7 +5,7 @@ Release notes:
 -----------------------------------------------------------------------
 
 -----------------------------------------------------------------------
-Version 2.6.9  12/XX/2007
+Version 2.6.9  12/14/2007
 -----------------------------------------------------------------------
 
 Bugs:
@@ -21,6 +21,17 @@ being persistent about reporting the bug and supplying the correct code.
 * Added isnull() to check for project custom fields in search.aspx,
 in case you have nulls in those fields.
 
+* Fixed some typos related to project custom dropdowns in search, for
+dropdowns 2 and 3.  Also, improved performance of search with regards 
+to project custom dropdowns.  The page no longer makes a trip to the 
+server if you are NOT using project custom dropdowns.
+
+* Fixed "Object not set to reference bug on this line in edit_bug.aspx
+when a user with Reporter permission tries to update a bug with a 
+custom field:
+
+Line 1851: string val = Request[drcc["name"].ToString()].Replace("'","''"); 
+
 New Feature:
 
 Add ability for each user to mark bugs with a personal flag, like, 
@@ -31,19 +42,6 @@ with the bug_user_flags table.
 Select ...., isnull(fl_flag,0) [$FLAG],...
 from bugs
 left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME
-
-Also:
-
-Improved performance of search with regards to project custom 
-dropdowns.  The page no longer makes a trip to the server if you are
-NOT using project custom dropdowns.
-
-
-
-* email style, comments have no border?
-
-* add logic to bypass trip to server if custom fields aren't being used
-* document organizations
 
 -----------------------------------------------------------------------
 Version 2.6.8  12/07/2007

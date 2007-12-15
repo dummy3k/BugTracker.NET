@@ -22,3 +22,30 @@ See the "demo use of css classes" query.
 .pr2_st2 {font-style: italic; background: orange;}
 
 
+
+
+/*
+Use these to hide fields you aren't using
+*/
+
+/*
+#project_label {display:none;}
+#current_project {display:none;}
+#change_project_label {display:none;}
+#project {display:none;}
+
+#category_label {display:none;}
+#category {display:none;}
+
+#priority_label {display:none;}
+#priority {display:none;}
+
+#status_label {display:none;}
+#status {display:none;}
+
+#assigned_to_label {display:none;}
+#assigned_to_username {display:none;}
+#reassign_label {display:none;}
+#assigned_to {display:none;}
+*/
+
