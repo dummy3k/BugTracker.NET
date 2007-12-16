@@ -62,16 +62,16 @@ void Page_Load(Object sender, EventArgs e)
 		comment.Visible = true;
 	}
 
-	string var = Request.QueryString["id"];
-	if (var == null)
+	string string_bugid = Request["id"];
+	if (string_bugid == null || (string_bugid != "0" && clone_ignore_bugid.Value == "1"))
 	{
 		id = 0;
 	}
 	else
 	{
-		if (btnet.Util.is_int(var))
+		if (btnet.Util.is_int(string_bugid))
 		{
-			id = Convert.ToInt32(var);
+			id = Convert.ToInt32(string_bugid);
 
 			HttpCookie cookie = Request.Cookies["images_inline"];
 			if (cookie == null || cookie.Value == "0")
@@ -1173,6 +1173,7 @@ bool did_something_change()
 	if (prev_short_desc.Value != short_desc.Value
 	|| comment.Value.Length > 0
 	|| fckeComment.Value.Length > 0
+	|| clone_ignore_bugid.Value == "1"
 	|| prev_project.Value != project.SelectedItem.Value
 	|| prev_org.Value != org.SelectedItem.Value
 	|| prev_category.Value != category.SelectedItem.Value
@@ -1182,6 +1183,7 @@ bool did_something_change()
 	|| (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1" &&
 		prev_udf.Value != udf.SelectedItem.Value))
 	{
+		clone_ignore_bugid.Value = "0";
 		something_changed = true;
 	}
 
@@ -1989,9 +1991,28 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 <table border=0 cellspacing=0 cellpadding=3>
 <tr>
+<script>
+function clone()
+{
+	el = document.getElementById("bugid")
+	el.firstChild.nodeValue = ""
+
+	el = document.getElementById("sub")
+	el.value = "Create"
+
+	el = document.getElementById("posts")
+	el.innerHTML = ""
+
+	el = document.getElementById("clone_ignore_bugid")
+	el.value = "1"
+
+}
+</script>
+
 <td nowrap valign=top> <!-- links -->
 	<div id="edit_bug_menu">
 		<ul>
+			<li id="clone" runat="server"><a href="javascript:clone()">clone</a></li>
 			<li id="print" runat="server" />
 			<li id="merge_bug" runat="server" />
 			<li id="delete_bug" runat="server" />
@@ -2451,6 +2472,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	<input type=hidden id="prev_pcd2" runat="server">
 	<input type=hidden id="prev_pcd3" runat="server">
 	<input type=hidden id="snapshot_timestamp" runat="server">
+	<input type=hidden id="clone_ignore_bugid" runat="server" value="0">
 
 <%
 
