@@ -5,6 +5,7 @@ Release notes:
 -----------------------------------------------------------------------
 
 * Fixed bug with flags - added code so that flag.aspx doesn't cache.
+* Added cloning feature
 
 * excel export for reports
 

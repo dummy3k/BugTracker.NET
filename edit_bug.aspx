@@ -63,12 +63,15 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	string string_bugid = Request["id"];
-	if (string_bugid == null || (string_bugid != "0" && clone_ignore_bugid.Value == "1"))
+	if (string_bugid == null || string_bugid == "0" || (string_bugid != "0" && clone_ignore_bugid.Value == "1"))
 	{
+		bugid_label.InnerHtml = "Description:&nbsp;";
 		id = 0;
 	}
 	else
 	{
+		bugid_label.Visible = true;
+		bugid_label.InnerHtml = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " ID:&nbsp;";
 		if (btnet.Util.is_int(string_bugid))
 		{
 			id = Convert.ToInt32(string_bugid);
@@ -552,6 +555,14 @@ void Page_Load(Object sender, EventArgs e)
 				+ " change history"
 				+ "</span></a>";
 			toggle_history.InnerHtml = toggle_history_link;
+
+			if (permission_level == Security.PERMISSION_ALL)
+			{
+				string clone_link = "<a href=\"javascript:clone()\" "
+					+ " title='Create a copy of this item'>create copy</a>";
+				clone.InnerHtml = clone_link;
+			}
+
 
 			if (permission_level != Security.PERMISSION_READONLY)
 			{
@@ -1997,6 +2008,9 @@ function clone()
 	el = document.getElementById("bugid")
 	el.firstChild.nodeValue = ""
 
+	el = document.getElementById("bugid_label")
+	el.firstChild.nodeValue = ""
+
 	el = document.getElementById("sub")
 	el.value = "Create"
 
@@ -2006,13 +2020,16 @@ function clone()
 	el = document.getElementById("clone_ignore_bugid")
 	el.value = "1"
 
+	el = document.getElementById("edit_bug_menu")
+	el.style.display = "none"
+
 }
 </script>
 
 <td nowrap valign=top> <!-- links -->
 	<div id="edit_bug_menu">
 		<ul>
-			<li id="clone" runat="server"><a href="javascript:clone()">clone</a></li>
+			<li id="clone" runat="server"/>
 			<li id="print" runat="server" />
 			<li id="merge_bug" runat="server" />
 			<li id="delete_bug" runat="server" />
@@ -2035,7 +2052,7 @@ function clone()
 
 	<tr>
 		<td nowrap colspan=2>
-			<span class=lbl><% Response.Write(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))); %> ID:&nbsp;</span>
+			<span class=lbl id="bugid_label" runat="server"></span>
 			<span runat="server" class=static id="bugid"></span>
 			&nbsp;&nbsp;&nbsp;
 			<span class=static id="static_short_desc" runat="server" style='width:500px; display: none;'></span>
