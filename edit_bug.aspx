@@ -600,9 +600,9 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				relationship_cnt = (int) dr["relationship_cnt"];
 			}
-			string relationships_link = "<a href=\"javascript:open_popup_window('relationships.aspx','relationships ',"
+			string relationships_link = "<a target=_blank href=relationships.aspx?id="
 				+ Convert.ToString(id)
-				+ ",750,550)\" title='Create a relationship between this item and another item'>relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
+				+ " title='Create a relationship between this item and another item'>relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
 			relationships.InnerHtml = relationships_link;
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")

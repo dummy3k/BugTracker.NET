@@ -68,6 +68,7 @@ void Page_Load(Object sender, EventArgs e)
 					dbutil.execute_nonquery(sql);
 				}
 			}
+
 		}
 		else
 		{
@@ -126,19 +127,34 @@ void Page_Load(Object sender, EventArgs e)
 
 									// insert the relationship both ways
 									sql = @"
-										insert into bug_relationships (re_bug1, re_bug2, re_type) values($bg, $bg2, N'$ty');
-										insert into bug_posts
-												(bp_bug, bp_user, bp_date, bp_comment, bp_type)
-												values($bg, $us, getdate(), N'added relationship to $bg2', 'update');";
+insert into bug_relationships (re_bug1, re_bug2, re_type, re_direction) values($bg, $bg2, N'$ty', $dir1);
+insert into bug_relationships (re_bug2, re_bug1, re_type, re_direction) values($bg, $bg2, N'$ty', $dir2);
+insert into bug_posts
+	(bp_bug, bp_user, bp_date, bp_comment, bp_type)
+	values($bg, $us, getdate(), N'added relationship to $bg2', 'update');";
 
-									//if (Request["two_way"] != null && Request["two_way"] != "")
-									{
-										sql += "insert into bug_relationships (re_bug2, re_bug1, re_type) values($bg, $bg2, N'$ty')";
-									}
 									sql = sql.Replace("$bg2",Convert.ToString(bugid2));
 									sql = sql.Replace("$bg",Convert.ToString(bugid));
 									sql = sql.Replace("$us",Convert.ToString(security.this_usid));
 									sql = sql.Replace("$ty",Request["type"].Replace("'","''"));
+
+
+									if (siblings.Checked )
+									{
+										sql = sql.Replace("$dir2","0");
+										sql = sql.Replace("$dir1","0");
+									}
+									else if (child_to_parent.Checked)
+									{
+										sql = sql.Replace("$dir2","1");
+										sql = sql.Replace("$dir1","2");
+									}
+									else
+									{
+										sql = sql.Replace("$dir2","2");
+										sql = sql.Replace("$dir1","1");
+									}
+
 									dbutil.execute_nonquery(sql);
 									add_err.InnerText = "Relationship was added.";
 								}
@@ -155,7 +171,11 @@ void Page_Load(Object sender, EventArgs e)
 	sql = @"select bg_id [id],
 		bg_short_desc [desc ],
 		re_type [comment],
-		'<a href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view]";
+		case
+			when re_direction = 0 then ''
+			when re_direction = 2 then 'child of $bg'
+			else 'parent of $bg' end [parent/child],
+		'<a target=_blank href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view]";
 
 		if (permission_level == Security.PERMISSION_ALL)
 		{
@@ -218,11 +238,18 @@ if (permission_level != Security.PERMISSION_READONLY)
 {
 %>
 <p>
-<form class=frm action="relationships.aspx">
+<form class=frm runat="server" action="relationships.aspx">
 <table>
-<tr><td>related ID:<td><input size=8 name=bugid2>
-<!--<tr><td>two-way:<td><input type=checkbox name=two_way checked>-->
-<tr><td>comment:<td><input name=type size=90 max=500>
+<tr><td>Related ID:<td><input size=8 name=bugid2>
+<tr><td>Comment:<td><input name=type size=90 max=500>
+
+<tr><td colspan=2>
+Related ID is sibling<asp:RadioButton runat="server" GroupName="direction" value="0" id="siblings"/>
+&nbsp;&nbsp;&nbsp;
+Related ID is child<asp:RadioButton runat="server" GroupName="direction" value="1" id="child_to_parent"/>
+&nbsp;&nbsp;&nbsp;
+Related ID is parent<asp:RadioButton runat="server" GroupName="direction" value="2" id="parent_to_child"/>
+&nbsp;&nbsp;&nbsp;
 <tr><td colspan=2><input class=btn type=submit value="Add">
 <tr><td colspan=2>&nbsp;
 <tr><td colspan=2>&nbsp;<span runat="server" class='err' id="add_err"></span>

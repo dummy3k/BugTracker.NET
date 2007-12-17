@@ -307,7 +307,8 @@ create table bug_relationships
 re_id int identity primary key not null,
 re_bug1 int not null,
 re_bug2 int not null,
-re_type nvarchar(500) null
+re_type nvarchar(500) null,
+re_direction int not null
 )
 
 create unique index re_index_1 on bug_relationships (re_bug1, re_bug2)
