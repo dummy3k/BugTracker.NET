@@ -818,7 +818,7 @@ void load_drop_downs()
 	// only show projects where user has permissions
 	if (security.this_is_admin)
 	{
-		sql = "/* drop downs */ select pj_id, pj_name from projects order by pj_name";
+		sql = "/* drop downs */ select pj_id, pj_name from projects order by pj_name;";
 	}
 	else
 	{
@@ -833,8 +833,17 @@ void load_drop_downs()
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 	}
 
+
+	if (security.this_other_orgs_permission_level != 0)
+	{
+		sql += " select og_id, og_name from orgs order by og_name;";
+	}
+	else
+	{
+		sql += " select og_id, og_name from orgs where og_id = " + Convert.ToInt32(security.this_org) + " order by og_name;";
+	}
+
 	sql += @"
-	select og_id, og_name from orgs order by og_name;
 	select ct_id, ct_name from categories order by ct_sort_seq, ct_name;
 	select pr_id, pr_name from priorities order by pr_sort_seq, pr_name;
 	select st_id, st_name from statuses order by st_sort_seq, st_name;

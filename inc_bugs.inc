@@ -412,7 +412,7 @@ void display_bugs(bool show_checkbox)
 	}
 	else
 	{
-		sql += "select og_name from orgs where og_id = " + Convert.ToInt32(security.this_org);
+		sql += "select og_name from orgs where og_id = " + Convert.ToInt32(security.this_org) + " order by og_name;";
 	}
 	sql += @"
 select ct_name from categories order by ct_sort_seq, ct_name;

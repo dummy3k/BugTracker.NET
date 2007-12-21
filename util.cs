@@ -799,30 +799,46 @@ namespace btnet
 
 			// figure out where to alter sql for project permissions
 
-			string bug_sql = sql;
+			string bug_sql;
 
-			int pos = sql.IndexOf("WhErE"); // first look for a "special" where, case sensitive, in case there are multiple where's to choose from
+			int where_pos = sql.IndexOf("WhErE"); // first look for a "special" where, case sensitive, in case there are multiple where's to choose from
+			if (where_pos == -1) where_pos = sql.ToUpper().IndexOf("WHERE");
+			int	order_pos = sql.ToUpper().LastIndexOf("ORDER BY");
+			if (order_pos < where_pos) order_pos = -1; // ignore an order by that occurs in a subquery, for example
+			Util.write_to_log(Convert.ToString(sql.Length) + " " + Convert.ToString(where_pos) + " " + Convert.ToString(order_pos));
 
-			if (pos == -1) pos = sql.ToUpper().IndexOf("WHERE");
-			if (pos != -1)
+			if (where_pos != -1 && order_pos != -1)
 			{
-				bug_sql = bug_sql.Substring(0,pos+5) +
-						project_permissions_sql +
-						"AND " + bug_sql.Substring(pos+5);
+				// both WHERE and ORDER BY clauses
+				bug_sql = sql.Substring(0,where_pos + 5)
+					+ " /* altered - both  */ ( "
+					+ sql.Substring(where_pos + 5, order_pos-(where_pos+5))
+					+ " ) AND ( "
+					+ project_permissions_sql
+					+ " ) "
+					+ sql.Substring(order_pos);
+			}
+			else if (order_pos == -1 && where_pos == -1)
+			{
+				// Neither
+				bug_sql = sql + " /* altered - neither */ WHERE " + project_permissions_sql;
+			}
+			else if (order_pos == -1)
+			{
+				// WHERE, without order
+				bug_sql = sql.Substring(0,where_pos + 5)
+					+ " /* altered - just where */ ( "
+					+ sql.Substring(where_pos + 5)
+					+ " ) AND ( "
+					+  project_permissions_sql + " )";
 			}
 			else
 			{
-				pos = sql.ToUpper().IndexOf("ORDER BY");
-				if (pos != -1)
-				{
-					bug_sql = bug_sql.Substring(0,pos) +
-						"WHERE" + project_permissions_sql +
-						bug_sql.Substring(pos);
-				}
-				else
-				{
-					bug_sql += " WHERE " + project_permissions_sql;
-				}
+				// ORDER BY, without WHERE
+				bug_sql = sql.Substring(0,order_pos)
+					+ " /* altered - just order by  */ WHERE "
+					+ project_permissions_sql
+					+ sql.Substring(order_pos);
 			}
 
 			return bug_sql;

@@ -4,6 +4,12 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
+* apostrophe's in dropdown values break search
+* NEED INSTRUCTIONS HOW TO UPGRADE 
+* no commas allowed in dropdown values too
+
+* filter counts
+
 * Fixed bug with flags - added code so that flag.aspx doesn't cache.
 * Added cloning feature
 
