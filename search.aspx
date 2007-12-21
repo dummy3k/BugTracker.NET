@@ -841,6 +841,8 @@ void load_drop_downs()
 	else
 	{
 		sql += " select og_id, og_name from orgs where og_id = " + Convert.ToInt32(security.this_org) + " order by og_name;";
+		org.Visible = false;
+		org_label.Visible = false;
 	}
 
 	sql += @"
@@ -1542,7 +1544,7 @@ function set_project_changed() {
 <table border=0 cellpadding=8 cellspacing=0>
 	<tr>
 
-		<td nowrap><span class=lbl id="org_label">organization:</span><br>
+		<td nowrap><span class=lbl id="org_label" runat="server">organization:</span><br>
 		<asp:ListBox Rows=6 SelectionMode="Multiple" id="org" runat="server" onchange="on_change()">
 		</asp:ListBox>
 		</td>
