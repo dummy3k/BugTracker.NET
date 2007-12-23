@@ -9,6 +9,32 @@ System.Data.DataSet ds_filters;
 System.Data.DataSet ds_custom_cols;
 
 ///////////////////////////////////////////////////////////////////////
+string get_bug_count_string()
+{
+	if (dv.Count == dv.Table.Rows.Count)
+	{
+		return "<br><br>" 
+			+ Convert.ToString(dv.Table.Rows.Count)
+			+ " "
+			+ btnet.Util.get_setting("PluralBugLabel","bugs")
+			+ " returned by query<br>";
+	}
+	else
+	{
+		return "<br><br>" 
+			+ "Showing "
+			+ Convert.ToString(dv.Count)
+			+ " out of "
+			+ Convert.ToString(dv.Table.Rows.Count)
+			+ " "
+			+ btnet.Util.get_setting("PluralBugLabel","bugs")
+			+ " returned by query<br>";
+	}
+		
+	
+}
+
+///////////////////////////////////////////////////////////////////////
 string get_paging_string()
 {
 
@@ -121,6 +147,8 @@ string get_paging_string()
 ///////////////////////////////////////////////////////////////////////
 void sort_dataview() {
 
+	if (dv == null) return;
+	
 	// remember filter
 	if (!IsPostBack)
 	{
@@ -140,7 +168,15 @@ void sort_dataview() {
 	else
 	{
 		Session["filter"] = filter.Value;
-		dv.RowFilter = filter.Value.Replace("'","''").Replace("$$$","'");
+		string filter_string = filter.Value;
+		btnet.Util.write_to_log ("corey " + filter.Value);
+
+		filter_string = filter_string.Replace("[$FLAG] =$$$red$$$","[$FLAG] =1");
+		filter_string = filter_string.Replace("[$FLAG] =$$$green$$$","[$FLAG] =2");
+		filter_string = filter_string.Replace("[$FLAG]<>$$$$$$","[$FLAG] <>0");
+		filter_string = filter_string.Replace("[$FLAG] =$$$$$$","[$FLAG] =0");
+		
+		dv.RowFilter = filter_string.Replace("'","''").Replace("$$$","'");
 	}
 	
 	
@@ -329,6 +365,7 @@ void display_bugs(bool show_checkbox)
 	}
 
 	string paging_string = get_paging_string();
+	string bug_count_string = get_bug_count_string();
 
 	Response.Write (paging_string);
 	Response.Write ("<table class=bugt border=1 ><tr>\n");
@@ -364,7 +401,7 @@ void display_bugs(bool show_checkbox)
 			
 			if (dc.ColumnName == "$FLAG")
 			{
-				Response.Write ("[!]");
+				Response.Write ("flag");
 			}
 			else
 			{
@@ -478,6 +515,10 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 			{
 				DataView dv_users = new DataView(dt_users);
 				display_filter_select ("[assigned to]", dt_users, 1);
+			}
+			else if (dc.ColumnName == "$FLAG" )
+			{
+				display_filter_select("[$FLAG]","red|green");
 			}
 			else
 			{
@@ -653,6 +694,7 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 
 	Response.Write ("</table>");
 	Response.Write (paging_string);
+	Response.Write (bug_count_string);
 
 }
 

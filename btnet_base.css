@@ -206,6 +206,16 @@ padding: 3px;
 	color: red;
 }
 
+.filter option {
+	font-size: 7pt;
+}
+
+.filter_selected option {
+	font-size: 7pt;
+}
+
+
+
 .tab_btn
 {
 	padding-left: 10px;
@@ -264,6 +274,6 @@ input  {
 	margin-bottom: 10px;
 }
 
-.wht {margin: auto; display: block; width:10px; height:10px; border: 1px solid #cccccc;}
-.red {margin: auto; display: block; width:10px; height:10px; background: red; border: 1px solid red;}
-.grn {margin: auto; display: block; width:10px; height:10px; background: #33ff33; border: 1px solid #33ff33;}
+.wht {margin: auto; display: block; width:40%; height:80%; border: 1px solid #cccccc;}
+.red {margin: auto; display: block; width:40%; height:80%; background: red; border: 1px solid red;}
+.grn {margin: auto; display: block; width:40%; height:80%; background: #33ff33; border: 1px solid #33ff33;}

@@ -12,6 +12,7 @@ Security security;
 bool query_changed = false;
 string qu_id_string = null;
 DataTable dt_users = null;
+string sql_error = "";
 
 void do_query()
 {
@@ -115,11 +116,18 @@ void do_query()
 		bug_sql = bug_sql.Replace("$fullnames","1 = 1");
 	}
 
-	DataSet ds = dbutil.get_dataset (bug_sql);
-	dv = new DataView(ds.Tables[0]);
+	DataSet ds;
+	try
+	{
+		ds = dbutil.get_dataset (bug_sql);
+		dv = new DataView(ds.Tables[0]);
+	}
+	catch(System.Data.SqlClient.SqlException e)
+	{
+		sql_error = e.Message;
+		dv = null;
+	}
 	Session["bugs"] = dv;
-	bug_count.Text = Convert.ToString(dv.Count);
-
 
 }
 
@@ -275,19 +283,24 @@ function get_or_post()
 
 <p>
 <%
-if (dv.Table.Rows.Count > 0)
+if (dv != null)
 {
-	display_bugs();
+	if (dv.Table.Rows.Count > 0)
+	{
+		display_bugs();
+	}
+	else
+	{
+		Response.Write ("<p>No ");
+		Response.Write (Util.get_setting("PluralBugLabel","bugs"));
+		Response.Write (" yet.<p>");
+	}
 }
 else
 {
-	Response.Write ("<p>No ");
-	Response.Write (Util.get_setting("PluralBugLabel","bugs"));
-	Response.Write (" yet.<p>");
+	Response.Write ("<div class=err>Error in query SQL: " + sql_error + "</div>");
 }
 %>
-<br><br><asp:label id="bug_count" runat="server"></asp:label> <% Response.Write(Util.get_setting("PluralBugLabel","bugs")); %> returned by query.
-
 <!-- #include file = "inc_bugs2.inc" -->
 </div>
 </form>
