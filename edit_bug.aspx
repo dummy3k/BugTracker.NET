@@ -2185,7 +2185,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			}
 			else
 			{
-				Response.Write (hash_custom_cols[(string)drcc["name"]]);
+				Response.Write (HttpUtility.HtmlEncode((string)hash_custom_cols[(string)drcc["name"]]));
 			}
 			Response.Write ("</span>");
 		}
