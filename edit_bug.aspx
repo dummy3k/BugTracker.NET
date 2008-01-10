@@ -648,6 +648,7 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				string delete_bug_link = "<a href=delete_bug.aspx?id="
 					+ Convert.ToString(id)
+					+ "&ses=" + Session["session_cookie"]
 					+ " title='Delete this item'>delete</a>";
 
 				delete_bug.InnerHtml = delete_bug_link;
@@ -2548,6 +2549,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	{
 		PrintBug.write_posts(
 			Response,
+			HttpContext.Current,
 			id,
 			permission_level,
 			true,

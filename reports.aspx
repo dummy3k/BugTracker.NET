@@ -48,11 +48,15 @@ void Page_Load(Object sender, EventArgs e)
 	        $adm
 	        from reports order by rp_desc";
 
-	if (security.this_is_admin || security.this_can_edit_reports) {
+	if (security.this_is_admin || security.this_can_edit_reports)
+	{
 		sql = sql.Replace("$adm", ", " +
 			"'<a href=''edit_report.aspx?id=' + convert(varchar, rp_id) + '''>edit</a>' [edit], " +
-			"'<a href=''delete_report.aspx?id=' + convert(varchar, rp_id) + '''>delete</a>' [delete] ");
-	} else {
+			"'<a href=''delete_report.aspx?ses=$ses&id=' + convert(varchar, rp_id) + '''>delete</a>' [delete] ");
+		sql = sql.Replace("$ses",Convert.ToString(Session["session_cookie"]));
+	}
+	else
+	{
 		sql = sql.Replace("$adm", "");
 	}
 

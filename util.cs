@@ -174,6 +174,7 @@ namespace btnet
 				Response.Redirect(target);
 			}
 
+			asp_net_context.Session["session_cookie"] = cookie.Value;
 
 			this_usid = Convert.ToInt32(dr["us_id"]);
 			this_username = (string) dr["us_username"];
@@ -371,6 +372,25 @@ namespace btnet
 			Response.Write("</tr></table><br>");
 
 		}
+
+		public bool check_password(DbUtil dbutil, string password)
+		{
+			string sql = @"select us_id
+				from users
+				where us_id = $us
+				and (us_password = N'$pw' or us_password = N'$en')
+				and us_active = 1";
+
+			sql = sql.Replace("$us", Convert.ToString(this_usid));
+			sql = sql.Replace("$pw", password.Replace("'","''"));
+			sql = sql.Replace("$en", btnet.Util.encrypt_string_using_MD5(password));
+
+			object us_id = dbutil.execute_scalar(sql);
+
+			return (us_id != null);
+
+		}
+
 
 	} // end Security
 
@@ -1940,7 +1960,7 @@ drop table #temp";
 
 
 			// don't write links, don't show images, do show update history
-			write_posts (Response, bugid, 0, false, false, true,
+			write_posts (Response, null, bugid, 0, false, false, true,
 				this_is_admin,
 				false,
 				this_external_user);
@@ -1955,6 +1975,7 @@ drop table #temp";
 		///////////////////////////////////////////////////////////////////////
 		public static void write_posts(
 			HttpResponse Response,
+			HttpContext context,
 			int bugid,
 			int permission_level,
 			bool write_links,
@@ -2006,7 +2027,7 @@ drop table #temp";
 						Response.Write ("</table>");
 					}
 
-					write_post(Response, bugid, permission_level, dr, bp_id, write_links, images_inline,
+					write_post(Response, context, bugid, permission_level, dr, bp_id, write_links, images_inline,
 						this_is_admin,
 						this_can_edit_and_delete_posts,
 						this_external_user);
@@ -2028,6 +2049,7 @@ drop table #temp";
 		///////////////////////////////////////////////////////////////////////
 		public static void write_post(
 			HttpResponse Response,
+			HttpContext context,
 			int bugid,
 			int permission_level,
 			DataRow dr,
@@ -2178,7 +2200,7 @@ drop table #temp";
 
 					// This delete leaves debris around, but it's better than nothing
 						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
-						Response.Write (" href=delete_comment.aspx?id="
+						Response.Write (" href=delete_comment.aspx?ses=" + context.Session["session_cookie"] + "&id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">delete</a>");
 
@@ -2209,7 +2231,7 @@ drop table #temp";
 						Response.Write (">edit</a>");
 
 						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
-						Response.Write (" href=delete_attachment.aspx?id="
+						Response.Write (" href=delete_attachment.aspx?ses=" + context.Session["session_cookie"] + "&id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">delete</a>");
 
@@ -2227,7 +2249,7 @@ drop table #temp";
 						Response.Write (">edit</a>");
 
 						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
-						Response.Write (" href=delete_comment.aspx?id="
+						Response.Write (" href=delete_comment.aspx?ses=" + context.Session["session_cookie"] + "&id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">delete</a>");
 					}

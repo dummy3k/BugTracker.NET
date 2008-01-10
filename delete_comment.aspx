@@ -51,7 +51,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	string confirm = Request.QueryString["confirm"];
 
-	if (confirm == "y")
+	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
 	{
 		// do delete here
 
@@ -63,7 +63,7 @@ void Page_Load(Object sender, EventArgs e)
 	else
 	{
 		back_href.HRef = "edit_bug.aspx?id=" + bug_id;
-		confirm_href.HRef = "delete_comment.aspx?confirm=y&id=" + id + "&bug_id=" + bug_id;
+		confirm_href.HRef = "delete_comment.aspx?confirm=y&id=" + id + "&bug_id=" + bug_id   + "&ses=" + Request["ses"];
 
 		sql = @"select bp_comment from bug_posts where bp_id = $1";
 		sql = sql.Replace("$1", id);

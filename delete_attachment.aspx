@@ -43,7 +43,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 
-	if (confirm == "y")
+	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
 	{
 		// save the filename before deleting the row
 		sql = @"select bp_file from bug_posts where bp_id = $ba";
@@ -83,7 +83,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		confirm_href.HRef =
 			"delete_attachment.aspx?confirm=y&id=" 	+ attachment_id_string
-			+ "&bug_id=" + bug_id_string;
+			+ "&bug_id=" + bug_id_string + "&ses=" + Request["ses"];
 
 
 		sql = @"select bp_file from bug_posts where bp_id = $1";

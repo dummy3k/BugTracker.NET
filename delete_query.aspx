@@ -25,9 +25,9 @@ void Page_Load(Object sender, EventArgs e)
 		+ "delete query";
 
 	string id = Util.sanitize_integer(Request["id"]);
-	string confirm = Request.QueryString["confirm"];
+	string confirm = Request["confirm"];
 
-	if (confirm == "y")
+	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
 	{
 		// do delete here
 		sql = @"delete queries where qu_id = $1";
@@ -37,7 +37,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	else
 	{
-		confirm_href.HRef = "delete_query.aspx?confirm=y&id=" + id;
+		confirm_href.HRef = "delete_query.aspx?confirm=y&id=" + id + "&ses=" + Request["ses"];
 
 		sql = @"select qu_desc, isnull(qu_user,0) qu_user from queries where qu_id = $1";
 		sql = sql.Replace("$1", id);

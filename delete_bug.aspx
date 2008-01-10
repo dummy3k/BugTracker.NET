@@ -47,7 +47,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	string confirm = Request.QueryString["confirm"];
 
-	if (confirm == "y")
+	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
 	{
 
 		Bug.delete_bug(Convert.ToInt32(id));
@@ -58,7 +58,7 @@ void Page_Load(Object sender, EventArgs e)
 	else
 	{
 		back_href.HRef = "edit_bug.aspx?id=" + id;
-		confirm_href.HRef = "delete_bug.aspx?confirm=y&id=" + id;
+		confirm_href.HRef = "delete_bug.aspx?confirm=y&id=" + id  + "&ses=" + Request["ses"];
 
 		sql = @"select bg_short_desc from bugs where bg_id = $1";
 		sql = sql.Replace("$1", id);

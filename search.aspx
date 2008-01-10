@@ -1874,6 +1874,7 @@ else
 			Response.Write("<td><span class=lbl>status:</span><br><select name=mass_status id=mass_status></select>");
 			Response.Write("<tr><td colspan=5>OR DELETE:&nbsp;<input type=checkbox name=mass_delete>");
 			Response.Write("<tr><td colspan=5 align=center><input type=submit value='Update/Delete All'>");
+			Response.Write("<input type=hidden name=ses value='" + Session["session_cookie"] + "'>");
 			Response.Write("</table></form><p><script>load_massedit_selects()</script>");
 		}
 		else

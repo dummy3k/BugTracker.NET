@@ -111,7 +111,7 @@ void Page_Load(Object sender, EventArgs e)
 
 
 		// either run the sql, or just ask for confirmation
-		if (Request["confirm"] != null)
+		if (Request["confirm"] != null  && (string) Request["ses"] == (string) Session["session_cookie"])
 		{
 			if (Request["mass_delete"] != null)
 			{

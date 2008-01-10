@@ -34,10 +34,10 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "delete report";
 
-	string id = Util.sanitize_integer(Request["id"]);
+	string id = Util.sanitize_integer(Request["id"] );
 	string confirm = Request["confirm"];
 
-	if (confirm == "y")
+	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
 	{
 		// do delete here
 		sql = @"delete reports where rp_id = $1";
@@ -47,7 +47,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	else
 	{
-		confirm_href.HRef = "delete_report.aspx?confirm=y&id=" + id;
+		confirm_href.HRef = "delete_report.aspx?confirm=y&id=" + id + "&ses=" + Request["ses"];
 
 		sql = @"select rp_desc from reports where rp_id = $1";
 		sql = sql.Replace("$1", id);

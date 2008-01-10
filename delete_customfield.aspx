@@ -26,7 +26,7 @@ void Page_Load(Object sender, EventArgs e)
 	string id = Util.sanitize_integer(Request["id"]);
 	string confirm = Request.QueryString["confirm"];
 
-	if (confirm == "y")
+	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
 	{
 		// do delete here
 
@@ -60,7 +60,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	else
 	{
-		confirm_href.HRef = "delete_customfield.aspx?confirm=y&id=" + id;
+		confirm_href.HRef = "delete_customfield.aspx?confirm=y&id=" + id  + "&ses=" + Request["ses"];
 	}
 
 }
