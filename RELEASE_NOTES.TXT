@@ -5,9 +5,6 @@ Release notes:
 -----------------------------------------------------------------------
 
 * relationship parent/child
-* query counts
-* filter for flags
-* friendlier handling of errors in sql 
 
 * apostrophe's in dropdown values break search
 * NEED INSTRUCTIONS HOW TO UPGRADE 
@@ -15,9 +12,6 @@ Release notes:
 
 * excel export for reports
 
-* call jeremy, 
-* better capture error in bug.aspx if query has sql err
-* test for apostrophe's
 * more explicit settings to turn on and off projects, organizations
 * more tool tips
 * # of days in status
@@ -25,7 +19,6 @@ Release notes:
 * deactivated users
 * per project defaults
 * escalation/reminder
-* better bug grouping
 * bitnami
 
 

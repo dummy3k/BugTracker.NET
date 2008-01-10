@@ -31,7 +31,10 @@ void Page_Load(Object sender, EventArgs e)
 	string comment = Request["comment"];
 	string from = Request["from"];
 	string message = Request["message"];
-
+	string attachment_as_base64 = Request["attachment"];
+	string attachment_content_type = Request["attachment_content_type"];
+	string attachment_filename = Request["attachment_filename"];
+	string attachment_desc = Request["attachment_desc"];
 
 	// only via emails
 	if (from == null)
@@ -470,6 +473,29 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 		}
+		else if (attachment_as_base64 != null && attachment_as_base64.Length > 0)
+		{
+
+			if (attachment_desc == null) attachment_desc = "";
+			if (attachment_content_type == null) attachment_content_type = "";
+			if (attachment_filename == null) attachment_filename = "";
+
+			System.Byte[] byte_array = System.Convert.FromBase64String(attachment_as_base64);
+			Stream stream = new MemoryStream(byte_array);
+
+			Bug.insert_post_attachment(
+				security,
+				new_ids.bugid,
+				stream,
+				byte_array.Length,
+				attachment_filename,
+				attachment_desc,
+				attachment_content_type,
+				-1, // parent
+				false, // internal_only
+				false); // don't send notification yet
+		}
+
 
         btnet.Bug.send_notifications(btnet.Bug.INSERT, new_ids.bugid, security);
 
@@ -478,7 +504,7 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 
 	}
-	else
+	else // update existing bug
 	{
 
 		string StatusResultingFromIncomingEmail = Util.get_setting("StatusResultingFromIncomingEmail","0");
@@ -533,6 +559,28 @@ void Page_Load(Object sender, EventArgs e)
 		if (mime_message != null)
 		{
 			add_attachments(mime_message, bugid, postid);
+		}
+		else if (attachment_as_base64 != null && attachment_as_base64.Length > 0)
+		{
+
+			if (attachment_desc == null) attachment_desc = "";
+			if (attachment_content_type == null) attachment_content_type = "";
+			if (attachment_filename == null) attachment_filename = "";
+
+			System.Byte[] byte_array = System.Convert.FromBase64String(attachment_as_base64);
+			Stream stream = new MemoryStream(byte_array);
+
+			Bug.insert_post_attachment(
+				security,
+				bugid,
+				stream,
+				byte_array.Length,
+				attachment_filename,
+				attachment_desc,
+				attachment_content_type,
+				-1, // parent
+				false, // internal_only
+				false); // don't send notification yet
 		}
 
 		btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security);
