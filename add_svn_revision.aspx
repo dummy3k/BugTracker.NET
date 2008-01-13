@@ -21,6 +21,7 @@ string svn_username = "";
 string svn_password = "";
 string websvn_url = "";
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)

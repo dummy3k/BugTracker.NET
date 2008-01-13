@@ -1,4 +1,6 @@
 <%@ Page language="C#" validateRequest="false"%>
+<%@ Import namespace="btnet"%>
+<%@ Import namespace="System.Data"%>
 <%@ Register TagPrefix="FCKeditorV2" Namespace="FredCK.FCKeditorV2" Assembly="FredCK.FCKeditorV2" %>
 
 <!--
@@ -30,6 +32,8 @@ bool history_inline = false;
 bool status_changed = false;
 bool assigned_to_changed = false;
 int prev_assigned_to_user = 0;
+
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -648,7 +652,6 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				string delete_bug_link = "<a href=delete_bug.aspx?id="
 					+ Convert.ToString(id)
-					+ "&ses=" + Session["session_cookie"]
 					+ " title='Delete this item'>delete</a>";
 
 				delete_bug.InnerHtml = delete_bug_link;
@@ -1577,57 +1580,63 @@ Boolean validate()
 				}
 				catch (FormatException)
 				{
-					custom_field_msg.InnerHtml = "<br>\"" + name + "\" not in a valid date format.<br>";
-					return false;
+					custom_field_msg.InnerHtml += "\"" + name + "\" not in a valid date format.<br>";
+					good = false;
 				}
 			}
 			else if (datatype == "int")
 			{
 				if (!btnet.Util.is_int(val))
 				{
-					custom_field_msg.InnerHtml = "<br>\"" + name + "\" must be an integer.<br>";
-					return false;
+					custom_field_msg.InnerHtml += "\"" + name + "\" must be an integer.<br>";
+					good = false;
 				}
 
 			}
 			else if (datatype == "decimal")
 			{
-				try
+				//modified by CJU on jan 9 2008 : better support for french number styles
+				//check that val string is a valid decimal value
+				System.Globalization.CultureInfo ci = btnet.Util.get_culture_info( );
+				decimal x;
+				if( !Decimal.TryParse( val, System.Globalization.NumberStyles.Float, ci, out x ) )
 				{
-					Decimal.Parse(val, btnet.Util.get_culture_info());
-
-					// check if there are too many digits overall
-					int xprec = Convert.ToInt32(drcc["xprec"]);
-					if (val.Replace(".","").Length > xprec)
-					{
-						custom_field_msg.InnerHtml = "<br>\"" + name + "\" has too many digits.<br>";
-						return false;
-					}
-
-					// check if there are too many digits to left or right of decimal
-					int xscale = Convert.ToInt32(drcc["xscale"]);
-					int pos = val.IndexOf(".");
-					if (pos > -1)
-					{
-						if (pos > xprec - xscale)
-						{
-							custom_field_msg.InnerHtml = "<br>\"" + name + "\" has too many digits to the left of the decimal point.<br>";
-							return false;
-						}
-
-						if (val.Length-(pos+1) > xscale)
-						{
-							custom_field_msg.InnerHtml = "<br>\"" + name + "\" has too many digits to the right of the decimal point.<br>";
-							return false;
-						}
-					}
-
+					custom_field_msg.InnerHtml += "\"" + name + "\" not in a valid decimal format.<br>";
+					good = false;
 				}
-				catch (FormatException)
+
+				// check if there are too many digits overall
+				int xprec = Convert.ToInt32(drcc["xprec"]);
+				string[] vals = val.Split( new string[] { ci.NumberFormat.NumberDecimalSeparator }, StringSplitOptions.None );
+				int prec = (vals.Length == 1 ? vals[0].Length : vals[0].Length + vals[1].Length);
+				if( prec > xprec )
 				{
-					custom_field_msg.InnerHtml = "<br>\"" + name + "\" not in a valid decimal format.<br>";
-					return false;
+					custom_field_msg.InnerHtml += "\"" + name + "\" has too many digits.<br>";
+					good = false;
 				}
+
+				// check if there are too many digits to left or right of decimal
+				int xscale = Convert.ToInt32(drcc["xscale"]);
+				if( vals.Length == 1 )
+				{
+					if (vals[0].Length > xprec - xscale)
+					{
+						custom_field_msg.InnerHtml += "\"" + name + "\" has more than "
+							+ Convert.ToString(xprec - xscale) + " digits to the left of the decimal point.<br>";
+						good = false;
+					}
+				}
+
+				if( vals.Length > 1 )
+				{
+					if (vals[1].Length > xscale)
+					{
+						custom_field_msg.InnerHtml += "\"" + name + "\" has more than "
+							+  Convert.ToString(xscale) + " digits to the right of the decimal point.<br>";
+						good = false;
+					}
+				}
+				//end modified by CJU on jan 9 2008
 			}
 		}
 		else
@@ -1635,12 +1644,11 @@ Boolean validate()
 			int nullable = (int) drcc["isnullable"];
 			if (nullable == 0)
 			{
-				custom_field_msg.InnerHtml = "<br>\"" + name + "\" is required.<br>";
-				return false;
+				custom_field_msg.InnerHtml += "\"" + name + "\" is required.<br>";
+				good = false;
 			}
 		}
 	}
-
 
 
 	return good;
@@ -1866,12 +1874,19 @@ void on_update (Object sender, EventArgs e)
 
 						string val = Request[drcc["name"].ToString()].Replace("'","''");
 
+						//modified by CJU on jan 9 2008 : added handling of the decimal datatype case
+						if( val.Length > 0 ) {
+							switch( drcc["datatype"].ToString( ) ) {
 						// if a date was entered, convert to db format
-						if (val.Length > 0
-						&& drcc["datatype"].ToString() == "datetime")
-						{
+								case "datetime":
 							val = btnet.Util.format_local_date_into_db_format(val);
+									break;
+								case "decimal":
+									val = btnet.Util.format_local_decimal_into_db_format( val );
+									break;
+							}
 						}
+						//end modified by CJU on jan 9 2008
 
 
 						if (val.Length == 0)
@@ -2179,14 +2194,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		|| permission_on_original == Security.PERMISSION_REPORTER)
 		{
 			Response.Write ("<span class=static>");
-			if (drcc["datatype"].ToString() == "datetime")
-			{
-				Response.Write (btnet.Util.format_db_date(hash_custom_cols[(string)drcc["name"]]));
-			}
-			else
-			{
-				Response.Write (HttpUtility.HtmlEncode((string)hash_custom_cols[(string)drcc["name"]]));
-			}
+			//modified by CJU on jan 9 2008
+			Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
+			//end modified by CJU on jan 9 2008
 			Response.Write ("</span>");
 		}
 		else
@@ -2285,28 +2295,11 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 
 					// output a date field according to the specified format
-					if (hash_custom_cols[(string)drcc["name"]].GetType().ToString() == "System.DateTime")
-					{
-						Response.Write (
-							" value=\""
-							+ btnet.Util.format_db_date(hash_custom_cols[(string)drcc["name"]])
-							+ "\"");
-
-					}
-					else
-					{
 						Response.Write (" value=\"");
-						Response.Write (
-							HttpUtility.HtmlEncode(
-								Convert.ToString(
-									hash_custom_cols[(string)drcc["name"]]
-								)
-							)
-						);
-						Response.Write ("\"");
-					}
-
-					Response.Write (">");
+					//modified by CJU on jan 9 2008
+					Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
+					//end modified by CJU on jan 9 2008
+					Response.Write ("\">");
 					if (drcc["datatype"].ToString() == "datetime")
 					{
 						Response.Write("<a style=\"font-size: 8pt;\"href=\"javascript:show_calendar('"
@@ -2504,27 +2497,10 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		Response.Write ("\"");
 
 		// output a date field according to the specified format
-		if (hash_custom_cols[(string)drcc["name"]].GetType().ToString() == "System.DateTime")
-		{
-
-			Response.Write (
-				" value=\""
-				+ btnet.Util.format_db_date(hash_prev_custom_cols[(string)drcc["name"]]));
-		}
-		else
-		{
 			Response.Write (" value=\"");
-
-			Response.Write (
-				HttpUtility.HtmlEncode(
-					Convert.ToString(
-						hash_prev_custom_cols[(string)drcc["name"]]
-					)
-				)
-			);
-
-		}
-
+		//modified by CJU on jan 9 2008
+		Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
+		//modified by CJU on jan 9 2008
 		Response.Write ("\">\n");
 	}
 
@@ -2549,7 +2525,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	{
 		PrintBug.write_posts(
 			Response,
-			HttpContext.Current,
 			id,
 			permission_level,
 			true,

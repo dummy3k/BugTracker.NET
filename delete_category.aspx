@@ -11,6 +11,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -20,23 +22,20 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
 
-	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "delete category";
-
-
-	string id = Util.sanitize_integer(Request["id"]);
-	string confirm = Request.QueryString["confirm"];
-
-	if (confirm == "y")
+	if (IsPostBack)
 	{
-		// do delete here
 		sql = @"delete categories where ct_id = $1";
-		sql = sql.Replace("$1", id);
+		sql = sql.Replace("$1", row_id.Value);
 		dbutil.execute_nonquery(sql);
 		Server.Transfer ("categories.aspx");
 	}
 	else
 	{
+		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "delete category";
+
+		string id = Util.sanitize_integer(Request["id"]);
+
 		sql = @"declare @cnt int
 			select @cnt = count(1) from bugs where bg_category = $1
 			select ct_name, @cnt [cnt] from categories where ct_id = $1";
@@ -53,11 +52,11 @@ void Page_Load(Object sender, EventArgs e)
 		}
 		else
 		{
-			confirm_href.HRef = "delete_category.aspx?confirm=y&id=" + id;
-
 			confirm_href.InnerText = "confirm delete of \""
 				+ Convert.ToString(dr["ct_name"])
 				+ "\"";
+
+			row_id.Value = id;
 		}
 	}
 
@@ -77,10 +76,23 @@ void Page_Load(Object sender, EventArgs e)
 <div class=align>
 <p>&nbsp</p>
 <a href=categories.aspx>back to categories</a>
-<p>
-or
-<p>
-<a id="confirm_href" runat="server" href=""></a>
+
+<p>or<p>
+
+<script>
+function submit_form()
+{
+    var frm = document.getElementById("frm");
+    frm.submit();
+    return true;
+}
+
+</script>
+<form runat="server" id="frm">
+<a id="confirm_href" runat="server" href="javascript: submit_form()"></a>
+<input type="hidden" id="row_id" runat="server">
+</form>
+
 </div>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

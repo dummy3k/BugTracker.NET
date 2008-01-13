@@ -44,7 +44,7 @@ void Page_Load(Object sender, EventArgs e)
 			'<a target=_blank href=print_bugs.aspx?format=excel&qu_id=' + convert(varchar,qu_id) + '>export as excel</a>' [export as excel],
 			'<a target=_blank href=print_bugs2.aspx?qu_id=' + convert(varchar,qu_id) + '>print detail</a>' [print list<br>with detail],
 			'<a href=edit_query.aspx?id=' + convert(varchar,qu_id) + '>edit</a>' [edit],
-			'<a href=delete_query.aspx?ses=$ses&id=' + convert(varchar,qu_id) + '>delete</a>' [delete],
+			'<a href=delete_query.aspx?id=' + convert(varchar,qu_id) + '>delete</a>' [delete],
 			qu_sql [sql]
 			from queries
 			left outer join users on qu_user = us_id
@@ -76,7 +76,6 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("qu_sql [sql],","");
 	}
 	sql = sql.Replace("$us",Convert.ToString(security.this_usid));
-	sql = sql.Replace("$ses",Convert.ToString(Session["session_cookie"]));
 	ds = dbutil.get_dataset(sql);
 
 }

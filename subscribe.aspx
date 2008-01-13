@@ -27,6 +27,12 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
+	if (Request.QueryString["ses"] != (string) Session["session_cookie"])
+	{
+		Response.Write ("session in URL doesn't match session cookie");
+		Response.End();
+	}
+
 	if (Request.QueryString["action"] == "1")
 	{
 		sql = @"insert into bug_subscriptions (bs_bug, bs_user)

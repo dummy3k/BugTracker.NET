@@ -118,17 +118,17 @@ function toggle_notifications(bugid)
 	}
 
 	// build url
-	var url = "subscribe.aspx?id=" 
+	var url = "subscribe.aspx?ses="
+		+ get_cookie("se_id")
+		+ "&id=" 
 		+ bugid
 		+ "&action="
-		
 		
 	if (text == "get notifications")
 		url += "1"
 	else
 		url += "0"
 
-	
 	xmlHttp.open("GET",url,true)
 	xmlHttp.send(null)
 

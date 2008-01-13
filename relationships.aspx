@@ -13,6 +13,9 @@ DbUtil dbutil;
 Security security;
 int permission_level;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
+
 void Page_Load(Object sender, EventArgs e)
 {
 
@@ -50,6 +53,14 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (action == "remove") // remove
 		{
+
+			if (Request.QueryString["ses"] != (string) Session["session_cookie"])
+			{
+				Response.Write ("session in URL doesn't match session cookie");
+				Response.End();
+			}
+
+
 			if (Request["bugid2"] != null)
 			{
 				if (Util.is_int(Request["bugid2"]))
@@ -180,10 +191,9 @@ insert into bug_posts
 		if (permission_level == Security.PERMISSION_ALL)
 		{
 
-			sql += @",'<a href=relationships.aspx?action=remove&id=$bg'
-		+ '&bugid2='
+			sql += @",'<a href=relationships.aspx?action=remove&ses=$ses&id=$bg&bugid2='
 		+ convert(varchar,re_bug2)
-			+ '>detach</a>' [detach]";
+		+ '>detach</a>' [detach]";
 
 		}
 
@@ -193,6 +203,8 @@ insert into bug_posts
 		where re_bug1 = $bg
 		order by bg_id desc";
 
+	string ses = (string) Session["session_cookie"];
+	sql = sql.Replace("$ses", ses.Replace("'","''"));
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
 	sql = Util.alter_sql_per_project_permissions(sql, security);
 

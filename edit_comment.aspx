@@ -17,6 +17,9 @@ Security security;
 bool use_fckeditor = false;
 int bugid;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {

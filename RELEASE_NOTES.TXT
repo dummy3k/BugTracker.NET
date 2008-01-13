@@ -19,8 +19,72 @@ Release notes:
 * deactivated users
 * per project defaults
 * escalation/reminder
-* bitnami
+* Wordwrap, and take advantage of new api.
 
+
+-----------------------------------------------------------------------
+Version 2.7.2  1/10/2008
+-----------------------------------------------------------------------
+
+* Fixed float for german stuff
+
+THIS RELEASE FIXES SECURITY VULNERABILITIES.  Please email me at 
+ctrager@yahoo.com if you think there are still vulnerabilities.
+
+* Fixed the worst Cross Site Request Forgery (CSRF) vulnerabilities.
+This is work is related to bug 1867089 "Multiple XSS and CSRF 
+vulnerabilities".  Many thanks to Si Wong for discovering and reporting
+these important vulnerabilities.
+
+For more about CSRF, also known as "session riding", read here:
+http://www.cgisecurity.com/articles/csrf-faq.shtml
+
+Until you install this release, a worst-case scenario is, if you are 
+an admin and logged into BugTracker.NET, and while you are logged in 
+- while your browser cookie is still in effect - if a bad guy could get 
+you to view his malicious web page, then just by viewing that page you 
+could delete bugs from your BugTracker.NET database.
+
+With the fixes in this version, I've closed all the vulnerabilities that
+I know about. Specifically, I revised all the delete_xxx.aspx pages.
+I've also revised massedit.aspx, subscribe.aspx, flag.aspx, and
+relationships.aspx.
+
+* Fixed the specific XSS vulnerability described in bug 1867089, where
+a user could enter javascript into a text custom field that would
+then be executed if a user without edit permissions views the page.
+I'm not aware of any other XSS vulnerability.
+
+* Fixed edit_self.aspx's project subscription dropdown. It shouldn't have
+been showing the "no project" option.
+
+* Fixed bug 978216 "Globalization problem on custom fields when type is 
+float".  Or rather decimal.  Edit_bug.aspx was changed to handle the
+European decimal fields, which can use a comma as the separator instead of
+a period. Thanks to Christian Jundt for the code.
+
+* Added logic to insert_bug.aspx to allow for an attachment to be posted
+without wrapping it inside an email message. 
+
+-----------------------------------------------------------------------
+Version 2.7.1  1/6/2008
+-----------------------------------------------------------------------
+
+* The flag column in queries now has a filter, just like category, 
+status, priority, etc.
+
+* Friendlier handling of sql errors in bugs.aspx, so that if you edit a
+query introducing a syntax error in the SQL, it's easier to get back 
+to the query page.
+
+* Fixed bug  1661602 "Bug count is incorrect when filtering bugs". Now
+when a filter changes the number of bugs shown in a query, the text 
+becomes:
+Showing N out of N bugs returned by query.
+
+* Resolved bug 1863186 "HideSql flag ineffective in 2.7.0".  Actually,
+support for the Web.config "HideSql" setting was dropped in 
+version 2.5.8, but I forgot to remove it from Web.config itself.
 
 -----------------------------------------------------------------------
 Version 2.7.0  12/21/2007

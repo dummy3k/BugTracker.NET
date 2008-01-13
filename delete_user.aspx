@@ -12,6 +12,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -21,11 +23,7 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN_OR_PROJECT_ADMIN);
 
-	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "delete user";
-
 	string id = Util.sanitize_integer(Request["id"]);
-	string confirm = Request.QueryString["confirm"];
 
 	if (!security.this_is_admin)
 	{
@@ -45,16 +43,19 @@ void Page_Load(Object sender, EventArgs e)
 		}
 	}
 
-	if (confirm == "y")
+	if (IsPostBack)
 	{
 		// do delete here
 		sql = @"delete users where us_id = $us";
-		sql = sql.Replace("$us", id);
+		sql = sql.Replace("$us", row_id.Value);
 		dbutil.execute_nonquery(sql);
 		Server.Transfer ("users.aspx");
 	}
 	else
 	{
+		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "delete user";
+
 		sql = @"declare @cnt int
 			select @cnt = count(1) from bugs where bg_reported_user = $us or bg_assigned_to_user = $us
 			select us_username, @cnt [cnt] from users where us_id = $us";
@@ -71,13 +72,14 @@ void Page_Load(Object sender, EventArgs e)
 		}
 		else
 		{
-			confirm_href.HRef = "delete_user.aspx?confirm=y&id=" + id;
 
 			confirm_href.InnerText = "confirm delete of \""
 				+ Convert.ToString(dr["us_username"])
 				+ "\"";
-		}
 
+			row_id.Value = id;
+
+		}
 	}
 
 }
@@ -96,10 +98,23 @@ void Page_Load(Object sender, EventArgs e)
 <div class=align>
 <p>&nbsp</p>
 <a href=users.aspx>back to users</a>
-<p>
-or
-<p>
-<a id="confirm_href" runat="server" href="">confirm delete</a>
+
+<p>or<p>
+
+<script>
+function submit_form()
+{
+    var frm = document.getElementById("frm");
+    frm.submit();
+    return true;
+}
+
+</script>
+<form runat="server" id="frm">
+<a id="confirm_href" runat="server" href="javascript: submit_form()"></a>
+<input type="hidden" id="row_id" runat="server">
+</form>
+
 </div>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

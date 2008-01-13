@@ -13,6 +13,8 @@ DbUtil dbutil;
 Security security;
 int added_attachment = 0;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)

@@ -52,11 +52,8 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		sql = sql.Replace("$adm", ", " +
 			"'<a href=''edit_report.aspx?id=' + convert(varchar, rp_id) + '''>edit</a>' [edit], " +
-			"'<a href=''delete_report.aspx?ses=$ses&id=' + convert(varchar, rp_id) + '''>delete</a>' [delete] ");
-		sql = sql.Replace("$ses",Convert.ToString(Session["session_cookie"]));
-	}
-	else
-	{
+			"'<a href=''delete_report.aspx?id=' + convert(varchar, rp_id) + '''>delete</a>' [delete] ");
+	} else {
 		sql = sql.Replace("$adm", "");
 	}
 

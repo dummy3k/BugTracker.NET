@@ -11,6 +11,9 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e) {
     Util.do_not_cache(Response);

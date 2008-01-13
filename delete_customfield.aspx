@@ -11,6 +11,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -23,10 +25,7 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "delete custom field";
 
-	string id = Util.sanitize_integer(Request["id"]);
-	string confirm = Request.QueryString["confirm"];
-
-	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
+	if (IsPostBack)
 	{
 		// do delete here
 
@@ -37,7 +36,7 @@ void Page_Load(Object sender, EventArgs e)
 			where so.name = 'bugs'
 			and sc.colorder = $id";
 
-		sql = sql.Replace("$id",id);
+		sql = sql.Replace("$id",row_id.Value);
 		DataRow dr = dbutil.get_datarow(sql);
 
 		// if there is a default, delete it
@@ -60,7 +59,23 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	else
 	{
-		confirm_href.HRef = "delete_customfield.aspx?confirm=y&id=" + id  + "&ses=" + Request["ses"];
+		string id = Util.sanitize_integer(Request["id"]);
+
+		sql = @"select sc.name
+			from syscolumns sc
+			inner join sysobjects so on sc.id = so.id
+			left outer join sysobjects df on df.id = sc.cdefault
+			where so.name = 'bugs'
+			and sc.colorder = $id";
+
+		sql = sql.Replace("$id",id);
+		DataRow dr = dbutil.get_datarow(sql);
+
+		confirm_href.InnerText = "confirm delete of \""
+			+ Convert.ToString(dr["name"])
+			+ "\"";
+
+		row_id.Value = id;
 	}
 
 }
@@ -78,11 +93,24 @@ void Page_Load(Object sender, EventArgs e)
 <div class=align>
 <p>&nbsp</p>
 <a href=customfields.aspx>back to custom fields</a>
-<p>
-or
-<p>
-<a id="confirm_href" runat="server" href="">confirm delete</a>
-</div>
+
+<p>or<p>
+
+<script>
+function submit_form()
+{
+    var frm = document.getElementById("frm");
+    frm.submit();
+    return true;
+}
+
+</script>
+<form runat="server" id="frm">
+<a id="confirm_href" runat="server" href="javascript: submit_form()"></a>
+<input type="hidden" id="row_id" runat="server">
+</form>
+
+
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>
 

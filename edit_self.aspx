@@ -13,6 +13,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -67,7 +69,6 @@ void Page_Load(Object sender, EventArgs e)
 		project_auto_subscribe.DataTextField = "pj_name";
 		project_auto_subscribe.DataValueField = "pj_id";
 		project_auto_subscribe.DataBind();
-		project_auto_subscribe.Items.Insert(0, new ListItem("[no project]", "0"));
 
 
 		// Get this entry's data from the db and fill in the form

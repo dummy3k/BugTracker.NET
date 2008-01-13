@@ -11,6 +11,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -31,23 +33,20 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "delete report";
-
-	string id = Util.sanitize_integer(Request["id"] );
-	string confirm = Request["confirm"];
-
-	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
+	if (IsPostBack)
 	{
 		// do delete here
 		sql = @"delete reports where rp_id = $1";
-		sql = sql.Replace("$1", id);
+		sql = sql.Replace("$1", row_id.Value);
 		dbutil.execute_nonquery(sql);
 		Server.Transfer ("reports.aspx");
 	}
 	else
 	{
-		confirm_href.HRef = "delete_report.aspx?confirm=y&id=" + id + "&ses=" + Request["ses"];
+		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "delete report";
+
+		string id = Util.sanitize_integer(Request["id"] );
 
 		sql = @"select rp_desc from reports where rp_id = $1";
 		sql = sql.Replace("$1", id);
@@ -57,14 +56,11 @@ void Page_Load(Object sender, EventArgs e)
 		confirm_href.InnerText = "confirm delete of report: "
 				+ Convert.ToString(dr["rp_desc"]);
 
+		row_id.Value = id;
 
 	}
 
-
 }
-
-
-
 
 </script>
 
@@ -79,10 +75,23 @@ void Page_Load(Object sender, EventArgs e)
 <div class=align>
 <p>&nbsp</p>
 <a href=reports.aspx>back to reports</a>
-<p>
-or
-<p>
-<a id="confirm_href" runat="server" href="">confirm delete</a>
+
+<p>or<p>
+
+<script>
+function submit_form()
+{
+    var frm = document.getElementById("frm");
+    frm.submit();
+    return true;
+}
+
+</script>
+<form runat="server" id="frm">
+<a id="confirm_href" runat="server" href="javascript: submit_form()"></a>
+<input type="hidden" id="row_id" runat="server">
+</form>
+
 </div>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

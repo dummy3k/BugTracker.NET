@@ -19,6 +19,12 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
+	if (Request.QueryString["ses"] != (string) Session["session_cookie"])
+	{
+		Response.Write ("session in URL doesn't match session cookie");
+		Response.End();
+	}
+
 	DataView dv = (DataView) Session["bugs"];
 	if (dv == null)
 	{

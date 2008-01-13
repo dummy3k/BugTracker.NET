@@ -12,6 +12,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -32,38 +34,34 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-
-	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "delete comment";
-
-
-	string id = Util.sanitize_integer(Request["id"]);
-
-	string bug_id = Util.sanitize_integer(Request["bug_id"]);
-
-	int permission_level = btnet.Bug.get_bug_permission_level(Convert.ToInt32(bug_id), security);
-	if (permission_level != Security.PERMISSION_ALL)
-	{
-		Response.Write("You are not allowed to edit this item");
-		Response.End();
-	}
-
-
-	string confirm = Request.QueryString["confirm"];
-
-	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
+	if (IsPostBack)
 	{
 		// do delete here
 
 		sql = @"delete bug_posts where bp_id = $1";
-		sql = sql.Replace("$1", id);
+		sql = sql.Replace("$1", row_id.Value);
 		dbutil.execute_nonquery(sql);
-		Response.Redirect ("edit_bug.aspx?id=" + bug_id);
+		Response.Redirect ("edit_bug.aspx?id=" + redirect_bugid.Value);
 	}
 	else
 	{
+
+		string bug_id = Util.sanitize_integer(Request["bug_id"]);
+		redirect_bugid.Value = bug_id;
+
+		int permission_level = btnet.Bug.get_bug_permission_level(Convert.ToInt32(bug_id), security);
+		if (permission_level != Security.PERMISSION_ALL)
+		{
+			Response.Write("You are not allowed to edit this item");
+			Response.End();
+		}
+
+		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "delete comment";
+
+		string id = Util.sanitize_integer(Request["id"]);
+
 		back_href.HRef = "edit_bug.aspx?id=" + bug_id;
-		confirm_href.HRef = "delete_comment.aspx?confirm=y&id=" + id + "&bug_id=" + bug_id   + "&ses=" + Request["ses"];
 
 		sql = @"select bp_comment from bug_posts where bp_id = $1";
 		sql = sql.Replace("$1", id);
@@ -79,6 +77,7 @@ void Page_Load(Object sender, EventArgs e)
 				+ s.Substring(0,len)
 				+ "...";
 
+		row_id.Value = id;
 	}
 
 
@@ -97,10 +96,25 @@ void Page_Load(Object sender, EventArgs e)
 <div class=align>
 <p>&nbsp</p>
 <a id="back_href" runat="server" href="">back to <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
-<p>
-or
-<p>
-<a id="confirm_href" runat="server" href="">confirm delete</a>
+
+<p>or<p>
+
+<script>
+function submit_form()
+{
+    var frm = document.getElementById("frm");
+    frm.submit();
+    return true;
+}
+
+</script>
+<form runat="server" id="frm">
+<a id="confirm_href" runat="server" href="javascript: submit_form()"></a>
+<input type="hidden" id="row_id" runat="server">
+<input type="hidden" id="redirect_bugid" runat="server">
+</form>
+
+
 </div>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

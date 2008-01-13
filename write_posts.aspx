@@ -27,7 +27,6 @@ void Page_Load(Object sender, EventArgs e)
 
 	PrintBug.write_posts(
 		Response,
-		HttpContext.Current,
 		bugid,
 		permission_level,
 		true,

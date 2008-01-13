@@ -11,6 +11,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -33,7 +35,6 @@ void Page_Load(Object sender, EventArgs e)
 
 	string attachment_id_string = Util.sanitize_integer(Request["id"]);
 	string bug_id_string = Util.sanitize_integer(Request["bug_id"]);
-	string confirm = Request.QueryString["confirm"];
 
 	int permission_level = btnet.Bug.get_bug_permission_level(Convert.ToInt32(bug_id_string), security);
 	if (permission_level != Security.PERMISSION_ALL)
@@ -43,7 +44,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 
-	if (confirm == "y" && (string) Request["ses"] == (string) Session["session_cookie"])
+	if (IsPostBack)
 	{
 		// save the filename before deleting the row
 		sql = @"select bp_file from bug_posts where bp_id = $ba";
@@ -78,13 +79,10 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	else
 	{
-		back_href.HRef =
-			"edit_bug.aspx?id=" + bug_id_string;
+		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "delete attachment";
 
-		confirm_href.HRef =
-			"delete_attachment.aspx?confirm=y&id=" 	+ attachment_id_string
-			+ "&bug_id=" + bug_id_string + "&ses=" + Request["ses"];
-
+		back_href.HRef = "edit_bug.aspx?id=" + bug_id_string;
 
 		sql = @"select bp_file from bug_posts where bp_id = $1";
 		sql = sql.Replace("$1", attachment_id_string);
@@ -95,7 +93,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		confirm_href.InnerText = "confirm delete of attachment: " + s;
 
-
+		row_id.Value = attachment_id_string;
 	}
 
 }
@@ -118,10 +116,23 @@ void Page_Load(Object sender, EventArgs e)
 back to <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>
 </a>
 
-<p>
-or
-<p>
-<a id="confirm_href" runat="server" href="">confirm delete</a>
+<p>or<p>
+
+<script>
+function submit_form()
+{
+    var frm = document.getElementById("frm");
+    frm.submit();
+    return true;
+}
+
+</script>
+<form runat="server" id="frm">
+<a id="confirm_href" runat="server" href="javascript: submit_form()"></a>
+<input type="hidden" id="row_id" runat="server">
+</form>
+
+
 </div>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

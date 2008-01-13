@@ -157,6 +157,18 @@ function on_mouse_out()
 	current_element = null
 }
 
+function get_cookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+
+
 var cls = (navigator.userAgent.indexOf("MSIE") > 0) ? "className" : "class";
 function flag(el, bugid)
 {
@@ -181,7 +193,7 @@ function flag(el, bugid)
 
 	el.setAttribute(cls,which)
 	
-	var url = "flag.aspx?bugid=" + bugid + "&flag=" + which_int
+	var url = "flag.aspx?ses=" + get_cookie("se_id") +  "&bugid=" + bugid + "&flag=" + which_int
 	xmlHttp = GetXmlHttpObject();
 	xmlHttp.open("GET",url,true)
 	xmlHttp.send(null)

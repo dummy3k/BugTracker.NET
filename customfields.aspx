@@ -46,7 +46,7 @@ void Page_Load(Object sender, EventArgs e)
 if (ds.Tables[0].Rows.Count > 0)
 {
 	SortableHtmlTable.create_from_dataset(
-		Response, ds, "edit_customfield.aspx?id=", "delete_customfield.aspx?ses=" + Session["session_cookie"] + "&id=");
+		Response, ds, "edit_customfield.aspx?id=", "delete_customfield.aspx?id=");
 
 }
 else

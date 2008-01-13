@@ -14,6 +14,9 @@ DbUtil dbutil;
 Security security;
 bool copy = false;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {

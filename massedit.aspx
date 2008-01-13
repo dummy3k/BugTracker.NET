@@ -11,6 +11,8 @@ String sql;
 DbUtil dbutil;
 Security security;
 
+void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -20,35 +22,42 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
 
-	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "massedit";
-
-	// create list of bugs affected
 	string list = "";
-	foreach (string var in Request.QueryString)
-	{
-		if (Util.is_int(var))
-		{
-			if (list != "")
-			{
-				list += ",";
-			}
-			list += var;
-		};
-	}
 
-	// handle NO BUGS SELECTED
-	if (list == "")
+	if (!IsPostBack)
 	{
-		msg.InnerText = "No items selected!";
-	}
-	else
-	{
-		// create the SQL
+		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "massedit";
 
 		if (Request["mass_delete"] != null)
 		{
-		    sql += "delete bug_post_attachments from bug_post_attachments inner join bug_posts on bug_post_attachments.bpa_post = bug_posts.bp_id where bug_posts.bp_bug in (" + list + ")";
+			update_or_delete.Value = "delete";
+		}
+		else
+		{
+			update_or_delete.Value = "update";
+		}
+
+		// create list of bugs affected
+		foreach (string var in Request.QueryString)
+		{
+			if (Util.is_int(var))
+			{
+				if (list != "")
+				{
+					list += ",";
+				}
+				list += var;
+			};
+		}
+
+		bug_list.Value = list;
+
+		if (update_or_delete.Value == "delete")
+		{
+			update_or_delete.Value = "delete";
+
+			sql += "delete bug_post_attachments from bug_post_attachments inner join bug_posts on bug_post_attachments.bpa_post = bug_posts.bp_id where bug_posts.bp_bug in (" + list + ")";
 			sql += "\ndelete from bug_posts where bp_bug in (" + list + ")";
 			sql += "\ndelete from bug_subscriptions where bs_bug in (" + list + ")";
 			sql += "\ndelete from bug_relationships where re_bug1 in (" + list + ")";
@@ -56,9 +65,12 @@ void Page_Load(Object sender, EventArgs e)
 			sql += "\ndelete from bugs where bg_id in (" + list + ")";
 
 			confirm_href.InnerText = "Confirm Delete";
+
 		}
 		else
 		{
+			update_or_delete.Value = "update";
+
 			sql = "update bugs \nset ";
 
 			string updates = "";
@@ -106,19 +118,24 @@ void Page_Load(Object sender, EventArgs e)
 
 
 			sql += updates + "\nwhere bg_id in (" + list + ")";
+
 			confirm_href.InnerText = "Confirm Update";
+
 		}
 
+		sql_text.InnerText = sql;
 
-		// either run the sql, or just ask for confirmation
-		if (Request["confirm"] != null  && (string) Request["ses"] == (string) Session["session_cookie"])
+	}
+	else // postback
+	{
+		list = bug_list.Value;
+
+		if (update_or_delete.Value == "delete")
 		{
-			if (Request["mass_delete"] != null)
+			string upload_folder = Util.get_upload_folder();
+			if (upload_folder != null)
 			{
-				string upload_folder = Util.get_upload_folder();
-                if (upload_folder != null)
-                {
-				string sql2 = @"select bp_bug, bp_id, bp_file from bug_posts where bp_type = 'file' and bp_bug in (" + list + ")";
+				string sql2 = @"select bp_bug, bp_id, bp_file from bug_posts where bp_type = 'file' and bp_bug in (" + bug_list.Value + ")";
 				DataSet ds = dbutil.get_dataset(sql2);
 				foreach (DataRow dr in ds.Tables[0].Rows)
 				{
@@ -136,18 +153,13 @@ void Page_Load(Object sender, EventArgs e)
 					}
 				}
 			}
-			}
-			dbutil.execute_nonquery(sql);
-			Response.Redirect ("search.aspx");
 		}
-		else
-		{
-			sql_text.InnerText = sql;
-			confirm_href.HRef = "massedit.aspx?confirm=y&" + Request.QueryString;
-		}
+
+
+		dbutil.execute_nonquery(sql_text.InnerText);
+		Response.Redirect ("search.aspx");
 
 	}
-
 }
 
 
@@ -168,12 +180,26 @@ void Page_Load(Object sender, EventArgs e)
 	<p>
 	<a href="search.aspx">back to search</a>
 
-	<p>
-	<a id="confirm_href" runat="server" href=""></a>
+<p>or<p>
+<script>
+function submit_form()
+{
+	var frm = document.getElementById("frm");
+	frm.submit();
+	return true;
+}
 
-	<hr>
+</script>
+<form runat="server" id="frm">
+<a style="border: 1px red solid; padding: 3px;" id="confirm_href" runat="server" href="javascript: submit_form()"></a>
+<input type="hidden" id="bug_list" runat="server">
+<input type="hidden" id="update_or_delete" runat="server">
+</form>
+
+
+	<p>&nbsp;<p>
 	<p><div class=err>Email notifications are not sent when updates are made via this page.</div>
-	<p>SQL statement:
+	<p>This SQL statement will execute when you confirm:
 	<pre id="sql_text" runat="server"></pre>
 
 </div>
