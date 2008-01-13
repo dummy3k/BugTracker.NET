@@ -65,6 +65,14 @@ namespace btnet
         public int this_org = 0;
         public int this_forced_project = 0;
 
+        public int this_assigned_to_field_permission_level = PERMISSION_ALL;
+        public int this_status_field_permission_level = PERMISSION_ALL;
+        public int this_category_field_permission_level = PERMISSION_ALL;
+		public int this_priority_field_permission_level = PERMISSION_ALL;
+		public int this_project_field_permission_level = PERMISSION_ALL;
+		public int this_org_field_permission_level = PERMISSION_ALL;
+		public int this_udf_field_permission_level = PERMISSION_ALL;
+
 		///////////////////////////////////////////////////////////////////////
 		public void check_security(DbUtil dbutil, HttpContext asp_net_context, int level)
 		{
@@ -149,6 +157,13 @@ namespace btnet
 				og_can_edit_reports,
 				og_can_be_assigned_to,
 				og_other_orgs_permission_level,
+				og_category_field_permission_level,
+				og_priority_field_permission_level,
+				og_assigned_to_field_permission_level,
+				og_status_field_permission_level,
+				og_project_field_permission_level,
+				og_org_field_permission_level,
+				og_udf_field_permission_level,
 				og_id,
 				isnull(us_forced_project, 0 ) us_forced_project,
 				isnull(pu_permission_level, $dpl) pu_permission_level,
@@ -196,6 +211,15 @@ namespace btnet
             this_other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
             this_org = (int) dr["og_id"];
             this_forced_project = (int) dr["us_forced_project"];
+
+            this_category_field_permission_level = (int) dr["og_category_field_permission_level"];
+            this_priority_field_permission_level = (int) dr["og_priority_field_permission_level"];
+            this_assigned_to_field_permission_level = (int) dr["og_assigned_to_field_permission_level"];
+            this_status_field_permission_level = (int) dr["og_status_field_permission_level"];
+            this_project_field_permission_level = (int) dr["og_project_field_permission_level"];
+            this_org_field_permission_level = (int) dr["og_org_field_permission_level"];
+            this_udf_field_permission_level = (int) dr["og_udf_field_permission_level"];
+
 
 			if (((string)dr["us_firstname"]).Trim().Length == 0)
 			{
@@ -640,7 +664,7 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		public static string format_local_decimal_into_db_format( string val ) 
+		public static string format_local_decimal_into_db_format( string val )
 		{
 			decimal x = decimal.Parse(val, get_culture_info());
 

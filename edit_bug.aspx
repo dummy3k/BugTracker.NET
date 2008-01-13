@@ -178,7 +178,7 @@ void Page_Load(Object sender, EventArgs e)
 			if (security.this_forced_project != 0)
 			{
 				initial_project = Convert.ToString(security.this_forced_project);
-				set_project_to_readonly();
+				set_project_field_permission();
 			}
 
 
@@ -252,7 +252,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			if (security.this_other_orgs_permission_level == 0)
 			{
-				set_org_to_readonly();
+				set_org_field_permission();
 			}
 
 
@@ -507,22 +507,16 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-			if (permission_level == Security.PERMISSION_READONLY
-			|| permission_level == Security.PERMISSION_REPORTER)
-			{
-
-				set_controls_to_readonly();
-
-			}
+			set_controls_field_permission(permission_level);
 
 			if (security.this_forced_project != 0)
 			{
-				set_project_to_readonly();
+				set_project_field_permission();
 			}
 
 			if (security.this_other_orgs_permission_level == 0)
 			{
-				set_org_to_readonly();
+				set_org_field_permission();
 			}
 
 			// save for next bug
@@ -690,11 +684,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			if (project.SelectedItem.Value == prev_project.Value)
 			{
-				if (permission_level == Security.PERMISSION_READONLY
-				|| permission_level == Security.PERMISSION_REPORTER)
-				{
-					set_controls_to_readonly();
-				}
+				set_controls_field_permission(permission_level);
 			}
 
 		}
@@ -906,24 +896,24 @@ void format_subcribe_cancel_link()
 
 
 ///////////////////////////////////////////////////////////////////////
-void set_project_to_readonly()
+void set_project_field_permission()
 {
-	static_project.Style["display"] = "";
-	change_project_label.Style["display"] = "none";
-	project.Style["display"] = "none";
+	static_project.Visible = true;;
+	change_project_label.Visible = false;;
+	project.Visible = false;
 }
 
 ///////////////////////////////////////////////////////////////////////
-void set_org_to_readonly()
+void set_org_field_permission()
 {
-	static_org.Style["display"] = "";
-	org.Style["display"] = "none";
+	static_org.Visible = true;
+	org.Visible = false;
 	static_org.InnerText = org.SelectedItem.Text;
 
 }
 
 ///////////////////////////////////////////////////////////////////////
-void set_shortdesc_to_readonly()
+void set_shortdesc_field_permission()
 {
 	// turn on the spans to hold the data
 	if (id != 0)
@@ -938,75 +928,165 @@ void set_shortdesc_to_readonly()
 
 
 ///////////////////////////////////////////////////////////////////////
-void set_category_to_readonly()
+void set_category_field_permission(int bug_permission_level)
 {
-	static_category.Style["display"] = "";
-	category.Style["display"] = "none";
-	static_category.InnerText = category.SelectedItem.Text;
-}
+	// pick the most restrictive permission
+	int perm_level = bug_permission_level < security.this_category_field_permission_level
+		? bug_permission_level : security.this_category_field_permission_level;
 
-///////////////////////////////////////////////////////////////////////
-void set_priority_to_readonly()
-{
-	static_priority.Style["display"] = "";
-	priority.Style["display"] = "none";
-	static_priority.InnerText = priority.SelectedItem.Text;
-
-}
-
-///////////////////////////////////////////////////////////////////////
-void set_status_to_readonly()
-{
-	static_status.Style["display"] = "";
-	status.Style["display"] = "none";
-	static_status.InnerText = status.SelectedItem.Text;
-}
-
-
-///////////////////////////////////////////////////////////////////////
-void set_assigned_to_readonly()
-{
-	reassign_label.Style["display"] = "none";
-	assigned_to.Style["display"] = "none";
-
-}
-
-///////////////////////////////////////////////////////////////////////
-void set_udf_to_readonly()
-{
-	static_udf.Style["display"] = "";
-	udf.Style["display"] = "none";
-	static_udf.InnerText = udf.SelectedItem.Text;
-}
-
-
-
-///////////////////////////////////////////////////////////////////////
-void set_controls_to_readonly()
-{
-
-	// even turn off commenting updating for read only
-	if (permission_level == Security.PERMISSION_READONLY)
+	if (perm_level == Security.PERMISSION_NONE)
 	{
-		sub.Disabled = true;
-		sub.Style["display"] = "none";
-		plus_label.Style["display"] = "none";
-		comment_label.Style["display"] = "none";
-		comment.Style["display"] = "none";
-		fckeComment.Visible = false;
+		category_label.Visible = false;
+		category.Visible = false;
+		prev_category.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		category.Visible = false;
+		static_category.InnerText = category.SelectedItem.Text;
+	}
+	else // editable
+	{
+		static_category.Visible = false;
 	}
 
-	set_project_to_readonly();
-	set_org_to_readonly();
-	set_category_to_readonly();
-	set_priority_to_readonly();
-	set_status_to_readonly();
-	set_assigned_to_readonly();
-	set_udf_to_readonly();
-	set_shortdesc_to_readonly();
+}
 
-	internal_only_label.Visible = false;
-	internal_only.Visible = false;
+///////////////////////////////////////////////////////////////////////
+void set_priority_field_permission(int bug_permission_level)
+{
+	// pick the most restrictive permission
+	int perm_level = bug_permission_level < security.this_priority_field_permission_level
+		? bug_permission_level : security.this_priority_field_permission_level;
+
+	if (perm_level == Security.PERMISSION_NONE)
+	{
+		priority_label.Visible = false;
+		priority.Visible = false;
+		prev_priority.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		priority.Visible = false;
+		static_priority.InnerText = priority.SelectedItem.Text;
+	}
+	else // editable
+	{
+		static_priority.Visible = false;
+	}
+
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_status_field_permission(int bug_permission_level)
+{
+	// pick the most restrictive permission
+	int perm_level = bug_permission_level < security.this_status_field_permission_level
+		? bug_permission_level : security.this_status_field_permission_level;
+
+	if (perm_level == Security.PERMISSION_NONE)
+	{
+		status_label.Visible = false;
+		status.Visible = false;
+		prev_status.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		status.Visible = false;
+		static_status.InnerText = status.SelectedItem.Text;
+	}
+	else // editable
+	{
+		static_status.Visible = false;
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////
+void set_assigned_field_permission(int bug_permission_level)
+{
+
+	int perm_level = bug_permission_level < security.this_assigned_to_field_permission_level
+		? bug_permission_level : security.this_assigned_to_field_permission_level;
+
+	if (perm_level == Security.PERMISSION_NONE)
+	{
+		assigned_to_username.Visible = false;
+		assigned_to_label.Visible = false;
+		assigned_to.Visible = false;
+		reassign_label.Visible = false;
+		prev_assigned_to.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		assigned_to.Visible = false;
+		reassign_label.Visible = false;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_udf_field_permission(int bug_permission_level)
+{
+	// pick the most restrictive permission
+	int perm_level = bug_permission_level < security.this_udf_field_permission_level
+		? bug_permission_level : security.this_udf_field_permission_level;
+
+	if (perm_level == Security.PERMISSION_NONE)
+	{
+		udf_label.Visible = false;
+		udf.Visible = false;
+		prev_udf.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		udf.Visible = false;
+		static_udf.InnerText = udf.SelectedItem.Text;
+	}
+	else // editable
+	{
+		static_udf.Visible = false;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_controls_field_permission(int bug_permission_level)
+{
+
+	if (bug_permission_level == Security.PERMISSION_READONLY
+	|| bug_permission_level == Security.PERMISSION_REPORTER)
+	{
+		// even turn off commenting updating for read only
+		if (permission_level == Security.PERMISSION_READONLY)
+		{
+			sub.Disabled = true;
+			sub.Visible = false;
+			plus_label.Visible = false;
+			comment_label.Visible = false;
+			comment.Visible = false;
+			fckeComment.Visible = false;
+		}
+
+		set_project_field_permission();
+		set_org_field_permission();
+		set_category_field_permission(Security.PERMISSION_READONLY);
+		set_priority_field_permission(Security.PERMISSION_READONLY);
+		set_status_field_permission(Security.PERMISSION_READONLY);
+		set_assigned_field_permission(Security.PERMISSION_READONLY);
+		set_udf_field_permission(Security.PERMISSION_READONLY);
+		set_shortdesc_field_permission();
+
+		internal_only_label.Visible = false;
+		internal_only.Visible = false;
+	}
+	else
+	{
+		// Call these functions so that the field level permissions can kick in
+		set_category_field_permission(Security.PERMISSION_ALL);
+		set_priority_field_permission(Security.PERMISSION_ALL);
+		set_status_field_permission(Security.PERMISSION_ALL);
+		set_assigned_field_permission(Security.PERMISSION_ALL);
+		set_udf_field_permission(Security.PERMISSION_ALL);
+	}
 
 }
 
@@ -1956,11 +2036,7 @@ void on_update (Object sender, EventArgs e)
 			comment.Value = "";
 			fckeComment.Value = "";
 
-			if (permission_level == Security.PERMISSION_READONLY
-			|| permission_level == Security.PERMISSION_REPORTER)
-			{
-				set_controls_to_readonly();
-			}
+			set_controls_field_permission(permission_level);
 
 		} // edit existing or not
 	}
@@ -2071,7 +2147,7 @@ function clone()
 			<span class=lbl id="bugid_label" runat="server"></span>
 			<span runat="server" class=static id="bugid"></span>
 			&nbsp;&nbsp;&nbsp;
-			<span class=static id="static_short_desc" runat="server" style='width:500px; display: none;'></span>
+			<span class=static id="static_short_desc" runat="server" style='width:500px;'></span>
 			<input runat="server" type=text class=txt id="short_desc" size="100" maxlength="200">
 			&nbsp;&nbsp;&nbsp;
 			<span runat="server" class=err id="short_desc_err">&nbsp;</span>
@@ -2095,10 +2171,10 @@ function clone()
 
 	<tr id="row1">
 		<td nowrap>
-			<span class=lbl id="project_label">Project:&nbsp;</span>
+			<span class=lbl id="project_label" runat="server">Project:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="current_project" runat="server">[no project]</span>
-			<span class=lbl id="static_project" runat="server" style='display: none;'></span>
+			<span class=lbl id="static_project" runat="server"></span>
 
 			<span class=lbl id="change_project_label" runat="server">&nbsp;&nbsp;&nbsp;&nbsp;Change project:&nbsp;</span>
 
@@ -2107,33 +2183,33 @@ function clone()
 
 	<tr id="row2">
 		<td nowrap>
-			<span class=lbl id="org_label">Organization:&nbsp;</span>
+			<span class=lbl id="org_label" runat="server">Organization:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_org" runat="server" style='display: none;'></span>
+			<span class=static id="static_org" runat="server"></span>
 
 			<asp:DropDownList id="org" runat="server"></asp:DropDownList>
 
 
 	<tr id="row3">
 		<td nowrap>
-			<span class=lbl id="category_label">Category:&nbsp;</span>
+			<span class=lbl id="category_label" runat="server">Category:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_category" runat="server" style='display: none;'></span>
+			<span class=static id="static_category" runat="server"></span>
 
 			<asp:DropDownList id="category" runat="server"></asp:DropDownList>
 
 
 	<tr id="row4">
 		<td nowrap>
-			<span class=lbl id="priority_label">Priority:&nbsp;</span>
+			<span class=lbl id="priority_label" runat="server">Priority:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_priority" runat="server" style='display: none;'></span>
+			<span class=static id="static_priority" runat="server"></span>
 
 			<asp:DropDownList id="priority" runat="server"></asp:DropDownList>
 
 	<tr id="row5">
 		<td nowrap>
-			<span class=lbl id="assigned_to_label">Assigned to:&nbsp;</span>
+			<span class=lbl id="assigned_to_label" runat="server">Assigned to:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="assigned_to_username" runat="server">[not assigned]</span>
 			<span  runat="server" id="reassign_label" class=lbl>&nbsp;&nbsp;&nbsp;&nbsp;Re-assign:&nbsp;</span>
@@ -2143,9 +2219,9 @@ function clone()
 
 	<tr id="row6">
 		<td nowrap>
-			<span class=lbl id="status_label">Status:&nbsp;</span>
+			<span class=lbl id="status_label" runat="server">Status:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_status" runat="server" style='display: none;'></span>
+			<span class=static id="static_status" runat="server"></span>
 			<asp:DropDownList id="status" runat="server"></asp:DropDownList>
 
 
@@ -2155,10 +2231,10 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 %>
 	<tr id="row7">
 		<td nowrap>
-			<span class=lbl id="udf_label">
+			<span class=lbl id="udf_label" runat="server">
 			<% Response.Write(btnet.Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %>:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_udf" runat="server" style='display: none;'></span>
+			<span class=static id="static_udf" runat="server"></span>
 			<asp:DropDownList id="udf" runat="server">
 			</asp:DropDownList>
 <%

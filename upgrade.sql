@@ -565,9 +565,17 @@ create unique index fl_index_1 on bug_user_flags (fl_bug, fl_user)
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
--- upgrade from 2.7.1 to 2.7.2
+-- upgrade from 2.7.2 to 2.7.3
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
 alter table bug_relationships add re_direction int not null default(0)
+
+alter table orgs add og_category_field_permission_level int not null default(2)
+alter table orgs add og_priority_field_permission_level int not null default(2)
+alter table orgs add og_assigned_to_field_permission_level int not null default(2)
+alter table orgs add og_status_field_permission_level int not null default(2)
+alter table orgs add og_project_field_permission_level int not null default(2)
+alter table orgs add og_org_field_permission_level int not null default(2)
+alter table orgs add og_udf_field_permission_level int not null default(2)

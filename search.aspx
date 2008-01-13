@@ -28,7 +28,6 @@ class ProjectDropdown
 
 class BtnetProject
 {
-	public int id;
 	public Dictionary<int, ProjectDropdown> map_dropdowns = new Dictionary<int, ProjectDropdown>();
 };
 

@@ -169,7 +169,6 @@ void sort_dataview() {
 	{
 		Session["filter"] = filter.Value;
 		string filter_string = filter.Value;
-		btnet.Util.write_to_log ("corey " + filter.Value);
 
 		filter_string = filter_string.Replace("[$FLAG] =$$$red$$$","[$FLAG] =1");
 		filter_string = filter_string.Replace("[$FLAG] =$$$green$$$","[$FLAG] =2");
