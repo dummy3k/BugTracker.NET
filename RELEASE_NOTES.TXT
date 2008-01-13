@@ -4,29 +4,42 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-* relationship parent/child
+* Change org page
+* TEST copying bug when the fields being copied are not visible
+* TEST new db.
+* TEST upgrade of old db.
 
+
+* more links between features and rest of web
 * apostrophe's in dropdown values break search
 * NEED INSTRUCTIONS HOW TO UPGRADE 
 * no commas allowed in dropdown values too
-
 * excel export for reports
-
 * more explicit settings to turn on and off projects, organizations
 * more tool tips
 * # of days in status
-* field level permissions
 * deactivated users
 * per project defaults
 * escalation/reminder
 * Wordwrap, and take advantage of new api.
 
+-----------------------------------------------------------------------
+Version 2.7.3  1/19/2008
+-----------------------------------------------------------------------
+
+See "upgrade.sql" for database changes for this release. Run the
+relevant part of the script against your database to upgrade.
+
+* Added field level permissions for the non-custom fields. As admin, 
+go to "organization" and see the field level permissions related to
+project, org, category, priority, assigned_to, status, and the
+user-defined-field.   No field level permissions on custom fields.
+
+* Added the concept of parent/child to relationships between bugs.
 
 -----------------------------------------------------------------------
 Version 2.7.2  1/12/2008
 -----------------------------------------------------------------------
-
-* Fixed float for german stuff
 
 THIS RELEASE FIXES SECURITY VULNERABILITIES.  Please email me at 
 ctrager@yahoo.com if you think there are still vulnerabilities.

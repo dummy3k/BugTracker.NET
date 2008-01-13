@@ -178,7 +178,6 @@ void Page_Load(Object sender, EventArgs e)
 			if (security.this_forced_project != 0)
 			{
 				initial_project = Convert.ToString(security.this_forced_project);
-				set_project_field_permission();
 			}
 
 
@@ -248,11 +247,6 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					li.Selected = false;
 				}
-			}
-
-			if (security.this_other_orgs_permission_level == 0)
-			{
-				set_org_field_permission();
 			}
 
 
@@ -350,7 +344,7 @@ void Page_Load(Object sender, EventArgs e)
 			}
 
 
-			// get default user here?
+			set_controls_field_permission(Security.PERMISSION_ALL);
 
 		}
 		else // prepare page for editing existing bug
@@ -508,16 +502,6 @@ void Page_Load(Object sender, EventArgs e)
 			}
 
 			set_controls_field_permission(permission_level);
-
-			if (security.this_forced_project != 0)
-			{
-				set_project_field_permission();
-			}
-
-			if (security.this_other_orgs_permission_level == 0)
-			{
-				set_org_field_permission();
-			}
 
 			// save for next bug
 			if (project.SelectedItem != null)
@@ -896,19 +880,27 @@ void format_subcribe_cancel_link()
 
 
 ///////////////////////////////////////////////////////////////////////
-void set_project_field_permission()
+void set_org_field_permission(int bug_permission_level)
 {
-	static_project.Visible = true;;
-	change_project_label.Visible = false;;
-	project.Visible = false;
-}
+	// pick the most restrictive permission
+	int perm_level = bug_permission_level < security.this_org_field_permission_level
+		? bug_permission_level : security.this_org_field_permission_level;
 
-///////////////////////////////////////////////////////////////////////
-void set_org_field_permission()
-{
-	static_org.Visible = true;
-	org.Visible = false;
-	static_org.InnerText = org.SelectedItem.Text;
+	if (perm_level == Security.PERMISSION_NONE)
+	{
+		org_label.Visible = false;
+		org.Visible = false;
+		prev_org.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		org.Visible = false;
+		static_org.InnerText = org.SelectedItem.Text;
+	}
+	else // editable
+	{
+		static_org.Visible = false;
+	}
 
 }
 
@@ -918,8 +910,8 @@ void set_shortdesc_field_permission()
 	// turn on the spans to hold the data
 	if (id != 0)
 	{
-		static_short_desc.Style["display"] = "";
-		short_desc.Style["display"] = "none";
+		static_short_desc.Visible = true;
+		short_desc.Visible = false;
 	}
 
 	static_short_desc.InnerText = short_desc.Value;
@@ -1003,6 +995,31 @@ void set_status_field_permission(int bug_permission_level)
 
 
 ///////////////////////////////////////////////////////////////////////
+void set_project_field_permission(int bug_permission_level)
+{
+
+	int perm_level = bug_permission_level < security.this_project_field_permission_level
+		? bug_permission_level : security.this_project_field_permission_level;
+
+	if (perm_level == Security.PERMISSION_NONE)
+	{
+		project_label.Visible = false;
+		current_project.Visible = false;
+
+		change_project_label.Visible = false;;
+		project.Visible = false;
+
+		prev_project.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		project.Visible = false;
+		change_project_label.Visible = false;;
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////
 void set_assigned_field_permission(int bug_permission_level)
 {
 
@@ -1011,10 +1028,12 @@ void set_assigned_field_permission(int bug_permission_level)
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
-		assigned_to_username.Visible = false;
 		assigned_to_label.Visible = false;
-		assigned_to.Visible = false;
+		assigned_to_username.Visible = false;
+
 		reassign_label.Visible = false;
+		assigned_to.Visible = false;
+
 		prev_assigned_to.Visible = false;
 	}
 	else if (perm_level == Security.PERMISSION_READONLY)
@@ -1066,8 +1085,8 @@ void set_controls_field_permission(int bug_permission_level)
 			fckeComment.Visible = false;
 		}
 
-		set_project_field_permission();
-		set_org_field_permission();
+		set_project_field_permission(Security.PERMISSION_READONLY);
+		set_org_field_permission(Security.PERMISSION_READONLY);
 		set_category_field_permission(Security.PERMISSION_READONLY);
 		set_priority_field_permission(Security.PERMISSION_READONLY);
 		set_status_field_permission(Security.PERMISSION_READONLY);
@@ -1081,6 +1100,23 @@ void set_controls_field_permission(int bug_permission_level)
 	else
 	{
 		// Call these functions so that the field level permissions can kick in
+		if (security.this_forced_project != 0)
+		{
+			set_project_field_permission(Security.PERMISSION_READONLY);
+		}
+		else
+		{
+			set_project_field_permission(Security.PERMISSION_ALL);
+		}
+
+		if (security.this_other_orgs_permission_level == 0)
+		{
+			set_org_field_permission(Security.PERMISSION_READONLY);
+		}
+		else
+		{
+			set_org_field_permission(Security.PERMISSION_ALL);
+		}
 		set_category_field_permission(Security.PERMISSION_ALL);
 		set_priority_field_permission(Security.PERMISSION_ALL);
 		set_status_field_permission(Security.PERMISSION_ALL);
@@ -2147,7 +2183,7 @@ function clone()
 			<span class=lbl id="bugid_label" runat="server"></span>
 			<span runat="server" class=static id="bugid"></span>
 			&nbsp;&nbsp;&nbsp;
-			<span class=static id="static_short_desc" runat="server" style='width:500px;'></span>
+			<span class=static id="static_short_desc" runat="server" style='width:500px; display:none;'></span>
 			<input runat="server" type=text class=txt id="short_desc" size="100" maxlength="200">
 			&nbsp;&nbsp;&nbsp;
 			<span runat="server" class=err id="short_desc_err">&nbsp;</span>
@@ -2174,7 +2210,6 @@ function clone()
 			<span class=lbl id="project_label" runat="server">Project:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="current_project" runat="server">[no project]</span>
-			<span class=lbl id="static_project" runat="server"></span>
 
 			<span class=lbl id="change_project_label" runat="server">&nbsp;&nbsp;&nbsp;&nbsp;Change project:&nbsp;</span>
 
