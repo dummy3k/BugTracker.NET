@@ -427,37 +427,89 @@ void do_query()
 	if (search_sql == "")
 	{
 
-		string select = @"select isnull(pr_background_color,'#ffffff') [color], bg_id [id],
-			bg_short_desc [desc], isnull(pj_name,'') [project], isnull(og_name,'') [organization], isnull(ct_name,'') [category], ";
+/*
+select isnull(pr_background_color,'#ffffff') [color], bg_id [id],
+bg_short_desc [desc],
+bg_reported_date [reported on],
+isnull(rpt.us_username,'') [reported by],
+isnull(pj_name,'') [project],
+isnull(og_name,'') [organization],
+isnull(ct_name,'') [category],
+isnull(pr_name,'') [priority],
+isnull(asg.us_username,'') [assigned to],
+isnull(st_name,'') [status],
+isnull(udf_name,'') [MyUDF],
+isnull([mycust],'') [mycust],
+isnull([mycust2],'') [mycust2]
+from bugs
+left outer join users rpt on rpt.us_id = bg_reported_user
+left outer join users asg on asg.us_id = bg_assigned_to_user
+left outer join projects on pj_id = bg_project
+left outer join orgs on og_id = bg_org
+left outer join categories on ct_id = bg_category
+left outer join priorities on pr_id = bg_priority
+left outer join statuses on st_id = bg_status
+left outer join user_defined_attribute on udf_id = bg_user_defined_attribute
+order by bg_id desc
+*/
 
+		string select = "select isnull(pr_background_color,'#ffffff') [color], bg_id [id],\nbg_short_desc [desc]";
+
+		select += "\n,bg_reported_date [reported on]";
 		if (use_full_names)
 		{
-			select += "isnull(rpt.us_lastname + ', ' + rpt.us_firstname,'') [reported by], ";
+			select += "\n,isnull(rpt.us_lastname + ', ' + rpt.us_firstname,'') [reported by]";
 		}
 		else
 		{
-			select += "isnull(rpt.us_username,'') [reported by], ";
+			select += "\n,isnull(rpt.us_username,'') [reported by]";
 		}
 
-		select += "bg_reported_date [reported on], isnull(pr_name,'') [priority], ";
-
-		if (use_full_names)
+		if (security.this_project_field_permission_level > 0)
 		{
-			select += "isnull(asg.us_lastname + ', ' + asg.us_firstname,'') [assigned to], ";
+			select += ",\nisnull(pj_name,'') [project]";
 		}
-		else
+
+		if (security.this_org_field_permission_level > 0)
 		{
-			select += "isnull(asg.us_username,'') [assigned to], ";
+			select += ",\nisnull(og_name,'') [organization]";
 		}
 
-		select += "isnull(st_name,'') [status]\n";
-
-		if (show_udf)
+		if (security.this_category_field_permission_level > 0)
 		{
-			string udf_name = Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE");
-			select += ", isnull(udf_name,'') [" + udf_name + "]";
+			select += ",\nisnull(ct_name,'') [category]";
 		}
 
+		if (security.this_priority_field_permission_level > 0)
+		{
+			select += ",\nisnull(pr_name,'') [priority]";
+		}
+
+		if (security.this_assigned_to_field_permission_level > 0)
+		{
+			if (use_full_names)
+			{
+				select += ",\nisnull(asg.us_lastname + ', ' + asg.us_firstname,'') [assigned to]";
+			}
+			else
+			{
+				select += ",\nisnull(asg.us_username,'') [assigned to]";
+			}
+		}
+
+		if (security.this_status_field_permission_level > 0)
+		{
+			select += ",\nisnull(st_name,'') [status]";
+		}
+
+		if (security.this_udf_field_permission_level > 0)
+		{
+			if (show_udf)
+			{
+				string udf_name = Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE");
+				select += ",\nisnull(udf_name,'') [" + udf_name + "]";
+			}
+		}
 
 		// let results include custom columns
 		string custom_cols_sql = "";
@@ -466,7 +518,7 @@ void do_query()
 		{
 			if (Convert.ToString(drcc["dropdown type"]) == "users")
 			{
-				custom_cols_sql += ", isnull(users"
+				custom_cols_sql += ",\nisnull(users"
 					+ Convert.ToString(user_type_cnt++)
 					+ ".us_username,'') "
 					+ "["
@@ -476,14 +528,14 @@ void do_query()
 			{
 				if (Convert.ToString(drcc["datatype"]) == "decimal")
 				{
-					custom_cols_sql += ",isnull(["
+					custom_cols_sql += ",\nisnull(["
 						+ drcc["name"].ToString()
 						+ "],0)["
 						+ drcc["name"].ToString() + "]";
 				}
 				else
 				{
-					custom_cols_sql += ",isnull(["
+					custom_cols_sql += ",\nisnull(["
 						+ drcc["name"].ToString()
 						+ "],'')["
 						+ drcc["name"].ToString() + "]";
@@ -895,6 +947,42 @@ void load_drop_downs()
 		udf.DataValueField = "udf_id";
 		udf.DataBind();
 		udf.Items.Insert(0, new ListItem("[none]", "0"));
+	}
+
+	if (security.this_project_field_permission_level == 0)
+	{
+		project_label.Style["display"] = "none";
+		project.Style["display"] = "none";
+	}
+	if (security.this_org_field_permission_level == 0)
+	{
+		org_label.Style["display"] = "none";
+		org.Style["display"] = "none";
+	}
+	if (security.this_category_field_permission_level == 0)
+	{
+		category_label.Style["display"] = "none";
+		category.Style["display"] = "none";
+	}
+	if (security.this_priority_field_permission_level == 0)
+	{
+		priority_label.Style["display"] = "none";
+		priority.Style["display"] = "none";
+	}
+	if (security.this_status_field_permission_level == 0)
+	{
+		status_label.Style["display"] = "none";
+		status.Style["display"] = "none";
+	}
+	if (security.this_assigned_to_field_permission_level == 0)
+	{
+		assigned_to_label.Style["display"] = "none";
+		assigned_to.Style["display"] = "none";
+	}
+	if (security.this_udf_field_permission_level == 0)
+	{
+		udf_label.Style["display"] = "none";
+		udf.Style["display"] = "none";
 	}
 
 }
@@ -1311,87 +1399,120 @@ function on_change()
 	{
 
 %>
-		var select = "select isnull(pr_background_color,'#ffffff') [color], bg_id [id],\n";
-		select += "bg_short_desc [desc], isnull(pj_name,'') [project], isnull(og_name,'') [organization], isnull(ct_name,'') [category],\n";
-<%
-		if (use_full_names)
-		{
-%>
-			select += "isnull(rpt.us_lastname + ', ' + rpt.us_firstname,'') [reported by], ";
-<%
-		}
-		else
-		{
-%>
-			select += "isnull(rpt.us_username,'') [reported by], ";
-<%
-		}
-%>
-		select += "bg_reported_date [reported on],\n";
-		select += "isnull(pr_name,'') [priority], "
+		var select = "select isnull(pr_background_color,'#ffffff') [color], bg_id [id]";
+		select += ",\nbg_short_desc [desc]"
+		select += ",\nbg_reported_date [reported on]"
 
 <%
 		if (use_full_names)
 		{
 %>
-			select += "isnull(asg.us_lastname + ', ' + asg.us_firstname,'') [assigned to], ";
+			select += ",\nisnull(rpt.us_lastname + ', ' + rpt.us_firstname,'') [reported by]";
 <%
 		}
 		else
 		{
 %>
-			select += "isnull(asg.us_username,'') [assigned to], ";
+			select += ",\nisnull(rpt.us_username,'') [reported by]";
 <%
 		}
+
+		if (security.this_project_field_permission_level > 0)
+		{
 %>
-		select += "isnull(st_name,'') [status]";
+			select += ",\nisnull(pj_name,'') [project]"
 <%
-		if (show_udf)
-		{
-			string udf_name = Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE");
-			Response.Write ("select += \",\\nisnull(udf_name,'') [" + udf_name + "]\"");
 		}
+
+		if (security.this_org_field_permission_level > 0)
+		{
 %>
-
+			select += ",\nisnull(og_name,'') [organization]"
 <%
-
-
-
-	// add the custom fields to the columns
-	int user_dropdown_cnt = 1;
-	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
-	{
-		if (Convert.ToString(drcc["dropdown type"]) == "users")
-		{
-			Response.Write ("\nselect += \", \\nisnull(users"
-			+ Convert.ToString(user_dropdown_cnt)
-			+ ".us_username,'') ["
-			+ Convert.ToString(drcc["name"])
-			+ "]\"");
-			user_dropdown_cnt++;
 		}
-		else
+
+		if (security.this_category_field_permission_level > 0)
 		{
-			if (Convert.ToString(drcc["datatype"]) == "decimal")
+%>
+			select += ",\nisnull(ct_name,'') [category]";
+<%
+		}
+
+		if (security.this_priority_field_permission_level > 0)
+		{
+%>
+			select += ",\nisnull(pr_name,'') [priority]"
+<%
+		}
+
+		if (security.this_assigned_to_field_permission_level > 0)
+		{
+			if (use_full_names)
 			{
-				Response.Write ("\nselect += \", \\nisnull(["
-				+ Convert.ToString(drcc["name"])
-				+ "],0) ["
-				+ Convert.ToString(drcc["name"])
-				+ "]\"");
+%>
+				select += ",\nisnull(asg.us_lastname + ', ' + asg.us_firstname,'') [assigned to]";
+<%
 			}
 			else
 			{
-				Response.Write ("\nselect += \", \\nisnull(["
-				+ Convert.ToString(drcc["name"])
-				+ "],'') ["
-				+ Convert.ToString(drcc["name"])
-				+ "]\"");
+%>
+				select += ",\nisnull(asg.us_username,'') [assigned to]";
+<%
 			}
 		}
-	}
 
-	Response.Write ("\nselect += \"" + project_dropdown_select_cols + "\"");
+		if (security.this_status_field_permission_level > 0)
+		{
+%>
+			select += ",\nisnull(st_name,'') [status]";
+<%
+		}
+
+		if (security.this_udf_field_permission_level > 0)
+		{
+			if (show_udf)
+			{
+				string udf_name = Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE");
+				Response.Write ("select += \",\\nisnull(udf_name,'') [" + udf_name + "]\"");
+			}
+		}
+
+
+		// add the custom fields to the columns
+		int user_dropdown_cnt = 1;
+		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
+		{
+			if (Convert.ToString(drcc["dropdown type"]) == "users")
+			{
+				Response.Write ("\nselect += \", \\nisnull(users"
+				+ Convert.ToString(user_dropdown_cnt)
+				+ ".us_username,'') ["
+				+ Convert.ToString(drcc["name"])
+				+ "]\"");
+				user_dropdown_cnt++;
+			}
+			else
+			{
+				if (Convert.ToString(drcc["datatype"]) == "decimal")
+				{
+					Response.Write ("\nselect += \", \\nisnull(["
+					+ Convert.ToString(drcc["name"])
+					+ "],0) ["
+					+ Convert.ToString(drcc["name"])
+					+ "]\"");
+				}
+				else
+				{
+					Response.Write ("\nselect += \", \\nisnull(["
+					+ Convert.ToString(drcc["name"])
+					+ "],'') ["
+					+ Convert.ToString(drcc["name"])
+					+ "]\"");
+				}
+			}
+		}
+
+		Response.Write ("\nselect += \"" + project_dropdown_select_cols + "\"");
 %>
 
 		select += "\nfrom bugs\n";
@@ -1405,26 +1526,23 @@ function on_change()
 
 <%
 	// do the joins related to "user" dropdowns
-	user_dropdown_cnt = 1;
-	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
-	{
-		if (Convert.ToString(drcc["dropdown type"]) == "users")
+		user_dropdown_cnt = 1;
+		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 		{
-			Response.Write ("select += \"left outer join users users");
-			Response.Write (Convert.ToString(user_dropdown_cnt));
-			Response.Write (" on users");
-			Response.Write (Convert.ToString(user_dropdown_cnt));
-			Response.Write (".us_id = bugs.");
-			Response.Write ("[");
-			Response.Write (drcc["name"]);
-			Response.Write ("]\\n\"\n");
-			user_dropdown_cnt++;
+			if (Convert.ToString(drcc["dropdown type"]) == "users")
+			{
+				Response.Write ("select += \"left outer join users users");
+				Response.Write (Convert.ToString(user_dropdown_cnt));
+				Response.Write (" on users");
+				Response.Write (Convert.ToString(user_dropdown_cnt));
+				Response.Write (".us_id = bugs.");
+				Response.Write ("[");
+				Response.Write (drcc["name"]);
+				Response.Write ("]\\n\"\n");
+				user_dropdown_cnt++;
+			}
 		}
-	}
-%>
 
-
-<%
 		if (show_udf)
 		{
 %>
@@ -1432,9 +1550,10 @@ function on_change()
 <%
 		}
 %>
+
 		frm.query.value = select + where + 'order by bg_id desc';
 <%
-	}
+	} // else use sql from web config
 	else
 	{
 %>
@@ -1518,22 +1637,22 @@ function set_project_changed() {
 		</asp:ListBox>
 		</td>
 
-		<td nowrap><span class=lbl id="category_label">category:</span><br>
+		<td nowrap><span class=lbl id="category_label" runat="server">category:</span><br>
 		<asp:ListBox Rows=6 SelectionMode="Multiple" id="category" runat="server" onchange="on_change()">
 		</asp:ListBox>
 		</td>
 
-		<td nowrap><span class=lbl id="priority_label">priority:</span><br>
+		<td nowrap><span class=lbl id="priority_label" runat="server">priority:</span><br>
 		<asp:ListBox Rows=6 SelectionMode="Multiple" id="priority" runat="server" onchange="on_change()">
 		</asp:ListBox>
 		</td>
 
-		<td nowrap><span class=lbl id="assigned_to_label">assigned to:</span><br>
+		<td nowrap><span class=lbl id="assigned_to_label" runat="server">assigned to:</span><br>
 		<asp:ListBox Rows=6 SelectionMode="Multiple" id="assigned_to" runat="server" onchange="on_change()">
 		</asp:ListBox>
 		</td>
 
-		<td nowrap><span class=lbl id="status_label">status:</span><br>
+		<td nowrap><span class=lbl id="status_label" runat="server">status:</span><br>
 		<asp:ListBox Rows=6 SelectionMode="Multiple" id="status" runat="server" onchange="on_change()">
 		</asp:ListBox>
 		</td>
@@ -1548,7 +1667,7 @@ function set_project_changed() {
 		</asp:ListBox>
 		</td>
 
-		<td nowrap><span class=lbl id="project_label">project:</span><br>
+		<td nowrap><span class=lbl id="project_label" runat="server">project:</span><br>
 			<asp:ListBox Rows=6 SelectionMode="Multiple" id="project" runat="server" onchange="set_project_changed()"
 			AutoPostBack="true">
 			</asp:ListBox>
@@ -1578,7 +1697,7 @@ function set_project_changed() {
 		<% if (show_udf)
 		{
 		%>
-		<td nowrap rowspan=2><span class=lbl><% Response.Write (Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %></span><br>
+		<td nowrap rowspan=2><span class=lbl id="udf_label" runat="server"><% Response.Write (Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %></span><br>
 			<asp:ListBox Rows=4 SelectionMode="Multiple" id="udf" runat="server" onchange="on_change()">
 			</asp:ListBox>
 
