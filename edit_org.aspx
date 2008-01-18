@@ -43,17 +43,21 @@ void Page_Load(Object sender, EventArgs e)
 	if (!IsPostBack)
 	{
 
-		//other_orgs_permission_level.Items.Insert(0, new ListItem("None", "0"));
-		//other_orgs_permission_level.Items.Insert(1, new ListItem("Read Only", "1"));
-		//other_orgs_permission_level.Items.Insert(2, new ListItem("Add/Edit", "2"));
-
-
 		// add or edit?
 		if (id == 0)
 		{
 			sub.Value = "Create";
 			//other_orgs_permission_level.SelectedIndex = 2;
 			can_be_assigned_to.Checked = true;
+			other_orgs.SelectedValue = "2";
+
+			project_field.SelectedValue = "2";
+			org_field.SelectedValue = "2";
+			category_field.SelectedValue = "2";
+			priority_field.SelectedValue = "2";
+			status_field.SelectedValue = "2";
+			assigned_to_field.SelectedValue = "2";
+			udf_field.SelectedValue = "2";
 		}
 		else
 		{
@@ -77,7 +81,17 @@ void Page_Load(Object sender, EventArgs e)
 			can_use_reports.Checked = Convert.ToBoolean((int)dr["og_can_use_reports"]);
 			can_edit_reports.Checked = Convert.ToBoolean((int)dr["og_can_edit_reports"]);
 			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["og_can_be_assigned_to"]);
-			//other_orgs_permission_level.SelectedIndex = (int)dr["og_other_orgs_permission_level"];
+
+			other_orgs.SelectedValue = Convert.ToString((int)dr["og_other_orgs_permission_level"]);
+
+			project_field.SelectedValue = Convert.ToString((int)dr["og_project_field_permission_level"]);
+			org_field.SelectedValue = Convert.ToString((int)dr["og_org_field_permission_level"]);
+			category_field.SelectedValue = Convert.ToString((int)dr["og_category_field_permission_level"]);
+			priority_field.SelectedValue = Convert.ToString((int)dr["og_priority_field_permission_level"]);
+			status_field.SelectedValue = Convert.ToString((int)dr["og_status_field_permission_level"]);
+			assigned_to_field.SelectedValue = Convert.ToString((int)dr["og_assigned_to_field_permission_level"]);
+			udf_field.SelectedValue = Convert.ToString((int)dr["og_udf_field_permission_level"]);
+
 		}
 	}
 
@@ -125,11 +139,25 @@ void on_update (Object sender, EventArgs e)
 			og_can_use_reports,
 			og_can_edit_reports,
 			og_can_be_assigned_to,
-			og_other_orgs_permission_level)
+			og_other_orgs_permission_level,
+			og_project_field_permission_level,
+			og_org_field_permission_level,
+			og_category_field_permission_level,
+			og_priority_field_permission_level,
+			og_status_field_permission_level,
+			og_assigned_to_field_permission_level,
+			og_udf_field_permission_level)
 			values (N'$nam', $non,
 			$ext, $ces, $cdb,
 			$cep, $cmb, $cme,
-			$cur, $cer, $cba, $otherorgs)";
+			$cur, $cer, $cba, $other_orgs,
+			$flp_project,
+			$flp_org,
+			$flp_category,
+			$flp_priority,
+			$flp_status,
+			$flp_assigned_to,
+			$flp_udf)";
 		}
 		else // edit existing
 		{
@@ -146,7 +174,14 @@ void on_update (Object sender, EventArgs e)
 			og_can_use_reports = $cur,
 			og_can_edit_reports = $cer,
 			og_can_be_assigned_to = $cba,
-			og_other_orgs_permission_level = $otherorgs
+			og_other_orgs_permission_level = $other_orgs,
+			og_project_field_permission_level = $flp_project,
+			og_org_field_permission_level = $flp_org,
+			og_category_field_permission_level = $flp_category,
+			og_priority_field_permission_level = $flp_priority,
+			og_status_field_permission_level = $flp_status,
+			og_assigned_to_field_permission_level = $flp_assigned_to,
+			og_udf_field_permission_level = $flp_udf
 			where og_id = $og_id";
 
 			sql = sql.Replace("$og_id", Convert.ToString(id));
@@ -164,7 +199,14 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$cur", Util.bool_to_string(can_use_reports.Checked));
 		sql = sql.Replace("$cer", Util.bool_to_string(can_edit_reports.Checked));
 		sql = sql.Replace("$cba", Util.bool_to_string(can_be_assigned_to.Checked));
-		//sql = sql.Replace("$otherorgs", Convert.ToString(other_orgs_permission_level.SelectedIndex));
+		sql = sql.Replace("$other_orgs", other_orgs.SelectedValue);
+		sql = sql.Replace("$flp_project", project_field.SelectedValue);
+		sql = sql.Replace("$flp_org", org_field.SelectedValue);
+		sql = sql.Replace("$flp_category", category_field.SelectedValue);
+		sql = sql.Replace("$flp_priority", priority_field.SelectedValue);
+		sql = sql.Replace("$flp_status", status_field.SelectedValue);
+		sql = sql.Replace("$flp_assigned_to", assigned_to_field.SelectedValue);
+		sql = sql.Replace("$flp_udf", udf_field.SelectedValue);
 
 
 		dbutil.execute_nonquery(sql);
@@ -217,12 +259,6 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	<tr>
-	<td colspan=3>
-	&nbsp;
-	</td>
-	</tr>
-
-	<tr>
 		<td class=lbl colspan=3>Permission level for bugs associated with other (or no) organizations<br>
 		<asp:RadioButtonList RepeatDirection="Horizontal" id="other_orgs" runat="server">
 			<asp:ListItem text="none"      value="0" ID="other_orgs0" runat="server"/>
@@ -242,19 +278,19 @@ void on_update (Object sender, EventArgs e)
 
 		<tr>
 		<td><asp:checkbox runat="server" class=txt id="external_user"/></td>
-		<td class=lbl>External user&nbsp;&nbsp; <span class=smallnote>(External users cannot view posts marked "Visible for internal usrs only")</span></td>
+		<td class=lbl>External users&nbsp;&nbsp; <span class=smallnote>(External users cannot view posts marked "Visible for internal usrs only")</span></td>
 		<td>&nbsp</td>
 		</tr>
 
 		<tr>
 		<td><asp:checkbox runat="server" class=txt id="can_be_assigned_to"/></td>
-		<td class=lbl>Appears in "assigned to" dropdown in edit bug page</td>
+		<td class=lbl>Members of this org appear in "assigned to" dropdown in edit bug page</td>
 		<td>&nbsp</td>
 		</tr>
 
 		<tr>
 		<td><asp:checkbox runat="server" class=txt id="non_admins_can_use"/></td>
-		<td class=lbl>Non-admins allowed to add users can use this org when adding users</td>
+		<td class=lbl>Non-admin with permission to add users can add users to this org</td>
 		<td>&nbsp</td>
 		</tr>
 

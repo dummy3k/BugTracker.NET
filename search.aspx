@@ -1260,7 +1260,20 @@ function on_change()
 	var project_custom_dropdown3_clause = build_clause_from_options (
 		frm.project_custom_dropdown3.options, "bg_project_custom_dropdown_value3");
 
-	var org_clause = build_clause_from_options (frm.org.options, "bg_org");
+<%
+	if (security.this_other_orgs_permission_level != 0)
+	{
+%>
+		var org_clause = build_clause_from_options (frm.org.options, "bg_org");
+<%
+	}
+	else
+	{
+%>
+	var org_clause = "";
+<%
+	}
+%>
 	var category_clause = build_clause_from_options (frm.category.options, "bg_category");
 	var priority_clause = build_clause_from_options (frm.priority.options, "bg_priority");
 	var status_clause = build_clause_from_options (frm.status.options, "bg_status");
