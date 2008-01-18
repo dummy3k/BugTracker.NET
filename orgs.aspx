@@ -34,11 +34,21 @@ void Page_Load(Object sender, EventArgs e)
 		case when og_can_edit_sql = 1 then 'Y' else 'N' end [can<br>edit sql],
 		case when og_can_delete_bug = 1 then 'Y' else 'N' end [can<br>delete item],
 		case when og_can_edit_and_delete_posts = 1 then 'Y' else 'N' end [can<br>edit/del posts],
-		case when og_can_merge_bugs = 1 then 'Y' else 'N' end [can<br>merge items],
-		case when og_can_mass_edit_bugs = 1 then 'Y' else 'N' end [can<br>mass edit],
 		case when og_can_use_reports = 1 then 'Y' else 'N' end [can<br>use rpts],
 		case when og_can_edit_reports = 1 then 'Y' else 'N' end [can<br>edit rpts],
-		case when og_can_be_assigned_to = 1 then 'Y' else 'N' end [can<br>be assigned to]
+		case when og_can_be_assigned_to = 1 then 'Y' else 'N' end [can<br>be assigned to],
+		case
+			when og_status_field_permission_level = 0 then 'None'
+			when og_status_field_permission_level = 1 then 'Read Only'
+			else 'Add/Edit' end [status<br>permission<br>level],
+		case
+			when og_assigned_to_field_permission_level = 0 then 'None'
+			when og_assigned_to_field_permission_level = 1 then 'Read Only'
+			else 'Add/Edit' end [assigned to<br>permission<br>level],
+		case
+			when og_priority_field_permission_level = 0 then 'None'
+			when og_priority_field_permission_level = 1 then 'Read Only'
+			else 'Add/Edit' end [priority<br>permission<br>level]
 		from orgs order by og_name");
 
 }
