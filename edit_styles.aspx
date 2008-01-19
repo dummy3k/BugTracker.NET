@@ -1,6 +1,5 @@
 <%@ Page language="C#"%>
 <%@ Import Namespace="System.IO" %>
-<%@ Import Namespace="System.Collections" %>
 
 <!--
 Copyright 2002-2007 Corey Trager

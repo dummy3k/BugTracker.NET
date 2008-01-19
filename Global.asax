@@ -1,6 +1,5 @@
 <%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="btnet" %>
-<%@ Assembly Src="util.cs"%>
 <script runat="server" language="C#">
 
 /*

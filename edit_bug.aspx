@@ -1,6 +1,5 @@
 <%@ Page language="C#" validateRequest="false"%>
 <%@ Import namespace="btnet"%>
-<%@ Import namespace="System.Data"%>
 <%@ Register TagPrefix="FCKeditorV2" Namespace="FredCK.FCKeditorV2" Assembly="FredCK.FCKeditorV2" %>
 
 <!--

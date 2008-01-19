@@ -1,5 +1,3 @@
-<%@ Import Namespace="System.Data" %>
-<%@ Import Namespace="System.Data.OleDb" %>
 <%@ Import Namespace="System.Drawing" %>
 <%@ Import Namespace="System.Drawing.Imaging" %>
 <!-- #include file = "inc.aspx" -->
@@ -599,7 +597,7 @@ void create_pie_chart(string title, DataSet ds)
 ///////////////////////////////////////////////////////////////////////
 void create_table(string title, DataSet ds)
 {
-	
+
     Response.Write("<link rel=StyleSheet href=btnet.css type=text/css>");
 	Response.Write("<s" + "cript");
 	Response.Write(" type=text/javascript language=JavaScript src=sortable.js>");
@@ -608,7 +606,7 @@ void create_table(string title, DataSet ds)
 	Response.Write ("<body style='background: white;'><div class=align><table border=0><tr><td>");
 
     Response.Write("<h2>" + title + "</h2>");
-    
+
 	if (ds != null && ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
 	{
 		SortableHtmlTable.create_from_dataset(

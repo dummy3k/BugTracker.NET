@@ -4,8 +4,12 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
+* info for axosfot, countersoft, 
+add info for elementool?  flyspray?
+
 * NEED INSTRUCTIONS HOW TO UPGRADE 
-* use salt in encryption
+* use salt in encryption, provide a way for ldap authentication to happen
+-- maybe move stuff to different folder for automatic compilation
 * # of days in status, the two queries the guy sent
 * Wordwrap, and take advantage of new api.
 
