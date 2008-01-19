@@ -105,7 +105,7 @@ namespace btnet
 				{
 					asp_net_context.Application[Request.ServerVariables["REMOTE_ADDR"]] = pages_viewed;
 				}
-		}
+			}
 
 
 			HttpCookie cookie = Request.Cookies["se_id"];
@@ -119,7 +119,7 @@ namespace btnet
 			string target = "default.aspx?url=" + original_url + "&qs=" + HttpUtility.UrlEncode(original_querystring);
 
 			if (cookie == null)
-		{
+			{
 				Util.write_to_log ("se_id cookie is null, so redirecting");
 				Util.write_to_log ("Trouble logging in?  Your browser might be failing to send back its cookie.");
 				Util.write_to_log ("See Help forum at http://sourceforge.net/forum/forum.php?forum_id=226938");
@@ -280,16 +280,13 @@ namespace btnet
 			}
 
 			if (Util.get_setting("WindowsAuthentication","0") == "1")
-				{
-					auth_method = "windows";
-				}
-				else
-				{
-					auth_method = "plain";
-				}
-
-
-
+			{
+				auth_method = "windows";
+			}
+			else
+			{
+				auth_method = "plain";
+			}
 		}
 
 		///////////////////////////////////////////////////////////////////////
