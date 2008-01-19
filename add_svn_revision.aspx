@@ -1,11 +1,11 @@
 <%@ Page language="C#"%>
 <%@ Import Namespace="System.Xml" %>
+<!--
+Copyright 2002-2008 Corey Trager
+Distributed under the terms of the GNU General Public License
+-->
 <!-- #include file = "inc.aspx" -->
 <script language="C#" runat="server">
-
-//Copyright 2002-2007 Corey Trager
-//Distributed under the terms of the GNU General Public License
-
 
 
 DbUtil dbutil;

@@ -2,7 +2,7 @@
 <!-- #include file = "inc.aspx" -->
 <script language="C#" runat="server">
 
-//Copyright 2002-2007 Corey Trager
+//Copyright 2002-2008 Corey Trager
 //Distributed under the terms of the GNU General Public License
 // Updated to support new 1.8+ version of btnetsc -WER
 

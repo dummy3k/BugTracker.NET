@@ -1,10 +1,10 @@
 <%@ Page language="C#"%>
+<!--
+Copyright 2002-2008 Corey Trager
+Distributed under the terms of the GNU General Public License
+-->
 <!-- #include file = "inc.aspx" -->
 <script language="C#" runat="server">
-
-//Copyright 2002-2007 Corey Trager
-//Distributed under the terms of the GNU General Public License
-
 
 /*
 The following is an explanation of Unified Diff Format from this web page, from Guido van Rossum, the Python guy:
