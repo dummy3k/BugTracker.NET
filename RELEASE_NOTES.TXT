@@ -21,6 +21,26 @@ add info for elementool?  flyspray?
 * field level permissions for custom fields?
 * escalation/reminder
 
+-----------------------------------------------------------------------
+Version 2.7.4  1/xx/2008
+-----------------------------------------------------------------------
+
+
+App data folder
+
+
+		<!--
+		Set this to "1" if you want the passwords in the db to be stored encrypted.
+
+		When you logon, BugTracker.NET will check the database for both the encrypted and unecrypted forms,
+		so setting this on and off won't break anything.
+
+		Passwords that are already stored aren't affected.  If you want to change what's already stored,
+		you need to go the the "settings" page or "edit user" page.
+		-->
+
+		<add key="EncryptStoredPasswords" value="1"/>
+
 
 -----------------------------------------------------------------------
 Version 2.7.3  1/19/2008
