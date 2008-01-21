@@ -114,23 +114,29 @@ void Page_Load(Object sender, EventArgs e)
 
 	// authenticate user
 
-	sql = @"select us_id, us_admin, us_org, og_other_orgs_permission_level
+    bool authenticated = btnet.Authenticate.check_password(username, password);
+    
+    if (!authenticated)
+    {        
+		Response.AddHeader("BTNET","ERROR: invalid username or password");
+		Response.Write("ERROR: invalid username or password");
+		Response.End();
+    }    
+	
+    sql = @"select us_id, us_admin, us_org, og_other_orgs_permission_level
 		from users
 		inner join orgs on us_org = og_id
-		where us_username = N'$us'
-		and (us_password = N'$pw' or us_password = N'$en')
-		and us_active = 1";
+		where us_username = N'$us'";
 
 	sql = sql.Replace("$us",username.Replace("'","''"));
-	sql = sql.Replace("$pw",password.Replace("'","''"));
-	sql = sql.Replace("$en", Util.encrypt_string_using_MD5(password));
 
 	DataRow dr = dbutil.get_datarow(sql);
 
-	if (dr == null)
+    // this should never happen
+    if (dr == null)
 	{
-		Response.AddHeader("BTNET","ERROR: invalid username or password");
-		Response.Write("ERROR: invalid username or password");
+		Response.AddHeader("BTNET","ERROR: authenticated user, but no user in db?");
+		Response.Write("ERROR: authenticated user, but no user in db?");
 		Response.End();
 	}
 

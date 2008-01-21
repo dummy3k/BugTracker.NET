@@ -190,64 +190,24 @@ void on_update (Object sender, EventArgs e)
 	if (good)
 	{
 
-		string password_to_store;
-		if (Util.get_setting("EncryptStoredPasswords", "0") == "1")
-		{
-			password_to_store = Util.encrypt_string_using_MD5(pw.Value).Replace("'","''");
-		}
-		else
-		{
-			password_to_store = pw.Value.Replace("'","''");
-		}
-
-
-		if (pw.Value != "")
-		{
-			// MAW -- 2006/01/27 -- Converted to use new notification columns
-			sql = @"update users set
-				us_password = N'$pw',
-				us_firstname = N'$fn',
-				us_lastname = N'$ln',
-				us_bugs_per_page = N'$bp',
-				us_use_fckeditor = $fk,
-				us_enable_bug_list_popups = $pp,
-				us_email = N'$em',
-				us_enable_notifications = $en,
-				us_send_notifications_to_self = $ss,
-                us_reported_notifications = $rn,
-                us_assigned_notifications = $an,
-                us_subscribed_notifications = $sn,
-				us_auto_subscribe = $as,
-				us_auto_subscribe_own_bugs = $ao,
-				us_auto_subscribe_reported_bugs = $ar,
-				us_default_query = $dq,
-				us_signature = N'$sg'
-				where us_id = $id";
-
-			sql = sql.Replace("$pw", password_to_store);
-		}
-		else
-		{
-			sql = @"update users set
-				us_firstname = N'$fn',
-				us_lastname = N'$ln',
-				us_bugs_per_page = N'$bp',
-				us_use_fckeditor = $fk,
-				us_enable_bug_list_popups = $pp,
-				us_email = N'$em',
-				us_enable_notifications = $en,
-				us_send_notifications_to_self = $ss,
-                us_reported_notifications = $rn,
-                us_assigned_notifications = $an,
-                us_subscribed_notifications = $sn,
-				us_auto_subscribe = $as,
-				us_auto_subscribe_own_bugs = $ao,
-				us_auto_subscribe_reported_bugs = $ar,
-				us_default_query = $dq,
-				us_signature = N'$sg'
-				where us_id = $id";
-
-		}
+		sql = @"update users set
+			us_firstname = N'$fn',
+			us_lastname = N'$ln',
+			us_bugs_per_page = N'$bp',
+			us_use_fckeditor = $fk,
+			us_enable_bug_list_popups = $pp,
+			us_email = N'$em',
+			us_enable_notifications = $en,
+			us_send_notifications_to_self = $ss,
+            us_reported_notifications = $rn,
+            us_assigned_notifications = $an,
+            us_subscribed_notifications = $sn,
+			us_auto_subscribe = $as,
+			us_auto_subscribe_own_bugs = $ao,
+			us_auto_subscribe_reported_bugs = $ar,
+			us_default_query = $dq,
+			us_signature = N'$sg'
+			where us_id = $id";
 
 		sql = sql.Replace("$fn", firstname.Value.Replace("'","''"));
 		sql = sql.Replace("$ln", lastname.Value.Replace("'","''"));
@@ -269,7 +229,12 @@ void on_update (Object sender, EventArgs e)
 
 		// update user
 		dbutil.execute_nonquery(sql);
-
+        
+        // update the password
+        if (pw.Value != "")
+        {
+            btnet.Util.update_user_password(dbutil, id, pw.Value);
+        }
 
 		// Now update project_user_xref
 

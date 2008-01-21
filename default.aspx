@@ -124,36 +124,31 @@ void on_logon(Object sender, EventArgs e)
 		}
 	}
 
-	sql = @"select us_id, us_username
-		from users
-		where us_username = N'$us'
-		and (us_password = N'$pw' or us_password = N'$en')
-		and us_active = 1";
+    bool authenticated = btnet.Authenticate.check_password(user.Value, pw.Value);
+    
+    if (authenticated)
+    {        
+        sql = "select us_id from users where us_username = N'$us'";
+    	sql = sql.Replace("$us", user.Value.Replace("'","''"));
+    	DataRow dr = dbutil.get_datarow(sql);
+        if (dr != null)
+        {
+            int us_id = (int)dr["us_id"];
 
-	sql = sql.Replace("$us", user.Value.Replace("'","''"));
-	if (pw.Value.Length == 32)
-	{
-		sql = sql.Replace("$pw", "");
-	}
-	else
-	{
-		sql = sql.Replace("$pw", pw.Value.Replace("'","''"));
-	}
+            create_session(
+                us_id,
+                user.Value,
+                "0");
 
-	sql = sql.Replace("$en", Util.encrypt_string_using_MD5(pw.Value));
-
-	DataRow dr = dbutil.get_datarow(sql);
-	if (dr != null)
-	{
-		int userid = (int) dr["us_id"];
-
-		create_session (
-			userid,
-			(string) dr["us_username"],
-			"0");
-
-		redirect();
-
+            redirect();
+        }
+        else
+        {
+            // How could this happen?  If someday the authentication
+            // method uses, say LDAP, then check_password could return
+            // true, even though there's no user in the database";
+            msg.InnerText = "User not found in database";
+        }
 	}
 	else
 	{

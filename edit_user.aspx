@@ -443,18 +443,6 @@ class Project
 ///////////////////////////////////////////////////////////////////////
 string replace_vars_in_sql_statement(string sql)
 {
-
-	string password_to_store;
-	if (Util.get_setting("EncryptStoredPasswords", "0") == "1")
-	{
-		password_to_store = Util.encrypt_string_using_MD5(pw.Value);
-	}
-	else
-	{
-		password_to_store = pw.Value;
-	}
-
-	sql = sql.Replace("$pw", password_to_store.Replace("'","''"));
 	sql = sql.Replace("$un", username.Value.Replace("'","''"));
 	sql = sql.Replace("$fn", firstname.Value.Replace("'","''"));
 	sql = sql.Replace("$ln", lastname.Value.Replace("'","''"));
@@ -549,7 +537,6 @@ select scope_identity()";
 				sql = replace_vars_in_sql_statement(sql);
 				sql = sql.Replace("$createdby", Convert.ToString(security.this_usid));
 
-
 				// only admins can create admins.
 				if (security.this_is_admin)
 				{
@@ -560,10 +547,16 @@ select scope_identity()";
 					sql = sql.Replace("$ad","0");
 				}
 
-				// insert the user
-				id = Convert.ToInt32(dbutil.execute_scalar(sql));
+                // fill the password field with some junk, just temporarily.
+                sql = sql.Replace("$pw", Convert.ToString(new Random().Next()));
 
-				update_project_user_xref();
+                // insert the user
+                id = Convert.ToInt32(dbutil.execute_scalar(sql));
+
+                // now encrypt the password and update the db
+                btnet.Util.update_user_password(dbutil, id, pw.Value);
+
+                update_project_user_xref();
 
 				Server.Transfer ("users.aspx");
 			}
@@ -591,7 +584,6 @@ select scope_identity()";
 				sql = @"
 update users set
 us_username = N'$un',
-$PASSWORD$
 us_firstname = N'$fn',
 us_lastname = N'$ln',
 us_bugs_per_page = N'$bp',
@@ -615,20 +607,16 @@ us_forced_project = $fp
 where us_id = $id";
 
 
-				if (pw.Value != "")
-				{
-					sql = sql.Replace("$PASSWORD$", "us_password = N'$pw',");
-				}
-				else
-				{
-					sql = sql.Replace("$PASSWORD$", "");
-				}
-
-
 				sql = replace_vars_in_sql_statement(sql);
 
 				dbutil.execute_nonquery(sql);
 
+                // update the password
+                if (pw.Value != "")
+                {
+                    btnet.Util.update_user_password(dbutil, id, pw.Value);
+                }                
+                
 				update_project_user_xref();
 
 				Server.Transfer ("users.aspx");

@@ -579,3 +579,14 @@ alter table orgs add og_status_field_permission_level int not null default(2)
 alter table orgs add og_project_field_permission_level int not null default(2)
 alter table orgs add og_org_field_permission_level int not null default(2)
 alter table orgs add og_udf_field_permission_level int not null default(2)
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.7.3 to 2.7.4
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table users add us_salt int null
