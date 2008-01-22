@@ -1,5 +1,4 @@
 <%@ Page language="C#" validateRequest="false"%>
-<%@ Assembly Src="TranslationService.cs"%>
 
 <!--
 
