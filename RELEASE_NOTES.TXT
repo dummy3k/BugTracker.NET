@@ -22,6 +22,20 @@ Release notes:
 * field level permissions for custom fields?
 * escalation/reminder
 
+
+<compilation debug="true">
+	<assemblies>
+		<add assembly="System.DirectoryServices.Protocols, Version=2.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A"/>
+	</assemblies>
+</compilation>
+
+
+<add key="AuthenticateUsingLdap" value="1"/>
+<add key="LdapServer" value="127.0.0.1"/>
+<add key="LdapUserDistinguishedName" value="uid=$REPLACE_WITH_USERNAME$,ou=people,dc=mycompany,dc=com"/>
+
+OpenLDAP.
+
 -----------------------------------------------------------------------
 Version 2.7.4  1/27/2008
 -----------------------------------------------------------------------

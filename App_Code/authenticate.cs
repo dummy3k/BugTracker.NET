@@ -6,6 +6,7 @@ Distributed under the terms of the GNU General Public License
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.DirectoryServices.Protocols;
 
 namespace btnet
 {
@@ -13,6 +14,56 @@ namespace btnet
 
         // returns user id
         public static bool check_password(string username, string password)
+        {
+
+			if (btnet.Util.get_setting("AuthenticateUsingLdap","0") == "1")
+			{
+				return check_password_with_ldap(username, password);
+			}
+			else
+			{
+				return check_password_with_db(username, password);
+			}
+		}
+
+        public static bool check_password_with_ldap(string username, string password)
+        {
+			string dn = btnet.Util.get_setting(
+				"LdapUserDistinguishedName",
+				"");
+
+			string ldap_server = btnet.Util.get_setting(
+				"LdapServer",
+				"127.0.0.1");
+
+            dn = dn.Replace("$REPLACE_WITH_USERNAME$", username);
+            LdapConnection ldap = new LdapConnection(ldap_server);
+            System.Net.NetworkCredential cred = new System.Net.NetworkCredential(dn, password);
+            ldap.AuthType = AuthType.Basic;
+            bool bResult = false;
+
+            try
+            {
+                ldap.Bind(cred);
+                btnet.Util.write_to_log("LDAP authentication ok: " + username);
+                return true;
+            }
+            catch (LdapException e)
+            {
+                string s = e.Message;
+                if (e.InnerException != null)
+                {
+                    s += "\n";
+                    s += e.InnerException.Message;
+                }
+                // write the message to the log
+                btnet.Util.write_to_log("LDAP authentication failed: " + s);
+                return false;
+            }
+
+		}
+
+        public static bool check_password_with_db(string username, string password)
         {
             DbUtil dbutil = new DbUtil();
 
