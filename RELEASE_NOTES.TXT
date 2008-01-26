@@ -4,13 +4,14 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-* info for axosfot, countersoft, 
-add info for elementool?  flyspray?
 
 * NEED INSTRUCTIONS HOW TO UPGRADE 
+
 * use salt in encryption, provide a way for ldap authentication to happen
 -- maybe move stuff to different folder for automatic compilation
+
 * # of days in status, the two queries the guy sent
+
 * Wordwrap, and take advantage of new api.
 
 * apostrophe's, commas, quotes in custom field names, values
@@ -22,25 +23,24 @@ add info for elementool?  flyspray?
 * escalation/reminder
 
 -----------------------------------------------------------------------
-Version 2.7.4  1/xx/2008
+Version 2.7.4  1/27/2008
 -----------------------------------------------------------------------
 
+* With this version, BugTracker.NET no longer supports storing user
+passwords unencrypted.  The setting "EncryptStoredPasswords" is now 
+ignored because passwords are now ALWAYS stored encrypted.
 
-App data folder
+To upgrade to this version, run the following SQL to modify your 
+database before deploying the new web pages:
+alter table users add us_salt int null
+
+As people log in, 
+
+* Now using the the ASP.NET "App_Code" folder.  util.cs has been split
+up into several smaller files.
 
 
-		<!--
-		Set this to "1" if you want the passwords in the db to be stored encrypted.
-
-		When you logon, BugTracker.NET will check the database for both the encrypted and unecrypted forms,
-		so setting this on and off won't break anything.
-
-		Passwords that are already stored aren't affected.  If you want to change what's already stored,
-		you need to go the the "settings" page or "edit user" page.
-		-->
-
-		<add key="EncryptStoredPasswords" value="1"/>
-
+* Adding attachments now updates the bug's last update date and user id.
 
 -----------------------------------------------------------------------
 Version 2.7.3  1/19/2008

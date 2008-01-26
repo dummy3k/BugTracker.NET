@@ -296,10 +296,20 @@ namespace btnet
 
                 // Insert a new post into bug_posts.
 
-                sql = @"insert into bug_posts
-		                (bp_type, bp_bug, bp_file, bp_comment, bp_size, bp_date, bp_user, bp_content_type, bp_parent, bp_hidden_from_external_users)
-		                values ('file', $bg, N'$fi', N'$de', $si, getdate(), $us, N'$ct', $pa, $internal)
-		                select scope_identity()";
+                sql = @"
+declare @now datetime
+
+set @now = getdate()
+
+update bugs
+	set bg_last_updated_date = @now,
+	bg_last_updated_user = $us
+	where bg_id = $bg
+
+insert into bug_posts
+	(bp_type, bp_bug, bp_file, bp_comment, bp_size, bp_date, bp_user, bp_content_type, bp_parent, bp_hidden_from_external_users)
+	values ('file', $bg, N'$fi', N'$de', $si, @now, $us, N'$ct', $pa, $internal)
+	select scope_identity()";
 
                 sql = sql.Replace("$bg", Convert.ToString(bugid));
                 sql = sql.Replace("$fi", effective_file.Replace("'", "''"));

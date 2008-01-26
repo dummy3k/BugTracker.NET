@@ -17,8 +17,8 @@ namespace btnet
             DbUtil dbutil = new DbUtil();
 
             string sql = @"
-select us_username, us_id, us_password, us_salt, us_active
-from users 
+select us_username, us_id, us_password, isnull(us_salt,0) us_salt, us_active
+from users
 where us_username = N'$username'";
 
             sql = sql.Replace("$username",username.Replace("'","''"));
@@ -38,12 +38,18 @@ where us_username = N'$username'";
                 Util.write_to_log("Inactive user " + username + " attempted to login.");
                 return false;
             }
-            
+
             int us_salt = (int) dr["us_salt"];
 
             string encrypted;
 
-            if (us_salt == 0)
+            string us_password = (string) dr["us_password"];
+
+            if (us_password.Length < 32) // if password in db is unencrypted
+            {
+				encrypted = password; // in other words, unecrypted
+			}
+            else if (us_salt == 0)
             {
                 encrypted = Util.encrypt_string_using_MD5(password);
             }
@@ -52,15 +58,15 @@ where us_username = N'$username'";
                 encrypted = Util.encrypt_string_using_MD5(password + Convert.ToString(us_salt));
             }
 
-            string us_password = (string) dr["us_password"];
 
 			if (encrypted == us_password)
             {
-                // Authenticated, but let's do a better job encrypting the password
-                // and store in back in the db, along with salt.
-                if (us_salt == 0)
+                // Authenticated, but let's do a better job encrypting the password.
+                // If it is not encrypted, or, if it is encrypted without salt, then
+                // update it so that it is encrypted WITH salt.
+                if (us_salt == 0 || us_password.Length < 32)
                 {
-                    btnet.Util.update_user_password(dbutil, (int) dr["us_id"], us_password);
+                    btnet.Util.update_user_password(dbutil, (int) dr["us_id"], password);
                 }
 
                 return true;
