@@ -34,9 +34,17 @@ To upgrade to this version, run the following SQL to modify your
 database before deploying the new web pages:
 alter table users add us_salt int null
 
-As people log in, 
+As users log in, if their passwords had been stored unencrypted, 
+the app will automatically update the database with the encrypted 
+passwords.  Or, you can encrypt all the passwords by invoking this
+page:
+upgrade_723_to_724.aspx
 
-* Now using the the ASP.NET "App_Code" folder.  util.cs has been split
+Even passwords that had been encrypted before will be re-encrypted
+with a stronger encryption scheme.
+
+
+* Now using the the ASP.NET "App_Code" folder.  Util.cs has been split
 up into several smaller files.
 
 

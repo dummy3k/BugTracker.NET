@@ -99,6 +99,7 @@ create table users
 (
 us_id int identity primary key not null,
 us_username nvarchar(40) not null,
+us_salt int null,
 us_password nvarchar(64) not null,
 us_firstname nvarchar(60) null,
 us_lastname nvarchar(60) null,
