@@ -26,10 +26,8 @@ int permission_level;
 bool images_inline = true;
 bool history_inline = false;
 
-// make these non-global
 bool status_changed = false;
 bool assigned_to_changed = false;
-int prev_assigned_to_user = 0;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
 
@@ -145,7 +143,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 
-		load_drop_downs();
+		load_drop_downs(id);
 
 
 		if (id == 0)  // prepare the page for adding a new bug
@@ -217,6 +215,8 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
+			load_user_dropdown();
+
 			// org
 
 			if (security.this_other_orgs_permission_level == 0)
@@ -272,18 +272,6 @@ void Page_Load(Object sender, EventArgs e)
 			foreach (ListItem li in priority.Items)
 			{
 				if (li.Value == default_value)
-				{
-					li.Selected = true;
-				}
-				else
-				{
-					li.Selected = false;
-				}
-			}
-
-			foreach (ListItem li in assigned_to.Items)
-			{
-				if (li.Value == "[not assigned]")
 				{
 					li.Selected = true;
 				}
@@ -397,10 +385,6 @@ void Page_Load(Object sender, EventArgs e)
 
 			current_project.InnerText = (string) dr["current_project"];
 
-			assigned_to_username.InnerText = btnet.Util.format_username(
-				(string) dr["assigned_to_username"],
-				(string) dr["assigned_to_fullname"]);
-
 			// reported by
 			string s;
 			s = "Created by <span class=static>" + btnet.Util.format_username(
@@ -463,18 +447,6 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-			foreach (ListItem li in assigned_to.Items)
-			{
-				if (Convert.ToInt32(li.Value) == (int) dr["assigned_to_user"])
-				{
-					li.Selected = true;
-				}
-				else
-				{
-					li.Selected = false;
-				}
-			}
-
 			foreach (ListItem li in status.Items)
 			{
 				if (Convert.ToInt32(li.Value) == (int) dr["status"])
@@ -499,13 +471,6 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-			set_controls_field_permission(permission_level);
-
-			// save for next bug
-			if (project.SelectedItem != null)
-			{
-				Session["project"] = project.SelectedItem.Value;
-			}
 
 			// save current values in previous, so that later we can write the audit trail when things change
 			prev_short_desc.Value = (string) dr["short_desc"];
@@ -514,11 +479,24 @@ void Page_Load(Object sender, EventArgs e)
 			prev_category.Value = Convert.ToString((int)dr["category"]);
 			prev_priority.Value = Convert.ToString((int)dr["priority"]);
 			prev_assigned_to.Value = Convert.ToString((int)dr["assigned_to_user"]);
+			prev_assigned_to_username.Value = Convert.ToString(dr["assigned_to_username"]);
 			prev_status.Value = Convert.ToString((int)dr["status"]);
 			prev_udf.Value = Convert.ToString((int)dr["udf"]);
 			prev_pcd1.Value = (string) dr["bg_project_custom_dropdown_value1"];
 			prev_pcd2.Value = (string) dr["bg_project_custom_dropdown_value2"];
 			prev_pcd3.Value = (string) dr["bg_project_custom_dropdown_value3"];
+
+
+			load_user_dropdown(); // must come before set_controls_field_permission, after assigning to prev_ values
+
+
+			set_controls_field_permission(permission_level);
+
+			// save for next bug
+			if (project.SelectedItem != null)
+			{
+				Session["project"] = project.SelectedItem.Value;
+			}
 
 			snapshot_timestamp.Value = Convert.ToDateTime(dr["snapshot_timestamp"]).ToString("yyyyMMdd HH\\:mm\\:ss\\:fff");
 
@@ -686,27 +664,29 @@ void Page_Load(Object sender, EventArgs e)
 			}
 			hash_prev_custom_cols.Add(drcc["name"].ToString(), Request["prev_" + (string)drcc["name"]]);
 		}
+
+
+		// needs to be reloaded if project changed
+		load_user_dropdown();
+
 	}
 
 
-	string current_assigned_to_selection;
-	if (assigned_to.SelectedItem != null)
+}
+
+///////////////////////////////////////////////////////////////////////
+void load_user_dropdown()
+{
+	// What's selected now?   Save it before we refresh the dropdown.
+	string current_value = "";
+
+	if (IsPostBack)
 	{
-		current_assigned_to_selection = assigned_to.SelectedItem.Value;
-	}
-	else
-	{
-		if (id != 0 && !IsPostBack)
-		{
-			current_assigned_to_selection =  Convert.ToString((int) dr["assigned_to_user"]);
-		}
-		else
-		{
-			current_assigned_to_selection = "0";
-		}
+		current_value = assigned_to.SelectedItem.Value;
 	}
 
 
+	// Load the user dropdown, which changes per project
 	// Only users explicitly allowed will be listed
 	if (btnet.Util.get_setting("DefaultPermissionLevel","2") == "0")
 	{
@@ -756,39 +736,94 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("$pj", "0");
 	}
 
-	if (dt_users == null)
-	{
-		dt_users = dbutil.get_dataset(sql).Tables[0];
-	}
+
+	dt_users = dbutil.get_dataset(sql).Tables[0];
+
 	assigned_to.DataSource = new DataView((DataTable)dt_users);
 	assigned_to.DataTextField = "us_username";
 	assigned_to.DataValueField = "us_id";
 	assigned_to.DataBind();
 	assigned_to.Items.Insert(0, new ListItem("[not assigned]", "0"));
 
-	// automatically set to project's default user
-	if (current_assigned_to_selection == "0")
+	// It can happen that the user in the db is not listed in the dropdown, because of a subsequent change in permissions.
+	// Since that user IS the user associated with the bug, let's force it into the dropdown.
+	if (id != 0) // if existing bug
 	{
+		if (prev_assigned_to.Value != "0")
+		{
+			// see if already in the dropdown.
+			bool user_in_dropdown = false;
+			foreach (ListItem li in assigned_to.Items)
+			{
+				if (li.Value == prev_assigned_to.Value)
+				{
+					user_in_dropdown = true;
+					break;
+				}
+			}
+
+			// Add to the list, even if permissions don't allow it now, because, in the past, they did allow it.
+			if (!user_in_dropdown)
+			{
+				assigned_to.Items.Insert(1,
+					new ListItem(
+						prev_assigned_to_username.Value,
+						prev_assigned_to.Value));
+
+			}
+		}
+	}
+
+	// At this point, all the users we need are in the dropdown.
+	// Now selected the selected.
+	if (current_value == "")
+	{
+		current_value = prev_assigned_to.Value;
+	}
+
+
+	// Select the user.  We are either restoring the previous selection
+	// or selecting what was in the database.
+	if (current_value != "0")
+	{
+		foreach (ListItem li in assigned_to.Items)
+		{
+			if (li.Value == current_value)
+			{
+				li.Selected = true;
+			}
+			else
+			{
+				li.Selected = false;
+			}
+		}
+	}
+
+	// if nothing else is selected. select the default user for the project
+	if (assigned_to.SelectedItem.Value == "0")
+	{
+		int project_default_user = 0;
 		if (project.SelectedItem != null)
 		{
-			current_assigned_to_selection = Convert.ToString(btnet.Util.get_default_user(Convert.ToInt32(project.SelectedItem.Value)));
+			// get the default user of the project
+			project_default_user = btnet.Util.get_default_user(Convert.ToInt32(project.SelectedItem.Value));
+
+			if (project_default_user != 0)
+			{
+				foreach (ListItem li in assigned_to.Items)
+				{
+					if (Convert.ToInt32(li.Value) == project_default_user)
+					{
+						li.Selected = true;
+					}
+					else
+					{
+						li.Selected = false;
+					}
+				}
+			}
 		}
 	}
-
-	// redo selections
-	foreach (ListItem li in assigned_to.Items)
-	{
-		if (li.Value == current_assigned_to_selection)
-		{
-			li.Selected = true;
-			assigned_to_username.InnerText = li.Text;
-		}
-		else
-		{
-			li.Selected = false;
-		}
-	}
-
 
 }
 
@@ -1027,17 +1062,13 @@ void set_assigned_field_permission(int bug_permission_level)
 	if (perm_level == Security.PERMISSION_NONE)
 	{
 		assigned_to_label.Visible = false;
-		assigned_to_username.Visible = false;
-
-		reassign_label.Visible = false;
 		assigned_to.Visible = false;
-
 		prev_assigned_to.Visible = false;
 	}
 	else if (perm_level == Security.PERMISSION_READONLY)
 	{
 		assigned_to.Visible = false;
-		reassign_label.Visible = false;
+		static_assigned_to.InnerText = assigned_to.SelectedItem.Text;
 	}
 }
 
@@ -1195,14 +1226,9 @@ void format_prev_next_bug()
 
 }
 
-///////////////////////////////////////////////////////////////////////
-private void on_assigned_to_changed(object sender, System.EventArgs e)
-{
-   assigned_to_changed = true;
-}
 
 ///////////////////////////////////////////////////////////////////////
-void load_drop_downs()
+void load_drop_downs(int bugid)
 {
 
 	// only show projects where user has permissions
@@ -1442,31 +1468,30 @@ bool record_changes()
 		prev_priority.Value = priority.SelectedItem.Value;
 	}
 
-	if (assigned_to_changed)
+
+	if (prev_assigned_to.Value != assigned_to.SelectedItem.Value)
 	{
 
-		from = get_dropdown_text_from_value(assigned_to, prev_assigned_to.Value);
+		assigned_to_changed = true; // for notifications
 
-		// not sure why i have to do this, but I do, otherwise
-		// program writes an extra bug_history entry.
-		if (assigned_to.SelectedItem.Text != from)
-		{
-			do_update = true;
-			sql += base_sql.Replace(
-				"$3",
-				"changed assigned_to from \""
-				+ from.Replace("'","''") + "\" to \""
-				+ assigned_to.SelectedItem.Text.Replace("'","''") + "\"");
+		// The "from" might not be in the dropdown anymore...
+		//from = get_dropdown_text_from_value(assigned_to, prev_assigned_to.Value);
 
-		}
-		prev_assigned_to_user = Int32.Parse(prev_assigned_to.Value);
+		do_update = true;
+		sql += base_sql.Replace(
+			"$3",
+			"changed assigned_to from \""
+			+ prev_assigned_to_username.Value.Replace("'","''") + "\" to \""
+			+ assigned_to.SelectedItem.Text.Replace("'","''") + "\"");
+
 		prev_assigned_to.Value = assigned_to.SelectedItem.Value;
-		assigned_to_username.InnerText = assigned_to.SelectedItem.Text;
+		prev_assigned_to_username.Value = assigned_to.SelectedItem.Text;
 	}
+
 
 	if (prev_status.Value != status.SelectedItem.Value)
 	{
-		status_changed = true;
+		status_changed = true; // for notifications
 
 		from = get_dropdown_text_from_value(status, prev_status.Value);
 
@@ -1772,7 +1797,7 @@ Boolean validate()
 ///////////////////////////////////////////////////////////////////////
 void on_update (Object sender, EventArgs e)
 {
-
+btnet.Util.write_to_log("corey on_update");
 	bool good = validate();
 
 	// save for next bug
@@ -1873,37 +1898,6 @@ void on_update (Object sender, EventArgs e)
 					new_project = prev_project.Value;
 				}
 
-				string new_assigned_to;
-				if (assigned_to_changed)
-				{
-					new_assigned_to = assigned_to.SelectedItem.Value;
-				}
-				else
-				{
-					new_assigned_to = prev_assigned_to.Value;
-				}
-
-
-				if (new_assigned_to == "0")
-				{
-					// assign to default user
-					int default_user = btnet.Util.get_default_user(Convert.ToInt32(new_project));
-					new_assigned_to = Convert.ToString(default_user);
-					assigned_to_changed = true;
-
-					foreach (ListItem li in assigned_to.Items)
-					{
-						if (Convert.ToInt32(li.Value) == default_user)
-						{
-							li.Selected = true;
-							break;
-						}
-						else
-						{
-							li.Selected = false;
-						}
-					}
-				}
 
 				sql = @"declare @now datetime
 					declare @last_updated datetime
@@ -1945,7 +1939,7 @@ void on_update (Object sender, EventArgs e)
 				sql = sql.Replace("$og", org.SelectedItem.Value);
 				sql = sql.Replace("$ct", category.SelectedItem.Value);
 				sql = sql.Replace("$pr", priority.SelectedItem.Value);
-				sql = sql.Replace("$au", new_assigned_to);
+				sql = sql.Replace("$au", assigned_to.SelectedItem.Value);
 				sql = sql.Replace("$st", status.SelectedItem.Value);
 				sql = sql.Replace("$udf", udf.SelectedItem.Value);
 				sql = sql.Replace("$snapshot_datetime", snapshot_timestamp.Value);
@@ -2054,7 +2048,7 @@ void on_update (Object sender, EventArgs e)
 				result = btnet.Bug.send_notifications(btnet.Bug.UPDATE,	id,	security, 0,
 					status_changed,
 					assigned_to_changed,
-					prev_assigned_to_user);
+					Convert.ToInt32(assigned_to.SelectedItem.Value));
 			}
 
 
@@ -2244,11 +2238,9 @@ function clone()
 		<td nowrap>
 			<span class=lbl id="assigned_to_label" runat="server">Assigned to:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="assigned_to_username" runat="server">[not assigned]</span>
-			<span  runat="server" id="reassign_label" class=lbl>&nbsp;&nbsp;&nbsp;&nbsp;Re-assign:&nbsp;</span>
+			<span class=static id="static_assigned_to" runat="server"></span>
 
-			<asp:DropDownList id="assigned_to" runat="server"
-			OnSelectedIndexChanged="on_assigned_to_changed"> </asp:DropDownList>
+			<asp:DropDownList id="assigned_to" runat="server"></asp:DropDownList>
 
 	<tr id="row6">
 		<td nowrap>
@@ -2586,6 +2578,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	<input type=hidden id="prev_category" runat="server">
 	<input type=hidden id="prev_priority" runat="server">
 	<input type=hidden id="prev_assigned_to" runat="server">
+	<input type=hidden id="prev_assigned_to_username" runat="server">
 	<input type=hidden id="prev_status" runat="server">
 	<input type=hidden id="prev_udf" runat="server">
 	<input type=hidden id="prev_pcd1" runat="server">

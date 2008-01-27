@@ -4,6 +4,10 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
+* test notifications related to assigned user, status
+
+* fill user dropdown with valid users PLUS whoever bug is actually
+assigned to.
 
 * NEED INSTRUCTIONS HOW TO UPGRADE 
 
