@@ -143,7 +143,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 
-		load_drop_downs(id);
+		load_dropdowns(id);
 
 
 		if (id == 0)  // prepare the page for adding a new bug
@@ -1228,7 +1228,7 @@ void format_prev_next_bug()
 
 
 ///////////////////////////////////////////////////////////////////////
-void load_drop_downs(int bugid)
+void load_dropdowns(int bugid) // passing bugid because someday, maybe, we'll make this logic smarter...
 {
 
 	// only show projects where user has permissions
@@ -1797,7 +1797,7 @@ Boolean validate()
 ///////////////////////////////////////////////////////////////////////
 void on_update (Object sender, EventArgs e)
 {
-btnet.Util.write_to_log("corey on_update");
+
 	bool good = validate();
 
 	// save for next bug
