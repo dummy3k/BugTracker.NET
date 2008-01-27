@@ -143,7 +143,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 
-		load_dropdowns(id);
+		load_dropdowns();
 
 
 		if (id == 0)  // prepare the page for adding a new bug
@@ -156,9 +156,6 @@ void Page_Load(Object sender, EventArgs e)
 				display_bug_not_found(id);
 			}
 
-			// get default values
-
-			string initial_project = (string) Session["project"];
 
 			sql = "\nselect top 1 pj_id from projects where pj_default = 1 order by pj_name;"; // 0
 			sql += "\nselect top 1 ct_id from categories where ct_default = 1 order by ct_name;";  // 1
@@ -170,52 +167,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			string default_value;
 
-			// project
-			if (security.this_forced_project != 0)
-			{
-				initial_project = Convert.ToString(security.this_forced_project);
-			}
-
-
-			if (initial_project != null && initial_project != "0")
-			{
-				foreach (ListItem li in project.Items)
-				{
-					if (li.Value == initial_project)
-					{
-						li.Selected = true;
-						current_project.InnerText = li.Text;
-					}
-					else
-					{
-						li.Selected = false;
-					}
-				}
-			}
-			else
-			{
-				if (ds_defaults.Tables[0].Rows.Count > 0)
-				{
-					default_value = Convert.ToString((int) ds_defaults.Tables[0].Rows[0][0]);
-				}
-				else
-				{
-					default_value = "0";
-				}
-				foreach (ListItem li in project.Items)
-				{
-					if (li.Value == default_value)
-					{
-						li.Selected = true;
-					}
-					else
-					{
-						li.Selected = false;
-					}
-				}
-			}
-
-			load_user_dropdown();
+			load_project_and_user_dropdowns(ds_defaults.Tables[0]);
 
 			// org
 
@@ -383,8 +335,6 @@ void Page_Load(Object sender, EventArgs e)
 			titl.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))
 				+" ID " + Convert.ToString(dr["id"]) + " " + (string) dr["short_desc"];
 
-			current_project.InnerText = (string) dr["current_project"];
-
 			// reported by
 			string s;
 			s = "Created by <span class=static>" + btnet.Util.format_username(
@@ -398,18 +348,6 @@ void Page_Load(Object sender, EventArgs e)
 			reported_by.InnerHtml = s;
 
 			// select the dropdowns
-
-			foreach (ListItem li in project.Items)
-			{
-				if (Convert.ToInt32(li.Value) == (int) dr["project"])
-				{
-					li.Selected = true;
-				}
-				else
-				{
-					li.Selected = false;
-				}
-			}
 
 			foreach (ListItem li in org.Items)
 			{
@@ -475,6 +413,7 @@ void Page_Load(Object sender, EventArgs e)
 			// save current values in previous, so that later we can write the audit trail when things change
 			prev_short_desc.Value = (string) dr["short_desc"];
 			prev_project.Value = Convert.ToString((int)dr["project"]);
+			prev_project_name.Value = Convert.ToString(dr["current_project"]);
 			prev_org.Value = Convert.ToString((int)dr["organization"]);
 			prev_category.Value = Convert.ToString((int)dr["category"]);
 			prev_priority.Value = Convert.ToString((int)dr["priority"]);
@@ -487,7 +426,7 @@ void Page_Load(Object sender, EventArgs e)
 			prev_pcd3.Value = (string) dr["bg_project_custom_dropdown_value3"];
 
 
-			load_user_dropdown(); // must come before set_controls_field_permission, after assigning to prev_ values
+			load_project_and_user_dropdowns(null); // must come before set_controls_field_permission, after assigning to prev_ values
 
 
 			set_controls_field_permission(permission_level);
@@ -667,7 +606,7 @@ void Page_Load(Object sender, EventArgs e)
 
 
 		// needs to be reloaded if project changed
-		load_user_dropdown();
+		load_project_and_user_dropdowns(null);
 
 	}
 
@@ -675,8 +614,114 @@ void Page_Load(Object sender, EventArgs e)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void load_user_dropdown()
+void load_project_and_user_dropdowns(DataTable project_default)
 {
+
+	if (!IsPostBack)
+	{
+
+		if (id == 0)
+		{
+
+			// get default values
+			string initial_project = (string) Session["project"];
+
+			// project
+			if (security.this_forced_project != 0)
+			{
+				initial_project = Convert.ToString(security.this_forced_project);
+			}
+
+			if (initial_project != null && initial_project != "0")
+			{
+				foreach (ListItem li in project.Items)
+				{
+					if (li.Value == initial_project)
+					{
+						li.Selected = true;
+					}
+					else
+					{
+						li.Selected = false;
+					}
+				}
+			}
+			else
+			{
+				string default_value;
+				if (project_default.Rows.Count > 0)
+				{
+					default_value = Convert.ToString((int)project_default.Rows[0][0]);
+				}
+				else
+				{
+					default_value = "0";
+				}
+
+				foreach (ListItem li in project.Items)
+				{
+					if (li.Value == default_value)
+					{
+						li.Selected = true;
+					}
+					else
+					{
+						li.Selected = false;
+					}
+				}
+			}
+
+		}
+	}
+
+	// It can happen that the project in the db is not listed in the dropdown, for example, when the project
+	// had been active in the past but is no longer active.
+	// Since that project IS the project associated with the bug, let's force it into the dropdown.
+
+	if (id != 0) // if existing bug
+	{
+
+		if (prev_project.Value != "0")
+		{
+			// see if already in the dropdown.
+			bool project_in_dropdown = false;
+			foreach (ListItem li in project.Items)
+			{
+				if (li.Value == prev_project.Value)
+				{
+					project_in_dropdown = true;
+					break;
+				}
+			}
+
+			// Add to the list, even if permissions don't allow it now, because, in the past, they did allow it.
+			if (!project_in_dropdown)
+			{
+				project.Items.Insert(1,
+					new ListItem(
+						prev_project_name.Value,
+						prev_project.Value));
+
+			}
+		}
+
+		if (!IsPostBack)
+		{
+			foreach (ListItem li in project.Items)
+			{
+				if (li.Value == prev_project.Value)
+				{
+					li.Selected = true;
+				}
+				else
+				{
+					li.Selected = false;
+				}
+			}
+		}
+	}
+
+
 	// What's selected now?   Save it before we refresh the dropdown.
 	string current_value = "";
 
@@ -1037,17 +1082,17 @@ void set_project_field_permission(int bug_permission_level)
 	if (perm_level == Security.PERMISSION_NONE)
 	{
 		project_label.Visible = false;
-		current_project.Visible = false;
-
-		change_project_label.Visible = false;;
 		project.Visible = false;
-
 		prev_project.Visible = false;
 	}
 	else if (perm_level == Security.PERMISSION_READONLY)
 	{
 		project.Visible = false;
-		change_project_label.Visible = false;;
+		static_project.InnerText = project.SelectedItem.Text;
+	}
+	else
+	{
+		static_project.Visible = false;
 	}
 }
 
@@ -1228,7 +1273,7 @@ void format_prev_next_bug()
 
 
 ///////////////////////////////////////////////////////////////////////
-void load_dropdowns(int bugid) // passing bugid because someday, maybe, we'll make this logic smarter...
+void load_dropdowns()
 {
 
 	// only show projects where user has permissions
@@ -1409,17 +1454,18 @@ bool record_changes()
 	if (project.SelectedItem.Value != prev_project.Value)
 	{
 
-		from = get_dropdown_text_from_value(project, prev_project.Value);
+		// The "from" might not be in the dropdown anymore
+		//from = get_dropdown_text_from_value(project, prev_project.Value);
 
 		do_update = true;
 		sql += base_sql.Replace(
 			"$3",
 			"changed project from \""
-			+ from.Replace("'","''") + "\" to \""
+			+ prev_project_name.Value.Replace("'","''") + "\" to \""
 			+ project.SelectedItem.Text.Replace("'","''") + "\"");
 
 		prev_project.Value = project.SelectedItem.Value;
-		current_project.InnerText = project.SelectedItem.Text;
+		prev_project_name.Value = project.SelectedItem.Text;
 
 	}
 
@@ -2201,9 +2247,7 @@ function clone()
 		<td nowrap>
 			<span class=lbl id="project_label" runat="server">Project:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="current_project" runat="server">[no project]</span>
-
-			<span class=lbl id="change_project_label" runat="server">&nbsp;&nbsp;&nbsp;&nbsp;Change project:&nbsp;</span>
+			<span class=static id="static_project" runat="server"></span>
 
 			<asp:DropDownList id="project" runat="server"
 			AutoPostBack="True"></asp:DropDownList>
@@ -2574,6 +2618,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	<input type=hidden id="new_id" runat="server" value="0">
 	<input type=hidden id="prev_short_desc" runat="server">
 	<input type=hidden id="prev_project" runat="server">
+	<input type=hidden id="prev_project_name" runat="server">
 	<input type=hidden id="prev_org" runat="server">
 	<input type=hidden id="prev_category" runat="server">
 	<input type=hidden id="prev_priority" runat="server">

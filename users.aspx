@@ -40,7 +40,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			u.us_username [username],
 			isnull(u.us_firstname,'') + ' ' + isnull(u.us_lastname,'') [name],
-			og_name [org],
+			'<a sort=''' + og_name + ''' href=edit_org.aspx?id=' + convert(varchar,og_id) + '>' + og_name + '</a>' [org],
 			case when u.us_admin = 1 then 'Y' else 'N' end [admin],
 			case when pu_user is null then 'N' else 'Y' end [project<br>admin],
 			case when u.us_active = 1 then 'Y' else 'N' end [active],
