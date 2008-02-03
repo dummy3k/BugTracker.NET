@@ -9,7 +9,6 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 DbUtil dbutil;
-Security security;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)

@@ -27,7 +27,7 @@ void Page_Load(Object sender, EventArgs e)
 	string sql = "";
 
 
-	if (security.this_is_admin || security.this_can_edit_sql)
+	if (security.user.is_admin || security.user.can_edit_sql)
 	{
 		// allow admin to edit all queries
 
@@ -75,7 +75,7 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		sql = sql.Replace("qu_sql [sql],","");
 	}
-	sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+	sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 	ds = dbutil.get_dataset(sql);
 
 }
@@ -96,7 +96,7 @@ void Page_Load(Object sender, EventArgs e)
 
 <div class=align>
 
-<% if (security.this_is_admin || security.this_can_edit_sql) { %>
+<% if (security.user.is_admin || security.user.can_edit_sql) { %>
 <a href=edit_query.aspx>add new query</a>
 <% } %>
 <p>

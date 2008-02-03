@@ -24,7 +24,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	string sql;
 
-	if (security.this_is_admin)
+	if (security.user.is_admin)
 	{
 		sql = @"
 			select distinct pu_user
@@ -122,7 +122,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("$inactive", ",0");
 	}
 
-	sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 	ds = dbutil.get_dataset(sql);
 
 }

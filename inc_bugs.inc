@@ -54,7 +54,7 @@ string get_paging_string()
 	}
 	
 	
-	page_size = security.this_bugs_per_page; 
+	page_size = security.user.bugs_per_page; 
 	total_rows = dv.Count;
 	// how many pages to show all the rows?
 	int total_pages = (total_rows-1) / page_size + 1;
@@ -439,16 +439,16 @@ void display_bugs(bool show_checkbox)
 			and isnull(pu_permission_level,$dpl) <> 0
 			order by pj_name;";
 
-	sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+	sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 	sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 
-	if (security.this_other_orgs_permission_level != 0)
+	if (security.user.other_orgs_permission_level != 0)
 	{
 		sql += "select og_name from orgs order by og_name;";
 	}
 	else
 	{
-		sql += "select og_name from orgs where og_id = " + Convert.ToInt32(security.this_org) + " order by og_name;";
+		sql += "select og_name from orgs where og_id = " + Convert.ToInt32(security.user.org) + " order by og_name;";
 	}
 	sql += @"
 select ct_name from categories order by ct_sort_seq, ct_name;

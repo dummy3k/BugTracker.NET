@@ -71,7 +71,7 @@ void Page_Load(Object sender, EventArgs e)
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 </head>
 
-<% PrintBug.print_bug(Response, dr, security.this_is_admin, security.this_external_user); %>
+<% PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user); %>
 
 </html>
 

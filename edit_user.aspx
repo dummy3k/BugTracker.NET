@@ -29,14 +29,14 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit user";
 
-	if (!security.this_is_admin)
+	if (!security.user.is_admin)
 	{
 		// Check if the current user is an admin for any project
 		sql = @"select pu_project
 			from project_user_xref
 			where pu_user = $us
 			and pu_admin = 1";
-		sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+		sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 		DataSet ds_projects = dbutil.get_dataset(sql);
 
 		if (ds_projects.Tables[0].Rows.Count == 0)
@@ -80,7 +80,7 @@ void Page_Load(Object sender, EventArgs e)
 	if (!IsPostBack)
 	{
 
-		if (!security.this_is_admin)
+		if (!security.user.is_admin)
 		{
 
 			// logged in user is a project level admin
@@ -101,7 +101,7 @@ void Page_Load(Object sender, EventArgs e)
 				order by pj_name;";
 
 
-			sql = sql.Replace("$this_usid",Convert.ToString(security.this_usid));
+			sql = sql.Replace("$this_usid",Convert.ToString(security.user.usid));
 
 		}
 		else // user is a real admin
@@ -184,7 +184,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		sql = sql.Replace("$us",Convert.ToString(id));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
-		sql = sql.Replace("$this_is_admin", Util.bool_to_string(security.this_is_admin));
+		sql = sql.Replace("$this_is_admin", Util.bool_to_string(security.user.is_admin));
 
 
 		DataSet ds = dbutil.get_dataset(sql);
@@ -245,9 +245,9 @@ void Page_Load(Object sender, EventArgs e)
 			DataRow dr = ds.Tables[3].Rows[0];
 
 			// check if project admin is allowed to edit this user
-			if (!security.this_is_admin)
+			if (!security.user.is_admin)
 			{
-				if (security.this_usid != (int) dr["us_created_user"])
+				if (security.user.usid != (int) dr["us_created_user"])
 				{
 					Response.Write ("You not allowed to edit this user, because you didn't create it.");
 					Response.End();
@@ -467,7 +467,7 @@ string replace_vars_in_sql_statement(string sql)
 
 
 	// only admins can create admins.
-	if (security.this_is_admin)
+	if (security.user.is_admin)
 	{
 		sql = sql.Replace("$ad", Util.bool_to_string(admin.Checked));
 	}
@@ -535,10 +535,10 @@ $createdby
 select scope_identity()";
 
 				sql = replace_vars_in_sql_statement(sql);
-				sql = sql.Replace("$createdby", Convert.ToString(security.this_usid));
+				sql = sql.Replace("$createdby", Convert.ToString(security.user.usid));
 
 				// only admins can create admins.
-				if (security.this_is_admin)
+				if (security.user.is_admin)
 				{
 					sql = sql.Replace("$ad", Util.bool_to_string(admin.Checked));
 				}
@@ -787,7 +787,7 @@ void update_project_user_xref()
 		sql = sql.Replace("$projects", projects);
 	}
 
-	if (security.this_is_admin)
+	if (security.user.is_admin)
 	{
 		projects = "";
 		foreach (Project p in hash_projects.Values)

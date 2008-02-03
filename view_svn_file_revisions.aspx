@@ -120,7 +120,7 @@ else
 </div>
 <%
 
-    if (security.this_is_admin)
+    if (security.user.is_admin)
     {
         Response.Write("<a href=add_svn_revision.aspx?bugid=" + Convert.ToString(bugid) + ">manually link revision to this bug</a>");
 

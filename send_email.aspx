@@ -44,7 +44,7 @@ void Page_Load(Object sender, EventArgs e)
 	string reply = Request["reply"];
 
 
-	if (security.this_use_fckeditor)
+	if (security.user.use_fckeditor)
 	{
 		fckeBody.Visible = true;
 		body.Visible = false;
@@ -89,7 +89,7 @@ void Page_Load(Object sender, EventArgs e)
 				or (bp_parent = $id and bp_type='file')";
 
 			sql = sql.Replace("$id", string_bp_id);
-			sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 
             DataView dv = dbutil.get_dataview(sql);
             dr = null;
@@ -168,7 +168,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			if (dr["us_signature"].ToString() != "")
 			{
-				if (security.this_use_fckeditor)
+				if (security.user.use_fckeditor)
 				{
 				    fckeBody.Value += "<br><br><br>";
 					fckeBody.Value += dr["us_signature"].ToString().Replace("\r\n", "<br>");
@@ -190,7 +190,7 @@ void Page_Load(Object sender, EventArgs e)
 
 				if (dr["bp_type"].ToString() == "received")
 				{
-					if (security.this_use_fckeditor)
+					if (security.user.use_fckeditor)
 					{
 					    fckeBody.Value += "&#62;From: " + dr["bp_email_from"].ToString().Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
 					}
@@ -204,7 +204,7 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					if (lines[i].IndexOf("To:") == 0 && i < 3)
 					{
-						if (security.this_use_fckeditor)
+						if (security.user.use_fckeditor)
 						{
                             fckeBody.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
 							fckeBody.Value += "&#62;Date: " + Convert.ToString(dr["bp_date"]) + "<br>&#62;<br>";
@@ -217,7 +217,7 @@ void Page_Load(Object sender, EventArgs e)
 					}
 					else
 					{
-						if (security.this_use_fckeditor)
+						if (security.user.use_fckeditor)
 						{
                             if (Convert.ToString(dr["bp_content_type"]) != "text/html")
                             {
@@ -279,7 +279,7 @@ void Page_Load(Object sender, EventArgs e)
 				left outer join projects on bg_project = pj_id
 				where bg_id = $bg";
 
-			sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 			sql = sql.Replace("$bg", string_bg_id);
 
 			dr = dbutil.get_datarow(sql);
@@ -313,7 +313,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			if (dr["us_signature"].ToString() != "")
 			{
-				if (security.this_use_fckeditor)
+				if (security.user.use_fckeditor)
 				{
 				    fckeBody.Value += "<br><br><br>";
 					fckeBody.Value += dr["us_signature"].ToString().Replace("\r\n", "<br>");
@@ -402,7 +402,7 @@ string get_bug_text(int bugid)
 		// write the html to that response
 		System.IO.StringWriter writer = new System.IO.StringWriter();
 		HttpResponse my_response = new HttpResponse(writer);
-		PrintBug.print_bug(my_response, bug_dr, security.this_is_admin, security.this_external_user);
+		PrintBug.print_bug(my_response, bug_dr, security.user.is_admin, security.user.external_user);
 		return writer.ToString();
 }
 
@@ -418,8 +418,8 @@ void on_update(object Source, EventArgs e)
 			select scope_identity()";
 
 	sql = sql.Replace("$id", bg_id.Value);
-	sql = sql.Replace("$us", Convert.ToString(security.this_usid));
-	if (security.this_use_fckeditor)
+	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
+	if (security.user.use_fckeditor)
 	{
 		sql = sql.Replace("$cm", fckeBody.Value.Replace("'", "&#39;"));
 		sql = sql.Replace("$cs", btnet.Util.strip_html(fckeBody.Value).Replace("'", "''"));
@@ -458,7 +458,7 @@ void on_update(object Source, EventArgs e)
 	{
 
 		// white space isn't handled well, I guess.
-		if (security.this_use_fckeditor)
+		if (security.user.use_fckeditor)
 		{
 		    body_text = fckeBody.Value;
 			body_text  += "<br><br>";
@@ -475,7 +475,7 @@ void on_update(object Source, EventArgs e)
 	}
 	else
 	{
-		if (security.this_use_fckeditor)
+		if (security.user.use_fckeditor)
 		{
 		    body_text = fckeBody.Value;
 			format = System.Web.Mail.MailFormat.Html;
@@ -616,7 +616,7 @@ int save_attachment(int comment_id, string filename, int content_length, string 
 	sql = sql.Replace("$2", filename.Replace("'","''"));
 	sql = sql.Replace("$3", "email attachment");
 	sql = sql.Replace("$4", Convert.ToString(content_length));
-	sql = sql.Replace("$5", Convert.ToString(security.this_usid));
+	sql = sql.Replace("$5", Convert.ToString(security.user.usid));
 	sql = sql.Replace("$6", Convert.ToString(comment_id));
 	sql = sql.Replace("$7", file_extension_to_content_type(ext));
 

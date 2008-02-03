@@ -45,7 +45,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	sql = sql.Replace("$bg", Util.sanitize_integer(Request["id"]));
-	sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 	dbutil.execute_nonquery(sql);
 
 }

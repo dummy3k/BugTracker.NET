@@ -44,7 +44,7 @@ void Page_Load(Object sender, EventArgs e)
 	if (!IsPostBack)
 	{
 
-		if (security.this_is_admin || security.this_can_edit_sql)
+		if (security.user.is_admin || security.user.can_edit_sql)
 		{
 			// these guys can do everything
 			vis_everybody.Checked = true;
@@ -107,9 +107,9 @@ void Page_Load(Object sender, EventArgs e)
 			sql = sql.Replace("$1", Convert.ToString(id));
 			DataRow dr = dbutil.get_datarow(sql);
 
-			if ((int) dr["qu_user"] != security.this_usid)
+			if ((int) dr["qu_user"] != security.user.usid)
 			{
-				if (security.this_is_admin || security.this_can_edit_sql)
+				if (security.user.is_admin || security.user.can_edit_sql)
 				{
 					// these guys can do everything
 				}
@@ -136,7 +136,7 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				vis_everybody.Checked = true;
 			}
-			else if ((int) dr["qu_user"] == security.this_usid)
+			else if ((int) dr["qu_user"] == security.user.usid)
 			{
 				vis_user.Checked = true;
 			}
@@ -273,7 +273,7 @@ void on_update (Object sender, EventArgs e)
 		}
 		else if (vis_user.Checked)
 		{
-			sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 			sql = sql.Replace("$rl", "0");
 		}
 		else

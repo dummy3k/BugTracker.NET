@@ -157,7 +157,7 @@ or isnull(pj_enable_custom_dropdown3,0) = 1";
 	hit_submit_button.Value = "0";
 	project_changed.Value = "0";
 
-	if (security.this_is_admin || security.this_can_edit_sql)
+	if (security.user.is_admin || security.user.can_edit_sql)
 	{
 
 	}
@@ -331,7 +331,7 @@ void do_query()
 	if (like2.Value != "") {
 		comments_clause = " bg_id in (select bp_bug from bug_posts where bp_type = 'comment' and isnull(bp_comment_search,bp_comment) like";
 		comments_clause += " N'%" + like2_string + "%'";
-		if (security.this_external_user) {
+		if (security.user.external_user) {
 			comments_clause += " and bp_hidden_from_external_users = 0";
 		}
 		comments_clause += ")\n";
@@ -465,27 +465,27 @@ order by bg_id desc
 			select += "\n,isnull(rpt.us_username,'') [reported by]";
 		}
 
-		if (security.this_project_field_permission_level > 0)
+		if (security.user.project_field_permission_level > 0)
 		{
 			select += ",\nisnull(pj_name,'') [project]";
 		}
 
-		if (security.this_org_field_permission_level > 0)
+		if (security.user.org_field_permission_level > 0)
 		{
 			select += ",\nisnull(og_name,'') [organization]";
 		}
 
-		if (security.this_category_field_permission_level > 0)
+		if (security.user.category_field_permission_level > 0)
 		{
 			select += ",\nisnull(ct_name,'') [category]";
 		}
 
-		if (security.this_priority_field_permission_level > 0)
+		if (security.user.priority_field_permission_level > 0)
 		{
 			select += ",\nisnull(pr_name,'') [priority]";
 		}
 
-		if (security.this_assigned_to_field_permission_level > 0)
+		if (security.user.assigned_to_field_permission_level > 0)
 		{
 			if (use_full_names)
 			{
@@ -497,12 +497,12 @@ order by bg_id desc
 			}
 		}
 
-		if (security.this_status_field_permission_level > 0)
+		if (security.user.status_field_permission_level > 0)
 		{
 			select += ",\nisnull(st_name,'') [status]";
 		}
 
-		if (security.this_udf_field_permission_level > 0)
+		if (security.user.udf_field_permission_level > 0)
 		{
 			if (show_udf)
 			{
@@ -867,7 +867,7 @@ void load_drop_downs()
 
 
 	// only show projects where user has permissions
-	if (security.this_is_admin)
+	if (security.user.is_admin)
 	{
 		sql = "/* drop downs */ select pj_id, pj_name from projects order by pj_name;";
 	}
@@ -880,18 +880,18 @@ void load_drop_downs()
 			where isnull(pu_permission_level,$dpl) <> 0
 			order by pj_name;";
 
-		sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+		sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 	}
 
 
-	if (security.this_other_orgs_permission_level != 0)
+	if (security.user.other_orgs_permission_level != 0)
 	{
 		sql += " select og_id, og_name from orgs order by og_name;";
 	}
 	else
 	{
-		sql += " select og_id, og_name from orgs where og_id = " + Convert.ToInt32(security.this_org) + " order by og_name;";
+		sql += " select og_id, og_name from orgs where og_id = " + Convert.ToInt32(security.user.org) + " order by og_name;";
 		org.Visible = false;
 		org_label.Visible = false;
 	}
@@ -949,37 +949,37 @@ void load_drop_downs()
 		udf.Items.Insert(0, new ListItem("[none]", "0"));
 	}
 
-	if (security.this_project_field_permission_level == 0)
+	if (security.user.project_field_permission_level == 0)
 	{
 		project_label.Style["display"] = "none";
 		project.Style["display"] = "none";
 	}
-	if (security.this_org_field_permission_level == 0)
+	if (security.user.org_field_permission_level == 0)
 	{
 		org_label.Style["display"] = "none";
 		org.Style["display"] = "none";
 	}
-	if (security.this_category_field_permission_level == 0)
+	if (security.user.category_field_permission_level == 0)
 	{
 		category_label.Style["display"] = "none";
 		category.Style["display"] = "none";
 	}
-	if (security.this_priority_field_permission_level == 0)
+	if (security.user.priority_field_permission_level == 0)
 	{
 		priority_label.Style["display"] = "none";
 		priority.Style["display"] = "none";
 	}
-	if (security.this_status_field_permission_level == 0)
+	if (security.user.status_field_permission_level == 0)
 	{
 		status_label.Style["display"] = "none";
 		status.Style["display"] = "none";
 	}
-	if (security.this_assigned_to_field_permission_level == 0)
+	if (security.user.assigned_to_field_permission_level == 0)
 	{
 		assigned_to_label.Style["display"] = "none";
 		assigned_to.Style["display"] = "none";
 	}
-	if (security.this_udf_field_permission_level == 0)
+	if (security.user.udf_field_permission_level == 0)
 	{
 		udf_label.Style["display"] = "none";
 		udf.Style["display"] = "none";
@@ -1011,7 +1011,7 @@ saerch_suggest_min_chars = <% Response.Write(Util.get_setting("SearchSuggestMinC
 
 
 // start of mass edit javascript
-<% if (security.this_is_admin || security.this_can_mass_edit_bugs) { %>
+<% if (security.user.is_admin || security.user.can_mass_edit_bugs) { %>
 
 function select_all(sel)
 {
@@ -1261,7 +1261,7 @@ function on_change()
 		frm.project_custom_dropdown3.options, "bg_project_custom_dropdown_value3");
 
 <%
-	if (security.this_other_orgs_permission_level != 0)
+	if (security.user.other_orgs_permission_level != 0)
 	{
 %>
 		var org_clause = build_clause_from_options (frm.org.options, "bg_org");
@@ -1315,7 +1315,7 @@ function on_change()
 	if (frm.like2.value != "") {
 		comments_clause = " bg_id in (select bp_bug from bug_posts where bp_type = 'comment' and isnull(bp_comment_search,bp_comment) like";
 		comments_clause += " N'%" + like2_string + "%'";
-		<% if (security.this_external_user) { %>
+		<% if (security.user.external_user) { %>
 		comments_clause += " and bp_hidden_from_external_users = 0"
 		<% } %>
 		comments_clause += ")\n";
@@ -1430,35 +1430,35 @@ function on_change()
 <%
 		}
 
-		if (security.this_project_field_permission_level > 0)
+		if (security.user.project_field_permission_level > 0)
 		{
 %>
 			select += ",\nisnull(pj_name,'') [project]"
 <%
 		}
 
-		if (security.this_org_field_permission_level > 0)
+		if (security.user.org_field_permission_level > 0)
 		{
 %>
 			select += ",\nisnull(og_name,'') [organization]"
 <%
 		}
 
-		if (security.this_category_field_permission_level > 0)
+		if (security.user.category_field_permission_level > 0)
 		{
 %>
 			select += ",\nisnull(ct_name,'') [category]";
 <%
 		}
 
-		if (security.this_priority_field_permission_level > 0)
+		if (security.user.priority_field_permission_level > 0)
 		{
 %>
 			select += ",\nisnull(pr_name,'') [priority]"
 <%
 		}
 
-		if (security.this_assigned_to_field_permission_level > 0)
+		if (security.user.assigned_to_field_permission_level > 0)
 		{
 			if (use_full_names)
 			{
@@ -1474,14 +1474,14 @@ function on_change()
 			}
 		}
 
-		if (security.this_status_field_permission_level > 0)
+		if (security.user.status_field_permission_level > 0)
 		{
 %>
 			select += ",\nisnull(st_name,'') [status]";
 <%
 		}
 
-		if (security.this_udf_field_permission_level > 0)
+		if (security.user.udf_field_permission_level > 0)
 		{
 			if (show_udf)
 			{
@@ -1625,7 +1625,7 @@ function set_project_changed() {
 
 <div class=align>
 
-<% if (!security.this_adds_not_allowed) { %>
+<% if (!security.user.adds_not_allowed) { %>
 <a href=edit_bug.aspx>add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
 <% } %>
 
@@ -1958,7 +1958,7 @@ function set_project_changed() {
 				frm.submit();
 			}
 			</script>
-<% if (!security.this_is_guest)  { %>
+<% if (!security.user.is_guest)  { %>
 			<input class=btn type=submit onclick="on_save_query()" value="Save search criteria as query">
 <% } %>
 		</td>
@@ -1988,7 +1988,7 @@ else
 		Response.Write ("&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs2.aspx>print detail</a>");
 		Response.Write ("&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx?format=excel>export to excel</a><br>");
 
-		if (security.this_is_admin || security.this_can_mass_edit_bugs)
+		if (security.user.is_admin || security.user.can_mass_edit_bugs)
 		{
 			Response.Write ("<form id=massform onsubmit='return validate_mass()' method=get action=massedit.aspx>");
 			display_bugs(true);

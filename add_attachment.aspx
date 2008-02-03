@@ -53,7 +53,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 
-	if (security.this_external_user || Util.get_setting("EnableInternalOnlyPosts","0") == "0")
+	if (security.user.external_user || Util.get_setting("EnableInternalOnlyPosts","0") == "0")
 	{
 		internal_only.Visible = false;
 		internal_only_label.Visible = false;

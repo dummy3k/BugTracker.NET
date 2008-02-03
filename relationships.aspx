@@ -75,7 +75,7 @@ void Page_Load(Object sender, EventArgs e)
 								values($bg, $us, getdate(), N'deleted relationship to $bg2', 'update')";
 					sql = sql.Replace("$bg2",Convert.ToString(bugid2));
 					sql = sql.Replace("$bg",Convert.ToString(bugid));
-					sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+					sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 					dbutil.execute_nonquery(sql);
 				}
 			}
@@ -146,7 +146,7 @@ insert into bug_posts
 
 									sql = sql.Replace("$bg2",Convert.ToString(bugid2));
 									sql = sql.Replace("$bg",Convert.ToString(bugid));
-									sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+									sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 									sql = sql.Replace("$ty",Request["type"].Replace("'","''"));
 
 

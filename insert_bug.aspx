@@ -141,10 +141,10 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	security = new Security();
-	security.this_usid = (int) dr["us_id"];
-	security.this_is_admin = Convert.ToBoolean(dr["us_id"]);
-	security.this_org = (int) dr["us_org"];
-	security.this_other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
+	security.user.usid = (int) dr["us_id"];
+	security.user.is_admin = Convert.ToBoolean(dr["us_id"]);
+	security.user.org = (int) dr["us_org"];
+	security.user.other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
 
 	int projectid = 0;
 	if (Util.is_int(projectid_string))
@@ -405,7 +405,7 @@ void Page_Load(Object sender, EventArgs e)
 		DataRow defaults = dbutil.get_datarow(sql);
 
 		if (projectid == 0) {projectid = (int) defaults["pj"];}
-		if (orgid == 0) {orgid = security.this_org;}
+		if (orgid == 0) {orgid = security.user.org;}
 		if (categoryid == 0) {categoryid = (int) defaults["ct"];}
 		if (priorityid == 0) {priorityid = (int) defaults["pr"];}
 		if (statusid == 0) {statusid = (int) defaults["st"];}

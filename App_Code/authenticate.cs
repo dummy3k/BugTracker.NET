@@ -40,7 +40,6 @@ namespace btnet
 			LdapConnection ldap = new LdapConnection(ldap_server);
 			System.Net.NetworkCredential cred = new System.Net.NetworkCredential(dn, password);
 			ldap.AuthType = AuthType.Basic;
-			bool bResult = false;
 
 			try
 			{

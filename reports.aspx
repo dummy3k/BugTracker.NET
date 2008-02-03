@@ -20,7 +20,7 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
-	if (security.this_is_admin || security.this_can_use_reports || security.this_can_edit_reports)
+	if (security.user.is_admin || security.user.can_use_reports || security.user.can_edit_reports)
 	{
 		//
 	}
@@ -48,7 +48,7 @@ void Page_Load(Object sender, EventArgs e)
 	        $adm
 	        from reports order by rp_desc";
 
-	if (security.this_is_admin || security.this_can_edit_reports)
+	if (security.user.is_admin || security.user.can_edit_reports)
 	{
 		sql = sql.Replace("$adm", ", " +
 			"'<a href=''edit_report.aspx?id=' + convert(varchar, rp_id) + '''>edit</a>' [edit], " +
@@ -77,7 +77,7 @@ void Page_Load(Object sender, EventArgs e)
 <div class=align>
 </p>
 
-<% if (security.this_is_admin || security.this_can_edit_reports) { %>
+<% if (security.user.is_admin || security.user.can_edit_reports) { %>
 <a href='edit_report.aspx'>add new report</a>
 <% } %>
 

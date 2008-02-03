@@ -16,52 +16,18 @@ namespace btnet
 
 	public class Security {
 
-		public const int MUST_BE_ADMIN = 1;
+
+        public const int MUST_BE_ADMIN = 1;
 		public const int ANY_USER_OK = 2;
 		public const int ANY_USER_OK_EXCEPT_GUEST = 3;
 		public const int MUST_BE_ADMIN_OR_PROJECT_ADMIN = 4;
+        public const int PERMISSION_NONE = 0;
+        public const int PERMISSION_READONLY = 1;
+        public const int PERMISSION_REPORTER = 3;
+        public const int PERMISSION_ALL = 2;
 
-		public int this_usid = 0;
-		public string this_username = "";
-		public string this_fullname = "";
-		public string this_email = "";
-		public bool this_is_admin = false;
-		public bool this_is_project_admin = false;
-		public bool this_is_guest = false;
-		public bool this_adds_not_allowed = false;
-		public string auth_method = "";
-		public int this_bugs_per_page;
-		public int this_enable_popups;
-		public bool this_use_fckeditor = false;
-
-        public bool this_external_user = false;
-        public bool this_can_edit_sql = false;
-        public bool this_can_delete_bug = false;
-
-        public bool this_can_edit_and_delete_posts = false;
-        public bool this_can_merge_bugs = false;
-        public bool this_can_mass_edit_bugs = false;
-
-        public bool this_can_use_reports = false;
-        public bool this_can_edit_reports = false;
-        public bool this_can_be_assigned_to = true;
-
-		public const int PERMISSION_NONE = 0;
-		public const int PERMISSION_READONLY = 1;
-		public const int PERMISSION_REPORTER = 3;
-		public const int PERMISSION_ALL = 2;
-
-        public int this_other_orgs_permission_level = PERMISSION_ALL;
-        public int this_org = 0;
-        public int this_forced_project = 0;
-
-        public int this_assigned_to_field_permission_level = PERMISSION_ALL;
-        public int this_status_field_permission_level = PERMISSION_ALL;
-        public int this_category_field_permission_level = PERMISSION_ALL;
-		public int this_priority_field_permission_level = PERMISSION_ALL;
-		public int this_project_field_permission_level = PERMISSION_ALL;
-		public int this_org_field_permission_level = PERMISSION_ALL;
-		public int this_udf_field_permission_level = PERMISSION_ALL;
+        public User user = new User();
+        public string auth_method = "";
 
 		///////////////////////////////////////////////////////////////////////
 		public void check_security(DbUtil dbutil, HttpContext asp_net_context, int level)
@@ -69,35 +35,6 @@ namespace btnet
 			Util.set_context(asp_net_context);
 			HttpRequest Request = asp_net_context.Request;
 			HttpResponse Response = asp_net_context.Response;
-
-
-			// for limiting pages views, for example when app is hosted publically as a demo
-
-			int page_view_limit = Convert.ToInt32(Util.get_setting("PageViewLimit","0"));
-
-			if (page_view_limit > 0)
-			{
-				int pages_viewed = 0;
-				object obj = asp_net_context.Application[Request.ServerVariables["REMOTE_ADDR"]];
-				if (obj != null)
-				{
-					pages_viewed = (int) obj;
-				}
-
-				pages_viewed++;
-
-				if (pages_viewed > page_view_limit)
-				{
-					Response.Write("Page view limit exceeded");
-					Response.End();
-				}
-				else
-				{
-					asp_net_context.Application[Request.ServerVariables["REMOTE_ADDR"]] = pages_viewed;
-				}
-			}
-
-
 			HttpCookie cookie = Request.Cookies["se_id"];
 
 			// This logic allows somebody to put a link in an email, like
@@ -137,30 +74,13 @@ namespace btnet
 				isnull(us_forced_project,0) us_forced_project,
 				us_use_fckeditor,
 				us_enable_bug_list_popups,
-				og_external_user,
-				og_can_edit_sql,
-				og_can_delete_bug,
-				og_can_edit_and_delete_posts,
-				og_can_merge_bugs,
-				og_can_mass_edit_bugs,
-				og_can_use_reports,
-				og_can_edit_reports,
-				og_can_be_assigned_to,
-				og_other_orgs_permission_level,
-				og_category_field_permission_level,
-				og_priority_field_permission_level,
-				og_assigned_to_field_permission_level,
-				og_status_field_permission_level,
-				og_project_field_permission_level,
-				og_org_field_permission_level,
-				og_udf_field_permission_level,
-				og_id,
+                og.*,
 				isnull(us_forced_project, 0 ) us_forced_project,
 				isnull(pu_permission_level, $dpl) pu_permission_level,
 				@project_admin [project_admin]
 				from sessions
 				inner join users on se_user = us_id
-				inner join orgs on us_org = og_id
+				inner join orgs og on us_org = og_id
 				left outer join project_user_xref
 					on pu_project = us_forced_project
 					and pu_user = us_id
@@ -179,92 +99,19 @@ namespace btnet
 				Response.Redirect(target);
 			}
 
-			asp_net_context.Session["session_cookie"] = cookie.Value;
+            asp_net_context.Session["session_cookie"] = cookie.Value;
 
-			this_usid = Convert.ToInt32(dr["us_id"]);
-			this_username = (string) dr["us_username"];
-			this_email = (string) dr["us_email"];
+            user.set_from_db(dr);
 
-            this_bugs_per_page = Convert.ToInt32(dr["us_bugs_per_page"]);
-			this_use_fckeditor = Convert.ToBoolean(dr["us_use_fckeditor"]);
-			this_enable_popups = Convert.ToInt32(dr["us_enable_bug_list_popups"]);
-
-            this_external_user = Convert.ToBoolean(dr["og_external_user"]);
-            this_can_edit_sql = Convert.ToBoolean(dr["og_can_edit_sql"]);
-            this_can_delete_bug = Convert.ToBoolean(dr["og_can_delete_bug"]);
-            this_can_edit_and_delete_posts = Convert.ToBoolean(dr["og_can_edit_and_delete_posts"]);
-            this_can_merge_bugs = Convert.ToBoolean(dr["og_can_merge_bugs"]);
-            this_can_mass_edit_bugs = Convert.ToBoolean(dr["og_can_mass_edit_bugs"]);
-            this_can_use_reports = Convert.ToBoolean(dr["og_can_use_reports"]);
-            this_can_edit_reports = Convert.ToBoolean(dr["og_can_edit_reports"]);
-            this_can_be_assigned_to = Convert.ToBoolean(dr["og_can_be_assigned_to"]);
-            this_other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
-            this_org = (int) dr["og_id"];
-            this_forced_project = (int) dr["us_forced_project"];
-
-            this_category_field_permission_level = (int) dr["og_category_field_permission_level"];
-            this_priority_field_permission_level = (int) dr["og_priority_field_permission_level"];
-            this_assigned_to_field_permission_level = (int) dr["og_assigned_to_field_permission_level"];
-            this_status_field_permission_level = (int) dr["og_status_field_permission_level"];
-            this_project_field_permission_level = (int) dr["og_project_field_permission_level"];
-            this_org_field_permission_level = (int) dr["og_org_field_permission_level"];
-            this_udf_field_permission_level = (int) dr["og_udf_field_permission_level"];
-
-
-			if (((string)dr["us_firstname"]).Trim().Length == 0)
-			{
-				this_fullname = (string) dr["us_lastname"];
-			}
-			else
-			{
-			this_fullname = (string) dr["us_lastname"] + ", " + (string) dr["us_firstname"];
-			}
-
-			Util.write_to_log ("userid=" + Convert.ToString(this_usid));
-			Util.write_to_log ("username=" + this_username);
-
-			if ((int)dr["us_admin"] == 1)
-			{
-				this_is_admin = true;
-			}
-			else
-			{
-				if ((int) dr["project_admin"] > 0)
-				{
-					this_is_project_admin = true;
-				}
-				else
-				{
-					if (this_username.ToLower() == "guest")
-					{
-						this_is_guest = true;
-					}
-				}
-			}
-
-
-			// if user is forced to a specific project, and doesn't have
-			// at least reporter permission on that project, than user
-			// can't add bugs
-			if ((int)dr["us_forced_project"] != 0)
-			{
-				if ((int)dr["pu_permission_level"] == PERMISSION_READONLY
-				||  (int)dr["pu_permission_level"] == PERMISSION_NONE)
-				{
-					this_adds_not_allowed = true;
-				}
-			}
-
-
-			if (level == MUST_BE_ADMIN && !this_is_admin)
+			if (level == MUST_BE_ADMIN && !user.is_admin)
 			{
 				Response.Redirect("default.aspx");
 			}
-			else if (level == ANY_USER_OK_EXCEPT_GUEST && this_is_guest)
+			else if (level == ANY_USER_OK_EXCEPT_GUEST && user.is_guest)
 			{
 				Response.Redirect("default.aspx");
 			}
-			else if (level == MUST_BE_ADMIN_OR_PROJECT_ADMIN && !this_is_admin && !this_is_project_admin)
+			else if (level == MUST_BE_ADMIN_OR_PROJECT_ADMIN && !user.is_admin && !user.is_project_admin)
 			{
 				Response.Redirect("default.aspx");
 			}
@@ -280,108 +127,10 @@ namespace btnet
 		}
 
 		///////////////////////////////////////////////////////////////////////
-		public static void write_menu_item(HttpResponse Response,
-			string this_link, string menu_item, string href)
-		{
-			Response.Write ("<td valign=middle align=left>");
-			if (this_link == menu_item)
-			{
-				Response.Write ("<a href=" + href + "><span class=selected_menu_item>" + menu_item + "</span></a>");	}
-			else
-			{
-				if (menu_item == "about")
-				{
-					Response.Write ("<a target=_blank href=" + href + "><span class=menu_item>" + menu_item + "</span></a>");
-				}
-				else
-				{
-					Response.Write ("<a href=" + href + "><span class=menu_item>" + menu_item + "</span></a>");
-				}
-			}
-			Response.Write ("</td>");
-		}
-
-
-
-		///////////////////////////////////////////////////////////////////////
 		public void write_menu(HttpResponse Response, string this_link)
 		{
 
-			// topmost visible HTML
-			string custom_header = (string) Util.context.Application["custom_header"];
-			Response.Write(custom_header);
-
-			Response.Write("<table border=0 width=100% cellpadding=0 cellspacing=0 class=menubar><tr>");
-
-			// logo
-			string logo = (string) Util.context.Application["custom_logo"];
-			Response.Write(logo);
-
-			Response.Write("<td width=20>&nbsp;</td>");
-			write_menu_item(Response, this_link, Util.get_setting("PluralBugLabel","bugs"), "bugs.aspx");
-			write_menu_item(Response, this_link, "search", "search.aspx");
-
-			if (!this_is_guest)
-			{
-				write_menu_item(Response, this_link, "queries", "queries.aspx");
-			}
-
-			if (this_is_admin)
-			{
-				write_menu_item(Response, this_link, "admin", "admin.aspx");
-			}
-			else if (this_is_project_admin)
-			{
-				write_menu_item(Response, this_link, "users", "users.aspx");
-			}
-
-			if (this_is_admin || this_can_use_reports || this_can_edit_reports)
-			{
-				write_menu_item(Response, this_link, "reports", "reports.aspx");
-			}
-
-
-			// for guest account, suppress display of "edit_self
-			if (!this_is_guest)
-			{
-				write_menu_item(Response, this_link, "settings", "edit_self.aspx");
-			}
-
-			if (auth_method == "plain")
-			{
-					write_menu_item(Response, this_link, "logoff", "logoff.aspx");
-			}
-
-			if (Util.get_setting("CustomMenuLinkLabel","") != "")
-			{
-				write_menu_item(Response, this_link,
-					Util.get_setting("CustomMenuLinkLabel",""),
-					Util.get_setting("CustomMenuLinkUrl",""));
-			}
-
-			write_menu_item(Response, this_link, "about", "about.html");
-
-			// go to
-			Response.Write("<td nowrap valign=middle>");
-			Response.Write("<form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>");
-			Response.Write("<font size=1>id:&nbsp;</font>");
-			Response.Write("<input style='font-size: 8pt;' size=4 type=text name=id accesskey=i>");
-			Response.Write("<input class=btn style='font-size: 8pt;' type=submit value='go to ");
-			Response.Write(Util.get_setting("SingularBugLabel","bug"));
-			Response.Write ("'>");
-			Response.Write("</form>");
-			Response.Write("</td>");
-
-			Response.Write ("<td nowrap valign=middle>");
-			Response.Write ("<span class=smallnote>logged in as:<br>");
-			Response.Write (this_username);
-			Response.Write ("</span></td>");
-
-			Response.Write ("<td nowrap valign=middle>");
-			Response.Write ("<a target=_blank href=http://ifdefined.com/README.html>[?]</a></td>");
-
-			Response.Write("</tr></table><br>");
-
+			btnet.Menu.write_menu(Response, this_link, user, auth_method);
 		}
 
 	} // end Security
@@ -667,18 +416,18 @@ namespace btnet
 					and pu_permission_level = 0)) ";
 			}
 
-			if (security.this_other_orgs_permission_level == 0)
+			if (security.user.other_orgs_permission_level == 0)
 			{
 				project_permissions_sql += @"
-					and bg_org = $this_org ";
+					and bg_org = $user.org ";
 
 			}
 
 			project_permissions_sql
-				= project_permissions_sql.Replace("$this_org",Convert.ToString(security.this_org));
+				= project_permissions_sql.Replace("$user.org",Convert.ToString(security.user.org));
 
 			project_permissions_sql
-				= project_permissions_sql.Replace("$user",Convert.ToString(security.this_usid));
+				= project_permissions_sql.Replace("$user",Convert.ToString(security.user.usid));
 
 
 			// figure out where to alter sql for project permissions
@@ -941,7 +690,7 @@ where us_id in
 	(select pu1.pu_user from project_user_xref pu1
 	where pu1.pu_project in
 		(select pu2.pu_project from project_user_xref pu2
-		where pu2.pu_user = $this_usid
+		where pu2.pu_user = $user.usid
 		and pu2.pu_permission_level <> 0
 		)
 	and pu1.pu_permission_level <> 0
@@ -949,7 +698,7 @@ where us_id in
 
 if $og_external_user = 1 -- external
 and $og_other_orgs_permission_level = 0 -- other orgs
-	delete from #temp where us_org <> $this_org and us_id <> $this_usid
+	delete from #temp where us_org <> $user.org and us_id <> $user.usid
 
 select us_id, us_username from #temp order by us_username
 drop table #temp";
@@ -979,7 +728,7 @@ from projects, users
 where pj_id not in
 (
 	select pu_project from project_user_xref
-	where pu_permission_level = 0 and pu_user = $this_usid
+	where pu_permission_level = 0 and pu_user = $user.usid
 )
 
 if $og_external_user = 1 -- external
@@ -989,7 +738,7 @@ begin
 	from #temp a
 	inner join users b on a.us_id = b.us_id
 	inner join orgs on b.us_id = og_id
-	where og_external_user = 0 or b.us_org = $this_org
+	where og_external_user = 0 or b.us_org = $user.org
 	order by us_username
 end
 else
@@ -1021,10 +770,10 @@ drop table #temp";
 				sql = sql.Replace("$fullnames","1 = 1");
 			}
 
-			sql = sql.Replace("$this_usid",Convert.ToString(security.this_usid));
-			sql = sql.Replace("$this_org",Convert.ToString(security.this_org));
-			sql = sql.Replace("$og_external_user",Convert.ToString(security.this_external_user ? 1 : 0));
-			sql = sql.Replace("$og_other_orgs_permission_level",Convert.ToString(security.this_other_orgs_permission_level));
+			sql = sql.Replace("$user.usid",Convert.ToString(security.user.usid));
+			sql = sql.Replace("$user.org",Convert.ToString(security.user.org));
+			sql = sql.Replace("$og_external_user",Convert.ToString(security.user.external_user ? 1 : 0));
+			sql = sql.Replace("$og_other_orgs_permission_level",Convert.ToString(security.user.other_orgs_permission_level));
 
 			return dbutil.get_dataset(sql).Tables[0];
 

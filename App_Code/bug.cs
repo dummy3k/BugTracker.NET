@@ -315,7 +315,7 @@ insert into bug_posts
                 sql = sql.Replace("$fi", effective_file.Replace("'", "''"));
                 sql = sql.Replace("$de", comment.Replace("'", "''"));
                 sql = sql.Replace("$si", Convert.ToString(effective_content_length));
-                sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+                sql = sql.Replace("$us", Convert.ToString(security.user.usid));
                 sql = sql.Replace("$ct", effective_content_type.Replace("'", "''"));
                 if (parent == -1)
                 {
@@ -642,8 +642,8 @@ insert into bug_posts
             }
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
-            sql = sql.Replace("$this_usid", Convert.ToString(security.this_usid));
-            sql = sql.Replace("$this_org", Convert.ToString(security.this_org));
+            sql = sql.Replace("$this_usid", Convert.ToString(security.user.usid));
+            sql = sql.Replace("$this_org", Convert.ToString(security.user.org));
             sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
 
             DbUtil dbutil = new DbUtil();
@@ -716,27 +716,27 @@ insert into bug_posts
 
             sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
             sql = sql.Replace("$bg", Convert.ToString(bugid));
-            sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+            sql = sql.Replace("$us", Convert.ToString(security.user.usid));
             DbUtil dbutil = new DbUtil();
             DataRow dr = dbutil.get_datarow(sql);
             int pl = (int)dr[0];
             int bg_org = (int)dr[1];
 
             // reduce permissions for guest
-            if (security.this_is_guest && pl == Security.PERMISSION_ALL)
+            if (security.user.is_guest && pl == Security.PERMISSION_ALL)
             {
                 pl = Security.PERMISSION_REPORTER;
             }
 
             // maybe reduce permissions
-            if (bg_org != security.this_org)
+            if (bg_org != security.user.org)
             {
-                if (security.this_other_orgs_permission_level == Security.PERMISSION_NONE
-                || security.this_other_orgs_permission_level == Security.PERMISSION_READONLY)
+                if (security.user.other_orgs_permission_level == Security.PERMISSION_NONE
+                || security.user.other_orgs_permission_level == Security.PERMISSION_READONLY)
                 {
-                    if (security.this_other_orgs_permission_level < pl)
+                    if (security.user.other_orgs_permission_level < pl)
                     {
-                        pl = security.this_other_orgs_permission_level;
+                        pl = security.user.other_orgs_permission_level;
                     }
                 }
             }
@@ -808,7 +808,7 @@ insert into bug_posts
 				    N'$pcd1',N'$pcd2',N'$pcd3' $custom_cols_placeholder2)";
 
             sql = sql.Replace("$short_desc", short_desc.Replace("'", "''"));
-            sql = sql.Replace("$reported_user", Convert.ToString(security.this_usid));
+            sql = sql.Replace("$reported_user", Convert.ToString(security.user.usid));
             sql = sql.Replace("$project", Convert.ToString(projectid));
             sql = sql.Replace("$org", Convert.ToString(orgid));
             sql = sql.Replace("$category", Convert.ToString(categoryid));
@@ -881,7 +881,7 @@ insert into bug_posts
 
 
             int bugid = Convert.ToInt32(dbutil.execute_scalar(sql));
-            int postid = btnet.Bug.insert_comment(bugid, security.this_usid, comments, from, content_type, internal_only);
+            int postid = btnet.Bug.insert_comment(bugid, security.user.usid, comments, from, content_type, internal_only);
 
             btnet.Bug.auto_subscribe(bugid);
 
@@ -1097,7 +1097,7 @@ insert into bug_posts
                 sql = sql.Replace("$pau", prev_assigned_to_user.ToString());
                 sql = sql.Replace("$id", Convert.ToString(bugid));
                 sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
-                sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+                sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 
                 DbUtil dbutil = new DbUtil();
                 DataSet subscribers = dbutil.get_dataset(sql);
@@ -1118,7 +1118,7 @@ insert into bug_posts
                     btnet.Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/") + "\"/>");
                     my_response.Write("</head>");
 
-                    PrintBug.print_bug(my_response, bug_dr, security.this_is_admin, true /* external_user */);
+                    PrintBug.print_bug(my_response, bug_dr, security.user.is_admin, true /* external_user */);
                     // at this point "writer" has the bug html
 
 

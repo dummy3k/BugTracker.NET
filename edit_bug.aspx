@@ -51,7 +51,7 @@ void Page_Load(Object sender, EventArgs e)
 	custom_field_msg.InnerHtml = "";
 
 
-	if (security.this_use_fckeditor)
+	if (security.user.use_fckeditor)
 	{
 		fckeComment.Visible = true;
 		comment.Visible = false;
@@ -118,7 +118,7 @@ void Page_Load(Object sender, EventArgs e)
 	// get list of custom fields
 	ds_custom_cols = btnet.Util.get_custom_columns(dbutil);
 
-	if (security.this_external_user || btnet.Util.get_setting("EnableInternalOnlyPosts","0") == "0")
+	if (security.user.external_user || btnet.Util.get_setting("EnableInternalOnlyPosts","0") == "0")
 	{
 		internal_only.Visible = false;
 		internal_only_label.Visible = false;
@@ -151,7 +151,7 @@ void Page_Load(Object sender, EventArgs e)
 			titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - Add New ";
 			titl.InnerText += btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"));
 
-			if (security.this_adds_not_allowed)
+			if (security.user.adds_not_allowed)
 			{
 				display_bug_not_found(id);
 			}
@@ -171,9 +171,9 @@ void Page_Load(Object sender, EventArgs e)
 
 			// org
 
-			if (security.this_other_orgs_permission_level == 0)
+			if (security.user.other_orgs_permission_level == 0)
 			{
-				default_value = Convert.ToString((int)security.this_org);
+				default_value = Convert.ToString((int)security.user.org);
 			}
 			else
 			{
@@ -302,7 +302,7 @@ void Page_Load(Object sender, EventArgs e)
 			permission_level = (int)dr["pu_permission_level"];
 
 			// reduce permissions for guest
-			if (security.this_is_guest && permission_level == Security.PERMISSION_ALL)
+			if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
 			{
 				permission_level = Security.PERMISSION_REPORTER;
 			}
@@ -529,8 +529,8 @@ void Page_Load(Object sender, EventArgs e)
 
 
 			// edit bug
-			if (security.this_is_admin
-			|| security.this_can_merge_bugs)
+			if (security.user.is_admin
+			|| security.user.can_merge_bugs)
 			{
 				string merge_bug_link = "<a href=merge_bug.aspx?id="
 					+ Convert.ToString(id)
@@ -540,8 +540,8 @@ void Page_Load(Object sender, EventArgs e)
 			}
 
 			// delete bug
-			if (security.this_is_admin
-			|| security.this_can_delete_bug)
+			if (security.user.is_admin
+			|| security.user.can_delete_bug)
 			{
 				string delete_bug_link = "<a href=delete_bug.aspx?id="
 					+ Convert.ToString(id)
@@ -627,9 +627,9 @@ void load_project_and_user_dropdowns(DataTable project_default)
 			string initial_project = (string) Session["project"];
 
 			// project
-			if (security.this_forced_project != 0)
+			if (security.user.forced_project != 0)
 			{
-				initial_project = Convert.ToString(security.this_forced_project);
+				initial_project = Convert.ToString(security.user.forced_project);
 			}
 
 			if (initial_project != null && initial_project != "0")
@@ -926,11 +926,11 @@ void format_subcribe_cancel_link()
 			// so be prepared to format the link even if this isn't the first time in.
 			sql = "select count(1) from bug_subscriptions where bs_bug = $bg and bs_user = $us";
 			sql = sql.Replace("$bg",Convert.ToString(id));
-			sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+			sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 			subscribed = (int) dbutil.execute_scalar(sql);
 		}
 
-		if (security.this_is_guest)
+		if (security.user.is_guest)
 		{
 			subscriptions.InnerHtml = "";
 		}
@@ -961,8 +961,8 @@ void format_subcribe_cancel_link()
 void set_org_field_permission(int bug_permission_level)
 {
 	// pick the most restrictive permission
-	int perm_level = bug_permission_level < security.this_org_field_permission_level
-		? bug_permission_level : security.this_org_field_permission_level;
+	int perm_level = bug_permission_level < security.user.org_field_permission_level
+		? bug_permission_level : security.user.org_field_permission_level;
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
@@ -1001,8 +1001,8 @@ void set_shortdesc_field_permission()
 void set_category_field_permission(int bug_permission_level)
 {
 	// pick the most restrictive permission
-	int perm_level = bug_permission_level < security.this_category_field_permission_level
-		? bug_permission_level : security.this_category_field_permission_level;
+	int perm_level = bug_permission_level < security.user.category_field_permission_level
+		? bug_permission_level : security.user.category_field_permission_level;
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
@@ -1026,8 +1026,8 @@ void set_category_field_permission(int bug_permission_level)
 void set_priority_field_permission(int bug_permission_level)
 {
 	// pick the most restrictive permission
-	int perm_level = bug_permission_level < security.this_priority_field_permission_level
-		? bug_permission_level : security.this_priority_field_permission_level;
+	int perm_level = bug_permission_level < security.user.priority_field_permission_level
+		? bug_permission_level : security.user.priority_field_permission_level;
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
@@ -1051,8 +1051,8 @@ void set_priority_field_permission(int bug_permission_level)
 void set_status_field_permission(int bug_permission_level)
 {
 	// pick the most restrictive permission
-	int perm_level = bug_permission_level < security.this_status_field_permission_level
-		? bug_permission_level : security.this_status_field_permission_level;
+	int perm_level = bug_permission_level < security.user.status_field_permission_level
+		? bug_permission_level : security.user.status_field_permission_level;
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
@@ -1076,8 +1076,8 @@ void set_status_field_permission(int bug_permission_level)
 void set_project_field_permission(int bug_permission_level)
 {
 
-	int perm_level = bug_permission_level < security.this_project_field_permission_level
-		? bug_permission_level : security.this_project_field_permission_level;
+	int perm_level = bug_permission_level < security.user.project_field_permission_level
+		? bug_permission_level : security.user.project_field_permission_level;
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
@@ -1101,8 +1101,8 @@ void set_project_field_permission(int bug_permission_level)
 void set_assigned_field_permission(int bug_permission_level)
 {
 
-	int perm_level = bug_permission_level < security.this_assigned_to_field_permission_level
-		? bug_permission_level : security.this_assigned_to_field_permission_level;
+	int perm_level = bug_permission_level < security.user.assigned_to_field_permission_level
+		? bug_permission_level : security.user.assigned_to_field_permission_level;
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
@@ -1121,8 +1121,8 @@ void set_assigned_field_permission(int bug_permission_level)
 void set_udf_field_permission(int bug_permission_level)
 {
 	// pick the most restrictive permission
-	int perm_level = bug_permission_level < security.this_udf_field_permission_level
-		? bug_permission_level : security.this_udf_field_permission_level;
+	int perm_level = bug_permission_level < security.user.udf_field_permission_level
+		? bug_permission_level : security.user.udf_field_permission_level;
 
 	if (perm_level == Security.PERMISSION_NONE)
 	{
@@ -1174,7 +1174,7 @@ void set_controls_field_permission(int bug_permission_level)
 	else
 	{
 		// Call these functions so that the field level permissions can kick in
-		if (security.this_forced_project != 0)
+		if (security.user.forced_project != 0)
 		{
 			set_project_field_permission(Security.PERMISSION_READONLY);
 		}
@@ -1183,7 +1183,7 @@ void set_controls_field_permission(int bug_permission_level)
 			set_project_field_permission(Security.PERMISSION_ALL);
 		}
 
-		if (security.this_other_orgs_permission_level == 0)
+		if (security.user.other_orgs_permission_level == 0)
 		{
 			set_org_field_permission(Security.PERMISSION_READONLY);
 		}
@@ -1286,7 +1286,7 @@ void load_dropdowns()
 		and isnull(pu_permission_level,$dpl) not in (0, 1)
 		order by pj_name;";
 
-	sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+	sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 	sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel","2"));
 
 	// 1
@@ -1431,7 +1431,7 @@ bool record_changes()
 		values($id, $us, getdate(), N'$3', 'update')";
 
 	base_sql = base_sql.Replace("$id", Convert.ToString(id));
-	base_sql = base_sql.Replace("$us", Convert.ToString(security.this_usid));
+	base_sql = base_sql.Replace("$us", Convert.ToString(security.user.usid));
 
 	string from;
 	sql = "";
@@ -1699,11 +1699,11 @@ int fetch_permission_level(string projectToCheck)
 
 	sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel","2"));
 	sql = sql.Replace("$pj", projectToCheck);
-	sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 	int pl = (int) dbutil.execute_scalar(sql);
 
 	// reduce permissions for guest
-	if (security.this_is_guest && permission_level == Security.PERMISSION_ALL)
+	if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
 	{
 		pl = Security.PERMISSION_REPORTER;
 	}
@@ -1858,7 +1858,7 @@ void on_update (Object sender, EventArgs e)
 		string commentType;
 
 
-		if (security.this_use_fckeditor) {
+		if (security.user.use_fckeditor) {
 		    commentText = fckeComment.Value;
 		    commentType = "text/html";
 		}
@@ -1979,7 +1979,7 @@ void on_update (Object sender, EventArgs e)
 
 
 				sql = sql.Replace("$sd", short_desc.Value.Replace("'","''"));
-				sql = sql.Replace("$lu", Convert.ToString(security.this_usid));
+				sql = sql.Replace("$lu", Convert.ToString(security.user.usid));
 				sql = sql.Replace("$id", Convert.ToString(id));
 				sql = sql.Replace("$pj", new_project);
 				sql = sql.Replace("$og", org.SelectedItem.Value);
@@ -2085,7 +2085,7 @@ void on_update (Object sender, EventArgs e)
 			} // permission_level = 3 or not
 
 
-            bugpost_fields_have_changed = (btnet.Bug.insert_comment(id, security.this_usid, commentText, null, commentType, internal_only.Checked) != 0);
+            bugpost_fields_have_changed = (btnet.Bug.insert_comment(id, security.user.usid, commentText, null, commentType, internal_only.Checked) != 0);
 
 
 			string result = "";
@@ -2157,7 +2157,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 <div class=align>
 
-<% if (!security.this_adds_not_allowed) { %>
+<% if (!security.user.adds_not_allowed) { %>
 <a href=edit_bug.aspx?id=0>add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
@@ -2582,9 +2582,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	<tr><td nowrap>
 		<span id="plus_label" runat="server">
 			<font size=0>
-				<a href="#" onclick="<%= security.this_use_fckeditor ? "resize_iframe('fckeComment___Frame', 50);" : "resize_comment(10);" %>"><span id="toggle_link_plus">[+]</span></a>
+				<a href="#" onclick="<%= security.user.use_fckeditor ? "resize_iframe('fckeComment___Frame', 50);" : "resize_comment(10);" %>"><span id="toggle_link_plus">[+]</span></a>
 				&nbsp;
-				<a href="#" onclick="<%= security.this_use_fckeditor ? "resize_iframe('fckeComment___Frame', -50);" : "resize_comment(-10);" %>"><span id="toggle_link_minus">[-]</span></a>
+				<a href="#" onclick="<%= security.user.use_fckeditor ? "resize_iframe('fckeComment___Frame', -50);" : "resize_comment(-10);" %>"><span id="toggle_link_minus">[-]</span></a>
 			</font>
 		</span>
 		&nbsp;
@@ -2677,9 +2677,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			true,
 			images_inline,
 			history_inline,
-			security.this_is_admin,
-			security.this_can_edit_and_delete_posts,
-			security.this_external_user);
+			security.user.is_admin,
+			security.user.can_edit_and_delete_posts,
+			security.user.external_user);
 	}
 
 	%>

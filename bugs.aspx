@@ -54,7 +54,7 @@ void do_query()
 		// use sql associated with user
 		sql = @"select qu_id, qu_sql from queries where qu_id in
 			(select us_default_query from users where us_id = $us)";
-		sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+		sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 		DataRow dr = dbutil.get_datarow(sql);
 		if (dr != null)
 		{
@@ -101,7 +101,7 @@ void do_query()
 
 
 	// replace magic variables
-	bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.this_usid));
+	bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.user.usid));
 
 	bug_sql = Util.alter_sql_per_project_permissions(bug_sql,security);
 
@@ -160,7 +160,7 @@ void Page_Load(Object sender, EventArgs e)
 			or isnull(qu_org,0) = @us_org
 			order by qu_desc";
 
-		sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+		sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 
 		query.DataSource = dbutil.get_dataview(sql);
 
@@ -261,7 +261,7 @@ function get_or_post()
 
 <table border=0><tr>
 	<td  nowrap>
-	<% if (!security.this_adds_not_allowed) { %>
+	<% if (!security.user.adds_not_allowed) { %>
 	<a href=edit_bug.aspx>add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<% } %>

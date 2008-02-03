@@ -27,7 +27,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
-	if (security.this_is_admin || security.this_can_edit_and_delete_posts)
+	if (security.user.is_admin || security.user.can_edit_and_delete_posts)
 	{
 		//
 	}
@@ -57,7 +57,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 
-	if (security.this_external_user || Util.get_setting("EnableInternalOnlyPosts","0") == "0")
+	if (security.user.external_user || Util.get_setting("EnableInternalOnlyPosts","0") == "0")
 	{
 		internal_only.Visible = false;
 		internal_only_label.Visible = false;

@@ -45,7 +45,7 @@ void Page_Load(Object sender, EventArgs e)
 		string bug_sql = (string)dbutil.execute_scalar(sql);
 
 		// replace magic variables
-		bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.this_usid));
+		bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.user.usid));
 
 		bug_sql = Util.alter_sql_per_project_permissions(bug_sql,security);
 

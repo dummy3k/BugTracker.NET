@@ -25,13 +25,13 @@ void Page_Load(Object sender, EventArgs e)
 
 	string id = Util.sanitize_integer(Request["id"]);
 
-	if (!security.this_is_admin)
+	if (!security.user.is_admin)
 	{
 		sql = @"select us_created_user, us_admin from users where us_id = $us";
 		sql = sql.Replace("$us", id);
 		DataRow dr = dbutil.get_datarow(sql);
 
-		if (security.this_usid != (int) dr["us_created_user"])
+		if (security.user.usid != (int) dr["us_created_user"])
 		{
 			Response.Write ("You not allowed to delete this user, because you didn't create it.");
 			Response.End();

@@ -6,7 +6,7 @@
 <input type=hidden name="prev_dir" id="prev_dir" runat="server" value="ASC">
 
 <script>
-var enable_popups = <% Response.Write(Convert.ToString(security.this_enable_popups)); %>;
+var enable_popups = <% Response.Write(Convert.ToString(security.user.enable_popups)); %>;
 var asp_form_id = '<% Response.Write(Util.get_form_name()); %>';
 </script>
 

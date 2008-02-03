@@ -23,7 +23,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
-	if (security.this_is_admin || security.this_can_merge_bugs)
+	if (security.user.is_admin || security.user.can_merge_bugs)
 	{
 		//
 	}
@@ -235,7 +235,7 @@ void on_update(object Source, EventArgs e)
 
 		sql = sql.Replace("$from",prev_from_bug.Value);
 		sql = sql.Replace("$into",prev_into_bug.Value);
-		sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+		sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 
 		int comment_id = Convert.ToInt32(dbutil.execute_scalar(sql));
 

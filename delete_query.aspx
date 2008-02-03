@@ -43,9 +43,9 @@ void Page_Load(Object sender, EventArgs e)
 
 		DataRow dr = dbutil.get_datarow(sql);
 
-		if ((int) dr["qu_user"] != security.this_usid)
+		if ((int) dr["qu_user"] != security.user.usid)
 		{
-			if (security.this_is_admin || security.this_can_edit_sql)
+			if (security.user.is_admin || security.user.can_edit_sql)
 			{
 				// can do anything
 			}

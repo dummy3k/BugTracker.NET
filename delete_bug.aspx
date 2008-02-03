@@ -23,7 +23,7 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
-	if (security.this_is_admin || security.this_can_delete_bug)
+	if (security.user.is_admin || security.user.can_delete_bug)
 	{
 		//
 	}

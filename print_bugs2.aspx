@@ -42,7 +42,7 @@ void Page_Load(Object sender, EventArgs e)
 		string bug_sql = (string)dbutil.execute_scalar(sql);
 
 		// replace magic variables
-		bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.this_usid));
+		bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.user.usid));
 		bug_sql = Util.alter_sql_per_project_permissions(bug_sql,security);
 
 		// all we really need is the bugid, but let's do the same query as print_bugs.aspx
@@ -85,7 +85,7 @@ if (dv != null)
 			(int)drv[1],
 			security);
 
-		PrintBug.print_bug(Response, dr, security.this_is_admin, security.this_external_user);
+		PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user);
 	}
 }
 else
@@ -107,7 +107,7 @@ else
 				(int)dr2[1],
 				security);
 
-			PrintBug.print_bug(Response, dr, security.this_is_admin, security.this_external_user);
+			PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user);
 		}
 	}
 	else

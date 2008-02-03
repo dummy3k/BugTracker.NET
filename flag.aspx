@@ -63,7 +63,7 @@ void Page_Load(Object sender, EventArgs e)
 			}
 
 			sql = sql.Replace("$bg", Convert.ToString(bugid));
-			sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 			sql = sql.Replace("$fl", Convert.ToString(flag));
 
 			dbutil.execute_nonquery(sql);

@@ -30,7 +30,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	msg.InnerText = "";
 
-	id = security.this_usid;
+	id = security.user.usid;
 
 	if (!IsPostBack)
 	{
@@ -46,7 +46,7 @@ void Page_Load(Object sender, EventArgs e)
 			or isnull(qu_org,0) = @org
 			order by qu_desc";
 
-		sql = sql.Replace("$us",Convert.ToString(security.this_usid));
+		sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 
 		query.DataSource = dbutil.get_dataview(sql);
 		query.DataTextField = "qu_desc";
@@ -60,7 +60,7 @@ void Page_Load(Object sender, EventArgs e)
 			where isnull(pu_permission_level,$dpl) <> 0
 			order by pj_name";
 
-		sql = sql.Replace("$us", Convert.ToString(security.this_usid));
+		sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 
 		DataView projects_dv = dbutil.get_dataview(sql);

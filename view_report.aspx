@@ -20,7 +20,7 @@ void Page_Load(Object sender, EventArgs e)
 //	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 //		+ "view report";
 
-	if (security.this_is_admin || security.this_can_use_reports)
+	if (security.user.is_admin || security.user.can_use_reports)
 	{
 		//
 	}
@@ -45,7 +45,7 @@ void Page_Load(Object sender, EventArgs e)
 	string rp_sql = (string) dr["rp_sql"];
 
 	// replace the magic pseudo variable
-	rp_sql = rp_sql.Replace("$ME", Convert.ToString(security.this_usid));
+	rp_sql = rp_sql.Replace("$ME", Convert.ToString(security.user.usid));
 
 	DataSet ds = dbutil.get_dataset (rp_sql);
 
