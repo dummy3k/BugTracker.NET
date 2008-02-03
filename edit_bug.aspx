@@ -143,12 +143,11 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 
-		load_dropdowns();
-
-
 		if (id == 0)  // prepare the page for adding a new bug
 		{
-			titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - Add New ";
+            load_dropdowns(null, security.user);
+
+            titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - Add New ";
 			titl.InnerText += btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"));
 
 			if (security.user.adds_not_allowed)
@@ -290,9 +289,11 @@ void Page_Load(Object sender, EventArgs e)
 
 			// Get this entry's data from the db and fill in the form
 
-
 			dr = btnet.Bug.get_bug_datarow(id, security, ds_custom_cols);
+            Session["bug_datarow"] = dr;
 
+            load_dropdowns(dr, security.user);            
+            
 			if (dr == null)
 			{
 				display_bug_not_found(id);
@@ -607,6 +608,8 @@ void Page_Load(Object sender, EventArgs e)
 
 		// needs to be reloaded if project changed
 		load_project_and_user_dropdowns(null);
+
+        Workflow.fill_status_dropdown((DataRow)Session["bug_datarow"], security.user, status.Items);        
 
 	}
 
@@ -1273,7 +1276,7 @@ void format_prev_next_bug()
 
 
 ///////////////////////////////////////////////////////////////////////
-void load_dropdowns()
+void load_dropdowns(DataRow dr, User user)
 {
 
 	// only show projects where user has permissions
@@ -1335,12 +1338,18 @@ void load_dropdowns()
 	priority.DataBind();
 	priority.Items.Insert(0, new ListItem("[no priority]", "0"));
 
-	status.DataSource = ds_dropdowns.Tables[4];
-	status.DataTextField = "st_name";
-	status.DataValueField = "st_id";
-	status.DataBind();
-	status.Items.Insert(0, new ListItem("[no status]", "0"));
+    // Make it easier to customize the list of statuses
+    Workflow.fill_status_dropdown(dr, security.user, status.Items);
 
+    if (status.Items.Count == 0)
+    {
+        status.DataSource = ds_dropdowns.Tables[4];
+        status.DataTextField = "st_name";
+        status.DataValueField = "st_id";
+        status.DataBind();
+        status.Items.Insert(0, new ListItem("[no status]", "0"));
+    }
+       
 	udf.DataSource  = ds_dropdowns.Tables[5];
 	udf.DataTextField = "udf_name";
 	udf.DataValueField = "udf_id";

@@ -126,12 +126,110 @@ namespace btnet
 			}
 		}
 
-		///////////////////////////////////////////////////////////////////////
-		public void write_menu(HttpResponse Response, string this_link)
-		{
+        ///////////////////////////////////////////////////////////////////////
+        public void write_menu_item(HttpResponse Response,
+            string this_link, string menu_item, string href)
+        {
+            Response.Write("<td valign=middle align=left>");
+            if (this_link == menu_item)
+            {
+                Response.Write("<a href=" + href + "><span class=selected_menu_item>" + menu_item + "</span></a>");
+            }
+            else
+            {
+                if (menu_item == "about")
+                {
+                    Response.Write("<a target=_blank href=" + href + "><span class=menu_item>" + menu_item + "</span></a>");
+                }
+                else
+                {
+                    Response.Write("<a href=" + href + "><span class=menu_item>" + menu_item + "</span></a>");
+                }
+            }
+            Response.Write("</td>");
+        }
+        
 
-			btnet.Menu.write_menu(Response, this_link, user, auth_method);
-		}
+        ///////////////////////////////////////////////////////////////////////
+        public void write_menu(HttpResponse Response, string this_link)
+        {
+
+            // topmost visible HTML
+            string custom_header = (string)Util.context.Application["custom_header"];
+            Response.Write(custom_header);
+
+            Response.Write("<table border=0 width=100% cellpadding=0 cellspacing=0 class=menubar><tr>");
+
+            // logo
+            string logo = (string)Util.context.Application["custom_logo"];
+            Response.Write(logo);
+
+            Response.Write("<td width=20>&nbsp;</td>");
+            write_menu_item(Response, this_link, Util.get_setting("PluralBugLabel", "bugs"), "bugs.aspx");
+            write_menu_item(Response, this_link, "search", "search.aspx");
+
+            if (!user.is_guest)
+            {
+                write_menu_item(Response, this_link, "queries", "queries.aspx");
+            }
+
+            if (user.is_admin)
+            {
+                write_menu_item(Response, this_link, "admin", "admin.aspx");
+            }
+            else if (user.is_project_admin)
+            {
+                write_menu_item(Response, this_link, "users", "users.aspx");
+            }
+
+            if (user.is_admin || user.can_use_reports || user.can_edit_reports)
+            {
+                write_menu_item(Response, this_link, "reports", "reports.aspx");
+            }
+
+
+            // for guest account, suppress display of "edit_self
+            if (!user.is_guest)
+            {
+                write_menu_item(Response, this_link, "settings", "edit_self.aspx");
+            }
+
+            if (auth_method == "plain")
+            {
+                write_menu_item(Response, this_link, "logoff", "logoff.aspx");
+            }
+
+            if (Util.get_setting("CustomMenuLinkLabel", "") != "")
+            {
+                write_menu_item(Response, this_link,
+                    Util.get_setting("CustomMenuLinkLabel", ""),
+                    Util.get_setting("CustomMenuLinkUrl", ""));
+            }
+
+            write_menu_item(Response, this_link, "about", "about.html");
+
+            // go to
+            Response.Write("<td nowrap valign=middle>");
+            Response.Write("<form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>");
+            Response.Write("<font size=1>id:&nbsp;</font>");
+            Response.Write("<input style='font-size: 8pt;' size=4 type=text name=id accesskey=i>");
+            Response.Write("<input class=btn style='font-size: 8pt;' type=submit value='go to ");
+            Response.Write(Util.get_setting("SingularBugLabel", "bug"));
+            Response.Write("'>");
+            Response.Write("</form>");
+            Response.Write("</td>");
+
+            Response.Write("<td nowrap valign=middle>");
+            Response.Write("<span class=smallnote>logged in as:<br>");
+            Response.Write(user.username);
+            Response.Write("</span></td>");
+
+            Response.Write("<td nowrap valign=middle>");
+            Response.Write("<a target=_blank href=http://ifdefined.com/README.html>[?]</a></td>");
+
+            Response.Write("</tr></table><br>");
+
+        }
 
 	} // end Security
 
