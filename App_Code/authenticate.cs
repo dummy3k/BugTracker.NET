@@ -26,8 +26,8 @@ namespace btnet
 			}
 		}
 
-        public static bool check_password_with_ldap(string username, string password)
-        {
+		public static bool check_password_with_ldap(string username, string password)
+		{
 			string dn = btnet.Util.get_setting(
 				"LdapUserDistinguishedName",
 				"");
@@ -36,31 +36,32 @@ namespace btnet
 				"LdapServer",
 				"127.0.0.1");
 
-            dn = dn.Replace("$REPLACE_WITH_USERNAME$", username);
-            LdapConnection ldap = new LdapConnection(ldap_server);
-            System.Net.NetworkCredential cred = new System.Net.NetworkCredential(dn, password);
-            ldap.AuthType = AuthType.Basic;
-            bool bResult = false;
+			dn = dn.Replace("$REPLACE_WITH_USERNAME$", username);
+			LdapConnection ldap = new LdapConnection(ldap_server);
+			System.Net.NetworkCredential cred = new System.Net.NetworkCredential(dn, password);
+			ldap.AuthType = AuthType.Basic;
+			bool bResult = false;
 
-            try
-            {
-                ldap.Bind(cred);
-                btnet.Util.write_to_log("LDAP authentication ok: " + username);
-                return true;
-            }
-            catch (LdapException e)
-            {
-                string s = e.Message;
-                if (e.InnerException != null)
-                {
-                    s += "\n";
-                    s += e.InnerException.Message;
-                }
-                // write the message to the log
-                btnet.Util.write_to_log("LDAP authentication failed: " + s);
-                return false;
-            }
+			try
+			{
+				ldap.Bind(cred);
+				btnet.Util.write_to_log("LDAP authentication ok: " + username);
+				return true;
+			}
+			catch (LdapException e)
+			{
+				string s = e.Message;
 
+				if (e.InnerException != null)
+				{
+					s += "\n";
+					s += e.InnerException.Message;
+				}
+
+				// write the message to the log
+				btnet.Util.write_to_log("LDAP authentication failed: " + s);
+				return false;
+			}
 		}
 
         public static bool check_password_with_db(string username, string password)

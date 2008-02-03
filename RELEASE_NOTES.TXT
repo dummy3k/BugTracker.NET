@@ -4,11 +4,6 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-* test notifications related to assigned user, status
-
-* fill user dropdown with valid users PLUS whoever bug is actually
-assigned to.
-
 * NEED INSTRUCTIONS HOW TO UPGRADE 
 
 * use salt in encryption, provide a way for ldap authentication to happen
@@ -27,6 +22,20 @@ assigned to.
 * escalation/reminder
 
 
+-----------------------------------------------------------------------
+Version 2.7.5  2/2/2008
+-----------------------------------------------------------------------
+
+This release adds some LDAP/Active Directory support.
+
+Before deploying this release, you must change your Web.config file.
+Your Web.config might be different from mine, but for me, the change
+I had to make was from this:
+
+<compilation debug="true"/>
+
+to this:
+
 <compilation debug="true">
 	<assemblies>
 		<add assembly="System.DirectoryServices.Protocols, Version=2.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A"/>
@@ -34,11 +43,40 @@ assigned to.
 </compilation>
 
 
+To enable LDAP support, configure these settings in your Web.config:
+
+
+<!--
+	You can have BugTracker.NET check the user's password using an LDAP server instead of
+	checking it in the database.  You still have to create a BugTracker.NET user. It's only
+	the password that get's checked.
+
+	To use LDAP, set AuthenticateUsingLdap to 1 and enter the appropriariate distinguished name.
+	The $REPLACE_WITH_USERNAME$ gets replaced with the username that's typed in by the user
+	when he tries to log on.
+-->
 <add key="AuthenticateUsingLdap" value="1"/>
 <add key="LdapServer" value="127.0.0.1"/>
 <add key="LdapUserDistinguishedName" value="uid=$REPLACE_WITH_USERNAME$,ou=people,dc=mycompany,dc=com"/>
 
-OpenLDAP.
+When you enable LDAP support, the application checks user passwords against the ones stored in your
+LDAP directory rather than the ones stored in the database.
+
+The zip also contains sample code for importing users from LDAP into 
+BugTracker.NET's database. See "import_users_from_ldap_sample.cs".
+
+Also:
+
+* Fixed bug with duplicate users in user dropdowns that affected 
+"external" users.  Thanks to Suchacek Zdenek for help with this.
+
+* Fixed how app was handling bugs associated with inactive projects or
+inactive users, or users who are no longer marked assignable. Before,
+if a bug was assigned to an inactive user, and then you updated the bug
+in some other way, you would inadvertently also change the user too, 
+because the inactive user was missing from the dropdown.  Now, the
+current project/user is always FORCED into the dropdown, even if
+it is inactive.
 
 -----------------------------------------------------------------------
 Version 2.7.4  1/27/2008

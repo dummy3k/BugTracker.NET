@@ -768,7 +768,7 @@ namespace btnet
             sql = sql.Replace("$salt", Convert.ToString(salt));
             sql = sql.Replace("$id", Convert.ToString(us_id));
 
-            dbutil.execute_nonquery(sql);        
+            dbutil.execute_nonquery(sql);
         }
 
 		///////////////////////////////////////////////////////////////////////
@@ -985,15 +985,12 @@ where pj_id not in
 if $og_external_user = 1 -- external
 and $og_other_orgs_permission_level = 0 -- other orgs
 begin
-	select a.*
-	into #temp2
+	select distinct a.us_id, a.us_username
 	from #temp a
 	inner join users b on a.us_id = b.us_id
 	inner join orgs on b.us_id = og_id
 	where og_external_user = 0 or b.us_org = $this_org
-
-	select * from #temp order by us_username
-	drop table #temp2
+	order by us_username
 end
 else
 begin
