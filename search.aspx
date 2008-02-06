@@ -671,6 +671,7 @@ order by bg_id desc
 	DataSet ds = dbutil.get_dataset(sql);
 	dv = new DataView (ds.Tables[0]);
 	Session["bugs"] = dv;
+	Session["bugs_unfiltered"] = ds.Tables[0];
 }
 
 ///////////////////////////////////////////////////////////////////////

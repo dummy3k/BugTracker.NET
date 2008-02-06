@@ -116,7 +116,7 @@ void do_query()
 		bug_sql = bug_sql.Replace("$fullnames","1 = 1");
 	}
 
-	DataSet ds;
+	DataSet ds = null;
 	try
 	{
 		ds = dbutil.get_dataset (bug_sql);
@@ -128,6 +128,15 @@ void do_query()
 		dv = null;
 	}
 	Session["bugs"] = dv;
+
+	if (ds != null)
+	{
+		Session["bugs_unfiltered"] = ds.Tables[0];
+	}
+	else
+	{
+		Session["bugs_unfiltered"] = null;
+	}
 
 }
 

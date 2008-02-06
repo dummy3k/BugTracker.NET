@@ -37,6 +37,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		Session["SelectedBugQuery"] = null;
 		Session["bugs"] = null;
+		Session["bugs_unfiltered"] = null;
 		Session["project"] = null;
 
 	}
