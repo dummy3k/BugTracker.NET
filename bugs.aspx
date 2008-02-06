@@ -11,7 +11,6 @@ DbUtil dbutil;
 Security security;
 bool query_changed = false;
 string qu_id_string = null;
-DataTable dt_users = null;
 string sql_error = "";
 
 void do_query()
