@@ -148,7 +148,7 @@ namespace btnet
             }
             Response.Write("</td>");
         }
-        
+
 
         ///////////////////////////////////////////////////////////////////////
         public void write_menu(HttpResponse Response, string this_link)
@@ -837,7 +837,7 @@ begin
 	inner join users b on a.us_id = b.us_id
 	inner join orgs on b.us_id = og_id
 	where og_external_user = 0 or b.us_org = $user.org
-	order by us_username
+	order by a.us_username
 end
 else
 begin

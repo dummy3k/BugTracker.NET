@@ -10,23 +10,24 @@ using System.Web.UI.WebControls;
 
 namespace btnet
 {
-/*
-    This is sample code that gives you an idea of how you could customize the workflow, i.e, the
-    change in bug statuses.   
-*/
+
+// This is sample code that gives you an idea of how you could customize the 
+// workflow, i.e, the change in bug statuses.  
+ 
     public class Workflow
     {
         public static void fill_status_dropdown(
-            DataRow bug,  // null if a new bug, otherwise the way the bug is now in the db
+            DataRow bug,  // null if a new bug, otherwise the state of the bug now in the db
             User user, // the currently logged in user
             System.Web.UI.WebControls.ListItemCollection statuses) // the options in the dropdown
         {
-            // If you do nothing, by default the app will fill the status dropdown with all the
-            // statuses in the database.
+            // If you do nothing here, by default the app will fill the status 
+            // dropdown with all the statuses in the database.
 
-            // Bug if you put something in the list of statuses, then the app will use
-            // YOUR list instead of the default list.
+            // But, if you put something in the list of statuses, then the app
+            // will use YOUR list instead of the default list.
 
+            // Uncomment the next line to play with the sample code.
             //fill_status_dropdown_sample(bug, user, statuses);
         }
 
@@ -36,7 +37,6 @@ namespace btnet
             User user, // the currently logged in user
             System.Web.UI.WebControls.ListItemCollection statuses) // the options in the dropdown
         {
-            //statuses.Clear();
 
             if (bug != null) // existing bug
             {
