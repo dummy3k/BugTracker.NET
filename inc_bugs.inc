@@ -5,7 +5,6 @@ int page_size;
 int this_page=0;
 int total_rows;
 int start_row;
-System.Data.DataSet ds_filters;
 System.Data.DataSet ds_custom_cols;
 
 ///////////////////////////////////////////////////////////////////////
@@ -357,11 +356,6 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 ///////////////////////////////////////////////////////////////////////
 void display_bugs(bool show_checkbox)
 {
-	
-	if (dt_users == null)
-	{
-		dt_users = Util.get_related_users(security, dbutil);
-	}
 
 	string paging_string = get_paging_string();
 	string bug_count_string = get_bug_count_string();
@@ -428,36 +422,6 @@ void display_bugs(bool show_checkbox)
 	/// filter row
 	////////////////////////////////////////////////////////////////////
 
-	// do the queries for the html SELECT elements
-
-	string sql = @"/* for dropdowns, filters */
-			select pj_name
-			from projects
-			left outer join project_user_xref on pj_id = pu_project
-			and pu_user = $us
-			where pj_active = 1
-			and isnull(pu_permission_level,$dpl) <> 0
-			order by pj_name;";
-
-	sql = sql.Replace("$us",Convert.ToString(security.user.usid));
-	sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
-
-	if (security.user.other_orgs_permission_level != 0)
-	{
-		sql += "select og_name from orgs order by og_name;";
-	}
-	else
-	{
-		sql += "select og_name from orgs where og_id = " + Convert.ToInt32(security.user.org) + " order by og_name;";
-	}
-	sql += @"
-select ct_name from categories order by ct_sort_seq, ct_name;
-select pr_name from priorities order by pr_sort_seq, pr_name
-select st_name from statuses order by st_sort_seq, st_name
-select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
-
-	ds_filters = dbutil.get_dataset(sql);
-
 	if (ds_custom_cols == null)
 	{
 		ds_custom_cols = Util.get_custom_columns(dbutil);
@@ -482,42 +446,26 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 		{
 			Response.Write ("<td class=bugf>");
 
-			if (dc.ColumnName == "project")
-			{
-				display_filter_select ("[project]", ds_filters.Tables[0]);
-			}
-			else if (dc.ColumnName == "organization")
-			{
-				display_filter_select ("[organization]", ds_filters.Tables[1]);
-			}
-			else if (dc.ColumnName == "category")
-			{
-				display_filter_select ("[category]", ds_filters.Tables[2]);
-			}
-			else if (dc.ColumnName == "priority")
-			{
-				display_filter_select ("[priority]", ds_filters.Tables[3]);
-			}
-			else if (dc.ColumnName == "status")
-			{
-				display_filter_select ("[status]", ds_filters.Tables[4]);
-			}
-			else if (dc.ColumnName == udf_column_name)
-			{
-				display_filter_select ("[" + udf_column_name + "]", ds_filters.Tables[5]);
-			}
-			else if (dc.ColumnName == "reported by")
-			{
-				display_filter_select ("[reported by]", dt_users, 1);
-			}
-			else if (dc.ColumnName == "assigned to")
-			{
-				DataView dv_users = new DataView(dt_users);
-				display_filter_select ("[assigned to]", dt_users, 1);
-			}
-			else if (dc.ColumnName == "$FLAG" )
+			if (dc.ColumnName == "$FLAG" )
 			{
 				display_filter_select("[$FLAG]","red|green");
+			}
+			else if (dc.ColumnName == "project"
+			|| dc.ColumnName == "organization"
+			|| dc.ColumnName == "category"
+			|| dc.ColumnName == "priority"
+			|| dc.ColumnName == "status"
+			|| dc.ColumnName == "reported by"
+			|| dc.ColumnName == "assigned to"
+			|| dc.ColumnName == "assigned to"
+			|| dc.ColumnName == udf_column_name)
+
+			{
+				string string_vals = btnet.Util.get_distinct_vals_from_dataset(
+					(DataTable)Session["bugs_unfiltered"],
+					db_column_count);
+
+				display_filter_select("[" + dc.ColumnName + "]", string_vals);
 			}
 			else
 			{
@@ -526,16 +474,17 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 				{
 					if (dc.ColumnName == (string) drcc["name"])
 					{
-						if ((string)drcc["dropdown type"] == "normal")
+						if ((string)drcc["dropdown type"] == "normal"
+						||  (string)drcc["dropdown type"] == "users")
 						{
 							with_filter = true;
-							display_filter_select ("[" + (string) drcc["name"] + "]",
-								Convert.ToString(drcc["vals"]));
-						}
-						else if ((string)drcc["dropdown type"] == "users")
-						{
-							with_filter = true;
-							display_filter_select ("[" + (string) drcc["name"] + "]", dt_users, 1);
+
+							string string_vals = btnet.Util.get_distinct_vals_from_dataset(
+								(DataTable)Session["bugs_unfiltered"],
+								db_column_count);
+
+							display_filter_select("[" + (string) drcc["name"] + "]", string_vals);
+
 						}
 						else
 						{
@@ -549,6 +498,7 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 					Response.Write ("&nbsp");
 				}
 			}
+			
 			Response.Write ("</td>\n");
 		}
 
@@ -694,7 +644,5 @@ select udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 	Response.Write ("</table>");
 	Response.Write (paging_string);
 	Response.Write (bug_count_string);
-
 }
-
 </script>

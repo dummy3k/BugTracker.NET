@@ -17,6 +17,21 @@ Release notes:
 
 
 -----------------------------------------------------------------------
+Version 2.7.6  2/XXXXX/2008
+-----------------------------------------------------------------------
+
+* Added file App_Code\workflow.cs, a designated spot for your custom C#
+code to control the transition of statuses.  For example, if you want
+to say that the only valid status after "tested" is "deployed", or if
+you only want users in the "testers" group to mark a bug as "tested",
+then you could add your logic to this file.  See the comments in the
+file for more detail.
+
+* Changed the implementation of filters dropdowns in the bug lists so 
+that usually, they only show choices that are actually present in the 
+bug list.
+
+-----------------------------------------------------------------------
 Version 2.7.5  2/2/2008
 -----------------------------------------------------------------------
 

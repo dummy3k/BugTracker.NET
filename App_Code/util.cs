@@ -10,6 +10,7 @@ using System.Data;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace btnet
 {
@@ -1046,8 +1047,27 @@ drop table #temp";
 				svn_password = (string) dr["pj_subversion_password"] ;
 				websvn_url = (string) dr["pj_websvn_url"] ;
 			}
-
-
 		}
-	} // end Util
+
+        public static string get_distinct_vals_from_dataset(DataTable dt, int col)
+        {
+            SortedDictionary<string,int> dict = new SortedDictionary<string,int>();
+            
+            foreach (DataRow row in dt.Rows)
+            {
+                dict[Convert.ToString(row[col])] = 1;
+            }
+            
+            string vals = "";
+
+            foreach (string s in dict.Keys)
+            { 
+                if (vals != "") vals += "|";
+
+                vals += s;
+            }
+
+            return vals;
+        }
+    } // end Util
 }
