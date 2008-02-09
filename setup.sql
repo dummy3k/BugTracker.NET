@@ -615,3 +615,25 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 0)
 
 
+insert into queries (qu_desc, qu_sql, qu_default) values (
+'days in status',
+'select case '
++ char(10) + ' when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 90 then ''#ff9999'' '
++ char(10) + ' when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 30 then ''#ffcccc'' '
++ char(10) + ' when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 7 then ''#ffdddd''  '
++ char(10) + ' else ''#ffffff'' end, '
++ char(10) + ' bg_id [id], bg_short_desc [desc], '
++ char(10) + ' datediff(d, isnull(bp_date,bg_reported_date), getdate()) [days in status],'
++ char(10) + ' st_name [status], '
++ char(10) + ' isnull(bp_comment,'''') [last status change], isnull(bp_date,bg_reported_date) [status date]'
++ char(10) + ' from bugs'
++ char(10) + ' inner join statuses on bg_status = st_id'
++ char(10) + ' left outer join bug_posts on bg_id = bp_bug'
++ char(10) + ' and bp_type = ''update'' '
++ char(10) + ' and bp_comment like ''changed status from%'' '
++ char(10) + ' and bp_date in (select max(bp_date) from bug_posts where bp_bug = bg_id)'
++ char(10) + ' WhErE 1 = 1 '
++ char(10) + ' order by 4 desc ',
+0)
+
+
