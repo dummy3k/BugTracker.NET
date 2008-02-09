@@ -2157,9 +2157,9 @@ var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditB
 var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 </script>
 
-
 </head>
-<body onunload='on_body_unload()'>
+
+<body onload='on_body_load()' onunload='on_body_unload()'>
 <% security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs")); %>
 
 <div id="overDiv" style="position:absolute;visibility:hidden; z-index:1000;"></div>
@@ -2177,29 +2177,6 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 <table border=0 cellspacing=0 cellpadding=3>
 <tr>
-<script>
-function clone()
-{
-	el = document.getElementById("bugid")
-	el.firstChild.nodeValue = ""
-
-	el = document.getElementById("bugid_label")
-	el.firstChild.nodeValue = ""
-
-	el = document.getElementById("sub")
-	el.value = "Create"
-
-	el = document.getElementById("posts")
-	el.innerHTML = ""
-
-	el = document.getElementById("clone_ignore_bugid")
-	el.value = "1"
-
-	el = document.getElementById("edit_bug_menu")
-	el.style.display = "none"
-
-}
-</script>
 
 <td nowrap valign=top> <!-- links -->
 	<div id="edit_bug_menu">

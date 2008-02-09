@@ -337,8 +337,9 @@ void on_update (Object sender, EventArgs e)
 	</td>
 
 	<tr>
-	<td class=lbl id="sql_text_label" runat="server">SQL:</td>
-	<td colspan=2><textarea rows=16 cols=85 runat="server" class=txt name="sql_text" id="sql_text"></textarea></td>
+	<td colspan=3>
+	<span class=lbl id="sql_text_label" runat="server">SQL:</span><br>
+	<textarea rows=24 cols=100 runat="server" class=txt name="sql_text" id="sql_text"></textarea></td>
 
 
 	<tr><td colspan=3 align=center>

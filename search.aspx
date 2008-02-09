@@ -1640,7 +1640,7 @@ function set_project_changed() {
 <div id=searchfrom>
 <form class=frm method="post" runat="server" onmouseover="hide_suggest()">
 
-<table border=0 cellpadding=8 cellspacing=0>
+<table border=0 cellpadding=6 cellspacing=0>
 	<tr>
 		<td colspan="10"><span class=smallnote>Hold down Ctrl key to select multiple items.</span></td>
 	</tr>
@@ -1673,7 +1673,7 @@ function set_project_changed() {
 	</tr>
 
 </table>
-<table border=0 cellpadding=8 cellspacing=0>
+<table border=0 cellpadding=3 cellspacing=0>
 	<tr>
 
 		<td nowrap><span class=lbl id="org_label" runat="server">organization:</span><br>
@@ -1702,7 +1702,7 @@ function set_project_changed() {
 	</tr>
 
 </table>
-<table border=0 cellpadding=8 cellspacing=0>
+<table border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> description contains:&nbsp;</span>
 		<td colspan=2><input type=text id="like" runat="server" onkeydown="search_criteria_onkeydown(this,event)" onkeyup="search_criteria_onkeyup(this,event)"  size=50 autocomplete="off">

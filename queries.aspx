@@ -45,7 +45,7 @@ void Page_Load(Object sender, EventArgs e)
 			'<a target=_blank href=print_bugs2.aspx?qu_id=' + convert(varchar,qu_id) + '>print detail</a>' [print list<br>with detail],
 			'<a href=edit_query.aspx?id=' + convert(varchar,qu_id) + '>edit</a>' [edit],
 			'<a href=delete_query.aspx?id=' + convert(varchar,qu_id) + '>delete</a>' [delete],
-			qu_sql [sql]
+			replace(convert(nvarchar(4000),qu_sql), char(10),'<br>') [sql]
 			from queries
 			left outer join users on qu_user = us_id
 			left outer join orgs on qu_org = og_id
@@ -55,7 +55,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	else
 	{
-		// allow editing for users own queries
+		// allow editing for users' own queries
 
 		sql =  @"select
 			qu_desc [query],
@@ -71,10 +71,6 @@ void Page_Load(Object sender, EventArgs e)
 			order by qu_desc";
 	}
 
-	if (Util.get_setting("HideSql", "0") == "1")
-	{
-		sql = sql.Replace("qu_sql [sql],","");
-	}
 	sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 	ds = dbutil.get_dataset(sql);
 

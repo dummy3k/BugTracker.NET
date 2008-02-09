@@ -330,6 +330,7 @@ function get_presets()
 	get_preset("status")
 	get_preset("udf")
 	get_preset("assigned_to")
+	on_body_load() // to change the select styles
 }
 
 function set_presets()
@@ -340,3 +341,46 @@ function set_presets()
 	save_var("udf")
 	save_var("assigned_to")
 }
+
+function clone()
+{
+	el = document.getElementById("bugid")
+	el.firstChild.nodeValue = ""
+
+	el = document.getElementById("bugid_label")
+	el.firstChild.nodeValue = ""
+
+	el = document.getElementById("sub")
+	el.value = "Create"
+
+	el = document.getElementById("posts")
+	el.innerHTML = ""
+
+	el = document.getElementById("clone_ignore_bugid")
+	el.value = "1"
+
+	el = document.getElementById("edit_bug_menu")
+	el.style.display = "none"
+
+}
+
+function on_body_load()
+{
+	// change the select styles depending on whether something has been selected or not
+	var cls = (navigator.userAgent.indexOf("MSIE") > 0) ? "className" : "class";
+	sels = document.getElementsByTagName("select");
+	for (i = 0; i < sels.length; i++)
+	{
+		sels[i].onchange = on_body_load
+		si = sels[i].options.selectedIndex;
+		if (sels[i].options[si].text.substr(0,3) == "[no")
+		{
+			sels[i].setAttribute(cls,'edit_bug_option_none')
+		}
+		else
+		{
+			sels[i].setAttribute(cls,'edit_bug_option')
+		}
+	}
+}
+

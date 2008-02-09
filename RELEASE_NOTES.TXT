@@ -17,6 +17,40 @@ Release notes:
 
 
 -----------------------------------------------------------------------
+Version 2.7.7  2/XXXXX/2008
+-----------------------------------------------------------------------
+
+* Added another query sample to setup.sql.  This one shows the bugs
+that have been stuck the longest time without a status change.
+
+select case 
+ when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 90 then '#ff9999' 
+ when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 30 then '#ffcccc' 
+ when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 7 then '#ffdddd'  
+ else '#ffffff' end, 
+ bg_id [id], bg_short_desc [desc], 
+ datediff(d, isnull(bp_date,bg_reported_date), getdate()) [days in status],
+ st_name [status], 
+ isnull(bp_comment,'') [last status change], isnull(bp_date,bg_reported_date) [status date]
+ from bugs
+ inner join statuses on bg_status = st_id
+ left outer join bug_posts on bg_id = bp_bug
+ and bp_type = 'update' 
+ and bp_comment like 'changed status from%' 
+ and bp_date in (select max(bp_date) from bug_posts where bp_bug = bg_id)
+ WhErE 1 = 1 
+ order by 4 desc 
+
+* In queries.aspx, now preserving the line breaks in the SQL, for easier
+reading.
+
+* Added a little bit of javascript to edit_bug.aspx to set the dropdown
+styles depending on whether something has been selected in any of the
+dropdowns or not.   The javascript toggles between "edit_bug_option"
+and "edit_bug_option_none" styles in btnet_base.css.
+
+
+-----------------------------------------------------------------------
 Version 2.7.6  2/8/2008
 -----------------------------------------------------------------------
 
