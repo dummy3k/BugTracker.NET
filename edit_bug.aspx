@@ -292,8 +292,8 @@ void Page_Load(Object sender, EventArgs e)
 			dr = btnet.Bug.get_bug_datarow(id, security, ds_custom_cols);
             Session["bug_datarow"] = dr;
 
-            load_dropdowns(dr, security.user);            
-            
+            load_dropdowns(dr, security.user);
+
 			if (dr == null)
 			{
 				display_bug_not_found(id);
@@ -609,7 +609,7 @@ void Page_Load(Object sender, EventArgs e)
 		// needs to be reloaded if project changed
 		load_project_and_user_dropdowns(null);
 
-        Workflow.fill_status_dropdown((DataRow)Session["bug_datarow"], security.user, status.Items);        
+        Workflow.fill_status_dropdown((DataRow)Session["bug_datarow"], security.user, status.Items);
 
 	}
 
@@ -991,7 +991,7 @@ void set_shortdesc_field_permission()
 	// turn on the spans to hold the data
 	if (id != 0)
 	{
-		static_short_desc.Visible = true;
+		static_short_desc.Style["display"] = "";
 		short_desc.Visible = false;
 	}
 
@@ -1349,7 +1349,7 @@ void load_dropdowns(DataRow dr, User user)
         status.DataBind();
         status.Items.Insert(0, new ListItem("[no status]", "0"));
     }
-       
+
 	udf.DataSource  = ds_dropdowns.Tables[5];
 	udf.DataTextField = "udf_name";
 	udf.DataValueField = "udf_id";

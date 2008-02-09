@@ -17,19 +17,27 @@ Release notes:
 
 
 -----------------------------------------------------------------------
-Version 2.7.6  2/XXXXX/2008
+Version 2.7.6  2/8/2008
 -----------------------------------------------------------------------
 
-* Added file App_Code\workflow.cs, a designated spot for your custom C#
-code to control the transition of statuses.  For example, if you want
-to say that the only valid status after "tested" is "deployed", or if
-you only want users in the "testers" group to mark a bug as "tested",
-then you could add your logic to this file.  See the comments in the
-file for more detail.
+* Fixed bug: when user has only view or reporter permission, the bug's
+short description was hidden on the edit_bug.aspx page.
 
 * Changed the implementation of filters dropdowns in the bug lists so 
 that usually, they only show choices that are actually present in the 
-bug list.
+bug list.  Before this change, if you had external users looking at
+bugs assigned to internal users, the filter dropdowns would have 
+been missing the internal users. Thanks to Suchacek Zdenek for
+reporting this.
+
+* I added a way to make it a bit easier for somebody with C# coding
+skills to build strict workflow rules in BugTracker.NET.  See the
+new file, App_Code\workflow.cs.  It's  the designated spot for your 
+custom C# code to control the transition of statuses.  For example, if
+you want to say that the only valid status after "tested" is
+"deployed", or if you only want users in the "testers" group to mark a
+bug as "tested", then you could add your logic to this file.  See the
+comments in the file for more detail.
 
 -----------------------------------------------------------------------
 Version 2.7.5  2/2/2008
