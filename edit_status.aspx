@@ -206,7 +206,7 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td class=lbl>Default Selection:</td>
-	<td><asp:checkbox runat="server" class=txt id="default_selection"/></td>
+	<td><asp:checkbox runat="server" class=cb id="default_selection"/></td>
 	<td>&nbsp</td>
 	</tr>
 

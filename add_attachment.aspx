@@ -169,7 +169,7 @@ Add attachment to <% Response.Write(Convert.ToString(bugid)); %>
 
 			<tr>
 			<td colspan=3>
-			<asp:checkbox runat="server" class=txt id="internal_only"/>
+			<asp:checkbox runat="server" class=cb id="internal_only"/>
 			<span runat="server" id="internal_only_label">Visible to internal users only</span>
 			</td>
 			</tr>

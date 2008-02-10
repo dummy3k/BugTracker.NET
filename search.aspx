@@ -329,7 +329,7 @@ void do_query()
 
 	string comments_clause = "";
 	if (like2.Value != "") {
-		comments_clause = " bg_id in (select bp_bug from bug_posts where bp_type = 'comment' and isnull(bp_comment_search,bp_comment) like";
+		comments_clause = " bg_id in (select bp_bug from bug_posts where bp_type in ('comment','received','sent') and isnull(bp_comment_search,bp_comment) like";
 		comments_clause += " N'%" + like2_string + "%'";
 		if (security.user.external_user) {
 			comments_clause += " and bp_hidden_from_external_users = 0";
@@ -340,7 +340,7 @@ void do_query()
 
 	string comments_since_clause = "";
 	if (comments_since.Value != "") {
-		comments_since_clause = " bg_id in (select bp_bug from bug_posts where bp_type = 'comment' and bp_date > '";
+		comments_since_clause = " bg_id in (select bp_bug from bug_posts where bp_type in ('comment','received','sent') and bp_date > '";
 		comments_since_clause += Util.format_local_date_into_db_format(comments_since.Value).Replace(" 12:00:00","");
 		comments_since_clause += "')\n";
 	}
@@ -1314,7 +1314,7 @@ function on_change()
 
 	var comments_clause = ""
 	if (frm.like2.value != "") {
-		comments_clause = " bg_id in (select bp_bug from bug_posts where bp_type = 'comment' and isnull(bp_comment_search,bp_comment) like";
+		comments_clause = " bg_id in (select bp_bug from bug_posts where bp_type in ('comment','received','sent') and isnull(bp_comment_search,bp_comment) like";
 		comments_clause += " N'%" + like2_string + "%'";
 		<% if (security.user.external_user) { %>
 		comments_clause += " and bp_hidden_from_external_users = 0"
@@ -1324,7 +1324,7 @@ function on_change()
 
 	var comments_since_clause = ""
 	if (frm.comments_since.value != "") {
-		comments_since_clause = " bg_id in (select bp_bug from bug_posts where bp_type = 'comment' and bp_date > '";
+		comments_since_clause = " bg_id in (select bp_bug from bug_posts where bp_type in ('comment','received','sent') and bp_date > '";
 		comments_since_clause += frm.comments_since.value + "')\n";
 	}
 
@@ -1705,7 +1705,7 @@ function set_project_changed() {
 <table border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> description contains:&nbsp;</span>
-		<td colspan=2><input type=text id="like" runat="server" onkeydown="search_criteria_onkeydown(this,event)" onkeyup="search_criteria_onkeyup(this,event)"  size=50 autocomplete="off">
+		<td colspan=2><input type=text class=txt id="like" runat="server" onkeydown="search_criteria_onkeydown(this,event)" onkeyup="search_criteria_onkeyup(this,event)"  size=50 autocomplete="off">
 
 
 		<% if (show_udf)
@@ -1723,14 +1723,14 @@ function set_project_changed() {
 
 	<tr>
 		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments contain:&nbsp;</span>
-		<td colspan=2><input type=text id="like2" runat="server" onkeyup="on_change()" size=50  autocomplete="off">
+		<td colspan=2><input type=text class=txt id="like2" runat="server" onkeyup="on_change()" size=50  autocomplete="off">
 		</td>
 	</tr>
 
 
 	<tr>
 		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments since:&nbsp;</span>
-		<td colspan=2><input type=text id="comments_since" runat="server" onkeyup="on_change()" size=10>
+		<td colspan=2><input type=text class=txt id="comments_since" runat="server" onkeyup="on_change()" size=10>
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.comments_since',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
 			[select]
@@ -1741,7 +1741,7 @@ function set_project_changed() {
 
 	<tr>
 		<td><span class=lbl>"Reported on" from date:&nbsp;</span>
-		<td colspan=2><input runat="server" type="text" id="from_date" maxlength=10 size=10 onchange="on_change()">
+		<td colspan=2><input runat="server" type=text class=txt  id="from_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.from_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
 			[select]
@@ -1749,7 +1749,7 @@ function set_project_changed() {
 
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			<span class=lbl>to:&nbsp;</span>
-			<input runat="server" type="text" id="to_date" maxlength=10 size=10 onchange="on_change()">
+			<input runat="server" type=text class=txt  id="to_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.to_date',    null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
 			[select]
@@ -1759,7 +1759,7 @@ function set_project_changed() {
 
 	<tr>
 		<td><span class=lbl>"Last updated on" from date:&nbsp;</span>
-		<td colspan=2><input runat="server" type="text" id="lu_from_date" maxlength=10 size=10 onchange="on_change()">
+		<td colspan=2><input runat="server" type=text class=txt  id="lu_from_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_from_date',null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
 			[select]
@@ -1767,7 +1767,7 @@ function set_project_changed() {
 
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			<span class=lbl>to:&nbsp;</span>
-			<input runat="server" type="text" id="lu_to_date" maxlength=10 size=10 onchange="on_change()">
+			<input runat="server" type=text class=txt  id="lu_to_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_to_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
 			[select]
@@ -1891,7 +1891,7 @@ function set_project_changed() {
 			else
 			{
 
-				Response.Write ("<input type=text");
+				Response.Write ("<input type=text class=txt");
 				Response.Write ("  onkeyup=\"on_change()\" ");
 
 				// match the size of the text field to the size of the database field
@@ -2004,7 +2004,7 @@ else
 			Response.Write("<td><span class=lbl>priority:</span><br><select name=mass_priority id=mass_priority></select>");
 			Response.Write("<td><span class=lbl>assigned to:</span><br><select name=mass_assigned_to id=mass_assigned_to></select>");
 			Response.Write("<td><span class=lbl>status:</span><br><select name=mass_status id=mass_status></select>");
-			Response.Write("<tr><td colspan=5>OR DELETE:&nbsp;<input type=checkbox name=mass_delete>");
+			Response.Write("<tr><td colspan=5>OR DELETE:&nbsp;<input type=checkbox class=cb name=mass_delete>");
 			Response.Write("<tr><td colspan=5 align=center><input type=submit value='Update/Delete All'>");
 			Response.Write("</table></form><p><script>load_massedit_selects()</script>");
 		}

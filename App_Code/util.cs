@@ -266,7 +266,7 @@ namespace btnet
             Response.Write("<td nowrap valign=middle>");
             Response.Write("<form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>");
             Response.Write("<font size=1>id:&nbsp;</font>");
-            Response.Write("<input style='font-size: 8pt;' size=4 type=text name=id accesskey=i>");
+            Response.Write("<input style='font-size: 8pt;' size=4 type=text class=txt name=id accesskey=i>");
             Response.Write("<input class=btn style='font-size: 8pt;' type=submit value='go to ");
             Response.Write(Util.get_setting("SingularBugLabel", "bug"));
             Response.Write("'>");

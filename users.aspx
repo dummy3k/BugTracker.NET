@@ -148,7 +148,7 @@ void Page_Load(Object sender, EventArgs e)
 <td align=right>
 	<form runat="server">
 	<span class=lbl>hide inactive users:</span>
-	<asp:CheckBox id="hide_inactive_users" runat="server" AutoPostBack="true" OnCheckedChanged="Page_Load"/>
+	<asp:CheckBox id="hide_inactive_users" class=cb runat="server" AutoPostBack="true" OnCheckedChanged="Page_Load"/>
 	</form>
 </table>
 

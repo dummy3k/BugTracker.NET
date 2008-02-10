@@ -277,19 +277,19 @@ void on_update (Object sender, EventArgs e)
 
 
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="external_user"/></td>
+		<td><asp:checkbox runat="server" class=cb id="external_user"/></td>
 		<td class=lbl>External users&nbsp;&nbsp; <span class=smallnote>(External users cannot view posts marked "Visible for internal usrs only")</span></td>
 		<td>&nbsp</td>
 		</tr>
 
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_be_assigned_to"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_be_assigned_to"/></td>
 		<td class=lbl>Members of this org appear in "assigned to" dropdown in edit bug page</td>
 		<td>&nbsp</td>
 		</tr>
 
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="non_admins_can_use"/></td>
+		<td><asp:checkbox runat="server" class=cb id="non_admins_can_use"/></td>
 		<td class=lbl>Non-admin with permission to add users can add users to this org</td>
 		<td>&nbsp</td>
 		</tr>
@@ -396,39 +396,39 @@ void on_update (Object sender, EventArgs e)
 		</tr>
 
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_edit_sql"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_edit_sql"/></td>
 		<td class=lbl>Can edit sql and create/edit queries for everybody</td>
 		<td>&nbsp</td>
 		</tr>
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_delete_bug"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_delete_bug"/></td>
 		<td class=lbl>Can delete bugs</td>
 		<td>&nbsp</td>
 		</tr>
 
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_edit_and_delete_posts"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_edit_and_delete_posts"/></td>
 		<td class=lbl>Can edit and delete comments and attachments</td>
 		<td>&nbsp</td>
 		</tr>
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_merge_bugs"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_merge_bugs"/></td>
 		<td class=lbl>Can merge two bugs into one</td>
 		<td>&nbsp</td>
 		</tr>
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_mass_edit_bugs"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_mass_edit_bugs"/></td>
 		<td class=lbl>Can mass edit bugs on search page</td>
 		<td>&nbsp</td>
 		</tr>
 
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_use_reports"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_use_reports"/></td>
 		<td class=lbl>Can use reports</td>
 		<td>&nbsp</td>
 		</tr>
 		<tr>
-		<td><asp:checkbox runat="server" class=txt id="can_edit_reports"/></td>
+		<td><asp:checkbox runat="server" class=cb id="can_edit_reports"/></td>
 		<td class=lbl>Can create/edit reports</td>
 		<td>&nbsp</td>
 		</tr>

@@ -325,7 +325,7 @@ into "INTO" <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>.
 <td class=lbl align=right>
 FROM <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>:
 <td align=left valign=bottom>
-<input type=text id="from_bug" runat="server" size=8>
+<input type=text class=txt id="from_bug" runat="server" size=8>
 <span class=static id="static_from_bug" runat="server" style='display: none;'></span>
 <br>
 <span class=static id="static_from_desc" runat="server" style='display: none;'></span>
@@ -337,7 +337,7 @@ FROM <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>:
 <td class=lbl align=right>
 INTO <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>:
 <td align=left valign=bottom>
-<input type=text id="into_bug" runat="server" size=8>
+<input type=text class=txt id="into_bug" runat="server" size=8>
 <span class=static id="static_into_bug" runat="server" style='display: none;'></span>
 <br>
 <span class=static id="static_into_desc" runat="server" style='display: none;'></span>

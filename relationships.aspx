@@ -252,8 +252,8 @@ if (permission_level != Security.PERMISSION_READONLY)
 <p>
 <form class=frm runat="server" action="relationships.aspx">
 <table>
-<tr><td>Related ID:<td><input size=8 name=bugid2>
-<tr><td>Comment:<td><input name=type size=90 max=500>
+<tr><td>Related ID:<td><input type=text class=txt size=8 name=bugid2>
+<tr><td>Comment:<td><input  type=text class=txt name=type size=90 max=500>
 
 <tr><td colspan=2>
 Related ID is sibling<asp:RadioButton runat="server" GroupName="direction" value="0" id="siblings"/>

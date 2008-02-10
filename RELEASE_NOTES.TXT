@@ -55,6 +55,7 @@ explanation from Web.config:
 	permissions beyond View Only and Reporter, the system will
 	automatically reduce his permissions downward.
 
+* Modified search of comments to also search email bodies.
 
 * Added another query sample to setup.sql.  This one shows the bugs
 that have been stuck the longest time without a status change.
@@ -84,11 +85,7 @@ select case
 * In queries.aspx, now preserving the line breaks in the SQL, for easier
 reading.
 
-* Added a little bit of javascript to edit_bug.aspx to set the dropdown
-styles depending on whether something has been selected in any of the
-dropdowns or not.   The javascript toggles between "edit_bug_option"
-and "edit_bug_option_none" styles in btnet_base.css.
-
+* Cosmetic changes to edit_bug.aspx, which I hope folks will like.
 
 -----------------------------------------------------------------------
 Version 2.7.6  2/8/2008

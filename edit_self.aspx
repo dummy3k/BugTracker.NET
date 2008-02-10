@@ -229,7 +229,7 @@ void on_update (Object sender, EventArgs e)
 
 		// update user
 		dbutil.execute_nonquery(sql);
-        
+
         // update the password
         if (pw.Value != "")
         {
@@ -402,13 +402,13 @@ function show_notification_settings()
 
 	<tr>
 	<td class=lbl>Enable <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>list popups:</td>
-	<td><asp:checkbox runat="server" class=txt id="enable_popups"/></td>
+	<td><asp:checkbox runat="server" class=cb id="enable_popups"/></td>
 	<td>&nbsp</td>
 	</tr>
 
 	<tr>
 	<td class=lbl>Edit text using colors and fonts:</td>
-	<td><asp:checkbox runat="server" class=txt id="use_fckeditor"/></td>
+	<td><asp:checkbox runat="server" class=cb id="use_fckeditor"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -473,7 +473,7 @@ function show_notification_settings()
 
 	<tr>
 	<td class=lbl>Enable notifications:</td>
-	<td><asp:checkbox runat="server" class=txt id="enable_notifications"/></td>
+	<td><asp:checkbox runat="server" class=cb id="enable_notifications"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -491,7 +491,7 @@ function show_notification_settings()
 
 	<tr>
 	<td class=lbl>Auto-subscribe to all items:</td>
-	<td><asp:checkbox runat="server" class=txt id="auto_subscribe"/></td>
+	<td><asp:checkbox runat="server" class=cb id="auto_subscribe"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -508,19 +508,19 @@ function show_notification_settings()
 
 	<tr>
 	<td class=lbl>Auto-subscribe to all items ASSIGNED TO you:</td>
-	<td><asp:checkbox runat="server" class=txt id="auto_subscribe_own"/></td>
+	<td><asp:checkbox runat="server" class=cb id="auto_subscribe_own"/></td>
 	<td>&nbsp</td>
 	</tr>
 
 	<tr>
 	<td class=lbl>Auto-subscribe to all items REPORTED BY you:</td>
-	<td><asp:checkbox runat="server" class=txt id="auto_subscribe_reported"/></td>
+	<td><asp:checkbox runat="server" class=cb id="auto_subscribe_reported"/></td>
 	<td>&nbsp</td>
 	</tr>
 
 	<tr>
 	<td class=lbl>Apply subscription changes retroactively:</td>
-	<td colspan=2><asp:checkbox runat="server" class=txt id="retroactive"/>&nbsp;&nbsp;
+	<td colspan=2><asp:checkbox runat="server" class=cb id="retroactive"/>&nbsp;&nbsp;
 	<span class=smallnote>Delete old subscriptions and create new ones, according to above settings.</span></td>
 	<td>&nbsp;</td>
 	</tr>
@@ -573,7 +573,7 @@ function show_notification_settings()
 
 	<tr>
 	<td class=lbl>Send notifications even for items you add or change:</td>
-	<td><asp:checkbox runat="server" class=txt id="send_to_self"/></td>
+	<td><asp:checkbox runat="server" class=cb id="send_to_self"/></td>
 	<td>&nbsp</td>
 	</tr>
 

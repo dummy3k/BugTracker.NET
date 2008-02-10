@@ -217,7 +217,7 @@ function set_action(val)
 <table border=0><tr><td>
 <form class="frm" runat="server">
 <span class=lbl>Enter revision to be added to bug <span id="bugid_label" runat="server"></span>
-<input type="text" id="rev" value="0" runat="server">
+<input type=text class=txt id="rev" value="0" runat="server">
 <input type="hidden" id="hidden_bugid" value="0" runat="server" />
 <input type="hidden" id="action" name="action" value="" runat="server" />
 <p>

@@ -378,13 +378,13 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>Active:</td>
-	<td><asp:checkbox runat="server" class=txt id="active"/></td>
+	<td><asp:checkbox runat="server" class=cb id="active"/></td>
 	<td>&nbsp</td>
 	</tr>
 
 	<tr>
 	<td class=lbl>Default Selection in "projects" Dropdown:</td>
-	<td><asp:checkbox runat="server" class=txt id="default_selection"/></td>
+	<td><asp:checkbox runat="server" class=cb id="default_selection"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -403,7 +403,7 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>Auto-Assign New <% Response.Write(Util.get_setting("PluralBugLabel","bug")); %>  to Default User:</td>
-	<td><asp:checkbox runat="server" class=txt id="auto_assign"/></td>
+	<td><asp:checkbox runat="server" class=cb id="auto_assign"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -419,7 +419,7 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>Auto-Subscribe Default User to Notifications:</td>
-	<td><asp:checkbox runat="server" class=txt id="auto_subscribe"/></td>
+	<td><asp:checkbox runat="server" class=cb id="auto_subscribe"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -441,7 +441,7 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>Enable Receiving <% Response.Write(Util.get_setting("PluralBugLabel","bug")); %> via POP3 (btnet_service.exe):</td>
-	<td><asp:checkbox runat="server" class=txt id="enable_pop3"/></td>
+	<td><asp:checkbox runat="server" class=cb id="enable_pop3"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -531,7 +531,7 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>Enable Custom Dropdown 1:</td>
-	<td><asp:checkbox runat="server" class=txt id="enable_custom_dropdown1"/></td>
+	<td><asp:checkbox runat="server" class=cb id="enable_custom_dropdown1"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -555,7 +555,7 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>Enable Custom Dropdown 2:</td>
-	<td><asp:checkbox runat="server" class=txt id="enable_custom_dropdown2"/></td>
+	<td><asp:checkbox runat="server" class=cb id="enable_custom_dropdown2"/></td>
 	<td>&nbsp</td>
 	</tr>
 
@@ -579,7 +579,7 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>Enable Custom Dropdown 3:</td>
-	<td><asp:checkbox runat="server" class=txt id="enable_custom_dropdown3"/></td>
+	<td><asp:checkbox runat="server" class=cb id="enable_custom_dropdown3"/></td>
 	<td>&nbsp</td>
 	</tr>
 

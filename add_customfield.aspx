@@ -292,7 +292,7 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td class=lbl>Required (NULL or NOT NULL):</td>
-	<td><asp:checkbox runat="server" class=txt id="required"/></td>
+	<td><asp:checkbox runat="server" class=cb id="required"/></td>
 	<td>&nbsp</td>
 	</tr>
 

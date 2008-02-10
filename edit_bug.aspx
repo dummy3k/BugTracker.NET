@@ -2404,7 +2404,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				}
 				else
 				{
-					Response.Write ("<input type=text ");
+					Response.Write ("<input type=text class=txt ");
 
 					// match the size of the text field to the size of the database field
 					if (drcc["datatype"].ToString().IndexOf("char") > -1)
@@ -2580,7 +2580,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>
 
 	<tr><td  nowrap>
-		<asp:checkbox runat="server" class=txt id="internal_only"/>
+		<asp:checkbox runat="server" class=cb id="internal_only"/>
 		<span runat="server" id="internal_only_label">Comment visible to internal users only</span>
 
 
