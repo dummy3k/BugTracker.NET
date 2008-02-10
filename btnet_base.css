@@ -250,22 +250,23 @@ padding: 3px;
 
 
 select {
-	font-size: 8pt;
+	font-size: 9pt;
 }
 
 option {
-	font-size: 8pt;
+	font-size: 9pt;
 }
 
 .edit_bug_option
 {
-	font-size: 8pt;
+	font-size: 9pt;
 }
 
 .edit_bug_option_none
 {
-	font-size: 8pt;
-	background: #f6f6f6;
+	font-size: 9pt;
+	color: #666666;
+	background: #f3f3f3;
 }
 
 input  {

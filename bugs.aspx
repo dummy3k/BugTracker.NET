@@ -65,9 +65,9 @@ void do_query()
 	// as a last resort, grab some query
 	if (bug_sql == null)
 	{
-		sql = @"select top 1 qu_sql from queries order by case when qu_default = 1 then 1 else 0 end desc";
-		bug_sql = (string)dbutil.execute_scalar(sql);
+		sql = @"select top 1 qu_id, qu_sql from queries order by case when qu_default = 1 then 1 else 0 end desc";
 		DataRow dr = dbutil.get_datarow(sql);
+		bug_sql = (string) dr["qu_sql"];
 		if (dr != null)
 		{
 			qu_id_string = Convert.ToString(dr["qu_id"]);

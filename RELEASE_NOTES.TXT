@@ -20,18 +20,41 @@ Release notes:
 Version 2.7.7  2/XXXXX/2008
 -----------------------------------------------------------------------
 
+* Added new Web.config setting "AllowGuestWithoutLogin".  This is the
+explanation from Web.config:
+
+	There's a special user in the database, "guest". Think of it as a 
+	user account that can be shared by several people. The guest user 
+	can't save settings and can't save searches. If 
+	"AllowGuestWithoutLogin" is set to "0", then the guest user still 
+	has to login with a password.  If set to "1", then the guest user 
+	doesn't need to even enter a password. Instead, a link will appear 
+	on the login page, default.aspx, saying:
+
+	Continue as "guest" without logging in
+
+	You can control the per-project permissions of the guest user in the
+	same way as other users EXCEPT that even if you give the guest user
+	permissions beyond View Only and Reporter, the system will
+	automatically reduce his permissions downward.
+
+
 * Added another query sample to setup.sql.  This one shows the bugs
 that have been stuck the longest time without a status change.
 
 select case 
- when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 90 then '#ff9999' 
- when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 30 then '#ffcccc' 
- when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 7 then '#ffdddd'  
+ when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 90 
+ 	then '#ff9999' 
+ when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 30 
+ 	then '#ffcccc' 
+ when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 7 
+ 	then '#ffdddd'  
  else '#ffffff' end, 
  bg_id [id], bg_short_desc [desc], 
  datediff(d, isnull(bp_date,bg_reported_date), getdate()) [days in status],
  st_name [status], 
- isnull(bp_comment,'') [last status change], isnull(bp_date,bg_reported_date) [status date]
+ isnull(bp_comment,'') [last status change], 
+ isnull(bp_date,bg_reported_date) [status date]
  from bugs
  inner join statuses on bg_status = st_id
  left outer join bug_posts on bg_id = bp_bug

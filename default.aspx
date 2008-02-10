@@ -125,9 +125,9 @@ void on_logon(Object sender, EventArgs e)
 	}
 
     bool authenticated = btnet.Authenticate.check_password(user.Value, pw.Value);
-    
+
     if (authenticated)
-    {        
+    {
         sql = "select us_id from users where us_username = N'$us'";
     	sql = sql.Replace("$us", user.Value.Replace("'","''"));
     	DataRow dr = dbutil.get_datarow(sql);
@@ -217,8 +217,15 @@ Response.Write (Application["custom_logo"]);
 
 	</table>
 
+<% if (Util.get_setting("AllowGuestWithoutLogin","0") == "1") { %>
+<p>
+&nbsp;<a href="bugs.aspx">Continue as "guest" without logging in</a>&nbsp;
+<p>
+<% } %>
+
 </form>
 </td></tr></table>
+
 <% Response.Write (Util.get_setting("CustomWelcomeHtml","")); %>
 </div>
 </body>

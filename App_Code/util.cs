@@ -46,63 +46,109 @@ namespace btnet
 			string original_querystring = Request.ServerVariables["QUERY_STRING"].ToString().ToLower();
 			string target = "default.aspx?url=" + original_url + "&qs=" + HttpUtility.UrlEncode(original_querystring);
 
+			DataRow dr = null;
+
 			if (cookie == null)
 			{
-				Util.write_to_log ("se_id cookie is null, so redirecting");
-				Util.write_to_log ("Trouble logging in?  Your browser might be failing to send back its cookie.");
-				Util.write_to_log ("See Help forum at http://sourceforge.net/forum/forum.php?forum_id=226938");
-				Response.Redirect(target);
+				if (Util.get_setting("AllowGuestWithoutLogin","0") == "0")
+				{
+					Util.write_to_log ("se_id cookie is null, so redirecting");
+					Util.write_to_log ("Trouble logging in?  Your browser might be failing to send back its cookie.");
+					Util.write_to_log ("See Help forum at http://sourceforge.net/forum/forum.php?forum_id=226938");
+					Response.Redirect(target);
+				}
+			}
+			else
+			{
+				// guard against "Sql Injection" exploit
+				string se_id = cookie.Value.Replace("'", "''");
+
+				// check for existing session for active user
+				string sql = @"/* check session */
+					declare @project_admin int
+					select @project_admin = count(1)
+						from sessions
+						inner join project_user_xref on pu_user = se_user
+						and pu_admin = 1
+						where se_id = '$se';
+
+					select us_id, us_admin,
+					us_username, us_firstname, us_lastname,
+					isnull(us_email,'') us_email,
+					isnull(us_bugs_per_page,10) us_bugs_per_page,
+					isnull(us_forced_project,0) us_forced_project,
+					us_use_fckeditor,
+					us_enable_bug_list_popups,
+					og.*,
+					isnull(us_forced_project, 0 ) us_forced_project,
+					isnull(pu_permission_level, $dpl) pu_permission_level,
+					@project_admin [project_admin]
+					from sessions
+					inner join users on se_user = us_id
+					inner join orgs og on us_org = og_id
+					left outer join project_user_xref
+						on pu_project = us_forced_project
+						and pu_user = us_id
+					where se_id = '$se'
+					and us_active = 1";
+
+
+				sql = sql.Replace("$se", se_id);
+				sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
+				dr = dbutil.get_datarow(sql);
+
 			}
 
-			Util.write_to_log ("session=" + cookie.Value);
+			if (dr == null)
+			{
+				if (Util.get_setting("AllowGuestWithoutLogin","0") == "1")
+				{
+					// allow users in, even without logging on.
+					// The user will have the permissions of the "guest" user.
+					string sql = @"/* get guest  */
+					select us_id, us_admin,
+					us_username, us_firstname, us_lastname,
+					isnull(us_email,'') us_email,
+					isnull(us_bugs_per_page,10) us_bugs_per_page,
+					isnull(us_forced_project,0) us_forced_project,
+					us_use_fckeditor,
+					us_enable_bug_list_popups,
+					og.*,
+					isnull(us_forced_project, 0 ) us_forced_project,
+					isnull(pu_permission_level, $dpl) pu_permission_level,
+					0 [project_admin]
+					from users
+					inner join orgs og on us_org = og_id
+					left outer join project_user_xref
+						on pu_project = us_forced_project
+						and pu_user = us_id
+					where us_username = 'guest'
+					and us_active = 1";
 
-			// guard against "Sql Injection" exploit
-			string se_id = cookie.Value.Replace("'", "''");
+					sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
+					dr = dbutil.get_datarow(sql);
+				}
+			}
 
-			// check for existing session for active user
-			string sql = @"/* check session */
-				declare @project_admin int
-				select @project_admin = count(1)
-					from sessions
-					inner join project_user_xref on pu_user = se_user
-					and pu_admin = 1
-					where se_id = '$se';
-
-				select us_id, us_admin,
-				us_username, us_firstname, us_lastname,
-				isnull(us_email,'') us_email,
-				isnull(us_bugs_per_page,10) us_bugs_per_page,
-				isnull(us_forced_project,0) us_forced_project,
-				us_use_fckeditor,
-				us_enable_bug_list_popups,
-                og.*,
-				isnull(us_forced_project, 0 ) us_forced_project,
-				isnull(pu_permission_level, $dpl) pu_permission_level,
-				@project_admin [project_admin]
-				from sessions
-				inner join users on se_user = us_id
-				inner join orgs og on us_org = og_id
-				left outer join project_user_xref
-					on pu_project = us_forced_project
-					and pu_user = us_id
-				where se_id = '$se'
-				and us_active = 1";
-
-
-			sql = sql.Replace("$se", se_id);
-			sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
-
-			DataRow dr = dbutil.get_datarow(sql);
-
-			// no previously established session
+			// no previous session, no guest login allowed
 			if (dr == null)
 			{
 				Response.Redirect(target);
 			}
+			else
+			{
+				user.set_from_db(dr);
+			}
 
-            asp_net_context.Session["session_cookie"] = cookie.Value;
 
-            user.set_from_db(dr);
+            if (cookie != null)
+            {
+            	asp_net_context.Session["session_cookie"] = cookie.Value;
+			}
+			else
+			{
+				asp_net_context.Session["session_cookie"]  = "";
+			}
 
 			if (level == MUST_BE_ADMIN && !user.is_admin)
 			{
@@ -197,7 +243,14 @@ namespace btnet
 
             if (auth_method == "plain")
             {
-                write_menu_item(Response, this_link, "logoff", "logoff.aspx");
+                if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
+                {
+                	write_menu_item(Response, this_link, "login", "default.aspx");
+				}
+				else
+				{
+					write_menu_item(Response, this_link, "logoff", "logoff.aspx");
+				}
             }
 
             if (Util.get_setting("CustomMenuLinkLabel", "") != "")
@@ -221,8 +274,15 @@ namespace btnet
             Response.Write("</td>");
 
             Response.Write("<td nowrap valign=middle>");
-            Response.Write("<span class=smallnote>logged in as:<br>");
-            Response.Write(user.username);
+			if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
+			{
+				Response.Write("<span class=smallnote>");
+			}
+			else
+			{
+				Response.Write("<span class=smallnote>logged in as:<br>");
+			}
+           	Response.Write(user.username);
             Response.Write("</span></td>");
 
             Response.Write("<td nowrap valign=middle>");
@@ -1052,16 +1112,16 @@ drop table #temp";
         public static string get_distinct_vals_from_dataset(DataTable dt, int col)
         {
             SortedDictionary<string,int> dict = new SortedDictionary<string,int>();
-            
+
             foreach (DataRow row in dt.Rows)
             {
                 dict[Convert.ToString(row[col])] = 1;
             }
-            
+
             string vals = "";
 
             foreach (string s in dict.Keys)
-            { 
+            {
                 if (vals != "") vals += "|";
 
                 vals += s;
