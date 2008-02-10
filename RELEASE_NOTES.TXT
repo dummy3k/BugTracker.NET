@@ -16,6 +16,23 @@ Release notes:
 * automatic user creation, self registration
 
 
+
+
+* change setup.sql for guest
+* username to use as template for self-registration
+enter email address, store rec, get back email with link
+click on email, fill in name, password, but must enforce strong passwords
+when done, go to bugs.aspx
+
+if forgot password, store rec, send email
+click on link, reenter a couple passwords
+when done, go to bugs.aspx
+
+
+
+
+
+
 -----------------------------------------------------------------------
 Version 2.7.7  2/XXXXX/2008
 -----------------------------------------------------------------------

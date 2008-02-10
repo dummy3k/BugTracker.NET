@@ -366,9 +366,26 @@ function clone()
 
 function on_body_load()
 {
-	// change the select styles depending on whether something has been selected or not
 	var cls = (navigator.userAgent.indexOf("MSIE") > 0) ? "className" : "class";
 	sels = document.getElementsByTagName("select");
+
+	// resize the options, making them all as wide as the widest
+	max_width = 0
+
+	for (i = 0; i < sels.length; i++)
+	{
+		if (sels[i].offsetWidth > max_width)
+		{
+			max_width = sels[i].offsetWidth;
+		}
+	}
+
+	for (i = 0; i < sels.length; i++)
+	{
+		sels[i].style.width = max_width
+	}
+
+	// change the select styles depending on whether something has been selected or not
 	for (i = 0; i < sels.length; i++)
 	{
 		sels[i].onchange = on_body_load
@@ -383,4 +400,3 @@ function on_body_load()
 		}
 	}
 }
-
