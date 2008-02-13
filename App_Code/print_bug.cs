@@ -31,43 +31,45 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		public static void print_bug (HttpResponse Response, DataRow dr, bool this_is_admin, bool this_external_user)
+		public static void print_bug (HttpResponse Response, DataRow dr, bool this_is_admin, bool this_external_user, bool include_style)
 		{
 
 			int bugid = Convert.ToInt32(dr["id"]);
 			string string_bugid = Convert.ToString(bugid);
 
-			Response.Write ("<style>");
-			string path_base = HttpContext.Current.Server.MapPath("./") + "btnet_base_notifications.css";
-			string path_custom = HttpContext.Current.Server.MapPath("./") + "btnet_custom_notifications.css";
+            if (include_style)
+            {
+                Response.Write("<style>\n");
+                string path_base = HttpContext.Current.Server.MapPath("./") + "btnet_base_notifications.css";
+                string path_custom = HttpContext.Current.Server.MapPath("./") + "btnet_custom_notifications.css";
 
-			if (System.IO.File.Exists(path_base))
-			{
-				Response.WriteFile(path_base);
-			}
-			else
-			{
-				Response.WriteFile(HttpContext.Current.Server.MapPath("./") + "btnet_base.css");
-			}
-			Response.Write ("\n");
+                if (System.IO.File.Exists(path_base))
+                {
+                    Response.WriteFile(path_base);
+                }
+                else
+                {
+                    Response.WriteFile(HttpContext.Current.Server.MapPath("./") + "btnet_base.css");
+                }
+                Response.Write("\n");
 
-			if (System.IO.File.Exists(path_custom))
-			{
-				Response.WriteFile(path_custom);
-			}
-			else
-			{
-				Response.WriteFile(HttpContext.Current.Server.MapPath("./custom/") + "btnet_custom.css");
-			}
+                if (System.IO.File.Exists(path_custom))
+                {
+                    Response.WriteFile(path_custom);
+                }
+                else
+                {
+                    Response.WriteFile(HttpContext.Current.Server.MapPath("./custom/") + "btnet_custom.css");
+                }
 
-			// underline links in the emails to make them more obvious
-			Response.Write ("\na {text-decoration: underline; }");
-			Response.Write ("\na:visited {text-decoration: underline; }");
-			Response.Write("\na:hover {text-decoration: underline; }");
-			Response.Write ("\n</style>");
+                // underline links in the emails to make them more obvious
+                Response.Write("\na {text-decoration: underline; }");
+                Response.Write("\na:visited {text-decoration: underline; }");
+                Response.Write("\na:hover {text-decoration: underline; }");
+                Response.Write("\n</style>\n");
+            }
 
-
-			Response.Write ("<body style=background:white>");
+			Response.Write ("<body style='background:white'>");
 			Response.Write ("<b>"
 				+ btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))
 				+ " ID:&nbsp;<a href="
@@ -86,26 +88,27 @@ namespace btnet
 				+ HttpUtility.HtmlEncode((string)dr["short_desc"])
 				+ "</a></b><p>");
 
-			Response.Write ("<table border=1 cellpadding=3 cellspacing=0>");
-			Response.Write ("<tr><td>Last changed by<td>"
+			// start of the table with the bug fields
+			Response.Write ("\n<table border=1 cellpadding=3 cellspacing=0>");
+            Response.Write("\n<tr><td>Last changed by<td>"
 				+ btnet.Util.format_username((string)dr["last_updated_user"],(string)dr["last_updated_fullname"])
 				+ "&nbsp;");
-			Response.Write ("<tr><td>Reported By<td>"
+            Response.Write("\n<tr><td>Reported By<td>"
 				+ btnet.Util.format_username((string)dr["reporter"],(string)dr["reporter_fullname"])
 				+ "&nbsp;");
-			Response.Write ("<tr><td>Reported On<td>" + btnet.Util.format_db_date(dr["reported_date"]) + "&nbsp;");
-			Response.Write ("<tr><td>Project<td>" + dr["current_project"] + "&nbsp;");
-			Response.Write ("<tr><td>Organization<td>" + dr["og_name"] + "&nbsp;");
-			Response.Write ("<tr><td>Category<td>" + dr["category_name"] + "&nbsp;");
-			Response.Write ("<tr><td>Priority<td>" + dr["priority_name"] + "&nbsp;");
-			Response.Write ("<tr><td>Assigned<td>"
+            Response.Write("\n<tr><td>Reported On<td>" + btnet.Util.format_db_date(dr["reported_date"]) + "&nbsp;");
+            Response.Write("\n<tr><td>Project<td>" + dr["current_project"] + "&nbsp;");
+            Response.Write("\n<tr><td>Organization<td>" + dr["og_name"] + "&nbsp;");
+            Response.Write("\n<tr><td>Category<td>" + dr["category_name"] + "&nbsp;");
+            Response.Write("\n<tr><td>Priority<td>" + dr["priority_name"] + "&nbsp;");
+            Response.Write("\n<tr><td>Assigned<td>"
 				+ btnet.Util.format_username((string)dr["assigned_to_username"],(string)dr["assigned_to_fullname"])
 				+ "&nbsp;");
-			Response.Write ("<tr><td>Status<td>" + dr["status_name"] + "&nbsp;");
+            Response.Write("\n<tr><td>Status<td>" + dr["status_name"] + "&nbsp;");
 
 			if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			{
-				Response.Write ("<tr><td>"
+                Response.Write("\n<tr><td>"
 					+ btnet.Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")
 					+ "<td>"
 					+ dr["udf_name"] + "&nbsp;");
@@ -122,7 +125,7 @@ namespace btnet
 
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
-				Response.Write ("<tr><td>");
+                Response.Write("\n<tr><td>");
 				Response.Write (drcc["name"]);
 				Response.Write ("<td>");
 
@@ -188,7 +191,7 @@ namespace btnet
 					{
 						if ((int)project_dr["pj_enable_custom_dropdown" + Convert.ToString(i)] == 1)
 						{
-							Response.Write ("<tr><td>");
+                            Response.Write("\n<tr><td>");
 							Response.Write (project_dr["pj_custom_dropdown_label" + Convert.ToString(i)]);
 							Response.Write ("<td>");
 							Response.Write (dr["bg_project_custom_dropdown_value"  + Convert.ToString(i)]);
@@ -200,9 +203,7 @@ namespace btnet
 
 
 
-			Response.Write("</table><p>");
-
-			Response.Write ("<p><table border=1 cellspacing=0 cellpadding=4>");
+			Response.Write("\n</table><p>"); // end of the table with the bug fields
 
 
 			// don't write links, don't show images, do show update history
@@ -211,9 +212,7 @@ namespace btnet
 				false,
 				this_external_user);
 
-			Response.Write ("</table>");
-
-			Response.Write ("<div class=align><table border=0><tr><td></table></div></body>");
+			Response.Write ("</body>");
 
 		}
 
@@ -231,15 +230,14 @@ namespace btnet
 			bool this_external_user)
 		{
 
-			Response.Write ("<table id='posts_table' border=0 cellpadding=0 cellspacing=3>");
+			Response.Write ("\n<table id='posts_table' border=0 cellpadding=0 cellspacing=3>");
 			DataSet ds_posts = btnet.Bug.get_bug_posts(bugid);
 
 			int bp_id;
 			int prev_bp_id = -1;
+
 			foreach (DataRow dr in ds_posts.Tables[0].Rows)
 			{
-
-				Response.Write ("\n");
 
 				if (this_external_user)
 				{
@@ -269,7 +267,7 @@ namespace btnet
 				{
 					// show the comment and maybe an attachment
 					if (prev_bp_id != -1) {
-						Response.Write ("</table>");
+						Response.Write ("\n</table>"); // end the previous table
 					}
 
 					write_post(Response, bugid, permission_level, dr, bp_id, write_links, images_inline,
@@ -285,10 +283,13 @@ namespace btnet
 					prev_bp_id = bp_id;
 				}
 
-				Response.Write ("\n");
-
 			}
-			Response.Write ("</table></table>");
+
+			if (prev_bp_id != -1) {
+				Response.Write ("\n</table>"); // end the previous table
+			}
+
+			Response.Write ("\n</table>");
 		}
 
 		///////////////////////////////////////////////////////////////////////
@@ -309,7 +310,7 @@ namespace btnet
 			string string_post_id = Convert.ToString(post_id);
 			string string_bug_id = Convert.ToString(bugid);
 
-			Response.Write ("\n<tr><td class=cmt><table width=100% ><tr><td align=left>");
+			Response.Write ("\n\n<tr><td class=cmt>\n<table width=100%>\n<tr><td align=left>");
 
 
 			/*
@@ -409,7 +410,7 @@ namespace btnet
 			// Format the date
 			Response.Write (" on ");
 			Response.Write (btnet.Util.format_db_date(dr["bp_date"]));
-			Response.Write ("</span></td>");
+			Response.Write ("</span>");
 
 
 			// Write the links
@@ -519,7 +520,7 @@ namespace btnet
 
 			}
 
-			Response.Write ("</td></td></tr></table><table border=0>\n<tr><td>");
+			Response.Write ("\n</table>\n<table border=0>\n<tr><td>");
 			// the text itself
 			string comment = (string) dr["bp_comment"];
 			string comment_type = (string) dr["bp_content_type"];
@@ -589,7 +590,7 @@ namespace btnet
 			string string_post_id = Convert.ToString(dr["ba_id"]); // intentially "ba"
 			string string_bug_id = Convert.ToString(bugid);
 
-			Response.Write ("<p><span class=pst>");
+			Response.Write ("\n<p><span class=pst>");
 			if (write_links)
 			{
 				Response.Write("<img src=attach.gif>");

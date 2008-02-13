@@ -10,8 +10,8 @@ a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
 /* bug tables */
 
 .bugt {
-	border-collapse: collapse;  
-	border-width: 1px; 
+	border-collapse: collapse;
+	border-width: 1px;
 	border-style: solid;
 	border-color: #aaaaaa;
 	padding: 3px;
@@ -20,21 +20,21 @@ a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
 /* bug table headers */
 
 .bugh {
-	background: #dddddd; 
-	vertical-align: top;  
-	text-align: center; 
+	background: #dddddd;
+	vertical-align: top;
+	text-align: center;
 	border-top: 1px solid #aaaaaa;
 	border-bottom: 1px solid #dddddd;
 	border-left: 1px solid #aaaaaa;
 	border-right: 1px solid #aaaaaa;
 }
 
-/* filter row in bug table heading */ 
+/* filter row in bug table heading */
 
 .bugf {
-	background: #dddddd; 
-	vertical-align: top;  
-	text-align: center; 
+	background: #dddddd;
+	vertical-align: top;
+	text-align: center;
 	border-top: 1px solid #dddddd;
 	border-bottom: 1px solid #aaaaaa;
 	border-left: 1px solid #aaaaaa;
@@ -44,15 +44,15 @@ a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
 /* table cell for bug table */
 .bugd {
 	vertical-align: top;
-	border: 1px solid #aaaaaa; 
+	border: 1px solid #aaaaaa;
 	padding: 3px;
 }
 
 /* other tables, like list of users, projects */
 
 .datat {
-	border-collapse: collapse;  
-	border-width: 1px; 
+	border-collapse: collapse;
+	border-width: 1px;
 	border-style: solid;
 	border-color: #aaaaaa;
 }
@@ -60,9 +60,9 @@ a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
 
 /* table headers */
 .datah {
-	background: #dddddd; 
-	vertical-align: top;  
-	text-align: center; 
+	background: #dddddd;
+	vertical-align: top;
+	text-align: center;
 	border-top: 1px solid #aaaaaa;
 	border-bottom: 1px solid #aaaaaa;
 	border-left: 1px solid #aaaaaa;
@@ -74,8 +74,8 @@ a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
 
 /* table cell */
 .datad {
-background: #ffffff; 
-vertical-align: top;  
+background: #ffffff;
+vertical-align: top;
 border: 1px solid #aaaaaa;
 padding: 3px;
 }
@@ -89,28 +89,28 @@ padding: 3px;
 
 .btn {
 	background: #ffeeaa;
-	color: #0000ff; 
+	color: #0000ff;
 }
 
 .menubar {
-	background: #f0fff0; 
-	padding: 0px; 
+	background: #f0fff0;
+	padding: 0px;
 	border-bottom: 1px solid #00cc00;
 }
 
 .cmt {
-	background:white; 
-	border: 1px #009900 solid; 
+	background:white;
+	border: 1px #009900 solid;
 	padding: 3px;
 }
 
 .cmt_text {
-	font-family:courier; 
+	font-family:courier;
 	font-size: 10pt;
 }
 
 .pst {
-	font-size: 8pt; 
+	font-size: 8pt;
 	color: darkgreen;
 }
 
@@ -124,11 +124,11 @@ padding: 3px;
 }
 
 .logo {
-	background: #00cc00; 
+	background: #00cc00;
 	font-family: arial;
-	padding: 5px; 
-	color: white; 
-	font-size: 12pt; 
+	padding: 5px;
+	color: white;
+	font-size: 12pt;
 	font-weight: bold;
 }
 
@@ -170,18 +170,18 @@ padding: 3px;
 
 
 .buglist_popup {
-	z-index: 111; 
+	z-index: 111;
 	border-left: 1px solid silver;
 	border-top: 1px solid silver;
 	border-right: 2px solid black;
 	border-bottom: 3px solid black;
-	padding: 3px; 
-	position:absolute; top:0; left:0;  
+	padding: 3px;
+	position:absolute; top:0; left:0;
 	background:#ccffcc;
-	color:black; 
+	color:black;
 	display:none;
 	width: 500;
-	font-size: 8pt;  
+	font-size: 8pt;
 	font-family: verdana;
 	text-overflow: clip;
 }
@@ -284,7 +284,7 @@ textarea {
 	border: 1px solid #cccccc;
 }
 
-#edit_bug_menu ul 
+#edit_bug_menu ul
 {
 	list-style: none;
 	padding-left: 0px;

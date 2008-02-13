@@ -62,6 +62,11 @@ void Page_Load(Object sender, EventArgs e)
 <head>
 <title id="titl" runat="server">btnet print bugs detail</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<style>
+a {text-decoration: underline; }
+a:visited {text-decoration: underline; }
+a:hover {text-decoration: underline; }
+</style>
 </head>
 
 <%
@@ -85,7 +90,7 @@ if (dv != null)
 			(int)drv[1],
 			security);
 
-		PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user);
+		PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user, false);
 	}
 }
 else
@@ -107,7 +112,7 @@ else
 				(int)dr2[1],
 				security);
 
-			PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user);
+			PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user, false);
 		}
 	}
 	else

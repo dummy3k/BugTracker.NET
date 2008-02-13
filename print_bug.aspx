@@ -69,9 +69,15 @@ void Page_Load(Object sender, EventArgs e)
 <head>
 <title  id="titl" runat="server">btnet edit bug</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<style>
+a {text-decoration: underline; }
+a:visited {text-decoration: underline; }
+a:hover {text-decoration: underline; }
+</style>
+
 </head>
 
-<% PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user); %>
+<% PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user, false /* include style */); %>
 
 </html>
 

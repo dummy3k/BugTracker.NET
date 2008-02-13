@@ -1113,14 +1113,11 @@ insert into bug_posts
                     System.IO.StringWriter writer = new System.IO.StringWriter();
                     HttpResponse my_response = new HttpResponse(writer);
                     my_response.Write("<html>");
-                    my_response.Write("<head>");
                     my_response.Write("<base href=\"" +
                     btnet.Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/") + "\"/>");
-                    my_response.Write("</head>");
 
-                    PrintBug.print_bug(my_response, bug_dr, security.user.is_admin, true /* external_user */);
+                    PrintBug.print_bug(my_response, bug_dr, security.user.is_admin, true /* external_user */, true /* include style */);
                     // at this point "writer" has the bug html
-
 
                     string from = btnet.Util.get_setting("NotificationEmailFrom", "");
                     string subject = btnet.Util.get_setting("NotificationSubjectFormat", "$THING$:$BUGID$ was $ACTION$ - $SHORTDESC$ $TRACKINGID$");

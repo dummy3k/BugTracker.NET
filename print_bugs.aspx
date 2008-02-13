@@ -143,7 +143,7 @@ void print_as_html()
 		Response.Write ("<td class=bugh>\n");
 		if (dv.Table.Columns[col].ColumnName == "$FLAG")
 		{
-			Response.Write("!");
+			Response.Write("flag");
 		}
 		else
 		{

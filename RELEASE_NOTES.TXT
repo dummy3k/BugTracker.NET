@@ -57,6 +57,12 @@ explanation from Web.config:
 
 * Modified search of comments to also search email bodies.
 
+* Some people have reported that there are no borders around the
+comments in the email notifications.  I made changes to print_bug.cs
+that may have fixed the problem.  Not sure, sinece I could never
+reproduce the problem.  If you had this problem before and this
+release fixes it, please let me know at ctrager@yahoo.com.
+
 * Added another query sample to setup.sql.  This one shows the bugs
 that have been stuck the longest time without a status change.
 
