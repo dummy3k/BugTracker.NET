@@ -388,7 +388,10 @@ function on_body_load()
 	// change the select styles depending on whether something has been selected or not
 	for (i = 0; i < sels.length; i++)
 	{
-		sels[i].onchange = on_body_load
+		if (sels[i].id != "project")
+		{
+			sels[i].onchange = on_body_load
+		}
 		si = sels[i].options.selectedIndex;
 		if (sels[i].options[si].text.substr(0,3) == "[no")
 		{

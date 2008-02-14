@@ -2238,6 +2238,12 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 			<asp:DropDownList id="project" runat="server"
 			AutoPostBack="True"></asp:DropDownList>
 
+		<!--
+		<td rowspan=100 bgcolor=yellow width=40>&nbsp;</td>
+		<td rowspan=100 bgcolor=pink width=200>I'll put something here eventually...</td>
+		-->
+
+
 	<tr id="row2">
 		<td nowrap>
 			<span class=lbl id="org_label" runat="server">Organization:&nbsp;</span>
@@ -2563,6 +2569,8 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	%>
 
 	</table>
+
+
 	<table border=0 cellpadding=0 cellspacing=3 width=98%>
 
 	<tr><td nowrap>

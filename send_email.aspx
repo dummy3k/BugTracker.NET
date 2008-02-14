@@ -12,7 +12,7 @@ Distributed under the terms of the GNU General Public License
 // disable System.Net.Mail warnings
 #pragma warning disable 618
 #warning System.Web.Mail is obsolete, but System.Net.Mail doesn't seem to work with GMail, so keeping System.Web.Mail for now - corey
-    
+
 String sql;
 DbUtil dbutil;
 Security security;
@@ -412,10 +412,15 @@ void on_update(object Source, EventArgs e)
 
 	if (!validate()) return;
 
-	sql = @"insert into bug_posts
-			(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_email_to, bp_type, bp_content_type)
-			values($id, $us, getdate(), N'$cm', N'$cs', N'$fr',  N'$to', 'sent', N'$ct')
-			select scope_identity()";
+	sql = @"
+insert into bug_posts
+	(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_email_to, bp_type, bp_content_type)
+	values($id, $us, getdate(), N'$cm', N'$cs', N'$fr',  N'$to', 'sent', N'$ct');
+select scope_identity()
+update bugs set
+	bg_last_updated_user = $us,
+	bg_last_updated_date = getdate()
+	where bg_id = $id";
 
 	sql = sql.Replace("$id", bg_id.Value);
 	sql = sql.Replace("$us", Convert.ToString(security.user.usid));

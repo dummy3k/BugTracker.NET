@@ -6,7 +6,7 @@ Release notes:
 
 * NEED INSTRUCTIONS HOW TO UPGRADE 
 
-* # of days in status, the two queries the guy sent
+* change setup.sql for guest organization
 
 * Wordwrap, and take advantage of new api.
 * apostrophe's, commas, quotes in custom field names, values
@@ -14,12 +14,12 @@ Release notes:
 * field level permissions for custom fields?
 * escalation/reminder
 * automatic user creation, self registration
-
-
-
-
-* change setup.sql for guest
+* update docs about having to "touch" files to refresh application cache
+* "its" not "it's" in docs.
+* new fckEditor eventually, with image uploads really shut off.
 * username to use as template for self-registration
+
+self registration:
 enter email address, store rec, get back email with link
 click on email, fill in name, password, but must enforce strong passwords
 when done, go to bugs.aspx
@@ -27,10 +27,6 @@ when done, go to bugs.aspx
 if forgot password, store rec, send email
 click on link, reenter a couple passwords
 when done, go to bugs.aspx
-
-
-
-
 
 
 -----------------------------------------------------------------------
@@ -57,6 +53,8 @@ explanation from Web.config:
 
 * Modified search of comments to also search email bodies.
 
+* Bug's last update datetime/user is now updated when an email is sent.
+
 * Some people have reported that there are no borders around the
 comments in the email notifications.  I made changes to print_bug.cs
 that may have fixed the problem.  Not sure, sinece I could never
@@ -65,6 +63,7 @@ release fixes it, please let me know at ctrager@yahoo.com.
 
 * Added another query sample to setup.sql.  This one shows the bugs
 that have been stuck the longest time without a status change.
+Here's the SQL if you want to try it out:
 
 select case 
  when datediff(d, isnull(bp_date,bg_reported_date), getdate()) > 90 
@@ -92,6 +91,10 @@ select case
 reading.
 
 * Cosmetic changes to edit_bug.aspx, which I hope folks will like.
+
+* Printing of "detail" reports should have better performance.  Before, 
+the css styles were wrongly being included once per bug, not once
+for the whole page.
 
 -----------------------------------------------------------------------
 Version 2.7.6  2/8/2008
