@@ -177,20 +177,20 @@ namespace btnet
         public void write_menu_item(HttpResponse Response,
             string this_link, string menu_item, string href)
         {
-            Response.Write("<td valign=middle align=left>");
+            Response.Write("<td valign=middle align=left'>");
             if (this_link == menu_item)
             {
-                Response.Write("<a href=" + href + "><span class=selected_menu_item>" + menu_item + "</span></a>");
+                Response.Write("<a href=" + href + "><span class=selected_menu_item  style='margin-left:3px;'>" + menu_item + "</span></a>");
             }
             else
             {
                 if (menu_item == "about")
                 {
-                    Response.Write("<a target=_blank href=" + href + "><span class=menu_item>" + menu_item + "</span></a>");
+                    Response.Write("<a target=_blank href=" + href + "><span class=menu_item style='margin-left:3px;'>" + menu_item + "</span></a>");
                 }
                 else
                 {
-                    Response.Write("<a href=" + href + "><span class=menu_item>" + menu_item + "</span></a>");
+                    Response.Write("<a href=" + href + "><span class=menu_item style='margin-left:3px;'>" + menu_item + "</span></a>");
                 }
             }
             Response.Write("</td>");
@@ -265,7 +265,7 @@ namespace btnet
             // go to
             Response.Write("<td nowrap valign=middle>");
             Response.Write("<form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>");
-            Response.Write("<font size=1>id:&nbsp;</font>");
+            Response.Write("<font size=1>&nbsp;id:&nbsp;</font>");
             Response.Write("<input style='font-size: 8pt;' size=4 type=text class=txt name=id accesskey=i>");
             Response.Write("<input class=btn style='font-size: 8pt;' type=submit value='go to ");
             Response.Write(Util.get_setting("SingularBugLabel", "bug"));
