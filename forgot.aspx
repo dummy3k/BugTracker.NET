@@ -30,6 +30,10 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			msg.InnerHtml = "Enter your email address.";
 		}
+		else if (!Util.validate_email(email.Value))
+		{
+			msg.InnerHtml = "Format of email address is invalid.";
+		}
 		else
 		{
 

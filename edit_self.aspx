@@ -158,6 +158,19 @@ Boolean validate()
 
 	Boolean good = true;
 
+	pw_err.InnerText = "";
+
+	if (pw.Value != "")
+	{
+		if (!Util.check_password_strength(pw.Value))
+		{
+			good = false;
+			pw_err.InnerHtml = "Password is not difficult enough to guess.";
+			pw_err.InnerHtml += "<br>Avoid common words.";
+			pw_err.InnerHtml += "<br>Try using a mixture of lowercase, uppercase, digits, and special characters.";
+		}
+	}
+
 	if (confirm_pw.Value != pw.Value)
 	{
 		good = false;
@@ -176,6 +189,16 @@ Boolean validate()
 	else
 	{
 		bugs_per_page_err.InnerText = "";
+	}
+
+	email_err.InnerHtml = "";
+	if (email.Value != "")
+	{
+		if (!Util.validate_email(email.Value))
+		{
+			good = false;
+			email_err.InnerHtml = "Format of email address is invalid.";
+		}
 	}
 
 	return good;
@@ -372,15 +395,24 @@ function show_notification_settings()
 
 	<tr>
 	<td class=lbl>Password:</td>
-	<td><input runat="server" autocomplete=off type=password class=txt id="pw" maxlength=20 size=20></td>
-	<td runat="server" class=err id="pw_err">&nbsp;</td>
+	<td colspan=2><input runat="server" autocomplete=off type=password class=txt id="pw" maxlength=20 size=20></td>
+	</tr>
+
+	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="pw_err">&nbsp;</td>
 	</tr>
 
 	<tr>
 	<td class=lbl>Confirm Password:</td>
-	<td><input runat="server" autofill=no type=password class=txt id="confirm_pw" maxlength=20 size=20></td>
-	<td runat="server" class=err id="confirm_pw_err">&nbsp;</td>
+	<td colspan=2><input runat="server" autofill=no type=password class=txt id="confirm_pw" maxlength=20 size=20></td>
 	</tr>
+
+	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="confirm_pw_err">&nbsp;</td>
+	</tr>
+
 
 	<tr>
 	<td class=lbl>First Name:</td>
@@ -443,6 +475,17 @@ function show_notification_settings()
 	</tr>
 
 	<tr>
+	<td class=lbl>Email:</td>
+	<td colspan=2><input runat="server" type=text class=txt id="email" maxlength=40 size=40></td>
+	</tr>
+
+	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="email_err">&nbsp;</td>
+	</tr>
+
+
+	<tr>
 	<td class=lbl valign=top>Outgoing Email Signature:</td>
 	<td><textarea class="txt" id="signature" rows="2" cols="72" runat="server"></textarea></td>
 	<td runat="server" class=err id="signature_err">&nbsp;</td>
@@ -459,16 +502,10 @@ function show_notification_settings()
 	<td colspan=3>
 	<span class=smallnote>
 	<div style="width: 400px;">
-	To receive email notifications when items are added or changed, fill in your email address, enable notifications, and then select "Auto-subscribe to all items" or the other options.<br>
+	To receive email notifications when items are added or changed, enable notifications, and then select "Auto-subscribe to all items" or the other options.<br>
 	<br>
 	</div>
 	</td>
-	</tr>
-
-	<tr>
-	<td class=lbl>Email:</td>
-	<td><input runat="server" type=text class=txt id="email" maxlength=40 size=40></td>
-	<td runat="server" class=err id="email_err">&nbsp;</td>
 	</tr>
 
 	<tr>

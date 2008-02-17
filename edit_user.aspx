@@ -376,13 +376,14 @@ Boolean validate()
 	if (username.Value == "")
 	{
 		good = false;
-		username_err.InnerText = "User is required.";
+		username_err.InnerText = "Username is required.";
 	}
 	else
 	{
 		username_err.InnerText = "";
 	}
 
+	pw_err.InnerText = "";
 	if (id == 0 || copy)
 	{
 		if (pw.Value == "")
@@ -390,9 +391,16 @@ Boolean validate()
 			good = false;
 			pw_err.InnerText = "Password is required.";
 		}
-		else
+	}
+
+	if (pw.Value != "")
+	{
+		if (!Util.check_password_strength(pw.Value))
 		{
-			pw_err.InnerText = "";
+			good = false;
+			pw_err.InnerHtml = "Password is not difficult enough to guess.";
+			pw_err.InnerHtml += "<br>Avoid common words.";
+			pw_err.InnerHtml += "<br>Try using a mixture of lowercase, uppercase, digits, and special characters.";
 		}
 	}
 
@@ -424,6 +432,16 @@ Boolean validate()
 	else
 	{
 		bugs_per_page_err.InnerText = "";
+	}
+
+	email_err.InnerHtml = "";
+	if (email.Value != "")
+	{
+		if (!Util.validate_email(email.Value))
+		{
+			good = false;
+			email_err.InnerHtml = "Format of email address is invalid.";
+		}
 	}
 
 	return good;
@@ -1032,21 +1050,49 @@ function show_permissions_settings()
 
 	<tr>
 	<td class=lbl>Username:</td>
-	<td><input runat="server" type=text class=txt id="username" maxlength=20 size=20></td>
-	<td runat="server" class=err id="username_err">&nbsp;</td>
+	<td colspan=2><input runat="server" type=text class=txt id="username" maxlength=20 size=20></td>
 	</tr>
 
 	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="username_err">&nbsp;</td>
+	</tr>
+
+
+	<tr>
 	<td class=lbl>Password:</td>
-	<td><input runat="server" autocomplete=off type=password class=txt id="pw" maxlength=20 size=20></td>
-	<td runat="server" class=err id="pw_err">&nbsp;</td>
+	<td colspan=2><input runat="server" autocomplete=off type=password class=txt id="pw" maxlength=20 size=20></td>
+	</tr>
+
+	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="pw_err">&nbsp;</td>
 	</tr>
 
 	<tr>
 	<td class=lbl>Confirm Password:</td>
-	<td><input runat="server" autofill=no type=password class=txt id="confirm_pw" maxlength=20 size=20></td>
-	<td runat="server" class=err id="confirm_pw_err">&nbsp;</td>
+	<td colspan=2><input runat="server" autofill=no type=password class=txt id="confirm_pw" maxlength=20 size=20></td>
 	</tr>
+
+	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="confirm_pw_err">&nbsp;</td>
+	</tr>
+
+
+	<tr>
+	<td class=lbl>org:</td>
+	<td colspan=2>
+		<asp:DropDownList id="org" runat="server">
+		</asp:DropDownList>
+	</td>
+	</tr>
+
+	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="org_err">&nbsp;</td>
+	</tr>
+
 
 	<tr>
 	<td class=lbl>First Name:</td>
@@ -1104,15 +1150,6 @@ function show_permissions_settings()
 	</tr>
 
 	<tr>
-	<td class=lbl>org:</td>
-	<td>
-		<asp:DropDownList id="org" runat="server">
-		</asp:DropDownList>
-	</td>
-	<td runat="server" class=err id="org_err">&nbsp;</td>
-	</tr>
-
-	<tr>
 	<td class=lbl>Default <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %> Query:</td>
 	<td>
 		<asp:DropDownList id="query" runat="server">
@@ -1127,6 +1164,18 @@ function show_permissions_settings()
 	&nbsp;
 	</td>
 	</tr>
+
+	<tr>
+	<td class=lbl>Email:</td>
+	<td colspan=2><input runat="server" type=text class=txt id="email" maxlength=40 size=40></td>
+	</tr>
+
+	<tr>
+	<td>&nbsp;</td>
+	<td colspan=2 runat="server" class=err id="email_err">&nbsp;</td>
+	</tr>
+
+
 
 	<tr>
 	<td class=lbl valign=top>Outgoing Email Signature:</td>
@@ -1150,12 +1199,6 @@ function show_permissions_settings()
 	<br>
 	</div>
 	</td>
-	</tr>
-
-	<tr>
-	<td class=lbl>Email:</td>
-	<td><input runat="server" type=text class=txt id="email" maxlength=40 size=40></td>
-	<td runat="server" class=err id="email_err">&nbsp;</td>
 	</tr>
 
 	<tr>

@@ -6,8 +6,6 @@ Release notes:
 
 * validate email address with regex
 
-* NEED INSTRUCTIONS HOW TO UPGRADE 
-
 * change setup.sql for guest organization
 
 * Wordwrap, and take advantage of new api.
@@ -15,21 +13,10 @@ Release notes:
 * excel export for reports
 * field level permissions for custom fields?
 * escalation/reminder
-* automatic user creation, self registration
-* update docs about having to "touch" files to refresh application cache
+
 * "its" not "it's" in docs.
+
 * new fckEditor eventually, with image uploads really shut off.
-* username to use as template for self-registration
-
-self registration:
-enter email address, store rec, get back email with link
-click on email, fill in name, password, but must enforce strong passwords
-when done, go to bugs.aspx
-
-if forgot password, store rec, send email
-click on link, reenter a couple passwords
-when done, go to bugs.aspx
-
 
 * new fckEditor - read my own fckdocs at ifdefined.  note that image
 uploads not supported.
@@ -43,71 +30,29 @@ uploads not supported.
 * document ldap at ifdefined.
 
 
-register.aspx->email
-email->confirm.aspx "click to login"
-
-forgot.aspx->email
-email->change_password.aspx
-
-
-
-Confirm Your Email Address
-ctrager Thank you for registering! We just sent you a confirmation email to ctrager@yahoo.com
-
-To proceed, please confirm your registration by clicking the link in the email message.
-
-Not receiving the email?
-
-    * Is the email address you provided correct?
-    * Check your SPAM folder. You may need to add no-reply@livemocha.com to your contacts.
-    * With some email accounts such as Yahoo, Hotmail, the email may be delayed. Check your email as well as your SPAM folder again after an hour.
-
-
-If you didn't get a confimation email, please click here so we can send it to you again
-Any Issues? Please tell us.
-
-
-Hello!
-
-To activate your account click the link, below
-http://www.livemocha.com/users/activate/216965/f166f0f7fbd4d4f18986f47a7cd57bab
-If the link doesn't work, cut and paste the link into your web browser.
-
-Thank you so much for signing up for Livemocha. My name is Jessica and I'm a member of the community management team here at Livemocha.
-
-If you're learning a new language, you'll see immediately how Livemocha is different:
-
-    * Enroll in Courses: With our fun and holistic online language courses you'll develop all the skills and confidence to begin conversing with native speakers.
-    * Make Friends: The Livemocha community is full of friendly, like-minded, and motivated language learners looking to practice their skills. Don't be shy - introduce yourself and start practicing!
-    * Receive Tips from Native Speakers: Have your speaking and writing submissions reviewed and scored by native speakers. They will rate their proficiency, give you tips for improvement, and help you meet your language-learning goals.
-    * Stay Motivated: Learning a new language is tough! Track your weekly goals, earn points for completing exercises, and compare your progress with that of your friends for some friendly competition.
-
-If you have any questions, comments, or just want to practice, drop me a message or a chat request anytime. Look forward to seeing you on Livemocha!
-
-Sincerely,
-Jessica - Community Manager, Livemocha
-
-P.S. - Please tell your friends about us!
-This email was sent to ctrager@yahoo.com
-If you prefer to not receive email, please reply to this email and type 'Remove Me' on the subject line 
-
-
 StreamReader sr = new StreamReader(file);
-
-
-
-Just like StreamWriter there are several posibilities for constructor overloads. This one takes an instance of FileStream.
-
-With StreamReader, there are four options for reading from a file: Read, ReadBlock, ReadLine, or ReadToEnd. Each one of these functions has several overloads. For the purposes of this example, I will use ReadToEnd, which just like the title implies, reads the entire file.
-
 string s = sr.ReadToEnd();
-
-
-
-Again, don't forget to close the stream!
-
 sr.Close();
 
+
+-----------------------------------------------------------------------
+Version 2.7.8  2/23/2008
+-----------------------------------------------------------------------
+
+* Added option to enforce strong passwords. See"RequireStrongPasswords"
+in Web.config.  Turning on the flag has no effect on users until they
+try to change their passwords.
+
+* Users can now reset their own passwords if they forget them.
+See "ShowForgotPasswordLink" in Web.config.
+
+* Users can now register themselves (add themselves to the user table).
+See the following settings in Web.config:
+	"AllowSelfRegistration"
+	"SelfRegisteredUserTemplate"
+	"RegistrationExpiration"
+
+* Format of user's email address is validated.
 
 -----------------------------------------------------------------------
 Version 2.7.7  2/16/2008

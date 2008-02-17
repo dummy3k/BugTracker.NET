@@ -311,8 +311,13 @@ namespace btnet
 
 		static Regex reCommas = new Regex(",");
 		static Regex rePipes = new Regex("\\|");
+		static Regex reEmail = new Regex("^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$");
 
 
+		public static bool validate_email(string s)
+		{
+			return reEmail.IsMatch(s);
+		}
 
 		///////////////////////////////////////////////////////////////////////
 		public static void set_context(HttpContext asp_net_context)

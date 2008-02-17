@@ -103,6 +103,14 @@ bool validate()
 		email_err.InnerText = "Email is required.";
 		valid = false;
 	}
+	else
+	{
+		if (!Util.validate_email(email.Value))
+		{
+			email_err.InnerHtml = "Format of email address is invalid.";
+			valid = false;
+		}
+	}
 
 	if (password.Value == "")
 	{
