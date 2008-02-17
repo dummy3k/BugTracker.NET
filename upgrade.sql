@@ -590,3 +590,26 @@ alter table orgs add og_udf_field_permission_level int not null default(2)
 -----------------------------------------------------------------------
 
 alter table users add us_salt int null
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.7.7 to 2.7.8
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+create table emailed_links
+(
+el_id char(37) not null,
+el_date datetime not null default(getdate()),
+el_email nvarchar(120) not null,
+el_action nvarchar(20) not null, -- "registration" or "forgot"
+el_username nvarchar(40) null,
+el_user_id int null,
+el_salt int null,
+el_password nvarchar(64) null,
+el_firstname nvarchar(60) null,
+el_lastname nvarchar(60) null
+)

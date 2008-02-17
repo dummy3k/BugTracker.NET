@@ -58,6 +58,9 @@ drop table [orgs]
 if exists (select * from dbo.sysobjects where id = object_id(N'[bug_user_flags]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [bug_user_flags]
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[emailed_links]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [emailed_links]
+
 /* org */
 
 create table orgs
@@ -170,6 +173,24 @@ create table sessions
 	se_id char(37) not null,
 	se_date datetime not null default(getdate()),
 	se_user int not null
+)
+
+
+/* EMAILED LINKS */
+
+
+create table emailed_links
+(
+el_id char(37) not null,
+el_date datetime not null default(getdate()),
+el_email nvarchar(120) not null,
+el_action nvarchar(20) not null, -- "registration" or "forgot"
+el_username nvarchar(40) null,
+el_user_id int null,
+el_salt int null,
+el_password nvarchar(64) null,
+el_firstname nvarchar(60) null,
+el_lastname nvarchar(60) null
 )
 
 /* CATEGORIES */

@@ -325,11 +325,11 @@ void on_update (Object sender, EventArgs e)
 	<tr>
 	<td class=lbl runat="server" id="visibility_label">Visibility:</td>
 	<td colspan=2>
-		<asp:RadioButton text="Everybody" runat="server" class=txt GroupName="visibility" id="vis_everybody"/>
+		<asp:RadioButton text="Everybody" runat="server" GroupName="visibility" id="vis_everybody"/>
 		&nbsp;&nbsp;&nbsp;
-		<asp:RadioButton text="Just You" runat="server" class=txt GroupName="visibility" id="vis_user"/>
+		<asp:RadioButton text="Just You" runat="server" GroupName="visibility" id="vis_user"/>
 		&nbsp;&nbsp;&nbsp;
-		<asp:RadioButton text="Users with org" runat="server" class=txt GroupName="visibility" id="vis_org"/>
+		<asp:RadioButton text="Users with org" runat="server" GroupName="visibility" id="vis_org"/>
 		<asp:DropDownList id="org" runat="server">
 		</asp:DropDownList>
 		&nbsp;&nbsp;

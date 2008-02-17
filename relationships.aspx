@@ -256,7 +256,7 @@ if (permission_level != Security.PERMISSION_READONLY)
 <tr><td>Comment:<td><input  type=text class=txt name=type size=90 max=500>
 
 <tr><td colspan=2>
-Related ID is sibling<asp:RadioButton runat="server" GroupName="direction" value="0" id="siblings"/>
+Related ID is sibling<asp:RadioButton runat="server" checked="true" GroupName="direction" value="0" id="siblings"/>
 &nbsp;&nbsp;&nbsp;
 Related ID is child<asp:RadioButton runat="server" GroupName="direction" value="1" id="child_to_parent"/>
 &nbsp;&nbsp;&nbsp;

@@ -216,6 +216,12 @@ Response.Write (Application["custom_logo"]);
 	</td></tr>
 
 	</table>
+</form>
+<% if (Util.get_setting("ShowForgotPasswordLink","1") == "1") { %>
+<p>
+&nbsp;<a href="forgot.aspx">Forgot your username or password?</a>&nbsp;
+<p>
+<% } %>
 
 <% if (Util.get_setting("AllowGuestWithoutLogin","0") == "1") { %>
 <p>
@@ -223,7 +229,14 @@ Response.Write (Application["custom_logo"]);
 <p>
 <% } %>
 
-</form>
+
+<% if (Util.get_setting("AllowSelfRegistration","0") == "1") { %>
+<p>
+&nbsp;<a href="register.aspx">Register</a>&nbsp;
+<p>
+<% } %>
+
+
 </td></tr></table>
 
 <% Response.Write (Util.get_setting("CustomWelcomeHtml","")); %>

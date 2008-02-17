@@ -1129,5 +1129,42 @@ drop table #temp";
 
             return vals;
         }
+
+		///////////////////////////////////////////////////////////////////////
+		public static bool check_password_strength(string pw)
+		{
+			if (Util.get_setting("RequireStrongPasswords","0") == "0")
+			{
+				return true;
+			}
+
+			if (pw.Length < 8) return false;
+			if (pw.IndexOf("password") > -1) return false;
+			if (pw.IndexOf("123") > -1) return false;
+			if (pw.IndexOf("asdf") > -1) return false;
+			if (pw.IndexOf("qwer") > -1) return false;
+			if (pw.IndexOf("test") > -1) return false;
+
+			int lowercase = 0;
+			int uppercase = 0;
+			int digits = 0;
+			int special_chars = 0;
+
+			for (int i = 0; i < pw.Length; i++)
+			{
+				char c = pw[i];
+				if (c >= 'a' && c <= 'z') lowercase = 1;
+				else if (c >= 'A' && c <= 'Z') uppercase = 1;
+				else if (c >= '0' && c <= '9') digits = 1;
+				else special_chars = 1;
+			}
+
+			if (lowercase + uppercase + digits + special_chars < 2)
+			{
+				return false;
+			}
+
+			return true;
+		}
     } // end Util
 }
