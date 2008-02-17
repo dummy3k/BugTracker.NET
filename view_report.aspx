@@ -7,6 +7,7 @@
 String sql;
 DbUtil dbutil;
 Security security;
+int scale = 1;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -16,9 +17,6 @@ void Page_Load(Object sender, EventArgs e)
 	dbutil = new DbUtil();
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
-
-//	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-//		+ "view report";
 
 	if (security.user.is_admin || security.user.can_use_reports)
 	{
@@ -33,6 +31,17 @@ void Page_Load(Object sender, EventArgs e)
 
 	string string_id = Util.sanitize_integer(Request["id"]);
 	string view = Request["view"];
+
+	string scale_string = Request["scale"];
+
+	if (scale_string == null || scale_string == "")
+	{
+		scale = 1;
+	}
+	else
+	{
+		scale = Convert.ToInt32(scale_string);
+	}
 
 	sql = @"select rp_desc, rp_sql, rp_chart_type
 		from reports
@@ -91,14 +100,14 @@ void Page_Load(Object sender, EventArgs e)
 ///////////////////////////////////////////////////////////////////////
 void create_line_chart(string title, DataSet ds)
 {
-	int chart_width=640;
-	int chart_height=300;
-	int chart_top_margin = 10; // gap between highest bar and border of chart
+	int chart_width=640 / scale;
+	int chart_height=300 / scale;
+	int chart_top_margin = 10 / scale; // gap between highest bar and border of chart
 
-	int x_axis_text_offset = 8; // gap between edge and start of x axis text
-	int page_top_margin = 40; // gape between chart and top of page
+	int x_axis_text_offset = 8 / scale; // gap between edge and start of x axis text
+	int page_top_margin = 40 / scale; // gape between chart and top of page
 
-	int max_grid_lines = 20;
+	int max_grid_lines = 20 / scale;
 
 	Font fontTitle = new Font("Verdana", 12, FontStyle.Bold);
 
@@ -125,7 +134,7 @@ void create_line_chart(string title, DataSet ds)
 	if (max > 1) {
 		while (max / grid_line_interval > max_grid_lines)
 		{
-			grid_line_interval *= 10;
+			grid_line_interval *= 10 / scale;
 		}
 	}
 
@@ -280,14 +289,14 @@ void create_line_chart(string title, DataSet ds)
 ///////////////////////////////////////////////////////////////////////
 void create_bar_chart(string title, DataSet ds)
 {
-	int chart_width=640;
-	int chart_height=300;
-	int chart_top_margin = 10; // gap between highest bar and border of chart
+	int chart_width=640 / scale;
+	int chart_height=300 / scale;
+	int chart_top_margin = 10 / scale; // gap between highest bar and border of chart
 
-	int x_axis_text_offset = 8; // gap between edge and start of x axis text
-	int page_top_margin = 40; // gape between chart and top of page
+	int x_axis_text_offset = 8 / scale; // gap between edge and start of x axis text
+	int page_top_margin = 40 / scale; // gape between chart and top of page
 
-	int max_grid_lines = 20;
+	int max_grid_lines = 20 / scale;
 
 	Font fontTitle = new Font("Verdana", 12, FontStyle.Bold);
 
@@ -314,7 +323,7 @@ void create_bar_chart(string title, DataSet ds)
 	if (max > 1) {
 		while (max / grid_line_interval > max_grid_lines)
 		{
-			grid_line_interval *= 10;
+			grid_line_interval *= 10 / scale;
 		}
 	}
 
@@ -450,7 +459,7 @@ void create_pie_chart(string title, DataSet ds)
 {
 
 	int width = 240;
-	const int page_top_margin = 15;
+	int page_top_margin = 15;
 
 	// [corey] - I downloaded this code from MSDN, the URL below, and modified it.
 	// http://msdn.microsoft.com/msdnmag/issues/02/02/ASPDraw/default.aspx
@@ -467,7 +476,6 @@ void create_pie_chart(string title, DataSet ds)
 		tmp = Convert.ToSingle(ds.Tables[0].Rows[i][1]);
 		total += tmp;
 	}
-
 
 	// we need to create fonts for our legend and title
 	Font fontLegend = new Font("Verdana", 10);
@@ -617,8 +625,6 @@ void create_table(string title, DataSet ds)
 	{
 		Response.Write ("<font size=+1>The database query for this report returned zero rows.</font>");
 	}
-
-	Response.Write ("</div></body>");
 
 
 }
