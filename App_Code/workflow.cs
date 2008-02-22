@@ -11,9 +11,9 @@ using System.Web.UI.WebControls;
 namespace btnet
 {
 
-// This is sample code that gives you an idea of how you could customize the 
-// workflow, i.e, the change in bug statuses.  
- 
+// This is sample code that gives you an idea of how you could customize the
+// workflow, i.e, the change in bug statuses.
+
     public class Workflow
     {
         public static void fill_status_dropdown(
@@ -21,7 +21,7 @@ namespace btnet
             User user, // the currently logged in user
             System.Web.UI.WebControls.ListItemCollection statuses) // the options in the dropdown
         {
-            // If you do nothing here, by default the app will fill the status 
+            // If you do nothing here, by default the app will fill the status
             // dropdown with all the statuses in the database.
 
             // But, if you put something in the list of statuses, then the app
@@ -45,17 +45,22 @@ namespace btnet
                 int status = (int) bug["status"];
                 string status_name = (string) bug["status_name"];
 
-                if (status_name == "new") 
+                if (status_name == "new")
                 {
-                    // always add the option corresponding to the bug's current status
-                    statuses.Add(new ListItem(
-                        status_name, 
-                        Convert.ToString(status)));  
+					// always add the option corresponding to the bug's current status
+					if (statuses.FindByValue(status.ToString()) == null)
+						statuses.Add(new ListItem(
+						status_name,
+						Convert.ToString(status)));
 
-                    // These are the only two valid statuses 
-                    statuses.Add(new ListItem("in progress", "2")); 
-                    statuses.Add(new ListItem("checked in", "3")); 
-                }
+					// These are the only two valid statuses
+					if (statuses.FindByValue("2") == null)
+						statuses.Add(new ListItem("in progress", "2"));
+
+					if (statuses.FindByValue("3") == null)
+						statuses.Add(new ListItem("checked in", "3"));
+
+				}
                 else
                 {
                     // no special logic

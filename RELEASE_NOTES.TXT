@@ -1,10 +1,56 @@
+Fix "print bugs" problem with borders.
+
+1. When deciding which status to add to the "statuses" collection, customisers must be made aware that they need to check in the item they want to add is not already in the collection otherwise they can end-up with duplicates in the status drop down after a post-back (note: it's not an issue during initial load, only on post-back):
+ 
+i.e. in the provided example it should be:
+ 
+                if (status_name == "new")
+                {
+                    // always add the option corresponding to the bug's current status
+                    if (statuses.FindByValue(status.ToString()) == null)
+                        statuses.Add(new ListItem(
+                            status_name, 
+                            Convert.ToString(status))); 
+ 
+                    // These are the only two valid statuses 
+                    if (statuses.FindByValue("2") == null)
+                        statuses.Add(new ListItem("in progress", "2")); 
+                    if (statuses.FindByValue("3") == null)
+                        statuses.Add(new ListItem("checked in", "3"));
+                }
+ 
+2. edit_bug.aspx: on_update function
+ 
+    We've had to add the following code
+ 
+            // GC: 16-Feb-2008: Bug fix to allow the Status drop down to be reloaded if there has been a change
+            if (status_changed && Session["bug_datarow"] != null)
+            {
+                DataRow bug;
+               
+                bug = (DataRow) Session["bug_datarow"];
+                bug["status"] = int.Parse(status.SelectedItem.Value);
+                bug["status_name"] = status.SelectedItem.Text;
+               
+                Workflow.fill_status_dropdown(bug, security.user, status.Items);
+            }
+    after an existing bug is updated so that the status drop down is reloaded with the appropriate values according to the custom workflow rules implemented by our organisation. Otherwise users have to exit the edit bug screen after updating it and re-open it again to see the new available statuses
+ 
+ 
+Other general bugs:
+ 
+a. When submitting a bug by email, if the subject to longer than 200 characters (length of the description field in the database) the insertion fails as the subject doesn't fit in the description field. The insert bug page should probably check fields lengths before inserting in the database and truncate them accordingly
+ 
+b. If a non-admin user is granted permission to add/edit users for a given project, the add user page has an empty organisation drop down and given that it is a mandatory field that user cannot add any new users.
+ 
+
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-* validate email address with regex
+* many to many, queries to organizations
 
 * change setup.sql for guest organization
 
@@ -15,8 +61,6 @@ Release notes:
 * escalation/reminder
 
 * "its" not "it's" in docs.
-
-* new fckEditor eventually, with image uploads really shut off.
 
 * new fckEditor - read my own fckdocs at ifdefined.  note that image
 uploads not supported.
@@ -39,6 +83,8 @@ sr.Close();
 Version 2.7.8  2/23/2008
 -----------------------------------------------------------------------
 
+WideBugFormLayout
+
 * Added option to enforce strong passwords. See"RequireStrongPasswords"
 in Web.config.  Turning on the flag has no effect on users until they
 try to change their passwords.
@@ -52,7 +98,10 @@ See the following settings in Web.config:
 	"SelfRegisteredUserTemplate"
 	"RegistrationExpiration"
 
-* Format of user's email address is validated.
+* Format of user's email address is now validated.
+
+* If incoming email has a subject that's too long for the database field,
+the subject is truncated rather than the insert failing.
 
 -----------------------------------------------------------------------
 Version 2.7.7  2/16/2008

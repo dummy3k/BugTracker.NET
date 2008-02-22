@@ -39,7 +39,7 @@ namespace btnet
 
             if (include_style)
             {
-                Response.Write("<style>\n");
+                Response.Write("\n<style>\n");
                 string path_base = HttpContext.Current.Server.MapPath("./") + "btnet_base_notifications.css";
                 string path_custom = HttpContext.Current.Server.MapPath("./") + "btnet_custom_notifications.css";
 

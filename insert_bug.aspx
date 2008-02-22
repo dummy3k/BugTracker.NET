@@ -115,14 +115,14 @@ void Page_Load(Object sender, EventArgs e)
 	// authenticate user
 
     bool authenticated = btnet.Authenticate.check_password(username, password);
-    
+
     if (!authenticated)
-    {        
+    {
 		Response.AddHeader("BTNET","ERROR: invalid username or password");
 		Response.Write("ERROR: invalid username or password");
 		Response.End();
-    }    
-	
+    }
+
     sql = @"select us_id, us_admin, us_org, og_other_orgs_permission_level
 		from users
 		inner join orgs on us_org = og_id
@@ -236,6 +236,10 @@ void Page_Load(Object sender, EventArgs e)
 			subject = subject.Replace(Util.get_setting("TrackingIdString","DO NOT EDIT THIS:"), "PREVIOUS:");
 
 			short_desc = subject;
+			if (short_desc.Length > 100)
+			{
+				short_desc = short_desc.Substring(0,100);
+			}
 
 			string headers = "";
 

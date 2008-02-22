@@ -1012,6 +1012,12 @@ void set_category_field_permission(int bug_permission_level)
 		category_label.Visible = false;
 		category.Visible = false;
 		prev_category.Visible = false;
+		static_category.Visible = false;
+
+	//	category_label.Style["display"] = "none";
+	//	category.Style["display"] = "none";
+	//	static_category.Style["display"] = "none";
+
 	}
 	else if (perm_level == Security.PERMISSION_READONLY)
 	{
@@ -2121,6 +2127,17 @@ void on_update (Object sender, EventArgs e)
 
 			set_controls_field_permission(permission_level);
 
+            // GC: 16-Feb-2008: Bug fix to allow the Status drop down to be reloaded if there has been a change
+            if (status_changed && Session["bug_datarow"] != null)
+            {
+                DataRow bug;
+
+                bug = (DataRow) Session["bug_datarow"];
+                bug["status"] = int.Parse(status.SelectedItem.Value);
+                bug["status_name"] = status.SelectedItem.Text;
+
+                Workflow.fill_status_dropdown(bug, security.user, status.Items);
+            }
 		} // edit existing or not
 	}
 	else
@@ -2227,7 +2244,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 	</table>
 
-	<table border=0 cellpadding=3 cellspacing=0>
+	<table border=0 cellpadding=0 cellspacing=4>
 
 	<tr id="row1">
 		<td nowrap>
@@ -2242,32 +2259,25 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 		<td rowspan=100 bgcolor=yellow width=40>&nbsp;</td>
 		<td rowspan=100 bgcolor=pink width=200>I'll put something here eventually...</td>
 		-->
-
-
 	<tr id="row2">
 		<td nowrap>
 			<span class=lbl id="org_label" runat="server">Organization:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="static_org" runat="server"></span>
-
 			<asp:DropDownList id="org" runat="server"></asp:DropDownList>
-
 
 	<tr id="row3">
 		<td nowrap>
 			<span class=lbl id="category_label" runat="server">Category:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="static_category" runat="server"></span>
-
 			<asp:DropDownList id="category" runat="server"></asp:DropDownList>
-
 
 	<tr id="row4">
 		<td nowrap>
 			<span class=lbl id="priority_label" runat="server">Priority:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="static_priority" runat="server"></span>
-
 			<asp:DropDownList id="priority" runat="server"></asp:DropDownList>
 
 	<tr id="row5">
@@ -2275,7 +2285,6 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 			<span class=lbl id="assigned_to_label" runat="server">Assigned to:&nbsp;</span>
 		<td nowrap>
 			<span class=static id="static_assigned_to" runat="server"></span>
-
 			<asp:DropDownList id="assigned_to" runat="server"></asp:DropDownList>
 
 	<tr id="row6">
@@ -2284,7 +2293,6 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 		<td nowrap>
 			<span class=static id="static_status" runat="server"></span>
 			<asp:DropDownList id="status" runat="server"></asp:DropDownList>
-
 
 <%
 if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
@@ -2311,8 +2319,10 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	// Create the custom column INPUT elements
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
-		Response.Write ("\n<tr>");
-		Response.Write ("<td nowrap><span id=\"" + drcc["name"] +  "_label\">");
+		string field_id = Convert.ToString(drcc["name"]).Replace(" ","");
+
+		Response.Write ("\n<tr id=\"" + field_id + "_row\">");
+		Response.Write ("<td nowrap><span id=\"" + field_id +  "_label\">");
 		Response.Write (drcc["name"]);
 		Response.Write (":</span><td align=left>");
 
@@ -2330,7 +2340,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		if (permission_on_original == Security.PERMISSION_READONLY
 		|| permission_on_original == Security.PERMISSION_REPORTER)
 		{
-			Response.Write ("<span class=static>");
+			Response.Write ("<span class=static id=\"" + field_id +  "_static\">");
 			//modified by CJU on jan 9 2008
 			Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
 			//end modified by CJU on jan 9 2008
@@ -2343,7 +2353,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			{
 				Response.Write ("<textarea cols=\"" + minTextAreaSize + "\" rows=\"" + (((fieldLength/minTextAreaSize)>maxTextAreaRows) ? maxTextAreaRows : (fieldLength/minTextAreaSize)) + "\" " );
 				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
-				Response.Write (" id=\"" + drcc["name"].ToString() + "\" >");
+				Response.Write (" id=\"" + field_id + "\" >");
 				Response.Write (HttpUtility.HtmlEncode(Convert.ToString(hash_custom_cols[(string)drcc["name"]])));
 				Response.Write ("</textarea>");
 			}
@@ -2360,7 +2370,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 					Response.Write ("<select ");
 
-					Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
+					Response.Write (" id=\"" + field_id + "\"");
 					Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
 					Response.Write (">");
 
@@ -2428,7 +2438,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 					}
 
 					Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
-					Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
+					Response.Write (" id=\"" + field_id + "\"");
 
 
 					// output a date field according to the specified format

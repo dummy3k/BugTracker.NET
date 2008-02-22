@@ -202,7 +202,7 @@ void Page_Load(Object sender, EventArgs e)
 		forced_project.DataBind();
 		forced_project.Items.Insert(0, new ListItem("[no forced project]", "0"));
 
-		// forced project dropdown
+		// org dropdown
 		org.DataSource = ds.Tables[2].DefaultView;
 		org.DataTextField = "og_name";
 		org.DataValueField = "og_id";

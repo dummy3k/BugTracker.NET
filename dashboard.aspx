@@ -37,7 +37,8 @@ void Page_Load(Object sender, EventArgs e)
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <style>
 body {background: #ffffff;}
-.panel {background: #ffffff; border: 1px solid #cccccc; padding: 10px;}
+.panel {background: #ffffff; border: 3px solid #cccccc; padding: 10px; margin-bottom: 10px;}
+iframe {border: 1px solid white; width: 100%; height:300px;}
 </style>
 <body>
 <% security.write_menu(Response, "admin"); %>
@@ -49,7 +50,6 @@ body {background: #ffffff;}
 <img src=view_report.aspx?id=1&scale=2>
 </div>
 
-<p>
 <div class="panel">
 <img src=view_report.aspx?id=5&scale=2>
 </div>
@@ -61,7 +61,6 @@ body {background: #ffffff;}
 <img src=view_report.aspx?id=2&scale=2>
 </div>
 
-<p>
 
 <div class="panel">
 <img src=view_report.aspx?id=4&scale=2>
@@ -69,7 +68,7 @@ body {background: #ffffff;}
 
 
 <div class="panel">
-<iframe width=100% height=300 src=view_report.aspx?id=4&view=data>
+<iframe src=view_report.aspx?id=4&view=data>
 </div>
 
 
