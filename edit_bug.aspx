@@ -2308,10 +2308,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			</asp:DropDownList>
 <%
 }
-%>
-
-
-	<%
 
 	int minTextAreaSize = int.Parse(btnet.Util.get_setting("TextAreaThreshold","100"));
 	int maxTextAreaRows = int.Parse(btnet.Util.get_setting("MaxTextAreaRows","5"));
@@ -2351,11 +2347,14 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 			if ( fieldLength > minTextAreaSize )
 			{
-				Response.Write ("<textarea cols=\"" + minTextAreaSize + "\" rows=\"" + (((fieldLength/minTextAreaSize)>maxTextAreaRows) ? maxTextAreaRows : (fieldLength/minTextAreaSize)) + "\" " );
+				Response.Write ("<textarea ");
+				Response.Write (" onkeydown=\"return count_chars('" + field_id + "'," + fieldLength + ")\" ");
+				Response.Write ("   onkeyup=\"return count_chars('" + field_id + "'," + fieldLength + ")\" ");
+				Response.Write (" cols=\"" + minTextAreaSize + "\" rows=\"" + (((fieldLength/minTextAreaSize)>maxTextAreaRows) ? maxTextAreaRows : (fieldLength/minTextAreaSize)) + "\" " );
 				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
 				Response.Write (" id=\"" + field_id + "\" >");
 				Response.Write (HttpUtility.HtmlEncode(Convert.ToString(hash_custom_cols[(string)drcc["name"]])));
-				Response.Write ("</textarea>");
+				Response.Write ("</textarea><div class=smallnote id=\"" + field_id + "_cnt\">&nbsp;</div>");
 			}
 			else
 			{

@@ -403,3 +403,34 @@ function on_body_load()
 		}
 	}
 }
+
+var ren = new RegExp( "\\n", "g" )
+var ren2 = new RegExp( "\\n\\n", "g" )
+
+function count_chars(textarea_id, max)
+{
+	var textarea = document.getElementById(textarea_id)
+	var count_span = document.getElementById(textarea_id + "_cnt");
+
+	// \n counts as two chars by the time we insert,
+	// so double them here for the purpose of counting
+	var s = textarea.value.replace(ren,"\n\n")
+	var len = s.length
+
+	if (s.length > max)
+	{
+		// truncate
+		var s = s.substr(0,max)
+		// convert the \n\n back to \n
+		textarea.value = s.replace(ren2,"\n")
+
+		count_span.firstChild.nodeValue = "0 more characters allowed"
+	}
+	else
+	{
+		count_span.firstChild.nodeValue = (max - len) + " more characters allowed"
+	}
+
+	return true
+}
+
