@@ -1012,12 +1012,6 @@ void set_category_field_permission(int bug_permission_level)
 		category_label.Visible = false;
 		category.Visible = false;
 		prev_category.Visible = false;
-		static_category.Visible = false;
-
-	//	category_label.Style["display"] = "none";
-	//	category.Style["display"] = "none";
-	//	static_category.Style["display"] = "none";
-
 	}
 	else if (perm_level == Security.PERMISSION_READONLY)
 	{
