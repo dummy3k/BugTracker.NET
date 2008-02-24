@@ -144,9 +144,16 @@ namespace btnet
 
 			if (attachment_bpids != null)
 			{
-				string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-				Directory.CreateDirectory(tempDirectory);
-				directories_to_delete.Add(tempDirectory);
+
+				string upload_folder = btnet.Util.get_upload_folder();
+
+				if (upload_folder == "")
+				{
+					upload_folder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+					Directory.CreateDirectory(upload_folder);
+					directories_to_delete.Add(upload_folder);
+				}
+
 
 				foreach (int attachment_bpid in attachment_bpids)
 				{
@@ -155,8 +162,12 @@ namespace btnet
 					Bug.BugPostAttachment bpa = Bug.get_bug_post_attachment(attachment_bpid);
 					using (bpa.content)
 					{
-						dest_path_and_filename = Path.Combine(tempDirectory, bpa.file);
-						using (FileStream out_stream = new FileStream(dest_path_and_filename, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+						dest_path_and_filename = Path.Combine(upload_folder, bpa.file);
+						using (FileStream out_stream = new FileStream(
+							dest_path_and_filename,
+							FileMode.CreateNew,
+							FileAccess.Write,
+							FileShare.None))
 						{
 							int bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
 							while (bytes_read != 0)

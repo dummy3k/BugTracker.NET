@@ -4,7 +4,7 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-* css for email and edit_Bug, Fix "print bugs" problem with borders.
+* allow for more css control in bug form
 
 * dashboard
 
@@ -33,8 +33,37 @@ uploads not supported.
 
 
 -----------------------------------------------------------------------
+Version 2.7.9  3/1/2008
+-----------------------------------------------------------------------
+
+Modified email.cs after experimenting with hosting an instance of
+BugTracker.NET at GoDaddy.  You need to specify the "UploadFolder"
+setting at GoDaddy even if you load attachments in the db, otherwise
+the logic will try to create a temporary folder, which it doesn't 
+have permission to do at Goddy.
+
+
+ForceBordersInEmails
+
+btnet_css_for_email.css.renamed
+
+But, post to this thread:
+http://sourceforge.net/forum/forum.php?thread_id=1927694&forum_id=226938
+
+
+1891559  	  Email message no longer has a border around each item
+
+spend time on this:
+1843726  	  Newline, trailing spaces in dropdown vals causes error
+
+-----------------------------------------------------------------------
 Version 2.7.8  2/23/2008
 -----------------------------------------------------------------------
+
+To upgrade to this release, run the SQL from upgrade.sql that creates
+the emailed_links table.  You only need this table if you turn on the
+new features related to the new Web.config settings 
+"AllowSelfRegistration" and "ShowForgotPasswordLink".
 
 * Fixed bug 1884391 - prevent entry of more text into a custom TEXTAREA
 field that would cause a databse truncation error.

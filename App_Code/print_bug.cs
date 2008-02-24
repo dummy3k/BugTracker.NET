@@ -37,29 +37,24 @@ namespace btnet
 			int bugid = Convert.ToInt32(dr["id"]);
 			string string_bugid = Convert.ToString(bugid);
 
-            if (include_style)
+            if (include_style) // when sending emails
             {
                 Response.Write("\n<style>\n");
-                string path_base = HttpContext.Current.Server.MapPath("./") + "btnet_base_notifications.css";
-                string path_custom = HttpContext.Current.Server.MapPath("./") + "btnet_custom_notifications.css";
 
-                if (System.IO.File.Exists(path_base))
+                // If this file exists, use it.
+                string css_for_email_file = HttpContext.Current.Server.MapPath("./") + "btnet_css_for_email.css";
+
+                if (System.IO.File.Exists(css_for_email_file))
                 {
-                    Response.WriteFile(path_base);
+                    Response.WriteFile(css_for_email_file);
+					Response.Write("\n");
                 }
                 else
                 {
                     Response.WriteFile(HttpContext.Current.Server.MapPath("./") + "btnet_base.css");
-                }
-                Response.Write("\n");
-
-                if (System.IO.File.Exists(path_custom))
-                {
-                    Response.WriteFile(path_custom);
-                }
-                else
-                {
-                    Response.WriteFile(HttpContext.Current.Server.MapPath("./custom/") + "btnet_custom.css");
+					Response.Write("\n");
+					Response.WriteFile(HttpContext.Current.Server.MapPath("./custom/") + "btnet_custom.css");
+					Response.Write("\n");
                 }
 
                 // underline links in the emails to make them more obvious
@@ -230,7 +225,15 @@ namespace btnet
 			bool this_external_user)
 		{
 
-			Response.Write ("\n<table id='posts_table' border=0 cellpadding=0 cellspacing=3>");
+			if (Util.get_setting("ForceBordersInEmails","0") == "1")
+			{
+				Response.Write ("\n<table id='posts_table' border=1 cellpadding=0 cellspacing=3>");
+			}
+			else
+			{
+				Response.Write ("\n<table id='posts_table' border=0 cellpadding=0 cellspacing=3>");
+			}
+
 			DataSet ds_posts = btnet.Bug.get_bug_posts(bugid);
 
 			int bp_id;
