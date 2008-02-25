@@ -142,12 +142,12 @@ namespace btnet
 				msg.Fields["http://schemas.microsoft.com/cdo/configuration/smtpserverport"] = smtp_server_port;
 			}
 
-			if (attachment_bpids != null)
+			if (attachment_bpids != null && attachment_bpids.Length > 0)
 			{
 
 				string upload_folder = btnet.Util.get_upload_folder();
 
-				if (upload_folder == "")
+				if (upload_folder == null || upload_folder == "")
 				{
 					upload_folder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 					Directory.CreateDirectory(upload_folder);

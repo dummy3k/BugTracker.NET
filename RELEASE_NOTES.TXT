@@ -36,25 +36,36 @@ uploads not supported.
 Version 2.7.9  3/1/2008
 -----------------------------------------------------------------------
 
-Modified email.cs after experimenting with hosting an instance of
-BugTracker.NET at GoDaddy.  You need to specify the "UploadFolder"
-setting at GoDaddy even if you load attachments in the db, otherwise
-the logic will try to create a temporary folder, which it doesn't 
-have permission to do at Goddy.
+* Fixed generate_btnetsc_reg.aspx.  That's the page that generates a
+.reg file for the screen capture utility's settings.  
 
+* Modified email.cs after experimenting with hosting an instance of
+BugTracker.NET at GoDaddy.  Now, even if you storing attachments in the
+db, the app will still use the "UploadFolder" in order to temporarily
+store attachments in the files system before being loaded into the db.
+Before, the logic always tried to create a temporary folder, which it
+doesn't have the rights to do at GoDaddy.
 
-ForceBordersInEmails
+* Fixed bug 1891559, "Email message no longer has a border around each
+item."  Same bug described here:
+http://sourceforge.net/forum/forum.php?thread_id=1890301&forum_id=226938
+Some people reported that the css doesn't work in the email
+notifications.  As a workaround, I added a "ForceBordersInEmails"
+which uses border=1 instead of css to create a border in the emails.
+See also "btnet_css_for_email.css.renamed".  If you rename that
+file to "btnet_css_for_email.css", notifications will use that css
+file. This fix relates to this thread
 
-btnet_css_for_email.css.renamed
+* Added "days ago" to the dates displayed in edit_bug.aspx
 
-But, post to this thread:
+* Some cosmetic changes to edit_bug.aspx
+
+COREY COREY COREY But, post to this thread:
 http://sourceforge.net/forum/forum.php?thread_id=1927694&forum_id=226938
-
-
-1891559  	  Email message no longer has a border around each item
 
 spend time on this:
 1843726  	  Newline, trailing spaces in dropdown vals causes error
+
 
 -----------------------------------------------------------------------
 Version 2.7.8  2/23/2008

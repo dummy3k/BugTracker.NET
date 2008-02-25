@@ -136,10 +136,6 @@ padding: 3px;
 	font-size: 8pt;
 }
 
-.static {
-	font-size: 8pt;
-	font-weight: bold;
-}
 
 .frm {
 	padding-top: 6px;
@@ -261,13 +257,32 @@ option {
 .edit_bug_option
 {
 	font-size: 8pt;
+	font-weight: bold;
 }
 
+// for "[no category]", etc, for dropdowns
 .edit_bug_option_none
 {
 	font-size: 8pt;
 	color: #666666;
 	background: #f3f3f3;
+}
+
+
+.static {
+	font-size: 8pt;
+	font-weight: bold;
+}
+
+.edit_bug_static {
+	font-size: 8pt;
+	font-weight: bold;
+}
+
+// for "[no category]", etc, for readonly fields
+.edit_bug_static_none {
+	font-size: 8pt;
+	color: #666666;
 }
 
 input  {

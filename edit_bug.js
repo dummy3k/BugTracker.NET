@@ -364,11 +364,24 @@ function clone()
 
 }
 
+var cls = null
+var ie = null
+
+function get_text(el)
+{
+	if (ie) return el.innerText
+	else return el.textContent
+	
+}
+
 function on_body_load()
 {
-	var cls = (navigator.userAgent.indexOf("MSIE") > 0) ? "className" : "class";
-	sels = document.getElementsByTagName("select");
 
+	ie = (navigator.userAgent.indexOf("MSIE") > 0)
+	cls = (navigator.userAgent.indexOf("MSIE") > 0) ? "className" : "class";
+	
+	sels = document.getElementsByTagName("select");
+	
 	// resize the options, making them all as wide as the widest
 	max_width = 0
 
@@ -380,17 +393,46 @@ function on_body_load()
 		}
 	}
 
+	max_width += 10; // a little fudge factor, because of the bold text
+
 	for (i = 0; i < sels.length; i++)
 	{
-		sels[i].style.width = max_width
+		sels[i].style.width = max_width; 
 	}
+	
+	change_dropdown_style();
+	
+
+	spans = document.getElementsByTagName("span");
+
+	for (i = 0; i < spans.length; i++)
+	{
+		if (spans[i].getAttribute(cls) == "static")
+		{
+			if (get_text(spans[i]).indexOf("[no") > -1)
+			{
+				spans[i].setAttribute(cls,'edit_bug_static_none')
+			}
+			else
+			{
+				spans[i].setAttribute(cls,'edit_bug_static')
+			}
+		}
+	}
+	
+}
+
+function change_dropdown_style()
+{
+	
+	sels = document.getElementsByTagName("select");
 
 	// change the select styles depending on whether something has been selected or not
 	for (i = 0; i < sels.length; i++)
 	{
 		if (sels[i].id != "project")
 		{
-			sels[i].onchange = on_body_load
+			sels[i].onchange = change_dropdown_style
 		}
 		si = sels[i].options.selectedIndex;
 		if (sels[i].options[si].text.substr(0,3) == "[no")

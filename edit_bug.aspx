@@ -170,7 +170,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			// org
 
-			if (security.user.other_orgs_permission_level == 0)
+			if (security.user.other_orgs_permission_level != Security.PERMISSION_ALL)
 			{
 				default_value = Convert.ToString((int)security.user.org);
 			}
@@ -338,13 +338,18 @@ void Page_Load(Object sender, EventArgs e)
 
 			// reported by
 			string s;
-			s = "Created by <span class=static>" + btnet.Util.format_username(
-				(string) dr["reporter"],
-				(string) dr["reporter_fullname"]);
-
-			s += "</span> on <span class=static>";
+			s = "Created by ";
+			s += btnet.PrintBug.format_email_username(
+					true,
+					Convert.ToInt32(dr["id"]),
+					Convert.ToString(dr["reporter_email"]),
+					Convert.ToString(dr["reporter"]),
+					Convert.ToString(dr["reporter_fullname"]));
+			s += " on ";
 			s += btnet.Util.format_db_date (dr["reported_date"]);
-			s += "</span>";
+			s += ", ";
+			s += Convert.ToString(dr["days_ago"]);
+			s += " days ago";
 
 			reported_by.InnerHtml = s;
 
@@ -700,7 +705,7 @@ void load_project_and_user_dropdowns(DataTable project_default)
 			// Add to the list, even if permissions don't allow it now, because, in the past, they did allow it.
 			if (!project_in_dropdown)
 			{
-				project.Items.Insert(1,
+				project.Items.Add(
 					new ListItem(
 						prev_project_name.Value,
 						prev_project.Value));

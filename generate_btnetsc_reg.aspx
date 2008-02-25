@@ -34,13 +34,6 @@ write_variable_value("Username", security.user.username);
 NameValueCollection NVCSrvElements = Request.ServerVariables;
 string[] array1 = NVCSrvElements.AllKeys;
 
-for (int i = 0; i < array1.Length; i++){
-Response.Write(array1[i]);
-Response.Write("=");
-Response.Write(Request.ServerVariables[array1[i]]);
-Response.Write("<br>");
-}
-
 }
 
 void write_variable_value(string var, string val)

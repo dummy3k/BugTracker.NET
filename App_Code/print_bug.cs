@@ -413,6 +413,7 @@ namespace btnet
 			// Format the date
 			Response.Write (" on ");
 			Response.Write (btnet.Util.format_db_date(dr["bp_date"]));
+			Response.Write (", " + Convert.ToString(dr["days_ago"]) + " days ago");
 			Response.Write ("</span>");
 
 

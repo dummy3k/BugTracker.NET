@@ -527,103 +527,105 @@ insert into bug_posts
             DataSet ds_custom_cols)
         {
             string sql = @" /* get_bug_datarow */
-    declare @revision int
-    set @revision = 0";
+declare @revision int
+set @revision = 0";
 
-            if (btnet.Util.get_setting("EnableSubversionIntegration", "0") == "1")
-            {
-                sql += @"
-    select @revision = count(1)
-    from svn_affected_paths
-    inner join svn_revisions on svnap_svnrev_id = svnrev_id
-    where svnrev_bug = $id;";
-            }
+			if (btnet.Util.get_setting("EnableSubversionIntegration", "0") == "1")
+			{
+				sql += @"
+select @revision = count(1)
+from svn_affected_paths
+inner join svn_revisions on svnap_svnrev_id = svnrev_id
+where svnrev_bug = $id;";
+			}
 
-            sql += @"
-    declare @related int;
-    select @related = count(1)
-    from bug_relationships
-    where re_bug1 = $id;
+			sql += @"
+declare @related int;
+select @related = count(1)
+from bug_relationships
+where re_bug1 = $id;
 
-    select bg_id [id],
-    bg_short_desc [short_desc],
-    isnull(ru.us_username,'[deleted user]') [reporter],
-    case rtrim(ru.us_firstname)
-    when null then isnull(ru.us_lastname, '')
-    when '' then isnull(ru.us_lastname, '')
-    else isnull(ru.us_lastname + ', ' + ru.us_firstname,'')
-    end [reporter_fullname],
-    bg_reported_date [reported_date],
-    isnull(lu.us_username,'') [last_updated_user],
-    case rtrim(lu.us_firstname)
-    when null then isnull(lu.us_lastname, '')
-    when '' then isnull(lu.us_lastname, '')
-    else isnull(lu.us_lastname + ', ' + lu.us_firstname,'')
-    end [last_updated_fullname],
+select bg_id [id],
+bg_short_desc [short_desc],
+isnull(ru.us_username,'[deleted user]') [reporter],
+isnull(ru.us_email,'') [reporter_email],
+case rtrim(ru.us_firstname)
+	when null then isnull(ru.us_lastname, '')
+	when '' then isnull(ru.us_lastname, '')
+	else isnull(ru.us_lastname + ', ' + ru.us_firstname,'')
+	end [reporter_fullname],
+bg_reported_date [reported_date],
+datediff(d,bg_reported_date,getdate()) [days_ago],
+isnull(lu.us_username,'') [last_updated_user],
+case rtrim(lu.us_firstname)
+	when null then isnull(lu.us_lastname, '')
+	when '' then isnull(lu.us_lastname, '')
+	else isnull(lu.us_lastname + ', ' + lu.us_firstname,'')
+	end [last_updated_fullname],
 
 
-    bg_last_updated_date [last_updated_date],
-    isnull(bg_project,0) [project],
-    isnull(pj_name,'[no project]') [current_project],
+bg_last_updated_date [last_updated_date],
+isnull(bg_project,0) [project],
+isnull(pj_name,'[no project]') [current_project],
 
-    isnull(bg_org,0) [organization],
-    isnull(bugorg.og_name,'') [og_name],
+isnull(bg_org,0) [organization],
+isnull(bugorg.og_name,'') [og_name],
 
-    isnull(bg_category,0) [category],
-    isnull(ct_name,'') [category_name],
+isnull(bg_category,0) [category],
+isnull(ct_name,'') [category_name],
 
-    isnull(bg_priority,0) [priority],
-    isnull(pr_name,'') [priority_name],
+isnull(bg_priority,0) [priority],
+isnull(pr_name,'') [priority_name],
 
-    isnull(bg_status,0) [status],
-    isnull(st_name,'') [status_name],
+isnull(bg_status,0) [status],
+isnull(st_name,'') [status_name],
 
-    isnull(bg_user_defined_attribute,0) [udf],
-    isnull(udf_name,'') [udf_name],
+isnull(bg_user_defined_attribute,0) [udf],
+isnull(udf_name,'') [udf_name],
 
-    isnull(bg_assigned_to_user,0) [assigned_to_user],
-    isnull(asg.us_username,'[not assigned]') [assigned_to_username],
-    case rtrim(asg.us_firstname)
-    when null then isnull(asg.us_lastname, '[not assigned]')
-    when '' then isnull(asg.us_lastname, '[not assigned]')
-    else isnull(asg.us_lastname + ', ' + asg.us_firstname,'[not assigned]')
-    end [assigned_to_fullname],
+isnull(bg_assigned_to_user,0) [assigned_to_user],
+isnull(asg.us_username,'[not assigned]') [assigned_to_username],
+case rtrim(asg.us_firstname)
+when null then isnull(asg.us_lastname, '[not assigned]')
+when '' then isnull(asg.us_lastname, '[not assigned]')
+else isnull(asg.us_lastname + ', ' + asg.us_firstname,'[not assigned]')
+end [assigned_to_fullname],
 
-    isnull(bs_id,0) [subscribed],
+isnull(bs_id,0) [subscribed],
 
-    case
-    when
-	    $this_org <> bg_org
-	    and userorg.og_other_orgs_permission_level < 2
-	    and userorg.og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-		    then userorg.og_other_orgs_permission_level
-    else
-	    isnull(pu_permission_level,$dpl)
-    end [pu_permission_level],
+case
+when
+	$this_org <> bg_org
+	and userorg.og_other_orgs_permission_level < 2
+	and userorg.og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+		then userorg.og_other_orgs_permission_level
+else
+	isnull(pu_permission_level,$dpl)
+end [pu_permission_level],
 
-    isnull(bg_project_custom_dropdown_value1,'') [bg_project_custom_dropdown_value1],
-    isnull(bg_project_custom_dropdown_value2,'') [bg_project_custom_dropdown_value2],
-    isnull(bg_project_custom_dropdown_value3,'') [bg_project_custom_dropdown_value3],
-    @related [relationship_cnt],
-    @revision [revision_cnt],
-    getdate() [snapshot_timestamp]
-    $custom_cols_placeholder
-    from bugs
-    inner join users this_user on us_id = $this_usid
-    inner join orgs userorg on this_user.us_org = userorg.og_id
-    left outer join user_defined_attribute on bg_user_defined_attribute = udf_id
-    left outer join projects on bg_project = pj_id
-    left outer join orgs bugorg on bg_org = bugorg.og_id
-    left outer join categories on bg_category = ct_id
-    left outer join priorities on bg_priority = pr_id
-    left outer join statuses on bg_status = st_id
-    left outer join users asg on bg_assigned_to_user = asg.us_id
-    left outer join users ru on bg_reported_user = ru.us_id
-    left outer join users lu on bg_last_updated_user = lu.us_id
-    left outer join bug_subscriptions on bs_bug = bg_id and bs_user = $this_usid
-    left outer join project_user_xref on pj_id = pu_project
-    and pu_user = $this_usid
-    where bg_id = $id";
+isnull(bg_project_custom_dropdown_value1,'') [bg_project_custom_dropdown_value1],
+isnull(bg_project_custom_dropdown_value2,'') [bg_project_custom_dropdown_value2],
+isnull(bg_project_custom_dropdown_value3,'') [bg_project_custom_dropdown_value3],
+@related [relationship_cnt],
+@revision [revision_cnt],
+getdate() [snapshot_timestamp]
+$custom_cols_placeholder
+from bugs
+inner join users this_user on us_id = $this_usid
+inner join orgs userorg on this_user.us_org = userorg.og_id
+left outer join user_defined_attribute on bg_user_defined_attribute = udf_id
+left outer join projects on bg_project = pj_id
+left outer join orgs bugorg on bg_org = bugorg.og_id
+left outer join categories on bg_category = ct_id
+left outer join priorities on bg_priority = pr_id
+left outer join statuses on bg_status = st_id
+left outer join users asg on bg_assigned_to_user = asg.us_id
+left outer join users ru on bg_reported_user = ru.us_id
+left outer join users lu on bg_last_updated_user = lu.us_id
+left outer join bug_subscriptions on bs_bug = bg_id and bs_user = $this_usid
+left outer join project_user_xref on pj_id = pu_project
+and pu_user = $this_usid
+where bg_id = $id";
 
             if (ds_custom_cols.Tables[0].Rows.Count == 0)
             {
@@ -655,35 +657,38 @@ insert into bug_posts
         ///////////////////////////////////////////////////////////////////////
         public static DataSet get_bug_posts(int bugid)
         {
-            string sql = @"select
-			    a.bp_bug,
-			    a.bp_comment,
-			    isnull(us_username,'') [us_username],
-			    case rtrim(us_firstname)
-				    when null then isnull(us_lastname, '')
-				    when '' then isnull(us_lastname, '')
-				    else isnull(us_lastname + ', ' + us_firstname,'')
-			    end [us_fullname],
-			    isnull(us_email,'') [us_email],
-			    a.bp_date,
-			    a.bp_id,
-			    a.bp_type,
-			    isnull(a.bp_email_from,'') bp_email_from,
-			    isnull(a.bp_email_to,'') bp_email_to,
-			    isnull(a.bp_file,'') bp_file,
-			    isnull(a.bp_size,0) bp_size,
-			    isnull(a.bp_content_type,'') bp_content_type,
-			    a.bp_hidden_from_external_users,
-			    isnull(ba.bp_file,'') ba_file,  -- intentionally ba
-			    isnull(ba.bp_id,'') ba_id, -- intentionally ba
-			    isnull(ba.bp_size,'') ba_size,  -- intentionally ba
-			    isnull(ba.bp_content_type,'') ba_content_type -- intentionally ba
-			    from bug_posts a
-			    left outer join users on us_id = a.bp_user
-			    left outer join bug_posts ba on ba.bp_parent = a.bp_id and ba.bp_bug = a.bp_bug
-			    where a.bp_bug = $id
-			    and a.bp_parent is null
-			    order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
+            string sql = @"
+/* get_bug_posts */
+select
+a.bp_bug,
+a.bp_comment,
+isnull(us_username,'') [us_username],
+case rtrim(us_firstname)
+	when null then isnull(us_lastname, '')
+	when '' then isnull(us_lastname, '')
+	else isnull(us_lastname + ', ' + us_firstname,'')
+	end [us_fullname],
+isnull(us_email,'') [us_email],
+a.bp_date,
+datediff(d,a.bp_date,getdate()) [days_ago],
+a.bp_id,
+a.bp_type,
+isnull(a.bp_email_from,'') bp_email_from,
+isnull(a.bp_email_to,'') bp_email_to,
+isnull(a.bp_file,'') bp_file,
+isnull(a.bp_size,0) bp_size,
+isnull(a.bp_content_type,'') bp_content_type,
+a.bp_hidden_from_external_users,
+isnull(ba.bp_file,'') ba_file,  -- intentionally ba
+isnull(ba.bp_id,'') ba_id, -- intentionally ba
+isnull(ba.bp_size,'') ba_size,  -- intentionally ba
+isnull(ba.bp_content_type,'') ba_content_type -- intentionally ba
+from bug_posts a
+left outer join users on us_id = a.bp_user
+left outer join bug_posts ba on ba.bp_parent = a.bp_id and ba.bp_bug = a.bp_bug
+where a.bp_bug = $id
+and a.bp_parent is null
+order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             DbUtil dbutil = new DbUtil();
