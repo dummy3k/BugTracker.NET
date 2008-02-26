@@ -4,31 +4,20 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-* allow for more css control in bug form
-
 * dashboard
 
 * many to many, queries to organizations
-
-* change setup.sql for guest organization
-
 * Wordwrap, and take advantage of new api to add attachment as attachment
 * apostrophe's, commas, quotes in custom field names, values
 * excel export for reports
 * field level permissions for custom fields?
 * escalation/reminder
-
 * "its" not "it's" in docs.
-
 * new fckEditor - read my own fckdocs at ifdefined.  note that image
 uploads not supported.
-
 * add arbitrary users/subscribers?
-
 * make read only if closed
-
 * document workflow.cs at ifdefined.
-
 * document ldap at ifdefined.
 
 
@@ -59,6 +48,8 @@ file. This fix relates to this thread
 * Added "days ago" to the dates displayed in edit_bug.aspx
 
 * Some cosmetic changes to edit_bug.aspx
+
+* Some cosmetic changes to search.aspx.  
 
 COREY COREY COREY But, post to this thread:
 http://sourceforge.net/forum/forum.php?thread_id=1927694&forum_id=226938

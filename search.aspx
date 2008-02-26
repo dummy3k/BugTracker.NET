@@ -1702,6 +1702,7 @@ function set_project_changed() {
 	</tr>
 
 </table>
+<br>
 <table border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> description contains:&nbsp;</span>
@@ -1729,7 +1730,7 @@ function set_project_changed() {
 
 
 	<tr>
-		<td><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments since:&nbsp;</span>
+		<td nowrap><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments since:&nbsp;</span>
 		<td colspan=2><input type=text class=txt id="comments_since" runat="server" onkeyup="on_change()" size=10>
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.comments_since',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
@@ -1740,7 +1741,7 @@ function set_project_changed() {
 
 
 	<tr>
-		<td><span class=lbl>"Reported on" from date:&nbsp;</span>
+		<td nowrap><span class=lbl>"Reported on" from date:&nbsp;</span>
 		<td colspan=2><input runat="server" type=text class=txt  id="from_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.from_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
@@ -1758,7 +1759,7 @@ function set_project_changed() {
 	</tr>
 
 	<tr>
-		<td><span class=lbl>"Last updated on" from date:&nbsp;</span>
+		<td  nowrap><span class=lbl>"Last updated on" from date:&nbsp;</span>
 		<td colspan=2><input runat="server" type=text class=txt  id="lu_from_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
 			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_from_date',null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
@@ -1805,127 +1806,122 @@ function set_project_changed() {
 
 		int fieldLength = int.Parse(drcc["length"].ToString());
 
-		if ( fieldLength > minTextAreaSize )
+		string dropdown_options = Convert.ToString(drcc["vals"]);
+
+		if (dropdown_type != "" || dropdown_options != "")
 		{
-			Response.Write ("<textarea cols=\"" + minTextAreaSize + "\" rows=\"" + (((fieldLength/minTextAreaSize)>maxTextAreaRows) ? maxTextAreaRows : (fieldLength/minTextAreaSize)) + "\" " );
-			Response.Write ("  onkeyup=\"on_change()\" ");
+			// create dropdown here
+
+			Response.Write ("<select multiple=multiple size=3 onchange='on_change()' ");
+
+			Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
 			Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
-			Response.Write (" id=\"" + drcc["name"].ToString() + "\" >");
-			Response.Write (HttpUtility.HtmlEncode(Request[(string)drcc["name"]]));
-			Response.Write ("</textarea>");
-		}
-		else
-		{
-			string dropdown_options = Convert.ToString(drcc["vals"]);
+			Response.Write (">");
 
-			if (dropdown_type != "" || dropdown_options != "")
+			string selected_vals = Request[Convert.ToString(drcc["name"])];
+			if (selected_vals == null)
 			{
-				// create dropdown here
+				selected_vals = "";
+			}
+			string[] selected_vals_array = Util.split_string_using_commas(selected_vals);
 
-				Response.Write ("<select multiple=multiple size=3 onchange='on_change()' ");
-
-				Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
-				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
-				Response.Write (">");
-
-				string selected_vals = Request[Convert.ToString(drcc["name"])];
-				if (selected_vals == null)
+			if (dropdown_type != "users")
+			{
+				string[] options = Util.split_string_using_pipes(dropdown_options);
+				for (int j = 0; j < options.Length; j++)
 				{
-					selected_vals = "";
-				}
-				string[] selected_vals_array = Util.split_string_using_commas(selected_vals);
+					Response.Write ("<option ");
 
-				if (dropdown_type != "users")
-				{
-					string[] options = Util.split_string_using_pipes(dropdown_options);
-					for (int j = 0; j < options.Length; j++)
+					// reselect vals
+					for (int k = 0; k < selected_vals_array.Length; k++)
 					{
-						Response.Write ("<option ");
-
-						// reselect vals
-						for (int k = 0; k < selected_vals_array.Length; k++)
+						if (options[j] == selected_vals_array[k])
 						{
-							if (options[j] == selected_vals_array[k])
-							{
-								Response.Write (" selected ");
-								break;
-							}
+							Response.Write (" selected ");
+							break;
 						}
-
-						Response.Write (">");
-						Response.Write (options[j]);
-						Response.Write ("</option>");
 					}
+
+					Response.Write (">");
+					Response.Write (options[j]);
+					Response.Write ("</option>");
 				}
-				else
-				{
-					DataView dv_users = new DataView(dt_users);
-					foreach (DataRowView drv in dv_users)
-					{
-						string user_id = Convert.ToString(drv[0]);
-						string user_name = Convert.ToString(drv[1]);
-
-						Response.Write ("<option value=");
-						Response.Write (user_id);
-
-						// reselect vals
-						for (int k = 0; k < selected_vals_array.Length; k++)
-						{
-							if (user_id == selected_vals_array[k])
-							{
-								Response.Write (" selected ");
-								break;
-							}
-						}
-
-						Response.Write (">");
-						Response.Write (user_name);
-						Response.Write ("</option>");
-
-					}
-				}
-
-				Response.Write ("</select>");
-
 			}
 			else
 			{
-
-				Response.Write ("<input type=text class=txt");
-				Response.Write ("  onkeyup=\"on_change()\" ");
-
-				// match the size of the text field to the size of the database field
-				if (datatype == "nvarchar")
+				DataView dv_users = new DataView(dt_users);
+				foreach (DataRowView drv in dv_users)
 				{
-					Response.Write (" size=" + Convert.ToString((Convert.ToInt32(drcc["length"]) / 2)));
-					Response.Write (" maxlength=" + Convert.ToString((Convert.ToInt32(drcc["length"]) / 2)));
-				}
-				else if (datatype == "varchar")
-				{
-					Response.Write (" size=" + drcc["length"]);
-					Response.Write (" maxlength=" + drcc["length"]);
-				}
+					string user_id = Convert.ToString(drv[0]);
+					string user_name = Convert.ToString(drv[1]);
 
-				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
-				Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
+					Response.Write ("<option value=");
+					Response.Write (user_id);
 
-				Response.Write (" value=\"");
-				if (Request[(string)drcc["name"]]!="")
-				{
-					Response.Write (HttpUtility.HtmlEncode(Request[(string)drcc["name"]]));
-				}
-				Response.Write ("\"");
-				Response.Write (">");
+					// reselect vals
+					for (int k = 0; k < selected_vals_array.Length; k++)
+					{
+						if (user_id == selected_vals_array[k])
+						{
+							Response.Write (" selected ");
+							break;
+						}
+					}
 
-				if ((datatype == "nvarchar" || datatype == "varchar")
-				&& dropdown_type == "")
-				{
-					//
+					Response.Write (">");
+					Response.Write (user_name);
+					Response.Write ("</option>");
+
 				}
-				else
-				{
-					Response.Write ("&nbsp;&nbsp;<span class=smallnote>Enter multiple values using commas, no spaces: 1,2,3</span>");
-				}
+			}
+
+			Response.Write ("</select>");
+
+		}
+		else
+		{
+
+			Response.Write ("<input type=text class=txt");
+			Response.Write ("  onkeyup=\"on_change()\" ");
+
+			// match the size of the text field to the size of the database field
+
+			int size = 0;
+
+			if (datatype == "nvarchar")
+			{
+				size = Convert.ToInt32(drcc["length"]) / 2;
+			}
+			else
+			{
+				size = Convert.ToInt32(drcc["length"]);
+			}
+
+			if (size > 60) size = 60;
+			string size_string = Convert.ToString(size);
+
+			Response.Write (" size=" + size_string);
+			Response.Write (" maxlength=" + size_string);
+
+			Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
+			Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
+
+			Response.Write (" value=\"");
+			if (Request[(string)drcc["name"]]!="")
+			{
+				Response.Write (HttpUtility.HtmlEncode(Request[(string)drcc["name"]]));
+			}
+			Response.Write ("\"");
+			Response.Write (">");
+
+			if ((datatype == "nvarchar" || datatype == "varchar")
+			&& dropdown_type == "")
+			{
+				//
+			}
+			else
+			{
+				Response.Write ("&nbsp;&nbsp;<span class=smallnote>Enter multiple values using commas, no spaces: 1,2,3</span>");
 			}
 		}
 	}

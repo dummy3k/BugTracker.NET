@@ -21,7 +21,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
 	if (security.user.is_admin || security.user.can_merge_bugs)
 	{
