@@ -150,7 +150,7 @@ or isnull(pj_enable_custom_dropdown3,0) = 1";
 			{
 				do_query();
 			}
-			sort_dataview();
+			sort_and_filter_dataview();
 		}
 	}
 

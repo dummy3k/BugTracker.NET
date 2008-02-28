@@ -22,6 +22,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "admin";
+
 }
 
 

@@ -12,6 +12,27 @@ string prev_day = DateTime.Now.ToString("yyyy-MM-dd");
 public void Application_Error(Object sender, EventArgs e)
 {
 
+	StringBuilder server_vars = new StringBuilder();
+
+	int loop1, loop2;
+	NameValueCollection coll;
+
+	// Load ServerVariable collection into NameValueCollection object.
+	coll=Request.ServerVariables;
+	// Get names of all keys into a string array.
+	String[] arr1 = coll.AllKeys;
+	for (loop1 = 0; loop1 < arr1.Length; loop1++)
+	{
+	   server_vars.Append("\n");
+	   server_vars.Append(arr1[loop1]);
+	   server_vars.Append("=");
+	   String[] arr2=coll.GetValues(arr1[loop1]);
+	   for (loop2 = 0; loop2 < 1; loop2++) {
+		  server_vars.Append(arr2[loop2]);
+	   }
+	}
+
+
 	Exception exc = Server.GetLastError().GetBaseException();
 
 	bool log_enabled = (Util.get_setting("LogEnabled","1") == "1");
@@ -27,7 +48,7 @@ public void Application_Error(Object sender, EventArgs e)
 		w.WriteLine("MSG: " + exc.Message.ToString());
 		w.WriteLine("URL: " + Request.Url.ToString());
 		w.WriteLine("EXCEPTION: " + exc.ToString());
-		
+		w.WriteLine(server_vars.ToString());		
 		w.Close();
 	}
 	
@@ -37,14 +58,19 @@ public void Application_Error(Object sender, EventArgs e)
 		string to = Util.get_setting("ErrorEmailTo","");
 		string from = Util.get_setting("ErrorEmailFrom","");
 		string subject = "Error: " + exc.Message.ToString();
-		string body = "\nTIME: "
-			+ DateTime.Now.ToLongTimeString()
-			+ "\nURL: "
-			+ Request.Url.ToString()
-			+ "\nException: "
-			+ exc.ToString();
 
-		btnet.Email.send_email(to, from, "", subject, body); // 5 args				
+		StringBuilder body = new StringBuilder();
+
+
+		body.Append("\nTIME: ");
+		body.Append(DateTime.Now.ToLongTimeString());
+		body.Append("\nURL: ");
+		body.Append(Request.Url.ToString());
+		body.Append("\nException: ");
+		body.Append(exc.ToString());
+		body.Append(server_vars.ToString());
+
+		btnet.Email.send_email(to, from, "", subject, body.ToString()); // 5 args				
 	}
 }
      

@@ -144,7 +144,7 @@ string get_paging_string()
 
 
 ///////////////////////////////////////////////////////////////////////
-void sort_dataview() {
+void sort_and_filter_dataview() {
 
 	if (dv == null) return;
 	
@@ -166,6 +166,7 @@ void sort_dataview() {
 	}
 	else
 	{
+
 		Session["filter"] = filter.Value;
 		string filter_string = filter.Value;
 
@@ -174,7 +175,14 @@ void sort_dataview() {
 		filter_string = filter_string.Replace("[$FLAG]<>$$$$$$","[$FLAG] <>0");
 		filter_string = filter_string.Replace("[$FLAG] =$$$$$$","[$FLAG] =0");
 		
-		dv.RowFilter = filter_string.Replace("'","''").Replace("$$$","'");
+		try
+		{
+			dv.RowFilter = filter_string.Replace("'","''").Replace("$$$","'");
+		}
+		catch(Exception)
+		{
+			// just in case a filter in the Session is incompatible
+		}
 	}
 	
 	

@@ -51,11 +51,20 @@ file. This fix relates to this thread
 
 * Some cosmetic changes to search.aspx.  
 
+
+* Writing the server variables into the log and error notification 
+email
+
+* fixed a bug where sometimes the bugs.aspx would crash trying to use 
+a filter that no longer applied to the query.
+
 COREY COREY COREY But, post to this thread:
 http://sourceforge.net/forum/forum.php?thread_id=1927694&forum_id=226938
 
 spend time on this:
 1843726  	  Newline, trailing spaces in dropdown vals causes error
+
+
 
 
 -----------------------------------------------------------------------
