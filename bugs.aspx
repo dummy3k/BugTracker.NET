@@ -9,7 +9,6 @@ Distributed under the terms of the GNU General Public License
 
 DbUtil dbutil;
 Security security;
-bool query_changed = false;
 string qu_id_string = null;
 string sql_error = "";
 

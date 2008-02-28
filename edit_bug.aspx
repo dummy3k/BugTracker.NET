@@ -2040,7 +2040,11 @@ void on_update (Object sender, EventArgs e)
 						custom_cols_sql += ",[" + drcc["name"].ToString() + "]";
 						custom_cols_sql += " = ";
 
-						string val = Request[drcc["name"].ToString()].Replace("'","''");
+						string val = Request[drcc["name"].ToString()];
+						if (val == null)
+							val = "";
+						else
+							val = val.Replace("'","''");
 
 						//modified by CJU on jan 9 2008 : added handling of the decimal datatype case
 						if( val.Length > 0 ) {
