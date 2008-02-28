@@ -1408,7 +1408,7 @@ bool did_something_change()
 		{
 			string var = (string)drcc["name"];
 			string before = hash_prev_custom_cols[var].ToString();
-			string after = hash_custom_cols[var].ToString();
+			string after = Convert.ToString(hash_custom_cols[var]);
 
 			if (before != after)
 			{
