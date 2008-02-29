@@ -1590,14 +1590,14 @@ bool record_changes()
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
 		string var = (string)drcc["name"];
-		string before = hash_prev_custom_cols[var].ToString();
-		string after = hash_custom_cols[var].ToString();
+		string before = Convert.ToString(hash_prev_custom_cols[var]);
+		string after = Convert.ToString(hash_custom_cols[var]);
 
-		if (before == null || before == "0" || before == "")
+		if (before == "0" || before == "")
 		{
 			before = "";
 		}
-		if (after == null || after == "0" || after == "")
+		if (after == "0" || after == "")
 		{
 			after = "";
 		}

@@ -28,6 +28,9 @@ Version 2.7.9  3/1/2008
 * Fixed generate_btnetsc_reg.aspx.  That's the page that generates a
 .reg file for the screen capture utility's settings.  
 
+* Fixed bug 1904370 "index out of range error on edit_bugs.aspx" when
+user is guest and there are no projects in the project dropdown.
+
 * Modified email.cs after experimenting with hosting an instance of
 BugTracker.NET at GoDaddy.  Now, even if you storing attachments in the
 db, the app will still use the "UploadFolder" in order to temporarily
@@ -47,16 +50,18 @@ file. This fix relates to this thread
 
 * Added "days ago" to the dates displayed in edit_bug.aspx
 
-* Some cosmetic changes to edit_bug.aspx
-
-* Some cosmetic changes to search.aspx.  
-
+* Some cosmetic changes to edit_bug.aspx and search.aspx.
 
 * Writing the server variables into the log and error notification 
 email
 
-* fixed a bug where sometimes the bugs.aspx would crash trying to use 
+* Fixed a bug where sometimes the bugs.aspx would crash trying to use 
 a filter that no longer applied to the query.
+
+* Fixed "Object reference not set to an instance of an object".  I only
+experienced this with the instance hosted at GoDaddy.  Not sure what is
+going on.  All the places were where the code is looking for a custom
+field's value to be present in the Request's variable collection.
 
 COREY COREY COREY But, post to this thread:
 http://sourceforge.net/forum/forum.php?thread_id=1927694&forum_id=226938
@@ -65,7 +70,7 @@ spend time on this:
 1843726  	  Newline, trailing spaces in dropdown vals causes error
 
 
-
+enableViewStateMac
 
 -----------------------------------------------------------------------
 Version 2.7.8  2/23/2008
