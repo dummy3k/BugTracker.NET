@@ -13,55 +13,12 @@ Release notes:
 * field level permissions for custom fields?
 * escalation/reminder
 * "its" not "it's" in docs.
-* new fckEditor - read my own fckdocs at ifdefined.  note that image
+* new fckEditor - read my own fckdocs at ifdefined. note that image
 uploads not supported.
 * add arbitrary users/subscribers?
 * make read only if closed
 * document workflow.cs at ifdefined.
 * document ldap at ifdefined.
-
-
------------------------------------------------------------------------
-Version 2.7.9  3/1/2008
------------------------------------------------------------------------
-
-* Fixed generate_btnetsc_reg.aspx.  That's the page that generates a
-.reg file for the screen capture utility's settings.  
-
-* Fixed bug 1904370 "index out of range error on edit_bugs.aspx" when
-user is guest and there are no projects in the project dropdown.
-
-* Modified email.cs after experimenting with hosting an instance of
-BugTracker.NET at GoDaddy.  Now, even if you storing attachments in the
-db, the app will still use the "UploadFolder" in order to temporarily
-store attachments in the files system before being loaded into the db.
-Before, the logic always tried to create a temporary folder, which it
-doesn't have the rights to do at GoDaddy.
-
-* Fixed bug 1891559, "Email message no longer has a border around each
-item."  Same bug described here:
-http://sourceforge.net/forum/forum.php?thread_id=1890301&forum_id=226938
-Some people reported that the css doesn't work in the email
-notifications.  As a workaround, I added a "ForceBordersInEmails"
-which uses border=1 instead of css to create a border in the emails.
-See also "btnet_css_for_email.css.renamed".  If you rename that
-file to "btnet_css_for_email.css", notifications will use that css
-file. This fix relates to this thread
-
-* Added "days ago" to the dates displayed in edit_bug.aspx
-
-* Some cosmetic changes to edit_bug.aspx and search.aspx.
-
-* Writing the server variables into the log and error notification 
-email
-
-* Fixed a bug where sometimes the bugs.aspx would crash trying to use 
-a filter that no longer applied to the query.
-
-* Fixed "Object reference not set to an instance of an object".  I only
-experienced this with the instance hosted at GoDaddy.  Not sure what is
-going on.  All the places were where the code is looking for a custom
-field's value to be present in the Request's variable collection.
 
 COREY COREY COREY But, post to this thread:
 http://sourceforge.net/forum/forum.php?thread_id=1927694&forum_id=226938
@@ -70,14 +27,74 @@ spend time on this:
 1843726  	  Newline, trailing spaces in dropdown vals causes error
 
 
-enableViewStateMac
+* In my Web.config at GoDaddy, I also set "enableViewStateMac" to false
+in Web.config.
+
+
+-----------------------------------------------------------------------
+Version 2.7.9  3/1/2008
+-----------------------------------------------------------------------
+
+Bug fixes. A few of these fixes are the result of me running a
+public instance of BugTracker.NET hosted at GoDaddy, at 
+http://ifdefined.com/btnet.
+
+* Fixed bug 1891559, "Email message no longer has a border around each
+item."  Same bug described here:
+http://sourceforge.net/forum/forum.php?thread_id=1890301&forum_id=226938
+Some people reported that the css doesn't work in the email
+notifications. As a workaround, I added a "ForceBordersInEmails"
+which uses border=1 instead of css to create a border in the emails.
+See also "btnet_css_for_email.css.renamed". If you rename that file to 
+"btnet_css_for_email.css", notifications will use that css file.
+
+* Fixed bug with generate_btnetsc_reg.aspx. It's the page that 
+generates a .reg file for the screen capture utility's settings. There
+was some debugging code accidently left in it.
+
+* Fixed bug 1904370 "index out of range error on edit_bugs.aspx" when
+user is guest and there are no projects in the project dropdown.
+
+* Modified email.cs after experimenting with hosting an instance of
+BugTracker.NET at GoDaddy. Now, even if you storing attachments in the
+db, the app will still use the "UploadFolder" in order to temporarily
+store attachments in the files system before being loaded into the db.
+Before, the logic always tried to create a temporary folder, which it
+doesn't have the rights to do at GoDaddy.
+
+* Fixed a bug where sometimes the bugs.aspx would crash trying to use 
+a filter that no longer applied to the query.You had to switch back
+and forth between the search and bugs page to make the crash happen.
+
+* Fixed "Object reference not set to an instance of an object" bug
+that was happening at BugTracker.NET running at GoDaddy. Where the
+logic was looking for a custom field in the Request's variable
+collection, the logic now handles the case of the variable being 
+missing.
+
+* Merged in code from Gerard Chanekon that adds ids to project
+specific custom fields in edit_bug.aspx, to help with css.
+
+* Corrected insert_bug.aspx to truncate short description at 200 
+chars, not 100.
+
+Enhancements:
+
+* Added "days ago" to the dates displayed in edit_bug.aspx
+
+* Some cosmetic changes to edit_bug.aspx and search.aspx.
+
+* The app intercepts errors and writes them to the log and can also send
+an email with the info. Now writing the server variables into the log 
+and error notification emails. Server variables means things like the
+IP of the browser, User Agent, Referer, Cookie Values...
 
 -----------------------------------------------------------------------
 Version 2.7.8  2/23/2008
 -----------------------------------------------------------------------
 
 To upgrade to this release, run the SQL from upgrade.sql that creates
-the emailed_links table.  You only need this table if you turn on the
+the emailed_links table. You only need this table if you turn on the
 new features related to the new Web.config settings 
 "AllowSelfRegistration" and "ShowForgotPasswordLink".
 
@@ -90,15 +107,15 @@ wasn't being initialized
 * Corrected the sample code in workflow.cs.
 
 * Fixed bug where emails with subjects longer than 200 chars were
-failing to be inserted into the db.  Now insert_bugs.aspx truncates the
+failing to be inserted into the db. Now insert_bugs.aspx truncates the
 subject at 200.
 
 * Added option to enforce strong passwords. See"RequireStrongPasswords"
-in Web.config.  Turning on the flag has no effect on users until they
-try to change their passwords.  This satisfies RFE 1726311.
+in Web.config. Turning on the flag has no effect on users until they
+try to change their passwords. This satisfies RFE 1726311.
 
 * Users can now reset their own passwords if they forget them.
-See "ShowForgotPasswordLink" in Web.config.  This satisifies RFE 904044.
+See "ShowForgotPasswordLink" in Web.config. This satisifies RFE 904044.
 
 * Users can now register themselves (add themselves to the user table).
 See the following settings in Web.config:
@@ -112,14 +129,14 @@ See the following settings in Web.config:
 Version 2.7.7  2/16/2008
 -----------------------------------------------------------------------
 
-* Added new Web.config setting "AllowGuestWithoutLogin".  This is the
+* Added new Web.config setting "AllowGuestWithoutLogin". This is the
 explanation from Web.config:
 
 	There's a special user in the database, "guest". Think of it as a 
 	user account that can be shared by several people. The guest user 
 	can't save settings and can't save searches. If 
 	"AllowGuestWithoutLogin" is set to "0", then the guest user still 
-	has to login with a password.  If set to "1", then the guest user 
+	has to login with a password. If set to "1", then the guest user 
 	doesn't need to even enter a password. Instead, a link will appear 
 	on the login page, default.aspx, saying:
 
@@ -135,12 +152,12 @@ explanation from Web.config:
 * Bug's last update datetime/user is now updated when an email is sent.
 
 * Some people have reported that there are no borders around the
-comments in the email notifications.  I made changes to print_bug.cs
-that may have fixed the problem.  Not sure, sinece I could never
-reproduce the problem.  If you had this problem before and this
+comments in the email notifications. I made changes to print_bug.cs
+that may have fixed the problem. Not sure, sinece I could never
+reproduce the problem. If you had this problem before and this
 release fixes it, please let me know at ctrager@yahoo.com.
 
-* Added another query sample to setup.sql.  This one shows the bugs
+* Added another query sample to setup.sql. This one shows the bugs
 that have been stuck the longest time without a status change.
 Here's the SQL if you want to try it out:
 
@@ -171,7 +188,7 @@ reading.
 
 * Cosmetic changes to edit_bug.aspx, which I hope folks will like.
 
-* Printing of "detail" reports should have better performance.  Before, 
+* Printing of "detail" reports should have better performance. Before, 
 the css styles were wrongly being included once per bug, not once
 for the whole page.
 
@@ -184,18 +201,18 @@ short description was hidden on the edit_bug.aspx page.
 
 * Changed the implementation of filters dropdowns in the bug lists so 
 that usually, they only show choices that are actually present in the 
-bug list.  Before this change, if you had external users looking at
+bug list. Before this change, if you had external users looking at
 bugs assigned to internal users, the filter dropdowns would have 
 been missing the internal users. Thanks to Suchacek Zdenek for
 reporting this.
 
 * I added a way to make it a bit easier for somebody with C# coding
-skills to build strict workflow rules in BugTracker.NET.  See the
-new file, App_Code\workflow.cs.  It's  the designated spot for your 
-custom C# code to control the transition of statuses.  For example, if
+skills to build strict workflow rules in BugTracker.NET. See the
+new file, App_Code\workflow.cs. It's  the designated spot for your 
+custom C# code to control the transition of statuses. For example, if
 you want to say that the only valid status after "tested" is
 "deployed", or if you only want users in the "testers" group to mark a
-bug as "tested", then you could add your logic to this file.  See the
+bug as "tested", then you could add your logic to this file. See the
 comments in the file for more detail.
 
 -----------------------------------------------------------------------
@@ -224,7 +241,7 @@ To enable LDAP support, configure these settings in your Web.config:
 
 <!--
 	You can have BugTracker.NET check the user's password using an LDAP server instead of
-	checking it in the database.  You still have to create a BugTracker.NET user. It's only
+	checking it in the database. You still have to create a BugTracker.NET user. It's only
 	the password that get's checked.
 
 	To use LDAP, set AuthenticateUsingLdap to 1 and enter the appropriariate distinguished name.
@@ -244,13 +261,13 @@ BugTracker.NET's database. See "import_users_from_ldap_sample.cs".
 Also:
 
 * Fixed bug with duplicate users in user dropdowns that affected 
-"external" users.  Thanks to Suchacek Zdenek for help with this.
+"external" users. Thanks to Suchacek Zdenek for help with this.
 
 * Fixed how app was handling bugs associated with inactive projects or
 inactive users, or users who are no longer marked assignable. Before,
 if a bug was assigned to an inactive user, and then you updated the bug
 in some other way, you would inadvertently also change the user too, 
-because the inactive user was missing from the dropdown.  Now, the
+because the inactive user was missing from the dropdown. Now, the
 current project/user is always FORCED into the dropdown, even if
 it is inactive.
 
@@ -259,7 +276,7 @@ Version 2.7.4  1/27/2008
 -----------------------------------------------------------------------
 
 * With this version, BugTracker.NET no longer supports storing user
-passwords unencrypted.  The setting "EncryptStoredPasswords" is now 
+passwords unencrypted. The setting "EncryptStoredPasswords" is now 
 ignored because passwords are now ALWAYS stored encrypted.
 
 To upgrade to this version, run the following SQL to modify your 
@@ -268,7 +285,7 @@ alter table users add us_salt int null
 
 As users log in, if their passwords had been stored unencrypted, 
 the app will automatically update the database with the encrypted 
-passwords.  Or, you can encrypt all the passwords by invoking this
+passwords. Or, you can encrypt all the passwords by invoking this
 page:
 upgrade_723_to_724.aspx
 
@@ -276,7 +293,7 @@ Even passwords that had been encrypted before will be re-encrypted
 with a stronger encryption scheme.
 
 
-* Now using the the ASP.NET "App_Code" folder.  Util.cs has been split
+* Now using the the ASP.NET "App_Code" folder. Util.cs has been split
 up into several smaller files.
 
 
@@ -292,7 +309,7 @@ relevant part of the script against your database to upgrade.
 * Added field level permissions for the non-custom fields. As admin, 
 go to "organization" and see the field level permissions related to
 project, org, category, priority, assigned_to, status, and the
-user-defined-field.   No field level permissions on custom fields or
+user-defined-field. No field level permissions on custom fields or
 project-specific custom fields.
 
 * Added the concept of parent/child to relationships between bugs.
@@ -301,12 +318,12 @@ project-specific custom fields.
 Version 2.7.2  1/12/2008
 -----------------------------------------------------------------------
 
-THIS RELEASE FIXES SECURITY VULNERABILITIES.  Please email me at 
+THIS RELEASE FIXES SECURITY VULNERABILITIES. Please email me at 
 ctrager@yahoo.com if you think there are still vulnerabilities.
 
 * Fixed the worst Cross Site Request Forgery (CSRF) vulnerabilities.
 This is work is related to bug 1867089 "Multiple XSS and CSRF 
-vulnerabilities".  Many thanks to Si Wong for discovering and reporting
+vulnerabilities". Many thanks to Si Wong for discovering and reporting
 these important vulnerabilities.
 
 For more about CSRF, also known as "session riding", read here:
@@ -332,7 +349,7 @@ I'm not aware of any other XSS vulnerability.
 been showing the "no project" option.
 
 * Fixed bug 978216 "Globalization problem on custom fields when type is 
-float".  Or rather decimal.  Edit_bug.aspx was changed to handle the
+float". Or rather decimal. Edit_bug.aspx was changed to handle the
 European decimal fields, which can use a comma as the separator instead of
 a period. Thanks to Christian Jundt for the code.
 
@@ -355,7 +372,7 @@ when a filter changes the number of bugs shown in a query, the text
 becomes:
 Showing N out of N bugs returned by query.
 
-* Resolved bug 1863186 "HideSql flag ineffective in 2.7.0".  Actually,
+* Resolved bug 1863186 "HideSql flag ineffective in 2.7.0". Actually,
 support for the Web.config "HideSql" setting was dropped in 
 version 2.5.8, but I forgot to remove it from Web.config itself.
 
@@ -364,7 +381,7 @@ Version 2.7.0  12/21/2007
 -----------------------------------------------------------------------
 
 * Fixed bug - "or" logic in search page allowed people to see items
-in the list that they don't have permission to see.   The sql had been
+in the list that they don't have permission to see. The sql had been
 wrong, something like this:
 where has permission OR matches criteria 1 OR matches criteria 2
 The corrected SQL is something like this:
@@ -375,10 +392,10 @@ organizations even if the user didn't have permission to see them. Now,
 if the user doesn't have permissions to see other organizations, the
 dropdown isn't even shown.
 
-* Fixed bug with the flag feature - flag.aspx was caching.  Add logic to
+* Fixed bug with the flag feature - flag.aspx was caching. Add logic to
 tell the browser not to cache flag.aspx.
 
-* Added new feature, "create copy".   It will create a copy of a bug,
+* Added new feature, "create copy". It will create a copy of a bug,
 not including related posts.
 
 -----------------------------------------------------------------------
@@ -399,8 +416,8 @@ being persistent about reporting the bug and supplying the correct code.
 in case you have nulls in those fields.
 
 * Fixed some typos related to project custom dropdowns in search, for
-dropdowns 2 and 3.  Also, improved performance of search with regards 
-to project custom dropdowns.  The page no longer makes a trip to the 
+dropdowns 2 and 3. Also, improved performance of search with regards 
+to project custom dropdowns. The page no longer makes a trip to the 
 server if you are NOT using project custom dropdowns.
 
 * Fixed "Object not set to reference bug on this line in edit_bug.aspx
@@ -412,7 +429,7 @@ Line 1851: string val = Request[drcc["name"].ToString()].Replace("'","''");
 New Feature:
 
 Add ability for each user to mark bugs with a personal flag, like, 
-"Flag for follow-up".  Use the new magic "$FLAG" macro in your
+"Flag for follow-up". Use the new magic "$FLAG" macro in your
 queries as shown below. You also need the left outer join 
 with the bug_user_flags table.
 
@@ -441,12 +458,12 @@ newly added subscriber should get a notification.
 
 * Fixed bug for when there are two "WHERE" clauses in the SQL and it's
 the second one that needs to be altered for the permissions. It's a
-workaround.  First the logic looks for "WhErE", with the upper/lower 
-case letters exactly like that.  Note the weird capitalization.  For an
+workaround. First the logic looks for "WhErE", with the upper/lower 
+case letters exactly like that. Note the weird capitalization. For an
 example, see setup.sql, "demo last comment as column".
 
 * Fixed bug with add_svn_file_revisions.aspx. It was submitting the
-data twice.  Thanks to Walt Crosby for the fix.
+data twice. Thanks to Walt Crosby for the fix.
 
 * Fixed bug 1707551 "[No project] = no edit" - when somebody adds a
 bug and doesn't set the project, then nobody can get to it in order
@@ -454,13 +471,13 @@ to add the project if the DefaultPermissionLevel is not 2.
 
 New features:
 
-* You can now associate a bug to an "Organization".  Typically, an
+* You can now associate a bug to an "Organization". Typically, an
 "Organization" would be your company's customer, but it could also
 be a department within your company, or whatever group of users you want.
 
 * Added "Permission level for bugs associated with other (or no) 
-organizations".  This allows you to restrict a gorup of users to
-just being able to see bugs associated with that group.  Typically,
+organizations". This allows you to restrict a gorup of users to
+just being able to see bugs associated with that group. Typically,
 you would use this to restrict a customer, or an individual, to
 only seeing bugs associated with that customer or individual.
 
@@ -533,7 +550,7 @@ change" was not checked.
 an additional notification per attachment.
 
 * Along with this release I'm posting a new version of the screen
-capture utility, btnetsc.exe version 2.1.1.  There was a bug fix:
+capture utility, btnetsc.exe version 2.1.1. There was a bug fix:
 
 Posting a screenshot to an EXISTING bug wrongly created a NEW bug 
 instead of adding an attachment to the specified existing bug.
@@ -545,11 +562,11 @@ Version 2.6.5  11/18/2007
 
 * !!!!!IMPORTANT!!!!!    Print bug AND email notifications were both 
 broken by 2.6.4 because the logic was looking for btnet_custom.css in 
-the wrong folder.   If you don't want to move to this release, then you
+the wrong folder. If you don't want to move to this release, then you
 can put an additional copy of btnet_custom.css into the parent btnet
 folder to fix the problem.
 
-* Cosmetic changes in the add/edit bug form.  The goal is to make it
+* Cosmetic changes in the add/edit bug form. The goal is to make it
 easier to read for all three categories of users:
 - full add/edit permission
 - reporter only permission
@@ -578,7 +595,7 @@ relevant part of the script against your database to upgrade.
 
 * Created new "custom" folder and moved several files into it. All the
 files intended for customization are in this folder now, except for
-Web.config.  When you upgrade to a new version of BugTracker.NET, just
+Web.config. When you upgrade to a new version of BugTracker.NET, just
 make sure you don't overlay your Web.config and all the files in the 
 "custom" folder.
 
@@ -586,7 +603,7 @@ make sure you don't overlay your Web.config and all the files in the
 WebSvn URL for specific projects different from the overall global 
 settings in Web.config.
 
-* Fixed svn_blame.aspx.  It wasn't HTML encoding the text of the 
+* Fixed svn_blame.aspx. It wasn't HTML encoding the text of the 
 document, so if the code had HTML tags, the page displayed nonsense.
 
 * RFE 1750613 "Project Description and name, not just name"
@@ -616,7 +633,7 @@ font/color formatting. Thanks to Jochen Jonckheere for the fix.
 Version 2.6.3  11/10/2007
 -----------------------------------------------------------------------
 
-* The Web.config setting "LogoHtml" is now obsolete.  Instead, there
+* The Web.config setting "LogoHtml" is now obsolete. Instead, there
 are now three new files that give you even more control over the look:
 
 custom_logo.html - The "BugTracker.NET" logo is in this file. If you
@@ -635,13 +652,13 @@ entering a space character in it.
 
 
 * More subversion integration: Added "TortoiseSVN_integration.bat"
-to the Subversion folder.  It's another, nicer, way to integrate 
-Subversion with BugTracker.NET.  For general information about how this
+to the Subversion folder. It's another, nicer, way to integrate 
+Subversion with BugTracker.NET. For general information about how this
 script works, see:
 http://tortoisesvn.net/issuetracker_integration
 
 Also modified btnet_post_commit.vbs to have the option to work with
-the nicer TortoiseSVN integration.  It can optionally look for the bugid
+the nicer TortoiseSVN integration. It can optionally look for the bugid
 at the end of the checkin comment instead of the beginning.
 
 
@@ -650,8 +667,8 @@ Version 2.6.2  11/8/2007
 -----------------------------------------------------------------------
 
 Along with this release of the web pages, there's a new release of the 
-screen capture utility, btnetsc_2.0.exe.  The new screen capture
-supports SSL.  If you aren't using SSL, you don't need to upgrade.
+screen capture utility, btnetsc_2.0.exe. The new screen capture
+supports SSL. If you aren't using SSL, you don't need to upgrade.
 Thanks to Jason Kresowaty, who did all the work.
 
 Bug fixes in this release:
@@ -667,7 +684,7 @@ images/history links resulted in page-not-found.
 Also:
 
 * Added an additional way to integrate with Subversion, by adding
-a link to a WebSvn (or similar) web page.  See the new Web.config
+a link to a WebSvn (or similar) web page. See the new Web.config
 setting "WebSvnUrl".
 
 * Swapped svn_log.aspx back to listing most recent on top.
@@ -675,7 +692,7 @@ setting "WebSvnUrl".
 * Removed the "edit" column at the far right of the bug lists
 
 * Revised the page that generates registry settings for the screen
-capture utility, generate_btnetsc_reg.aspx.  It no longer creates
+capture utility, generate_btnetsc_reg.aspx. It no longer creates
 a setting for "Port" since you would now specify that in the 
 URL itself, if it's not a standard port.
 
@@ -687,7 +704,7 @@ Version 2.6.1  11/5/2007
 Important bug fixes:
 
 * Adding a user didn't set the user's password correctly. You had to
-re-edit the users password before it really got into the db.  This bug
+re-edit the users password before it really got into the db. This bug
 was introduced in version 2.5.8.
 
 * "EncryptStoredPasswords" setting in Web.config was being ignored.
@@ -701,9 +718,9 @@ checkin comments.
 
 * With the addition of the additional user fields in 2.5.8, the
 users.aspx page, the list of users, was hard to user because the "edit"
-link was so far from the name of the user.  Moved it to the far left.
+link was so far from the name of the user. Moved it to the far left.
 
-Also, added the revised pre-commit script by Jason Kresowaty.  Thanks
+Also, added the revised pre-commit script by Jason Kresowaty. Thanks
 Jason, for your patience.
 
 Also from Jason:
@@ -718,7 +735,7 @@ Big changes to the Subversion integration. If you are using the new
 Subversion pages in 2.5.9, you should upgrade to 2.6.0.
 
 First of all, if you aren't using version control at all, start using
-Subversion and TortoiseSVN.  If you are using SourceSafe, you might
+Subversion and TortoiseSVN. If you are using SourceSafe, you might
 still want to experiment with Subversion/TortoiseSVN and BugTracker.NET
 together just to see what you are missing.
 

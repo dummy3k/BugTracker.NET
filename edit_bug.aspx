@@ -2496,8 +2496,13 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		{
 			if ((int)project_dr["pj_enable_custom_dropdown" + Convert.ToString(i)] == 1)
 			{
-				Response.Write ("\n<tr><td nowrap>");
+				// GC: 20-Feb-08: Modified to add an ID to each custom row for CSS customisation
+				Response.Write ("\n<tr id=\"pcdrow" + Convert.ToString(i) + "\"><td nowrap>");
+
+				Response.Write ("<span id=label_pcd" + Convert.ToString(i) + ">");
 				Response.Write (project_dr["pj_custom_dropdown_label" + Convert.ToString(i)]);
+				Response.Write ("</span>");
+				// End GC
 				Response.Write ("<td nowrap>");
 
 
@@ -2509,7 +2514,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				if (permission_on_original == Security.PERMISSION_READONLY
 				|| permission_on_original == Security.PERMISSION_REPORTER)
 				{
-					Response.Write ("<span class=static>");
+					// GC: 20-Feb-08: Modified to add an ID to the SPAN as well for easier CSS customisation
+					//Response.Write ("<span class=static>");
+					Response.Write ("<span class=static id=pcd" + Convert.ToString(i) + ">");
 					if (IsPostBack)
 					{
 						Response.Write (Request["pcd" + Convert.ToString(i)]);
@@ -2538,7 +2545,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 					// create a dropdown
 
 					Response.Write ("<select");
-					Response.Write (" name=pcd" + Convert.ToString(i) + ">");
+					// GC: 20-Feb-08: Added an ID as well for easier CSS customisation
+					Response.Write (" name=pcd" + Convert.ToString(i));
+					Response.Write (" id=pcd" + Convert.ToString(i) + ">");
 					string[] options = btnet.Util.split_string_using_pipes(
 						(string)project_dr["pj_custom_dropdown_values" + Convert.ToString(i)]);
 

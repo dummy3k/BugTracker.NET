@@ -52,9 +52,9 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		short_desc = "";
 	}
-	else if (short_desc.Length > 100)
+	else if (short_desc.Length > 200)
 	{
-		short_desc = short_desc.Substring(0,100);
+		short_desc = short_desc.Substring(0,200);
 	}
 
 	SharpMimeMessage mime_message = null;
@@ -236,9 +236,9 @@ void Page_Load(Object sender, EventArgs e)
 			subject = subject.Replace(Util.get_setting("TrackingIdString","DO NOT EDIT THIS:"), "PREVIOUS:");
 
 			short_desc = subject;
-			if (short_desc.Length > 100)
+			if (short_desc.Length > 200)
 			{
-				short_desc = short_desc.Substring(0,100);
+				short_desc = short_desc.Substring(0,200);
 			}
 
 			string headers = "";
