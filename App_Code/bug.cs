@@ -1204,7 +1204,7 @@ values (getdate(), $bug, $user, N'not sent', N'$to', N'$from', N'$subject', N'$b
             return "";
         }
 
-
+		// Send the emails in the queue
 		private static void threadproc()
 		{
 			lock (dummy)
