@@ -22,7 +22,7 @@ namespace btnet
 
         public const int INSERT = 1;
         public const int UPDATE = 2;
-
+		private static object dummy = new object(); // for a lock
 
         ///////////////////////////////////////////////////////////////////////
         public static void auto_subscribe(int bugid)
@@ -997,6 +997,8 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
 
         ///////////////////////////////////////////////////////////////////////
+        // This used to send the emails, but not now.  Now it just queues
+        // the emails to be sent, then spawns a thread to send them.
         public static string send_notifications(int insert_or_update,
             int bugid,
             Security security,
@@ -1006,7 +1008,6 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
             int prev_assigned_to_user)
         {
 
-            string result = "";
 
             bool notification_email_enabled = (btnet.Util.get_setting("NotificationEmailEnabled", "1") == "1");
 
@@ -1037,7 +1038,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
                 {
                     sql = @"
     /* get notification email for just one user  */
-    select us_email
+    select us_email, us_id
     from bug_subscriptions
     inner join users on bs_user = us_id
     inner join orgs on us_org = og_id
@@ -1069,7 +1070,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
                     // MAW -- 2006/01/27 -- Added different notifications if reported or assigned-to
                     sql = @"
     /* get notification emails for all subscribers */
-    select us_email
+    select us_email, us_id
     from bug_subscriptions
     inner join users on bs_user = us_id
     inner join orgs on us_org = og_id
@@ -1110,21 +1111,15 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
                 if (subscribers.Tables[0].Rows.Count > 0)
                 {
 
+                    bool added_to_queue = false;
+
+
                     // Get bug html
                     DataRow bug_dr = btnet.Bug.get_bug_datarow(bugid, security);
 
-                    // Create a fake response and let the code
-                    // write the html to that response
-                    System.IO.StringWriter writer = new System.IO.StringWriter();
-                    HttpResponse my_response = new HttpResponse(writer);
-                    my_response.Write("<html>");
-                    my_response.Write("<base href=\"" +
-                    btnet.Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/") + "\"/>");
-
-                    PrintBug.print_bug(my_response, bug_dr, security.user.is_admin, true /* external_user */, true /* include style */);
-                    // at this point "writer" has the bug html
-
                     string from = btnet.Util.get_setting("NotificationEmailFrom", "");
+
+                    // Format the subject line
                     string subject = btnet.Util.get_setting("NotificationSubjectFormat", "$THING$:$BUGID$ was $ACTION$ - $SHORTDESC$ $TRACKINGID$");
 
                     subject = subject.Replace("$THING$", btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel", "bug")));
@@ -1157,53 +1152,73 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
                     subject = subject.Replace("$ASSIGNED_TO$", (string)bug_dr["assigned_to_username"]);
 
 
+					// send a separate email to each subscriber
+					foreach (DataRow dr in subscribers.Tables[0].Rows)
+					{
+						string to = (string)dr["us_email"];
 
-                    string to = "";
+						// Create a fake response and let the code
+						// write the html to that response
+						System.IO.StringWriter writer = new System.IO.StringWriter();
+						HttpResponse my_response = new HttpResponse(writer);
+						my_response.Write("<html>");
+						my_response.Write("<base href=\"" +
+						btnet.Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/") + "\"/>");
 
-                    if (btnet.Util.get_setting("SendJustOneEmail", "1") == "1")
-                    {
+						PrintBug.print_bug(my_response, bug_dr, security.user.is_admin, true /* external_user */, true /* include style */);
+						// at this point "writer" has the bug html
 
-                        // send just one email, with a bunch of addresses
 
-                        foreach (DataRow dr in subscribers.Tables[0].Rows)
-                        {
-                            // Concat in a string for performance
-                            to += (string)dr["us_email"] + ";";
-                        }
+						sql = @"
+insert into queued_notifications
+(qn_date_created, qn_bug, qn_user, qn_status, qn_to, qn_from, qn_subject, qn_body)
+values (getdate(), $bug, $user, N'not sent', N'$to', N'$from', N'$subject', N'$body')";
 
-                        result += btnet.Email.send_email( // 6 args
-                            to,
-                            from,
-                            "", // cc
-                            subject,
-                            writer.ToString(),
-                            System.Web.Mail.MailFormat.Html);
+						sql = sql.Replace("$bug",Convert.ToString(bugid));
+						sql = sql.Replace("$user",Convert.ToString(dr["us_id"]));
+						sql = sql.Replace("$to", to.Replace("'","''"));
+						sql = sql.Replace("$from", from.Replace("'","''"));
+						sql = sql.Replace("$subject", subject.Replace("'","''"));
+						sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
 
-                    }
-                    else
-                    {
+						dbutil.execute_nonquery(sql);
 
-                        // send a separate email to each subscriber
-                        foreach (DataRow dr in subscribers.Tables[0].Rows)
-                        {
-                            to = (string)dr["us_email"];
+						added_to_queue = true;
 
-                            result += btnet.Email.send_email(  // 5 args
-                                to,
-                                from,
-                                "", // cc
-                                subject, writer.ToString(),
-                                System.Web.Mail.MailFormat.Html);
-                        }
+					} // end loop through subscribers
 
-                    }
-                }
-            }
+					if (added_to_queue)
+					{
+						// create a thread to send the emails
+						System.Threading.ThreadStart worker = new System.Threading.ThreadStart(threadproc);
+						System.Threading.Thread thread = new System.Threading.Thread(worker);
+						thread.Start();
+					}
 
-            return result;
+                }  // if there are any subscribers
+
+            } // notifications enabled or not
+
+
+
+            return "";
         }
-    }
-}
 
+
+		private static void threadproc()
+		{
+			lock (dummy)
+			{
+				for (int i=0; i < 20; i++)
+				{
+					btnet.Util.write_to_log("foo "  + Convert.ToString(i));
+					System.Threading.Thread.Sleep(200);
+				}
+			}
+		}
+
+    };
+
+}
 
 

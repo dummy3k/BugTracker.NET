@@ -613,3 +613,28 @@ el_password nvarchar(64) null,
 el_firstname nvarchar(60) null,
 el_lastname nvarchar(60) null
 )
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.7.9 to 2.8.0
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+
+create table queued_notifications
+(
+qn_id int identity primary key not null,
+qn_date_created datetime not null,
+qn_bug int not null,
+qn_user int not null,
+qn_status nvarchar(30) not null,
+qn_to nvarchar(200) not null,
+qn_from nvarchar(200) not null,
+qn_subject nvarchar(200) not null,
+qn_body ntext not null
+)
+
+

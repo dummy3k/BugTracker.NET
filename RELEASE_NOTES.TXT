@@ -4,6 +4,23 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
+select bp_bug, sum(bp_size) bytes
+into #t 
+from bug_posts
+where bp_type = 'file'
+group by bp_bug
+
+select '#ffffff', bg_id [id], bg_short_desc [desc],
+bytes
+from bugs
+inner join #t on bp_bug = bg_id
+WhErE 1 = 1
+order by bytes desc
+
+drop table #t
+
+
+
 * dashboard
 
 * many to many, queries to organizations

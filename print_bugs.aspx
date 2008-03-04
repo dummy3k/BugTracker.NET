@@ -83,7 +83,7 @@ void Page_Load(Object sender, EventArgs e)
 void print_as_excel()
 {
 
-	Response.Charset= "UTF-8";
+	Response.Charset= btnet.Util.get_setting("ExportToExcelCharset","UTF-8");
 	Response.ContentType = "application/x-msexcel";
 	Response.AddHeader ("content-disposition","attachment; filename=bugs.xls");
 
