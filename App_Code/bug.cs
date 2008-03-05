@@ -1171,8 +1171,8 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
 						sql = @"
 insert into queued_notifications
-(qn_date_created, qn_bug, qn_user, qn_status, qn_to, qn_from, qn_subject, qn_body)
-values (getdate(), $bug, $user, N'not sent', N'$to', N'$from', N'$subject', N'$body')";
+(qn_date_created, qn_bug, qn_user, qn_status, qn_retries, qn_to, qn_from, qn_subject, qn_body)
+values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N'$body')";
 
 						sql = sql.Replace("$bug",Convert.ToString(bugid));
 						sql = sql.Replace("$user",Convert.ToString(dr["us_id"]));
@@ -1181,7 +1181,7 @@ values (getdate(), $bug, $user, N'not sent', N'$to', N'$from', N'$subject', N'$b
 						sql = sql.Replace("$subject", subject.Replace("'","''"));
 						sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
 
-						dbutil.execute_nonquery(sql);
+						dbutil.execute_nonquery_without_logging(sql);
 
 						added_to_queue = true;
 
@@ -1209,10 +1209,50 @@ values (getdate(), $bug, $user, N'not sent', N'$to', N'$from', N'$subject', N'$b
 		{
 			lock (dummy)
 			{
-				for (int i=0; i < 20; i++)
+				string sql = @"select * from queued_notifications where qn_status = N'not sent' and qn_retries < 3";
+ 				DbUtil dbutil = new DbUtil(); // create a new one, just in case there would be multithreading issues...
+				DataSet ds = dbutil.get_dataset(sql);
+				foreach (DataRow dr in ds.Tables[0].Rows)
 				{
-					btnet.Util.write_to_log("foo "  + Convert.ToString(i));
-					System.Threading.Thread.Sleep(200);
+
+					string err = "";
+
+					try
+					{
+
+						err = btnet.Email.send_email(
+							(string) dr["qn_to"],
+							(string) dr["qn_from"],
+							"", // cc
+							(string) dr["qn_subject"],
+							(string) dr["qn_body"],
+							System.Web.Mail.MailFormat.Html);
+
+						if (err == "")
+						{
+							sql = "delete from queued_notifications where qn_id = $qn_id";
+						}
+					}
+					catch (Exception e)
+					{
+						err = e.Message;
+						if (e.InnerException != null)
+						{
+							err += "; ";
+							err += e.InnerException.Message;
+						}
+
+					}
+
+					if (err != "")
+					{
+						sql = "update queued_notifications  set qn_retries = qn_retries + 1, qn_last_exception = N'$ex' where qn_id = $qn_id";
+						sql = sql.Replace("$ex", err.Replace("'","''"));
+					}
+
+					sql = sql.Replace("$qn_id", Convert.ToString(dr["qn_id"]));
+
+					dbutil.execute_nonquery(sql);
 				}
 			}
 		}

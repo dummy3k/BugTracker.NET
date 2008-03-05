@@ -76,6 +76,19 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
+        public void execute_nonquery_without_logging(string sql)
+        {
+
+            using (SqlConnection conn = get_sqlconnection())
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+                conn.Close();
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         public void execute_nonquery(string sql)
         {
 
