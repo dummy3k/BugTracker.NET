@@ -31,7 +31,7 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		public static void print_bug (HttpResponse Response, DataRow dr, bool this_is_admin, bool this_external_user, bool include_style)
+		public static void print_bug (HttpResponse Response, DataRow dr, Security security, bool include_style)
 		{
 
 			int bugid = Convert.ToInt32(dr["id"]);
@@ -92,22 +92,35 @@ namespace btnet
 				+ btnet.Util.format_username((string)dr["reporter"],(string)dr["reporter_fullname"])
 				+ "&nbsp;");
             Response.Write("\n<tr><td>Reported On<td>" + btnet.Util.format_db_date(dr["reported_date"]) + "&nbsp;");
-            Response.Write("\n<tr><td>Project<td>" + dr["current_project"] + "&nbsp;");
-            Response.Write("\n<tr><td>Organization<td>" + dr["og_name"] + "&nbsp;");
-            Response.Write("\n<tr><td>Category<td>" + dr["category_name"] + "&nbsp;");
-            Response.Write("\n<tr><td>Priority<td>" + dr["priority_name"] + "&nbsp;");
-            Response.Write("\n<tr><td>Assigned<td>"
-				+ btnet.Util.format_username((string)dr["assigned_to_username"],(string)dr["assigned_to_fullname"])
-				+ "&nbsp;");
-            Response.Write("\n<tr><td>Status<td>" + dr["status_name"] + "&nbsp;");
 
-			if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
-			{
-                Response.Write("\n<tr><td>"
-					+ btnet.Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")
-					+ "<td>"
-					+ dr["udf_name"] + "&nbsp;");
-			}
+            if (security.user.project_field_permission_level > 0)
+	            Response.Write("\n<tr><td>Project<td>" + dr["current_project"] + "&nbsp;");
+
+            if (security.user.org_field_permission_level > 0)
+	            Response.Write("\n<tr><td>Organization<td>" + dr["og_name"] + "&nbsp;");
+
+            if (security.user.category_field_permission_level > 0)
+	            Response.Write("\n<tr><td>Category<td>" + dr["category_name"] + "&nbsp;");
+
+            if (security.user.priority_field_permission_level > 0)
+	            Response.Write("\n<tr><td>Priority<td>" + dr["priority_name"] + "&nbsp;");
+
+            if (security.user.assigned_to_field_permission_level > 0)
+	            Response.Write("\n<tr><td>Assigned<td>"
+					+ btnet.Util.format_username((string)dr["assigned_to_username"],(string)dr["assigned_to_fullname"])
+					+ "&nbsp;");
+
+            if (security.user.status_field_permission_level > 0)
+            	Response.Write("\n<tr><td>Status<td>" + dr["status_name"] + "&nbsp;");
+
+			if (security.user.udf_field_permission_level > 0)
+				if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
+				{
+					Response.Write("\n<tr><td>"
+						+ btnet.Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")
+						+ "<td>"
+						+ dr["udf_name"] + "&nbsp;");
+				}
 
 			// Get custom column info  (There's an inefficiency here - we just did this
 			// same call in get_bug_datarow...)
@@ -203,9 +216,7 @@ namespace btnet
 
 			// don't write links, don't show images, do show update history
 			write_posts (Response, bugid, 0, false, false, true,
-				this_is_admin,
-				false,
-				this_external_user);
+				security.user);
 
 			Response.Write ("</body>");
 
@@ -219,10 +230,8 @@ namespace btnet
 			int permission_level,
 			bool write_links,
 			bool images_inline,
-			bool history_inline,
-			bool this_is_admin,
-			bool this_can_edit_and_delete_posts,
-			bool this_external_user)
+            bool history_inline,
+			btnet.User user)
 		{
 
 			if (Util.get_setting("ForceBordersInEmails","0") == "1")
@@ -242,7 +251,7 @@ namespace btnet
 			foreach (DataRow dr in ds_posts.Tables[0].Rows)
 			{
 
-				if (this_external_user)
+				if (user.external_user)
 				{
 					if ((int)dr["bp_hidden_from_external_users"] == 1)
 					{
@@ -259,6 +268,38 @@ namespace btnet
 					{
 						continue;
 					}
+
+					string comment = (string) dr["bp_comment"];
+
+					if (user.project_field_permission_level == 0
+					&& comment.StartsWith("changed project from"))
+						continue;
+
+					if (user.org_field_permission_level == 0
+					&& comment.StartsWith("changed organization from"))
+						continue;
+
+					if (user.category_field_permission_level == 0
+					&& comment.StartsWith("changed category from"))
+						continue;
+
+					if (user.priority_field_permission_level == 0
+					&& comment.StartsWith("changed priority from"))
+						continue;
+
+					if (user.assigned_to_field_permission_level == 0
+					&& comment.StartsWith("changed assigned_to from"))
+						continue;
+
+					if (user.status_field_permission_level == 0
+					&& comment.StartsWith("changed status from"))
+						continue;
+
+					if (user.udf_field_permission_level == 0
+					&& comment.StartsWith("changed " + Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE") + " from"))
+						continue;
+
+
 				}
 
 				if (bp_id == prev_bp_id)
@@ -274,9 +315,9 @@ namespace btnet
 					}
 
 					write_post(Response, bugid, permission_level, dr, bp_id, write_links, images_inline,
-						this_is_admin,
-						this_can_edit_and_delete_posts,
-						this_external_user);
+						user.is_admin,
+						user.can_edit_and_delete_posts,
+						user.external_user);
 
 
 					if (Convert.ToString(dr["ba_file"]) != "") // intentially "ba"

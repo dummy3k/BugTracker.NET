@@ -77,7 +77,7 @@ a:hover {text-decoration: underline; }
 
 </head>
 
-<% PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user, false /* include style */); %>
+<% PrintBug.print_bug(Response, dr, security, false /* include style */); %>
 
 </html>
 

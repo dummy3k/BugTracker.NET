@@ -90,7 +90,7 @@ if (dv != null)
 			(int)drv[1],
 			security);
 
-		PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user, false);
+		PrintBug.print_bug(Response, dr, security, false /* include style */);
 	}
 }
 else
@@ -112,7 +112,7 @@ else
 				(int)dr2[1],
 				security);
 
-			PrintBug.print_bug(Response, dr, security.user.is_admin, security.user.external_user, false);
+			PrintBug.print_bug(Response, dr, security, false /* include style */);
 		}
 	}
 	else

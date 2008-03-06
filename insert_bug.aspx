@@ -142,7 +142,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	security = new Security();
 	security.user.usid = (int) dr["us_id"];
-	security.user.is_admin = Convert.ToBoolean(dr["us_id"]);
+	security.user.is_admin = Convert.ToBoolean(dr["us_admin"]);
 	security.user.org = (int) dr["us_org"];
 	security.user.other_orgs_permission_level = (int) dr["og_other_orgs_permission_level"];
 

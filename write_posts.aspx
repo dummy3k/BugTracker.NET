@@ -32,9 +32,7 @@ void Page_Load(Object sender, EventArgs e)
 		true,
 		images_inline,
 		history_inline,
-		security.user.is_admin,
-		security.user.can_edit_and_delete_posts,
-		security.user.external_user);
+		security.user);
 
 }
 

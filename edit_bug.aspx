@@ -484,11 +484,6 @@ void Page_Load(Object sender, EventArgs e)
 				send_email.InnerHtml = send_email_link;
 			}
 
-			string history_link = "<a target=_blank href=view_bug_history.aspx?id="
-				+ Convert.ToString(id)
-				+ " title='View history of changes to this item'>view history</a>";
-			history.InnerHtml = history_link;
-
 			if (permission_level != Security.PERMISSION_READONLY)
 			{
 				string subscribers_link = "<a target=_blank href=view_subscribers.aspx?id="
@@ -2205,7 +2200,6 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 			<li id="print" runat="server" />
 			<li id="merge_bug" runat="server" />
 			<li id="delete_bug" runat="server" />
-			<li id="history" runat="server" />
 			<li id="revisions" runat="server" />
 			<li id="subscribers" runat="server" />
 			<li id="subscriptions" runat="server" />
@@ -2692,9 +2686,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			true,
 			images_inline,
 			history_inline,
-			security.user.is_admin,
-			security.user.can_edit_and_delete_posts,
-			security.user.external_user);
+			security.user);
 	}
 
 	%>

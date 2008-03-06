@@ -1038,10 +1038,10 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
                 {
                     sql = @"
     /* get notification email for just one user  */
-    select us_email, us_id
+    select us_email, us_id, us_admin, og.*
     from bug_subscriptions
     inner join users on bs_user = us_id
-    inner join orgs on us_org = og_id
+    inner join orgs og on us_org = og_id
     inner join bugs on bg_id = bs_bug
     left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
     where us_email is not null
@@ -1070,10 +1070,10 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
                     // MAW -- 2006/01/27 -- Added different notifications if reported or assigned-to
                     sql = @"
     /* get notification emails for all subscribers */
-    select us_email, us_id
+    select us_email, us_id, us_admin, og.*
     from bug_subscriptions
     inner join users on bs_user = us_id
-    inner join orgs on us_org = og_id
+    inner join orgs og on us_org = og_id
     inner join bugs on bg_id = bs_bug
     left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
     where us_email is not null
@@ -1106,9 +1106,9 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
                 sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 
                 DbUtil dbutil = new DbUtil();
-                DataSet subscribers = dbutil.get_dataset(sql);
+                DataSet ds_subscribers = dbutil.get_dataset(sql);
 
-                if (subscribers.Tables[0].Rows.Count > 0)
+                if (ds_subscribers.Tables[0].Rows.Count > 0)
                 {
 
                     bool added_to_queue = false;
@@ -1153,7 +1153,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
 
 					// send a separate email to each subscriber
-					foreach (DataRow dr in subscribers.Tables[0].Rows)
+					foreach (DataRow dr in ds_subscribers.Tables[0].Rows)
 					{
 						string to = (string)dr["us_email"];
 
@@ -1165,9 +1165,27 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 						my_response.Write("<base href=\"" +
 						btnet.Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/") + "\"/>");
 
-						PrintBug.print_bug(my_response, bug_dr, security.user.is_admin, true /* external_user */, true /* include style */);
-						// at this point "writer" has the bug html
+						// create a security rec for the user receiving the email
+						Security sec2 = new Security();
 
+						// fill in what we know is needed downstream
+						sec2.user.is_admin = Convert.ToBoolean(dr["us_admin"]);
+						sec2.user.external_user = Convert.ToBoolean(dr["og_external_user"]);
+						sec2.user.category_field_permission_level = (int)dr["og_category_field_permission_level"];
+            			sec2.user.priority_field_permission_level = (int)dr["og_priority_field_permission_level"];
+						sec2.user.assigned_to_field_permission_level = (int)dr["og_assigned_to_field_permission_level"];
+						sec2.user.status_field_permission_level = (int)dr["og_status_field_permission_level"];
+						sec2.user.project_field_permission_level = (int)dr["og_project_field_permission_level"];
+						sec2.user.org_field_permission_level = (int)dr["og_org_field_permission_level"];
+						sec2.user.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
+
+						PrintBug.print_bug(
+							my_response,
+							bug_dr,
+							security,
+							true /* include style */);
+
+						// at this point "writer" has the bug html
 
 						sql = @"
 insert into queued_notifications
@@ -1185,11 +1203,11 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 
 						added_to_queue = true;
 
-					} // end loop through subscribers
+					} // end loop through ds_subscribers
 
 					if (added_to_queue)
 					{
-						// create a thread to send the emails
+						// spawn a worker thread to send the emails
 						System.Threading.ThreadStart worker = new System.Threading.ThreadStart(threadproc);
 						System.Threading.Thread thread = new System.Threading.Thread(worker);
 						thread.Start();
@@ -1207,10 +1225,13 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 		// Send the emails in the queue
 		private static void threadproc()
 		{
+			// just to be safe, make the worker threads wait for each other
 			lock (dummy)
 			{
 				string sql = @"select * from queued_notifications where qn_status = N'not sent' and qn_retries < 3";
  				DbUtil dbutil = new DbUtil(); // create a new one, just in case there would be multithreading issues...
+
+				// get the pending notifications
 				DataSet ds = dbutil.get_dataset(sql);
 				foreach (DataRow dr in ds.Tables[0].Rows)
 				{
@@ -1220,6 +1241,7 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 					try
 					{
 
+						// try to send it
 						err = btnet.Email.send_email(
 							(string) dr["qn_to"],
 							(string) dr["qn_from"],
@@ -1252,9 +1274,12 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 
 					sql = sql.Replace("$qn_id", Convert.ToString(dr["qn_id"]));
 
+					// update the row or delete the row
 					dbutil.execute_nonquery(sql);
 				}
 			}
+			// exit the worker thread
+
 		}
 
     };
