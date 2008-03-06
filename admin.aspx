@@ -60,6 +60,8 @@ void Page_Load(Object sender, EventArgs e)
 &nbsp;&nbsp;
 <span style="border: solid red 1px; padding: 2px; margin: 3px; xbackground: yellow; color: red; font-size: 9px;">
 This links to query.aspx.&nbsp;&nbsp;Query.aspx is not safe on a public web server.&nbsp;&nbsp;Delete it if you are deploying on a public web server.</span><br>
+<p>
+<li class=listitem><a href=notifications.aspx>queued email notifications</a>
 </ul>
 </td></tr></table>
 
