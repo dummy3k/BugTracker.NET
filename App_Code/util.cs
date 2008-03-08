@@ -825,6 +825,7 @@ namespace btnet
 		}
 
 		///////////////////////////////////////////////////////////////////////
+		// only used by search?
 		public static DataTable get_related_users(Security security, DbUtil dbutil)
 		{
 			string sql = "";
@@ -862,9 +863,14 @@ where us_id in
 
 if $og_external_user = 1 -- external
 and $og_other_orgs_permission_level = 0 -- other orgs
+begin
 	delete from #temp where us_org <> $user.org and us_id <> $user.usid
+end
+
+$limit_users
 
 select us_id, us_username from #temp order by us_username
+
 drop table #temp";
 
 
@@ -895,6 +901,10 @@ where pj_id not in
 	where pu_permission_level = 0 and pu_user = $user.usid
 )
 
+
+$limit_users
+
+
 if $og_external_user = 1 -- external
 and $og_other_orgs_permission_level = 0 -- other orgs
 begin
@@ -914,11 +924,26 @@ begin
 		and us_id = pu_user
 		where isnull(pu_permission_level,2) <> 0
 		order by us_username
-
 end
 
 drop table #temp";
 
+			}
+
+			string sql_limit_user_names = @"
+delete from #temp
+where us_id not in
+(select bg_assigned_to_user from bugs
+union
+select bg_reported_user from bugs)";
+
+			if (Util.get_setting("LimitUsernameDropdownsInSearch","0") == "1")
+			{
+				sql = sql.Replace("$limit_users",sql_limit_user_names);
+			}
+			else
+			{
+				sql = sql.Replace("$limit_users","");
 			}
 
 

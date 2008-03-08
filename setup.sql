@@ -61,6 +61,10 @@ drop table [bug_user_flags]
 if exists (select * from dbo.sysobjects where id = object_id(N'[emailed_links]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [emailed_links]
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[queued_notifications]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [queued_notifications]
+
+
 /* org */
 
 create table orgs
@@ -525,6 +529,23 @@ create table queries
 )
 
 create unique index unique_qu_desc on queries (qu_desc, qu_user, qu_org)
+
+
+create table queued_notifications
+(
+qn_id int identity primary key not null,
+qn_date_created datetime not null,
+qn_bug int not null,
+qn_user int not null,
+qn_status nvarchar(30) not null,
+qn_retries int not null,
+qn_last_exception nvarchar(1000),
+qn_to nvarchar(200) not null,
+qn_from nvarchar(200) not null,
+qn_subject nvarchar(200) not null,
+qn_body ntext not null
+)
+
 
 
 /*
