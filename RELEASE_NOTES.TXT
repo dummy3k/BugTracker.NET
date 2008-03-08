@@ -53,12 +53,66 @@ admin,
 -----------------------------------------------------------------------
 Version 2.8.0  3/8/2008
 -----------------------------------------------------------------------
+To upgrade to this release, run the sql in upgrade.sql to create a new
+table:
 
+create table queued_notifications
+(
+qn_id int identity primary key not null,
+qn_date_created datetime not null,
+qn_bug int not null,
+qn_user int not null,
+qn_status nvarchar(30) not null,
+qn_retries int not null,
+qn_last_exception nvarchar(1000),
+qn_to nvarchar(200) not null,
+qn_from nvarchar(200) not null,
+qn_subject nvarchar(200) not null,
+qn_body ntext not null
+)
 
-"SendJustOneEmail" is obsolete
+Fixed bug 1900496 "print bug, emails, history, don't obey fld
+permissions".  As part of this bug fix, the Web.config option 
+"SendJustOneEmail" is now obsolete.
 
+I've rewritten the logic for sending out the notifications so that it
+first stores the email into the new "queued_notifications" table and 
+then another thread sends the emails.  The only way for me to fix the
+bug 1900496 was to compose and send a separate email for each user
+receiving a notification.  But the sending itself can take a long time,
+so that's why I now queue them at first, and then send them in another
+thread later.
 
-* got rid of view_bug_history.aspx page.  delete yours.
+The admin page now has a new link, "view queued notifications". That 
+new page says:
+
+"Email notifications are put into a table into the database and then the 
+system attempts to send them. If the system fails to send the 
+notification, it records the reason for the failure with the row.
+
+The system makes three attempts to send the notification. After the third
+attempt, you can either give up and delete the unsent notifications or 
+you can reset the retry count and let the system continue trying."
+
+Also related to bug 1900496, the view_bug_history.aspx page is now 
+obsolete. You should delete it from your web server.
+
+Also in this release:
+
+* The "PrintHistory" key in Web.config has been obsolete for a while, 
+but I only just now have removed it from Web.config.
+
+* Added new setting to Web.config that might help you if you have lots
+of users.   Here's what it says in Web.config
+
+<!--
+	If this is set to "1", then the list of user names in the dropdowns
+	in the search page is limited to those users who have either reported bugs
+	or have bugs currently assigned to them.  Setting this to "1" might
+	make the search page load slower. Setting it to "0" might result in
+	too many names in the dropdowns on the search page.
+-->
+<add key="LimitUsernameDropdownsInSearch" value="0" />
 
 -----------------------------------------------------------------------
 Version 2.7.9  3/1/2008

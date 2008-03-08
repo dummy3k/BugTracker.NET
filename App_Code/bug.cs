@@ -1182,7 +1182,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 						PrintBug.print_bug(
 							my_response,
 							bug_dr,
-							security,
+							sec2,
 							true /* include style */);
 
 						// at this point "writer" has the bug html
