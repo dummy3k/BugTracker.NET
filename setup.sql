@@ -64,6 +64,9 @@ drop table [emailed_links]
 if exists (select * from dbo.sysobjects where id = object_id(N'[queued_notifications]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [queued_notifications]
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dashboard_items]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dashboard_items]
+
 
 /* org */
 
@@ -544,6 +547,15 @@ qn_body ntext not null
 )
 
 
+create table dashboard_items
+(
+ds_id int identity primary key not null,
+ds_user int not null,
+ds_report int not null,
+ds_chart_type varchar(8) not null,
+ds_col int not null,
+ds_row int not null
+)
 
 /*
 

@@ -170,7 +170,7 @@ function add_selected_report(chart_type, id)
 <% write_column(1); %>
 
 <div class=panel>
-<a href="javascript:show_select_report_page(1)">[add report to dashboard]</a>
+<a href="javascript:show_select_report_page(1)">[add report to dashboard column 1]</a>
 </div>
 
 <td valign=top>&nbsp;<br>
@@ -178,7 +178,7 @@ function add_selected_report(chart_type, id)
 <% write_column(2); %>
 
 <div class=panel>
-<a href="javascript:show_select_report_page(2)">[add report to dashboard]</a>
+<a href="javascript:show_select_report_page(2)">[add report to dashboard column 2]</a>
 </div>
 
 
