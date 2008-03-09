@@ -36,7 +36,9 @@ void Page_Load(Object sender, EventArgs e)
 	if (IsPostBack)
 	{
 		// do delete here
-		sql = @"delete reports where rp_id = $1";
+		sql = @"
+delete reports where rp_id = $1;
+delete dashboard_items where ds_report = $1";
 		sql = sql.Replace("$1", row_id.Value);
 		dbutil.execute_nonquery(sql);
 		Server.Transfer ("reports.aspx");

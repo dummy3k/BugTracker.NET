@@ -4,25 +4,6 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-select bp_bug, sum(bp_size) bytes
-into #t 
-from bug_posts
-where bp_type = 'file'
-group by bp_bug
-
-select '#ffffff', bg_id [id], bg_short_desc [desc],
-bytes
-from bugs
-inner join #t on bp_bug = bg_id
-WhErE 1 = 1
-order by bytes desc
-
-drop table #t
-
-
-
-* dashboard
-
 * many to many, queries to organizations
 * Wordwrap, and take advantage of new api to add attachment as attachment
 * apostrophe's, commas, quotes in custom field names, values
@@ -36,19 +17,35 @@ uploads not supported.
 * make read only if closed
 * document workflow.cs at ifdefined.
 * document ldap at ifdefined.
+* 1843726 Newline, trailing spaces in dropdown vals causes error
 
-COREY COREY COREY But, post to this thread:
-http://sourceforge.net/forum/forum.php?thread_id=1927694&forum_id=226938
+-----------------------------------------------------------------------
+Version 2.8.1  3/15/2008
+-----------------------------------------------------------------------
 
-spend time on this:
-1843726  	  Newline, trailing spaces in dropdown vals causes error
+* Added new "dashboard" page. It's a way of displaying the results of
+several reports all on one page, customized for you. Go to "reports" 
+and click on "dashboard" link and then "edit dashboard" to try it out. 
 
+* Added another query to setup.sql, which helps with finding bugs with
+large attachments:
 
-* In my Web.config at GoDaddy, I also set "enableViewStateMac" to false
-in Web.config.
+insert into queries (qu_desc, qu_sql, qu_default) values (
+'bugs with attachments',
++ char(10) + ' select bp_bug, sum(bp_size) bytes '
++ char(10) + ' into #t '
++ char(10) + ' from bug_posts '
++ char(10) + ' where bp_type = ''file'' '
++ char(10) + ' group by bp_bug '
++ char(10) + ' select ''#ffffff'', bg_id [id], bg_short_desc [desc], '
++ char(10) + ' bytes ' 
++ char(10) + ' from bugs '
++ char(10) + ' inner join #t on bp_bug = bg_id '
++ char(10) + ' WhErE 1 = 1 '
++ char(10) + ' order by bytes desc ' 
++ char(10) + ' drop table #t ',
+0)
 
-
-admin, 
 
 -----------------------------------------------------------------------
 Version 2.8.0  3/8/2008

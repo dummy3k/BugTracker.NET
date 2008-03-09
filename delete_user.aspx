@@ -46,7 +46,15 @@ void Page_Load(Object sender, EventArgs e)
 	if (IsPostBack)
 	{
 		// do delete here
-		sql = @"delete users where us_id = $us";
+		sql = @"
+delete users where us_id = $us
+delete project_user_xref where pu_user = $us
+delete bug_subscriptions where bs_user = $us
+delete bug_user_flags where fl_user = $us
+delete queries where qu_user = $us
+delete queued_notifications where qn_user = $us
+delete dashboard_items where ds_user = $us";
+
 		sql = sql.Replace("$us", row_id.Value);
 		dbutil.execute_nonquery(sql);
 		Server.Transfer ("users.aspx");
@@ -58,6 +66,10 @@ void Page_Load(Object sender, EventArgs e)
 
 		sql = @"declare @cnt int
 			select @cnt = count(1) from bugs where bg_reported_user = $us or bg_assigned_to_user = $us
+			if @cnt = 0
+			begin
+				select @cnt = count(1) from bug_posts where bp_user = $us
+			end
 			select us_username, @cnt [cnt] from users where us_id = $us";
 		sql = sql.Replace("$us", id);
 
@@ -67,7 +79,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			Response.Write ("You can't delete user \""
 				+ Convert.ToString(dr["us_username"])
-				+ "\" because some bugs still reference it.");
+				+ "\" because some bugs or bug posts still reference it.");
 			Response.End();
 		}
 		else
