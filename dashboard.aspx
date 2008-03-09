@@ -48,7 +48,7 @@ void write_column(int col)
 			if ((string) dr["ds_chart_type"] == "data")
 			{
 				Response.Write("\n<div class=panel>");
-				Response.Write("\n<iframe src=view_report.aspx?view=data&id=" + dr["ds_report"] + "></iframe>");
+				Response.Write("\n<iframe frameborder='0' src=view_report.aspx?view=data&id=" + dr["ds_report"] + "></iframe>");
 				Response.Write("\n</div>");
 			}
 			else
@@ -80,7 +80,7 @@ body {background: #ffffff;}
 
 iframe {
 	border: 1px solid white;
-	width: 100%;
+	width: 90%;
 	height:300px;
 }
 
