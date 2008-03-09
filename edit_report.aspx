@@ -182,13 +182,13 @@ void on_update (Object sender, EventArgs e) {
                     <tr>
                         <td class='lbl'>Chart Type:</td>
                         <td>
-                            <asp:RadioButton text="Table" runat="server" class='txt' GroupName="chart_type" id="table" />
+                            <asp:RadioButton text="Table" runat="server" GroupName="chart_type" id="table" />
                             &nbsp;&nbsp;&nbsp;
-                            <asp:RadioButton text="Pie" runat="server" class='txt' GroupName="chart_type" id="pie" />
+                            <asp:RadioButton text="Pie" runat="server" GroupName="chart_type" id="pie" />
                             &nbsp;&nbsp;&nbsp;
-                            <asp:RadioButton text="Bar" runat="server" class='txt' GroupName="chart_type" id="bar" />
+                            <asp:RadioButton text="Bar" runat="server" GroupName="chart_type" id="bar" />
                             &nbsp;&nbsp;&nbsp;
-                            <asp:RadioButton text="Line" runat="server" class='txt' GroupName="chart_type" id="line" />
+                            <asp:RadioButton text="Line" runat="server" GroupName="chart_type" id="line" />
                             &nbsp;&nbsp;&nbsp;
                         </td>
                         <td runat="server" class='err' id="chart_type_err">&nbsp;</td>

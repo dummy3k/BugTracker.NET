@@ -468,9 +468,6 @@ svnap_path nvarchar(400) not null
 create index svn_revision_index on svn_affected_paths (svnap_svnrev_id)
 
 
-
-
-
 /* REPORTS */
 create table reports
 (
@@ -520,12 +517,12 @@ values('Bugs by User',
 
 create table queries
 (
-	qu_id int identity primary key not null,
-	qu_desc nvarchar(200) not null,
-	qu_sql ntext not null,
-	qu_default int null,
-	qu_user int null,
-	qu_org int null
+qu_id int identity primary key not null,
+qu_desc nvarchar(200) not null,
+qu_sql ntext not null,
+qu_default int null,
+qu_user int null,
+qu_org int null
 )
 
 create unique index unique_qu_desc on queries (qu_desc, qu_user, qu_org)

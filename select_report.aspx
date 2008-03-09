@@ -20,7 +20,7 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
-	if (security.user.is_admin || security.user.can_use_reports || security.user.can_edit_reports)
+	if (security.user.is_admin || security.user.can_use_reports)
 	{
 		//
 	}
@@ -38,25 +38,15 @@ select
 rp_desc [report],
 case
 	when rp_chart_type = 'pie' then
-		'<a target=''_blank'' href=''view_report.aspx?view=chart&id=' + convert(varchar, rp_id) + '''>pie</a>'
+		'<a href=''javascript:select_report(""pie"",' + convert(varchar, rp_id) + ')''>select pie</a>'
 	when rp_chart_type = 'line' then
-		'<a target=''_blank'' href=''view_report.aspx?view=chart&id=' + convert(varchar, rp_id) + '''>line</a>'
+		'<a href=''javascript:select_report(""line"",' + convert(varchar, rp_id) + ')''>select line</a>'
 	when rp_chart_type = 'bar' then
-		'<a target=''_blank'' href=''view_report.aspx?view=chart&id=' + convert(varchar, rp_id) + '''>bar</a>'
+		'<a href=''javascript:select_report(""bar"",' + convert(varchar, rp_id) + ')''>select bar</a>'
 	else
-		'&nbsp;' end [view<br>chart],
-'<a target=''_blank'' href=''view_report.aspx?view=data&id=' + convert(varchar, rp_id) + '''>data</a>' [view<br>data]
-$adm
+		'&nbsp;' end [chart],
+'<a href=''javascript:select_report(""data"",' + convert(varchar, rp_id) + ')''>select data</a>' [data]
 from reports order by rp_desc";
-
-	if (security.user.is_admin || security.user.can_edit_reports)
-	{
-		sql = sql.Replace("$adm", ", " +
-			"'<a href=''edit_report.aspx?id=' + convert(varchar, rp_id) + '''>edit</a>' [edit], " +
-			"'<a href=''delete_report.aspx?id=' + convert(varchar, rp_id) + '''>delete</a>' [delete] ");
-	} else {
-		sql = sql.Replace("$adm", "");
-	}
 
     ds = dbutil.get_dataset(sql);
 
@@ -70,22 +60,24 @@ from reports order by rp_desc";
 <title id="titl" runat="server">btnet reports</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
+
+<script>
+
+function select_report(type, id)
+{
+opener.add_selected_report(type, id)
+window.close()
+
+}
+
+</script>
+
 </head>
 
 <body>
-<% security.write_menu(Response, "reports"); %>
 
 <div class=align>
 </p>
-
-<% if (security.user.is_admin || security.user.can_edit_reports) { %>
-<a href='edit_report.aspx'>add new report</a>
-<% } %>
-
-<% if (!security.user.is_guest) { %>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href='dashboard.aspx'>dashboard</a>
-<% } %>
-
 
 <%
 
