@@ -79,13 +79,10 @@ from reports order by rp_desc";
 </p>
 
 <% if (security.user.is_admin || security.user.can_edit_reports) { %>
-<a href='edit_report.aspx'>add new report</a>
+<a href='edit_report.aspx'>add new report</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
 
-<% if (!security.user.is_guest) { %>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href='dashboard.aspx'>dashboard</a>
-<% } %>
-
+<a href='dashboard.aspx'>dashboard</a>
 
 <%
 

@@ -465,8 +465,17 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-        public static string strip_html(string html) {
-            return HttpUtility.HtmlDecode(Regex.Replace(html, @"<(.|\n)*?>", string.Empty));
+        public static string strip_html(string text_with_tags) {
+
+            if (Util.get_setting("StripHtmlTagsFromSearchableText","1") == "1")
+            {
+            	return HttpUtility.HtmlDecode(Regex.Replace(text_with_tags, @"<(.|\n)*?>", string.Empty));
+			}
+			else
+			{
+				return text_with_tags;
+			}
+
         }
 
 
@@ -930,15 +939,15 @@ drop table #temp";
 
 			}
 
-			string sql_limit_user_names = @"
-delete from #temp
-where us_id not in
-(select bg_assigned_to_user from bugs
-union
-select bg_reported_user from bugs)";
-
 			if (Util.get_setting("LimitUsernameDropdownsInSearch","0") == "1")
 			{
+				string sql_limit_user_names = @"
+delete from #temp
+where us_id not in
+(select isnull(bg_assigned_to_user,0) from bugs
+union
+select isnull(bg_reported_user,0) from bugs)";
+
 				sql = sql.Replace("$limit_users",sql_limit_user_names);
 			}
 			else

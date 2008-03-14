@@ -86,9 +86,12 @@ iframe {
 
 </style>
 <body>
-<% security.write_menu(Response, "admin"); %>
+<% security.write_menu(Response, "reports"); %>
 
+<% if (!security.user.is_guest) { %>
 <a href=edit_dashboard.aspx>edit dashboard</a>
+<% } %>
+
 
 <table border=0 cellspacing=0 cellpadding=10>
 <tr>

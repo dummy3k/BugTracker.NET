@@ -14,7 +14,7 @@ void Page_Load(Object sender, EventArgs e)
 	Util.do_not_cache(Response);
 	dbutil = new DbUtil();
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit dashboard";

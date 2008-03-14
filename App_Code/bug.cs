@@ -922,7 +922,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
     $id,
     $us,
     @now,
-    N'$comment',
+    N'$comment_formatted',
     N'$comment_search',
     N'$from',
     N'$type',
@@ -954,8 +954,8 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
                 sql = sql.Replace("$id", Convert.ToString(bugid));
                 sql = sql.Replace("$us", Convert.ToString(this_usid));
-                sql = sql.Replace("$comment", s);
-                sql = sql.Replace("$comment_search", s);
+                sql = sql.Replace("$comment_formatted", s.Replace("'", "''"));
+                sql = sql.Replace("$comment_search", btnet.Util.strip_html(s).Replace("'", "''"));
                 sql = sql.Replace("$content_type", content_type);
                 sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only));
 
