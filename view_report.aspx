@@ -51,8 +51,10 @@ void Page_Load(Object sender, EventArgs e)
 
 	DataRow dr = dbutil.get_datarow (sql);
 
-	string rp_sql = (string) dr["rp_sql"];
-
+	string rp_sql = (string)dr["rp_sql"];
+    string chart_type = (string)dr["rp_chart_type"];
+    string desc = (string)dr["rp_desc"];
+    
 	// replace the magic pseudo variable
 	rp_sql = rp_sql.Replace("$ME", Convert.ToString(security.user.usid));
 
@@ -62,40 +64,57 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		if (view == "data")
 		{
-			create_table((string) dr["rp_desc"], ds);
+			create_table(desc, ds);
 		}
 		else
 		{
-			if ((string) dr["rp_chart_type"] == "pie")
+			if (chart_type == "pie")
 			{
-				create_pie_chart((string) dr["rp_desc"], ds);
+				create_pie_chart(desc, ds);
 			}
-			else if ((string) dr["rp_chart_type"] == "bar")
+			else if (chart_type == "bar")
 			{
-				create_bar_chart((string) dr["rp_desc"], ds);
+				create_bar_chart(desc, ds);
 			}
-			else if ((string) dr["rp_chart_type"] == "line")
+			else if (chart_type == "line")
 			{
 				// we need at least two values to draw a line
-				if (ds.Tables[0].Rows.Count > 1)
-				{
-					create_line_chart((string) dr["rp_desc"], ds);
-				}
+                if (ds.Tables[0].Rows.Count > 1)
+                {
+                    create_line_chart(desc, ds);
+                }
+                else
+                {
+                    write_no_data_message(desc, ds);
+                }
 			}
 			else {
-				create_table((string) dr["rp_desc"], ds);
+				create_table(desc, ds);
 			}
 		}
 	}
-	else
-	{
-		create_table((string) dr["rp_desc"], ds);
-	}
+    else
+    {
+        if (view == "data")
+        {
+            create_table(desc, ds);
+        }
+        else
+        {
+            if (chart_type == "pie"
+            || chart_type == "bar"
+            || chart_type == "line")
+            {
+                write_no_data_message(desc, ds);
+            }
+            else
+            {
+                create_table(desc, ds);
+            }
+        }
+    }
 
 }
-
-
-
 
 ///////////////////////////////////////////////////////////////////////
 void create_line_chart(string title, DataSet ds)
@@ -629,4 +648,55 @@ void create_table(string title, DataSet ds)
 
 }
 
+///////////////////////////////////////////////////////////////////////
+void write_no_data_message(string title, DataSet ds)
+{
+    int chart_width = 640 / scale;
+    int chart_height = 300 / scale;
+    int chart_top_margin = 10 / scale; // gap between highest bar and border of chart
+
+    int x_axis_text_offset = 8 / scale; // gap between edge and start of x axis text
+    int page_top_margin = 40 / scale; // gape between chart and top of page
+
+    Font fontTitle = new Font("Verdana", 12, FontStyle.Bold);
+    Font fontLegend = new Font("Verdana", 8);    
+    int page_bottom_margin = 3 * fontLegend.Height;
+    int page_left_margin = (4 * fontLegend.Height) + x_axis_text_offset;  // where the y axis text goes    
+
+    // Create a Bitmap instance
+    Bitmap objBitmap = new Bitmap(
+        page_left_margin + chart_width,  // total width
+        page_top_margin + fontTitle.Height + chart_height + page_bottom_margin);  // total height
+
+    Graphics objGraphics = Graphics.FromImage(objBitmap);
+
+    // white overall background
+    objGraphics.FillRectangle(
+        new SolidBrush(Color.White), // yellow
+        0, 0,
+        page_left_margin + chart_width, // far left
+        page_top_margin + fontTitle.Height + chart_height + page_bottom_margin);  // bottom
+
+    SolidBrush blackBrush = new SolidBrush(Color.Black);
+
+    // draw title
+    objGraphics.DrawString(
+        title + " (no data to chart)",
+        fontTitle,
+        blackBrush,
+        x_axis_text_offset,
+        fontTitle.Height / 2);
+
+    // Since we are outputting a Jpeg, set the ContentType appropriately
+    Response.ContentType = "image/jpeg";
+
+    // Save the image to a file
+    objBitmap.Save(Response.OutputStream, ImageFormat.Jpeg);
+
+    // clean up...
+    objGraphics.Dispose();
+    objBitmap.Dispose();
+}
+    
+    
 </script>

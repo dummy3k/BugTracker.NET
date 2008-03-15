@@ -26,30 +26,43 @@ uploads not supported.
 * estimating?
 * wiki?
 
-Regarding the position of the validation error messages, moving them with css, I apologize for not answering that post. I also would not be able to do it using .css. Another developer recently volunteered to help with BugTracker.NET and what I asked him to do was to make the edit_bug.aspx friendly to css positioning. We'll see how that goes.
+* syscolumns, column order scheme
 
-Regarding the way I used syscolumns, well, it's a bad design by me, but because of backwards compatibility issues, I may be stuck with that design. I'm glad you were able to workaround my design mistake. If nothing else, I need to update the documentation to include your workaround.
-
+* edit_bug.aspx and css
 
 -----------------------------------------------------------------------
 Version 2.8.1  3/15/2008
 -----------------------------------------------------------------------
 
-MAKE SUER I DON"T STRIP TAGS OUT OF GOOD COMMENTS IF fckEditor is NOT being used.
-DEAL WITH THE "XX" stuff
+To upgrade to this release, run the SQL near the bottom of upgrade.sql.
 
-CHECK THE GUY'S CSS STUFF
+* Fixed bug 1914408 "bp_comment_search contains formating info from
+fckEditor".  If you entered text using fckEditor, there was logic to
+strip out the formating so that searching in the text would work ok.
 
-* LAST LOGIN DATE
+For example, instead of saving
+	<font color=red>hot</font> and <font color=blue>cold</font>
+the logic would save
+	hot and cold
 
-* bug with text saved for searching.  Reedit.
+At some point in time, the logic to strip out the formating was 
+accidently removed.  My changes here won't fix any data that's already 
+been stored in your database.
+
+I also corrected one of the sample queries to display data from
+bp_comment_search instead of bp_comment.
+
+* Added a last login date to the user table, to keep track of when
+a user last logged in.  Now that there is a public demo of 
+BugTracker.NET, I myself need the date to be able to get rid of users
+who have been inactive for a long time.
 
 * Added new "dashboard" page. It's a way of displaying the results of
 several reports all on one page, customized for you. Go to "reports" 
 and click on "dashboard" link and then "edit dashboard" to try it out. 
 
 * Added another query to setup.sql, which helps with finding bugs with
-large attachments:
+large attachments, useful to me to manage my public demo:
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'bugs with attachments',
@@ -66,7 +79,6 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 + char(10) + ' order by bytes desc ' 
 + char(10) + ' drop table #t ',
 0)
-
 
 -----------------------------------------------------------------------
 Version 2.8.0  3/8/2008

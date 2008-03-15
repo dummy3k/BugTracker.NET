@@ -558,6 +558,9 @@ ds_col int not null,
 ds_row int not null
 )
 
+create index ds_user_index on dashboard_items (ds_user)
+
+
 /*
 
 The web pages that display the bugs expect the first two columns of the

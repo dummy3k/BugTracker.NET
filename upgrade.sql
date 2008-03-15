@@ -658,5 +658,7 @@ ds_col int not null,
 ds_row int not null
 )
 
+create index ds_user_index on dashboard_items (ds_user)
 
 alter table users add us_most_recent_login_datetime datetime null
+
