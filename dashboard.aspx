@@ -32,8 +32,10 @@ void Page_Load(Object sender, EventArgs e)
 select ds.*, rp_desc
 from dashboard_items ds
 inner join reports on rp_id = ds_report
+where ds_user = $us
 order by ds_col, ds_row";
 
+    sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 	ds = dbutil.get_dataset(sql);
 
 }
@@ -88,7 +90,9 @@ iframe {
 <body>
 <% security.write_menu(Response, "reports"); %>
 
-<% if (!security.user.is_guest) { %>
+<% if (security.user.is_guest) { %>
+<span style="color:Gray;">edit dashboard not available to "guest" user</span>
+<% } else { %>
 <a href=edit_dashboard.aspx>edit dashboard</a>
 <% } %>
 
