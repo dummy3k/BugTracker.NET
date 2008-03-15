@@ -132,7 +132,8 @@ us_use_fckeditor int not null default(0),
 us_enable_bug_list_popups int not null default(1),
 /* who created this user */
 us_created_user int not null default(1),
-us_org int not null default(1)
+us_org int not null default(1),
+us_most_recent_login_datetime datetime null
 )
 
 create unique index unique_us_username on users (us_username)

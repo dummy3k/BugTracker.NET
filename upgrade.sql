@@ -658,3 +658,5 @@ ds_col int not null,
 ds_row int not null
 )
 
+
+alter table users add us_most_recent_login_datetime datetime null

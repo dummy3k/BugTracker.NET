@@ -120,6 +120,11 @@ where us_username = N'$username'";
                     btnet.Util.update_user_password(dbutil, (int) dr["us_id"], password);
                 }
 
+	            sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us";
+	            sql = sql.Replace("$us",Convert.ToString((int)dr["us_id"]));
+	            dbutil.execute_nonquery(sql);
+
+
                 return true;
             }
             else
