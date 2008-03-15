@@ -428,6 +428,7 @@ void Page_Load(Object sender, EventArgs e)
 			udfid,
 			"","","", // project specific dropdown values
 			adjusted_comment,
+            adjusted_comment,
 			from,
 			"text/plain",
 			false, // internal only
@@ -559,9 +560,11 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 		// Add a comment to existing bug.
-		int postid = btnet.Bug.insert_comment(bugid,
+		int postid = btnet.Bug.insert_comment(
+            bugid,
 			(int) dr["us_id"],
 		 	comment,
+            comment,
 		 	from,
 		 	"text/plain",
 		 	false); // internal only

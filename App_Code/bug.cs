@@ -775,7 +775,8 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
             string project_custom_dropdown_value1,
             string project_custom_dropdown_value2,
             string project_custom_dropdown_value3,
-            string comments,
+            string comment_formated,
+            string comment_search,
             string from,
             string content_type,
             bool internal_only,
@@ -886,7 +887,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
 
             int bugid = Convert.ToInt32(dbutil.execute_scalar(sql));
-            int postid = btnet.Bug.insert_comment(bugid, security.user.usid, comments, from, content_type, internal_only);
+            int postid = btnet.Bug.insert_comment(bugid, security.user.usid, comment_formated, comment_search, from, content_type, internal_only);
 
             btnet.Bug.auto_subscribe(bugid);
 
@@ -904,13 +905,14 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
         public static int insert_comment(
             int bugid,
             int this_usid,
-            string comments,
+            string comment_formated,
+            string comment_search,
             string from,
             string content_type,
             bool internal_only)
         {
 
-            if (comments != "")
+            if (comment_formated != "")
             {
                 string sql = @"
     declare @now datetime
@@ -929,8 +931,6 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
     N'$content_type',
     $internal)
     select scope_identity();";
-
-                string s = comments.Replace("'", "''");
 
                 if (from != null)
                 {
@@ -954,8 +954,8 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
                 sql = sql.Replace("$id", Convert.ToString(bugid));
                 sql = sql.Replace("$us", Convert.ToString(this_usid));
-                sql = sql.Replace("$comment_formatted", s.Replace("'", "''"));
-                sql = sql.Replace("$comment_search", btnet.Util.strip_html(s).Replace("'", "''"));
+                sql = sql.Replace("$comment_formatted", comment_formated.Replace("'", "''"));
+                sql = sql.Replace("$comment_search", comment_search.Replace("'", "''"));
                 sql = sql.Replace("$content_type", content_type);
                 sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only));
 

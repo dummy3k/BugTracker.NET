@@ -1863,17 +1863,20 @@ void on_update (Object sender, EventArgs e)
 
 	if (good)
 	{
-		string commentText;
+		string comment_formated;
+        string comment_search;
 		string commentType;
 
 
 		if (security.user.use_fckeditor) {
-		    commentText = fckeComment.Value;
+		    comment_formated = fckeComment.Value;
+            comment_search = btnet.Util.strip_html(comment_formated);
 		    commentType = "text/html";
 		}
 		else
 		{
-			commentText = HttpUtility.HtmlDecode(comment.Value);
+			comment_formated = HttpUtility.HtmlDecode(comment.Value);
+            comment_search = comment_formated;
 			commentType = "text/plain";
 		}
 
@@ -1917,7 +1920,8 @@ void on_update (Object sender, EventArgs e)
 				Request["pcd1"],
 				Request["pcd2"],
 				Request["pcd3"],
-				commentText,
+				comment_formated,
+                comment_search,
 				null,
 				commentType,
 				internal_only.Checked,
@@ -2098,7 +2102,14 @@ void on_update (Object sender, EventArgs e)
 			} // permission_level = 3 or not
 
 
-            bugpost_fields_have_changed = (btnet.Bug.insert_comment(id, security.user.usid, commentText, null, commentType, internal_only.Checked) != 0);
+            bugpost_fields_have_changed = (btnet.Bug.insert_comment(
+                id, 
+                security.user.usid, 
+                comment_formated, 
+                comment_search,
+                null, 
+                commentType, 
+                internal_only.Checked) != 0);
 
 
 			string result = "";

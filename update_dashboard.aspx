@@ -4,7 +4,6 @@
 
 DbUtil dbutil;
 Security security;
-DataSet ds = null;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)

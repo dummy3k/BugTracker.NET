@@ -656,7 +656,7 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'demo last comment as column',
 'select ''#ffffff'', bg_id [id], bg_short_desc [desc], ' 
-+ char(10) + ' substring(bp_comment,1,40) [last comment], bp_date [last comment date]'
++ char(10) + ' substring(bp_comment_search,1,40) [last comment], bp_date [last comment date]'
 + char(10) + ' from bugs'
 + char(10) + ' left outer join bug_posts on bg_id = bp_bug'
 + char(10) + ' and bp_type = ''comment''' 
