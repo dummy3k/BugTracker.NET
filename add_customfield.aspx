@@ -49,7 +49,16 @@ void Page_Load(Object sender, EventArgs e)
 Boolean validate()
 {
 
+	name_err.InnerText = "";
+	length_err.InnerText = "";
+	sort_seq_err.InnerText = "";
+	default_err.InnerText = "";
+	vals_err.InnerText = "";
+	datatype_err.InnerText = "";
+	required_err.InnerText = "";
+
 	Boolean good = true;
+
 	if (name.Value == "")
 	{
 		good = false;
@@ -57,7 +66,19 @@ Boolean validate()
 	}
 	else
 	{
-		name_err.InnerText = "";
+		if (name.Value.ToLower() == "url")
+		{
+			good = false;
+			name_err.InnerText = "Field name of \"URL\" causes problems with ASP.NET.";
+		}
+		else if (name.Value.Contains("'")
+		|| name.Value.Contains("\"")
+		|| name.Value.Contains("<")
+		|| name.Value.Contains(">"))
+		{
+			good = false;
+			name_err.InnerText = "Special characters like quotes not allowed.";
+		}
 	}
 
 
@@ -66,7 +87,7 @@ Boolean validate()
 		if (datatype.SelectedItem.Value == "int"
 		|| datatype.SelectedItem.Value == "datetime")
 		{
-			length_err.InnerText = "";
+			// ok
 		}
 		else
 		{
@@ -76,14 +97,89 @@ Boolean validate()
 	}
 	else
 	{
-		if (datatype.SelectedItem.Value == "int" || datatype.SelectedItem.Value == "datetime")
+		if (datatype.SelectedItem.Value == "int"
+		|| datatype.SelectedItem.Value == "datetime")
 		{
 			good = false;
 			length_err.InnerText = "Length or Precision not allowed for this datatype.";
 		}
+	}
+
+
+	if (required.Checked)
+	{
+		if (default_text.Value == "")
+		{
+			good = false;
+			default_err.InnerText = "If \"Required\" is checked, then Default is required.";
+		}
+
+		if (dropdown_type.SelectedItem.Value != "not a dropdown")
+		{
+			good = false;
+			required_err.InnerText = "Checking \"Required\" is not compatible with a normal or users dropdown";
+		}
+
+	}
+
+
+	if (dropdown_type.SelectedItem.Value == "normal")
+	{
+		if (vals.Value == "")
+		{
+			good = false;
+			vals_err.InnerText = "Dropdown values are required for dropdown type of \"normal\".";
+		}
+		else if (vals.Value.Contains("'")
+		|| vals.Value.Contains("\"")
+		|| vals.Value.Contains("<")
+		|| vals.Value.Contains(">")
+		|| vals.Value.Contains("\n")
+		|| vals.Value.Contains("\t")
+		|| vals.Value.Contains("\r"))
+		{
+			good = false;
+			vals_err.InnerText = "Special characters like quotes, line breaks not allowed.";
+		}
 		else
 		{
-			length_err.InnerText = "";
+			string[] options = Util.split_string_using_pipes(vals.Value);
+
+			for (int i = 0; i < options.Length; i++)
+			{
+				if (options[i].StartsWith(" ") || options[i].EndsWith(" "))
+				{
+					good = false;
+					vals_err.InnerText = "Dropdown values not allowed to have leading or trailing spaces.";
+					break;
+				}
+			}
+		}
+
+		if (datatype.SelectedItem.Value == "int"
+		|| datatype.SelectedItem.Value == "decimal"
+		|| datatype.SelectedItem.Value == "datetime")
+		{
+			good = false;
+			datatype_err.InnerText = "For a normal dropdown datatype must be char, varchar, nchar, or nvarchar.";
+		}
+	}
+	else if (dropdown_type.SelectedItem.Value == "users")
+	{
+		if (datatype.SelectedItem.Value != "int")
+		{
+			good = false;
+			datatype_err.InnerText = "For a users dropdown datatype must be int.";
+		}
+	}
+
+
+	if (dropdown_type.SelectedItem.Value != "normal")
+	{
+		if (vals.Value != "")
+		{
+			good = false;
+			vals_err.InnerText = "Dropdown values are only used for dropdown of type \"normal\".";
 		}
 	}
 
@@ -95,28 +191,10 @@ Boolean validate()
 	}
 	else
 	{
-		sort_seq_err.InnerText = "";
-	}
-
-
-	if (!Util.is_int(sort_seq.Value))
-	{
-		good = false;
-		sort_seq_err.InnerText = "Sort Sequence must be an integer.";
-	}
-	else
-	{
-		sort_seq_err.InnerText = "";
-	}
-
-
-	default_err.InnerText = "";
-	if (required.Checked && default_text.Value == "")
-	{
-		if (default_text.Value == "")
+		if (!Util.is_int(sort_seq.Value))
 		{
 			good = false;
-			default_err.InnerText = "If \"Required\" is checked, then Default is required.";
+			sort_seq_err.InnerText = "Sort Sequence must be an integer.";
 		}
 	}
 
@@ -135,11 +213,33 @@ void on_update (Object sender, EventArgs e)
 		sql = "alter table bugs add [$nm] $dt $ln $null $df";
 		sql = sql.Replace("$nm", name.Value);
 		sql = sql.Replace("$dt", datatype.SelectedItem.Value);
-		sql = sql.Replace("$ln", length.Value);
+
+		if (length.Value != "")
+		{
+			if (length.Value.StartsWith("("))
+			{
+				sql = sql.Replace("$ln", length.Value);
+			}
+			else
+			{
+				sql = sql.Replace("$ln", "(" + length.Value + ")");
+			}
+		}
+		else
+		{
+			sql = sql.Replace("$ln", "");
+		}
 
 		if (default_text.Value != "")
 		{
-			sql = sql.Replace("$df", "DEFAULT " + default_text.Value);
+			if (default_text.Value.StartsWith("("))
+			{
+				sql = sql.Replace("$df", "DEFAULT " + default_text.Value);
+			}
+			else
+			{
+				sql = sql.Replace("$df", "DEFAULT (" + default_text.Value + ")");
+			}
 		}
 		else
 		{
@@ -264,14 +364,14 @@ void on_update (Object sender, EventArgs e)
 		<asp:DropDownList id="datatype" runat="server">
 		</asp:DropDownList>
 	</td>
-	<td>&nbsp;</td>
+	<td nowrap runat="server" class=err id="datatype_err">&nbsp;</td>
 	</tr>
 
 	<tr>
 	<td colspan=3>
 	<span class=smallnote>
-	<br><br>For char, varchar, etc, specify as (NNN).&nbsp;&nbsp;Don't forget the parenthesis.<br><br>
-	For decimal specify as (A,B) where A is the total number of digits and B is the number of those digits to the right of decimal point.&nbsp;&nbsp;Don't forget the parenthesis.<br><br>
+	<br><br>For char, varchar, etc, specify as (NNN).<br><br>
+	For decimal specify as (A,B) where A is the total number of digits and B is the number of those digits to the right of decimal point.<br><br>
 	</span>
 	</td>
 	</tr>
@@ -293,7 +393,7 @@ void on_update (Object sender, EventArgs e)
 	<tr>
 	<td class=lbl>Required (NULL or NOT NULL):</td>
 	<td><asp:checkbox runat="server" class=cb id="required"/></td>
-	<td>&nbsp</td>
+	<td nowrap runat="server" class=err id="required_err">&nbsp;</td>
 	</tr>
 
 	<tr>
@@ -314,20 +414,26 @@ void on_update (Object sender, EventArgs e)
 	Use the following if you want the custom field to be a "normal" dropdown.
 	<br>Create a pipe seperated list of values as shown below.
 	<br>No individiual value should be longer than the length of your custom field.
-	<br>Don't use commas, &gt;, or &lt; characters in the list of values.
+	<br>Don't use commas, &gt;, &lt;, quotes, or leading/trailing spaces in the list of values.
+	<br>Here some good examples:
 	<br>
-	"version 1.0|Version 1.1|Version 1.2"
+	"1.0|1.1|1.2"
+	<br>
+	"red|blue|green"
+	<br>It's ok to have one of the values be blank:<br>
+	"|red|blue|green"
 	</span>
 	</td>
 	</tr>
 
 
 	<tr>
-	<td colspan=2>
+	<td colspan=3>
 	<br>
 	<div  class=lbl >Normal Dropdown Values:</div><p>
-	<textarea runat="server" class=txt id="vals" rows=4 cols=80></textarea></td>
-	<td runat="server" class=err id="vals_err">&nbsp;</td>
+	<textarea runat="server" class=txt id="vals" rows=4 cols=80></textarea>
+	<br>
+	<span runat="server" class=err id="vals_err">&nbsp;</span>
 	</tr>
 
 
