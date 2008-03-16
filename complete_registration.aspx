@@ -103,10 +103,10 @@ select pu_project, @new_user_id, pu_auto_subscribe, pu_permission_level, pu_admi
 
 delete from emailed_links where el_id = '$guid'";
 
-		sql = sql.Replace("$username", (string) dr["el_username"]);
-		sql = sql.Replace("$email", (string) dr["el_email"]);
-		sql = sql.Replace("$firstname", (string) dr["el_firstname"]);
-		sql = sql.Replace("$lastname", (string) dr["el_lastname"]);
+		sql = sql.Replace("$username", ((string) dr["el_username"]).Replace("'","''"));
+		sql = sql.Replace("$email", ((string) dr["el_email"]).Replace("'","''"));
+		sql = sql.Replace("$firstname", ((string) dr["el_firstname"]).Replace("'","''"));
+		sql = sql.Replace("$lastname", ((string) dr["el_lastname"]).Replace("'","''"));
 		sql = sql.Replace("$salt", Convert.ToString((int)dr["el_salt"]));
 		sql = sql.Replace("$password", (string) dr["el_password"]);
 
