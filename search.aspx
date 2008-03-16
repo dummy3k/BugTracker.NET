@@ -1987,7 +1987,7 @@ else
 		Response.Write ("&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs2.aspx>print detail</a>");
 		Response.Write ("&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx?format=excel>export to excel</a><br>");
 
-		if (security.user.is_admin || security.user.can_mass_edit_bugs)
+		if (!security.user.is_guest && (security.user.is_admin || security.user.can_mass_edit_bugs))
 		{
 			Response.Write ("<form id=massform onsubmit='return validate_mass()' method=get action=massedit.aspx>");
 			display_bugs(true);

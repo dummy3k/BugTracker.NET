@@ -530,14 +530,17 @@ void Page_Load(Object sender, EventArgs e)
 
 
 			// edit bug
-			if (security.user.is_admin
-			|| security.user.can_merge_bugs)
+			if (!security.user.is_guest)
 			{
-				string merge_bug_link = "<a href=merge_bug.aspx?id="
-					+ Convert.ToString(id)
-					+ " title='Merge this item and another item together'>merge</a>";
+				if (security.user.is_admin
+				|| security.user.can_merge_bugs)
+				{
+					string merge_bug_link = "<a href=merge_bug.aspx?id="
+						+ Convert.ToString(id)
+						+ " title='Merge this item and another item together'>merge</a>";
 
-				merge_bug.InnerHtml = merge_bug_link;
+					merge_bug.InnerHtml = merge_bug_link;
+				}
 			}
 
 			// delete bug
@@ -2103,12 +2106,12 @@ void on_update (Object sender, EventArgs e)
 
 
             bugpost_fields_have_changed = (btnet.Bug.insert_comment(
-                id, 
-                security.user.usid, 
-                comment_formated, 
+                id,
+                security.user.usid,
+                comment_formated,
                 comment_search,
-                null, 
-                commentType, 
+                null,
+                commentType,
                 internal_only.Checked) != 0);
 
 

@@ -58,6 +58,7 @@ void Page_Load(Object sender, EventArgs e)
 			left outer join users u2 on u.us_created_user = u2.us_id
 			left outer join #t on u.us_id = pu_user
 			where u.us_active in (1 $inactive)
+			$filter_users
 			order by u.us_username;
 
 			drop table #t";
@@ -94,6 +95,7 @@ void Page_Load(Object sender, EventArgs e)
 			left outer join #t on us_id = pu_user
 			where us_created_user = $us
 			and us_active in (1 $inactive)
+			$filter_users
 			order by us_username;
 
 			drop table #t";
@@ -109,21 +111,59 @@ void Page_Load(Object sender, EventArgs e)
 				hide_inactive_users.Checked = true;
 			}
 		}
+
+
+		HttpCookie cookie2 = Request.Cookies["filter_users"];
+		if (cookie2 != null)
+		{
+			filter_users.Value = (string) cookie2.Value;
+		}
+		else
+		{
+			filter_users.Value = "";
+		}
 	}
+
 
 	if (hide_inactive_users.Checked)
 	{
-		Response.Cookies["hide_inactive_users"].Value = "1";
 		sql = sql.Replace("$inactive", "");
 	}
 	else
 	{
-		Response.Cookies["hide_inactive_users"].Value = "0";
 		sql = sql.Replace("$inactive", ",0");
+	}
+
+
+	if (filter_users.Value != "")
+	{
+		sql = sql.Replace("$filter_users", "and u.us_username like '" + filter_users.Value.Replace("'","''") + "%'");
+	}
+	else
+	{
+		sql = sql.Replace("$filter_users", "");
 	}
 
 	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 	ds = dbutil.get_dataset(sql);
+
+	// cookies
+	if (hide_inactive_users.Checked)
+	{
+		Response.Cookies["hide_inactive_users"].Value = "1";
+	}
+	else
+	{
+		Response.Cookies["hide_inactive_users"].Value = "0";
+	}
+
+	Response.Cookies["filter_users"].Value = filter_users.Value;
+
+    DateTime dt = DateTime.Now;
+    TimeSpan ts = new TimeSpan(365, 0, 0, 0);
+    Response.Cookies["hide_inactive_users"].Expires = dt.Add(ts);
+    Response.Cookies["filter_users"].Expires = dt.Add(ts);
+
 
 }
 
@@ -135,38 +175,64 @@ void Page_Load(Object sender, EventArgs e)
 <title id="titl" runat="server">btnet users</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
+
+<script>
+
+function filter_changed()
+{
+	el = document.getElementById("filter_users")
+
+	if (el.value != "")
+	{
+		el.style.background = "yellow"
+	}
+	else
+	{
+		el.style.background = "white"
+	}
+
+}
+
+</script>
+
+
 </head>
 
-<body>
+<body onload="filter_changed()">
 <% security.write_menu(Response, "admin"); %>
 
 <div class=align>
 
 <table border=0 width=80%><tr>
-<td align=left>
-	<a href=edit_user.aspx>add new user </a>
-<td align=right>
-	<form runat="server">
-	<span class=lbl>hide inactive users:</span>
-	<asp:CheckBox id="hide_inactive_users" class=cb runat="server" AutoPostBack="true" OnCheckedChanged="Page_Load"/>
-	</form>
+	<td align=left valign=top>
+		<a href=edit_user.aspx>add new user </a>
+	<td align=right valign=top>
+		<form runat="server">
+
+			<span class=lbl>Show only usernames starting with:</span>
+			<input type="text" runat="server" id="filter_users" class="txt" value="" onkeyup="filter_changed()" style="color: red;">
+
+			&nbsp;&nbsp;&nbsp;
+
+			<span class=lbl>hide inactive users:</span>
+			<asp:CheckBox id="hide_inactive_users" class="cb" runat="server"/>
+
+			<input type=submit class="btn" value="Refresh User List">
+		</form>
 </table>
 
 <%
 
 if (ds.Tables[0].Rows.Count > 0)
 {
-//	SortableHtmlTable.create_from_dataset(
-//		Response, ds, "edit_user.aspx?id=", "delete_user.aspx?id=", false);
 
 	SortableHtmlTable.create_from_dataset(
 		Response, ds, "", "", false);
 
-
 }
 else
 {
-	Response.Write ("No users in the database.");
+	Response.Write ("No users to display.");
 }
 %>
 </div>

@@ -20,7 +20,19 @@ void Page_Load(Object sender, EventArgs e)
 	Util.do_not_cache(Response);
 	dbutil = new DbUtil();
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+
+	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+
+	if (security.user.is_admin || security.user.can_mass_edit_bugs)
+	{
+		//
+	}
+	else
+	{
+		Response.Write ("You are not allowed to use this page.");
+		Response.End();
+	}
+
 
 	string list = "";
 
