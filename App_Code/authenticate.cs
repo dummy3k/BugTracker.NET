@@ -16,14 +16,52 @@ namespace btnet
         public static bool check_password(string username, string password)
         {
 
-			if (btnet.Util.get_setting("AuthenticateUsingLdap","0") == "1")
+            DbUtil dbutil = new DbUtil();
+
+            string sql = @"
+select us_username, us_id, us_password, isnull(us_salt,0) us_salt, us_active
+from users
+where us_username = N'$username'";
+
+            sql = sql.Replace("$username", username.Replace("'", "''"));
+
+            DataRow dr = dbutil.get_datarow(sql);
+
+            if (dr == null)
+            {
+                Util.write_to_log("Unknown user " + username + " attempted to login.");
+                return false;
+            }
+
+            int us_active = (int)dr["us_active"];
+
+            if (us_active == 0)
+            {
+                Util.write_to_log("Inactive user " + username + " attempted to login.");
+                return false;
+            }
+
+            bool authenticated = false;
+            if (btnet.Util.get_setting("AuthenticateUsingLdap","0") == "1")
 			{
-				return check_password_with_ldap(username, password);
+				authenticated = check_password_with_ldap(username, password);
 			}
 			else
 			{
-				return check_password_with_db(username, password);
+				authenticated = check_password_with_db(username, password, dbutil, dr);
 			}
+
+            if (authenticated)
+            {
+                sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us";
+                sql = sql.Replace("$us", Convert.ToString((int)dr["us_id"]));
+                dbutil.execute_nonquery(sql);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 		}
 
 		public static bool check_password_with_ldap(string username, string password)
@@ -39,7 +77,30 @@ namespace btnet
 			dn = dn.Replace("$REPLACE_WITH_USERNAME$", username);
 			LdapConnection ldap = new LdapConnection(ldap_server);
 			System.Net.NetworkCredential cred = new System.Net.NetworkCredential(dn, password);
-			ldap.AuthType = AuthType.Basic;
+
+            string auth_type = btnet.Util.get_setting(
+                "LdapAuthType","Basic");
+
+            if (auth_type == "Basic")
+                ldap.AuthType = AuthType.Basic;
+            else if (auth_type == "Anonymous")
+                ldap.AuthType = AuthType.Anonymous;
+            else if (auth_type == "Digest")
+                ldap.AuthType = AuthType.Digest;
+            else if (auth_type == "Dpa")
+                ldap.AuthType = AuthType.Dpa;
+            else if (auth_type == "External")
+                ldap.AuthType = AuthType.External;
+            else if (auth_type == "Kerberos")
+                ldap.AuthType = AuthType.Kerberos;
+            else if (auth_type == "Msn")
+                ldap.AuthType = AuthType.Msn;
+            else if (auth_type == "Negotiate")
+                ldap.AuthType = AuthType.Negotiate;
+            else if (auth_type == "Ntlm")
+                ldap.AuthType = AuthType.Ntlm;
+            else if (auth_type == "Sicily")
+                ldap.AuthType = AuthType.Sicily;
 
 			try
 			{
@@ -63,32 +124,8 @@ namespace btnet
 			}
 		}
 
-        public static bool check_password_with_db(string username, string password)
+        public static bool check_password_with_db(string username, string password, DbUtil dbutil, DataRow dr)
         {
-            DbUtil dbutil = new DbUtil();
-
-            string sql = @"
-select us_username, us_id, us_password, isnull(us_salt,0) us_salt, us_active
-from users
-where us_username = N'$username'";
-
-            sql = sql.Replace("$username",username.Replace("'","''"));
-
-            DataRow dr = dbutil.get_datarow(sql);
-
-            if (dr == null)
-            {
-                Util.write_to_log("Unknown user " + username + " attempted to login.");
-                return false;
-            }
-
-            int us_active = (int) dr["us_active"];
-
-            if (us_active == 0)
-            {
-                Util.write_to_log("Inactive user " + username + " attempted to login.");
-                return false;
-            }
 
             int us_salt = (int) dr["us_salt"];
 
@@ -119,12 +156,6 @@ where us_username = N'$username'";
                 {
                     btnet.Util.update_user_password(dbutil, (int) dr["us_id"], password);
                 }
-
-	            sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us";
-	            sql = sql.Replace("$us",Convert.ToString((int)dr["us_id"]));
-	            dbutil.execute_nonquery(sql);
-
-
                 return true;
             }
             else

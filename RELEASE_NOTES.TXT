@@ -31,14 +31,32 @@ uploads not supported.
 Version 2.8.2  3/22/2008
 -----------------------------------------------------------------------
 
-Minor changes:
+* LDAP security options
 
-* Added filtering to users.aspx, in case you have many, many users, to
-limit how many users are displayed.
+* Added "LdapAuthType" to Web.config
 
-* Some links were visible to guests even though logic downstream would
-prevent them from actually being used, like merge and mass edit.  Now
-the links aren't shown to guests.
+* Check active/inactive, even if LDAP
+
+* Summary: error in print_bug.cs with custom field of type "user" 
+
+Initial Comment:
+the error occurs if the custom field contains '' values.
+
+I think the following change could fix the issue:
+
+if ((string)drcc["dropdown type"] == "users")
+{
+	object obj = dr[(string)drcc["name"]];
+	if (obj.GetType().ToString() != "System.DBNull" && obj.ToString().Length > 0)
+	{
+
+the change is ' && obj.ToString().Length > 0'.
+
+
+Small bug fixes:
+
+* Fixed bug: Self registration wasn't working for names like "O'Brien",
+with an apostrophe.  Fixed now.
 
 * Added more validation to the "add custom field" page. The validation
 takes care of the following bugs:
@@ -46,6 +64,15 @@ takes care of the following bugs:
 1843742 Custom column named "URL" breaks search.aspx
 1843726 Newline, trailing spaces in dropdown vals causes error
 1914410 "required" not working with custom field of type "user"
+
+* Some links were visible to guests even though logic downstream would
+prevent them from actually being used, like merge and mass edit.  Now
+the links aren't shown to guests.
+
+Enhancement:
+
+* Added filtering to users.aspx, in case you have many, many users, to
+limit how many users are displayed.
 
 -----------------------------------------------------------------------
 Version 2.8.1  3/15/2008
