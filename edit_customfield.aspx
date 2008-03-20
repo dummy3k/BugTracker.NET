@@ -37,40 +37,37 @@ void Page_Load(Object sender, EventArgs e)
 
 		// Get this entry's data from the db and fill in the form
 
-		sql = @"select sc.name, isnull(ccm_dropdown_vals,'') [vals],
-			isnull(ccm_dropdown_type,'') [dropdown_type],
-			isnull(ccm_sort_seq, sc.colorder) [column order]
-			from syscolumns sc
-			inner join sysobjects so on sc.id = so.id
-			left outer join custom_col_metadata ccm on ccm_colorder = sc.colorder
-			where so.name = 'bugs'
-			and sc.colorder = $co";
+		sql = @"
+select sc.name,
+isnull(ccm_dropdown_vals,'') [vals],
+isnull(ccm_dropdown_type,'') [dropdown_type],
+isnull(ccm_sort_seq, sc.colorder) [column order]
+from syscolumns sc
+inner join sysobjects so on sc.id = so.id
+left outer join custom_col_metadata ccm on ccm_colorder = sc.colorder
+where so.name = 'bugs'
+and sc.colorder = $co";
 
 		sql = sql.Replace("$co", Convert.ToString(id));
 		DataRow dr = dbutil.get_datarow(sql);
 
 		name.InnerText = (string) dr["name"];
+		dropdown_type.Value = Convert.ToString(dr["dropdown_type"]);
 
+		if (dropdown_type.Value == "normal")
+		{
+			// show the dropdown vals
+		}
+		else
+		{
+			vals.Visible = false;
+			vals_label.Visible = false;
+			//vals_explanation.Visible = false;
+		}
 
 		// Fill in this form
 		vals.Value = (string) dr["vals"];
 		sort_seq.Value = Convert.ToString(dr["column order"]);
-		dropdown_type.Items.Insert(0, new ListItem("not a dropdown",""));
-		dropdown_type.Items.Insert(1, new ListItem("normal","normal"));
-		dropdown_type.Items.Insert(2, new ListItem("users","users"));
-
-		foreach (ListItem li in dropdown_type.Items)
-		{
-			if (li.Text == Convert.ToString(dr["dropdown_type"]))
-			{
-				li.Selected = true;
-			}
-			else
-			{
-				li.Selected = false;
-			}
-		}
-
 
 	}
 
@@ -83,14 +80,13 @@ Boolean validate()
 
 	Boolean good = true;
 
+	sort_seq_err.InnerText = "";
+	vals_err.InnerText = "";
+
 	if (sort_seq.Value == "")
 	{
 		good = false;
 		sort_seq_err.InnerText = "Sort Sequence is required.";
-	}
-	else
-	{
-		sort_seq_err.InnerText = "";
 	}
 
 
@@ -99,11 +95,41 @@ Boolean validate()
 		good = false;
 		sort_seq_err.InnerText = "Sort Sequence must be an integer.";
 	}
-	else
-	{
-		sort_seq_err.InnerText = "";
-	}
 
+
+	if (dropdown_type.Value == "normal")
+	{
+		if (vals.Value == "")
+		{
+			good = false;
+			vals_err.InnerText = "Dropdown values are required for dropdown type of \"normal\".";
+		}
+		else if (vals.Value.Contains("'")
+		|| vals.Value.Contains("\"")
+		|| vals.Value.Contains("<")
+		|| vals.Value.Contains(">")
+		|| vals.Value.Contains("\n")
+		|| vals.Value.Contains("\t")
+		|| vals.Value.Contains("\r"))
+		{
+			good = false;
+			vals_err.InnerText = "Special characters like quotes, line breaks not allowed.";
+		}
+		else
+		{
+			string[] options = Util.split_string_using_pipes(vals.Value);
+
+			for (int i = 0; i < options.Length; i++)
+			{
+				if (options[i].StartsWith(" ") || options[i].EndsWith(" "))
+				{
+					good = false;
+					vals_err.InnerText = "Dropdown values not allowed to have leading or trailing spaces.";
+					break;
+				}
+			}
+		}
+	}
 
 	return good;
 }
@@ -128,15 +154,12 @@ void on_update (Object sender, EventArgs e)
 			else
 				update custom_col_metadata
 				set ccm_dropdown_vals = '$v',
-				ccm_sort_seq = $ss,
-				ccm_dropdown_type = '$dt'
+				ccm_sort_seq = $ss
 				where ccm_colorder = $co";
 
 		sql = sql.Replace("$co", Convert.ToString(id));
 		sql = sql.Replace("$v", vals.Value.Replace("'", "''"));
 		sql = sql.Replace("$ss", sort_seq.Value);
-		sql = sql.Replace("$dt", dropdown_type.SelectedItem.Value.Replace("'", "''"));
-
 
 		dbutil.execute_nonquery(sql);
 		Server.Transfer ("customfields.aspx");
@@ -171,28 +194,7 @@ void on_update (Object sender, EventArgs e)
 	</td>
 	</tr>
 
-	<tr>
-	<td colspan=3>
-	&nbsp;
-	</td>
-	</tr>
-
-	<tr>
-	<td colspan=3>
-	<span class=smallnote>
-	A dropdown type of "normal" uses the values specified in "Normal Dropdown Values" below.
-	<br>A dropdown type of "users" is filled with values from the users table.
-	<br>The same list that is used for "assigned to" will be used for a "user" dropdown.
-	</span>
-	</td>
-	</tr>
-
-	<tr>
-	<td class=lbl>Dropdown Type:</td>
-	<td><asp:DropDownList id="dropdown_type" runat="server">
-	</asp:DropDownList></td>
-	<td>&nbsp</td>
-	</tr>
+<% if (dropdown_type.Value == "normal") { %>
 
 	<tr>
 	<td colspan=3>
@@ -202,25 +204,33 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td colspan=3>
-	<span class=smallnote>
+	<span class=smallnote id="vals_explanation" runat="server">
 	Use the following if you want the custom field to be a "normal" dropdown.
 	<br>Create a pipe seperated list of values as shown below.
 	<br>No individiual value should be longer than the length of your custom field.
-	<br>Don't use commas, &gt;, or &lt; characters in the list of values.
+	<br>Don't use commas, &gt;, &lt;, quotes, or leading/trailing spaces in the list of values.
+	<br>Here some good examples:
 	<br>
-	"version 1.0|Version 1.1|Version 1.2"
+	"1.0|1.1|1.2"
+	<br>
+	"red|blue|green"
+	<br>It's ok to have one of the values be blank:<br>
+	"|red|blue|green"
 	</span>
 	</td>
 	</tr>
 
+<% } %>
 
 	<tr>
-	<td colspan=2>
+	<td colspan=3>
 	<br>
-	<div  class=lbl >Normal Dropdown Values:</div><p>
-	<textarea runat="server" class=txt id="vals" rows=4 cols=80></textarea></td>
-	<td runat="server" class=err id="vals_err">&nbsp;</td>
+	<div class=lbl id="vals_label" runat="server">Normal Dropdown Values:</div><p>
+	<textarea runat="server" class=txt id="vals" rows=4 cols=80></textarea>
+	<br>
+	<span runat="server" class=err id="vals_err">&nbsp;</span>
 	</tr>
+
 
 	<tr>
 	<td colspan=3>
@@ -237,8 +247,8 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	<tr>
-	<td class=lbl>Sort Sequence:</td>
-	<td><input runat="server" type=text class=txt id="sort_seq" maxlength=2 size=2></td>
+	<td colspan=2 class=lbl>Sort Sequence:
+	&nbsp;&nbsp;<input runat="server" type=text class=txt id="sort_seq" maxlength=2 size=2></td>
 	<td runat="server" class=err id="sort_seq_err">&nbsp;</td>
 	</tr>
 
@@ -255,6 +265,8 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	</table>
+
+	<input type="hidden" id="dropdown_type" runat="server">
 </form>
 
 </td></tr></table></div>
