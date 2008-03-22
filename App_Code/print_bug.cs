@@ -213,6 +213,54 @@ namespace btnet
 
 			Response.Write("\n</table><p>"); // end of the table with the bug fields
 
+			// Relationships
+
+			string sql2 = @"select bg_id [id],
+				bg_short_desc [desc],
+				re_type [comment],
+				case
+					when re_direction = 0 then ''
+					when re_direction = 2 then 'child of $bg'
+					else 'parent of $bg' end [parent/child]
+				from bug_relationships
+				inner join bugs on re_bug2 = bg_id
+				where re_bug1 = $bg
+				order by 1";
+
+			sql2 = sql2.Replace("$bg", Convert.ToString(dr["id"]));
+			DataSet ds_relationships = dbutil.get_dataset(sql2);
+
+			if (ds_relationships.Tables[0].Rows.Count > 0)
+			{
+				Response.Write ("<b>Relationships</b><p><table id=mytable border=1 class=datat><tr>");
+				Response.Write ("<td class=datah valign=bottom>id</td>");
+				Response.Write ("<td class=datah valign=bottom>desc</td>");
+				Response.Write ("<td class=datah valign=bottom>comment</td>");
+				Response.Write ("<td class=datah valign=bottom>parent/child</td>");
+
+				foreach (DataRow dr_relationships in ds_relationships.Tables[0].Rows)
+				{
+					Response.Write ("<tr>");
+
+					Response.Write ("<td class=datad valign=bottom align=right>");
+					Response.Write (Convert.ToString((int) dr_relationships["id"]));
+
+					Response.Write ("<td class=datad valign=bottom>");
+					Response.Write (Convert.ToString(dr_relationships["desc"]));
+
+					Response.Write ("<td class=datad valign=bottom>");
+					Response.Write (Convert.ToString(dr_relationships["comment"]));
+
+					Response.Write ("<td class=datad valign=bottom>");
+					Response.Write (Convert.ToString(dr_relationships["parent/child"]));
+
+				}
+
+				Response.Write ("</table><p>");
+
+			}
+
+			// End of relationship logic
 
 			// don't write links, don't show images, do show update history
 			write_posts (Response, bugid, 0, false, false, true,

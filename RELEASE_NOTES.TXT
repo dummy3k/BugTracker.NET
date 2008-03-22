@@ -26,32 +26,9 @@ uploads not supported.
 
 * edit_bug.aspx and css
 
-
 -----------------------------------------------------------------------
 Version 2.8.2  3/22/2008
 -----------------------------------------------------------------------
-
-* LDAP security options
-
-* Added "LdapAuthType" to Web.config
-
-* Check active/inactive, even if LDAP
-
-* Summary: error in print_bug.cs with custom field of type "user" 
-
-Initial Comment:
-the error occurs if the custom field contains '' values.
-
-I think the following change could fix the issue:
-
-if ((string)drcc["dropdown type"] == "users")
-{
-	object obj = dr[(string)drcc["name"]];
-	if (obj.GetType().ToString() != "System.DBNull" && obj.ToString().Length > 0)
-	{
-
-the change is ' && obj.ToString().Length > 0'.
-
 
 Small bug fixes:
 
@@ -64,15 +41,24 @@ takes care of the following bugs:
 1843742 Custom column named "URL" breaks search.aspx
 1843726 Newline, trailing spaces in dropdown vals causes error
 1914410 "required" not working with custom field of type "user"
+1916585 error in print_bug.cs with custom field of type "user"
 
 * Some links were visible to guests even though logic downstream would
 prevent them from actually being used, like merge and mass edit.  Now
 the links aren't shown to guests.
 
-Enhancement:
+* Even if the password authentication is done via LDAP, now checking
+whether the BugTracker.NET user is marked active, and also now
+updating the last login datetime.
+
+Enhancements:
 
 * Added filtering to users.aspx, in case you have many, many users, to
 limit how many users are displayed.
+
+* Added "LdapAuthType" setting to Web.config.
+
+* RFE 1919939 Show a bug's related bugs in the print and email
 
 -----------------------------------------------------------------------
 Version 2.8.1  3/15/2008
