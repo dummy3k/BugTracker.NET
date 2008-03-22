@@ -314,7 +314,7 @@ void on_update (Object sender, EventArgs e)
 <div class=align><table border=0><tr><td>
 <a href=customfields.aspx>back to custom fields</a>
 <form class=frm runat="server">
-	<table border=0 xwidth=640>
+	<table border=0>
 
 	<tr>
 	<td colspan=3>
@@ -335,11 +335,11 @@ void on_update (Object sender, EventArgs e)
 	</tr>
 
 	<tr>
-	<td colspan=3>
+	<td colspan=3 width=350>
 	<span class=smallnote>
-	A dropdown type of "normal" uses the values specified<br>in "Normal Dropdown Values" below.
-	<br>A dropdown type of "users" is filled with values from the users table.
-	<br>The same list that is used for "assigned to" will be used for a "user" dropdown.
+	A dropdown type of "normal" uses the values specified in "Normal Dropdown Values"
+	below. A dropdown type of "users" is filled with values from the users table. The
+	same list that is used for "assigned to" will be used for a "user" dropdown.
 	</span>
 	</td>
 	</tr>
@@ -432,7 +432,7 @@ void on_update (Object sender, EventArgs e)
 	<td colspan=3>
 	<br>
 	<div class=lbl >Normal Dropdown Values:</div><p>
-	<textarea runat="server" class=txt id="vals" rows=4 cols=80></textarea>
+	<textarea runat="server" class=txt id="vals" rows=6 cols=60></textarea>
 	<br>
 	<span runat="server" class=err id="vals_err">&nbsp;</span>
 	</tr>

@@ -226,7 +226,7 @@ void on_update (Object sender, EventArgs e)
 	<td colspan=3>
 	<br>
 	<div class=lbl id="vals_label" runat="server">Normal Dropdown Values:</div><p>
-	<textarea runat="server" class=txt id="vals" rows=4 cols=80></textarea>
+	<textarea runat="server" class=txt id="vals" rows=6 cols=60></textarea>
 	<br>
 	<span runat="server" class=err id="vals_err">&nbsp;</span>
 	</tr>
