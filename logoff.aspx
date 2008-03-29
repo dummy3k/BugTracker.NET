@@ -17,6 +17,8 @@ void Page_Load(Object sender, EventArgs e)
 
 	Util.do_not_cache(Response);
 
+	Util.set_context(HttpContext.Current);
+
 	dbutil = new DbUtil();
 	dbutil.get_sqlconnection();
 

@@ -20,12 +20,10 @@ void Page_Load(Object sender, EventArgs e)
 
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
-
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "queries";
 
 	string sql = "";
-
 
 	if (security.user.is_admin || security.user.can_edit_sql)
 	{
@@ -49,9 +47,12 @@ void Page_Load(Object sender, EventArgs e)
 			from queries
 			left outer join users on qu_user = us_id
 			left outer join orgs on qu_org = og_id
-			where isnull(qu_user,0) = $us
+			where 1 = $all /* all */
+			or isnull(qu_user,0) = $us
 			or isnull(qu_user,0) = 0
 			order by qu_desc";
+
+		sql = sql.Replace("$all", show_all.Checked ? "1" : "0");
 	}
 	else
 	{
@@ -76,8 +77,6 @@ void Page_Load(Object sender, EventArgs e)
 
 }
 
-
-
 </script>
 
 <html>
@@ -93,12 +92,27 @@ void Page_Load(Object sender, EventArgs e)
 <div class=align>
 
 <% if (security.user.is_admin || security.user.can_edit_sql) { %>
-<a href=edit_query.aspx>add new query</a>
-<% } %>
-<p>
-
+	<table border=0 width=80%><tr>
+		<td align=left valign=top>
+			<a href=edit_query.aspx>add new query</a>
+		<td align=right valign=top>
+			<form runat="server">
+				<span class=lbl>show everybody's private queries:</span>
+				<asp:CheckBox id="show_all" class="cb" runat="server" AutoPostback="True" />
+			</form>
+	</table>
 <%
 
+}
+else
+{
+	Response.Write ("<p>");
+}
+
+%>
+
+
+<%
 
 if (ds.Tables[0].Rows.Count > 0)
 {

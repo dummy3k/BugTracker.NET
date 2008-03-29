@@ -18,13 +18,38 @@ uploads not supported.
 * document ldap at ifdefined.
 
 * bug, issue, defect - googling the various phrases
-* my rejection from google
 * top things bugtracker.net can't do: foreign languages, linux, multiple databases
 * time tracking
+
+* my estimation methodology
 
 * syscolumns, column order scheme
 
 * edit_bug.aspx and css
+
+* 
+
+-----------------------------------------------------------------------
+Version 2.8.3  
+-----------------------------------------------------------------------
+
+* user setting to control whether first comment or last comment
+* user settings to control refreshing bugs page
+* Make first comment, last comment configurable
+
+* Use date range for search, custom fields
+
+* Let admin remove subscriber
+* Let admin see everybody's queries, with filter
+
+
+
+
+* Fixed bug: If you were inactive awhile and then clicked on logoff, 
+you could an an error.
+
+* Queries.aspx now gives admins the ability to see everybody's 
+private queries.
 
 -----------------------------------------------------------------------
 Version 2.8.2  3/22/2008
