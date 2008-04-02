@@ -71,23 +71,43 @@ void Page_Load(Object sender, EventArgs e)
 
 	// show who is subscribed
 
-	sql = @"select
-		us_username [user],
-		us_lastname + ', ' + us_firstname [name],
-		us_email [email],
-		case when us_reported_notifications < 4 or us_assigned_notifications < 4 or us_subscribed_notifications < 4 then 'Y' else 'N' end [user is<br>filtering<br>notifications]
-		from bug_subscriptions
-		inner join users on bs_user = us_id
-		where bs_bug = $bg
-		and us_enable_notifications = 1
-		and us_active = 1
-		order by 1";
+	if (security.user.is_admin)
+	{
+		sql = @"
+select
+'<a href=delete_subscriber.aspx?ses=$ses&bg_id=$bg&bs_id=' + convert(varchar,bs_id) + '>unsubscribe</a>'	[$no_sort_unsubscriber],
+us_username [user],
+us_lastname + ', ' + us_firstname [name],
+us_email [email],
+case when us_reported_notifications < 4 or us_assigned_notifications < 4 or us_subscribed_notifications < 4 then 'Y' else 'N' end [user is<br>filtering<br>notifications]
+from bug_subscriptions
+inner join users on bs_user = us_id
+where bs_bug = $bg
+and us_enable_notifications = 1
+and us_active = 1
+order by 1";
+
+		sql = sql.Replace("$ses", Convert.ToString(Session["session_cookie"]));
+
+	}
+	else
+	{
+		sql = @"
+select
+us_username [user],
+us_lastname + ', ' + us_firstname [name],
+us_email [email],
+case when us_reported_notifications < 4 or us_assigned_notifications < 4 or us_subscribed_notifications < 4 then 'Y' else 'N' end [user is<br>filtering<br>notifications]
+from bug_subscriptions
+inner join users on bs_user = us_id
+where bs_bug = $bg
+and us_enable_notifications = 1
+and us_active = 1
+order by 1";
+	}
 
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
 	ds = dbutil.get_dataset(sql);
-
-
-
 
 	// Get list of users who could be subscribed to this bug.
 
@@ -95,7 +115,6 @@ void Page_Load(Object sender, EventArgs e)
 declare @project int;
 declare @org int;
 select @project = bg_project, @org = bg_org from bugs where bg_id = $bg;";
-
 
 	// Only users explicitly allowed will be listed
 	if (Util.get_setting("DefaultPermissionLevel","2") == "0")
@@ -216,7 +235,7 @@ Subscribers for <% Response.Write(Convert.ToString(bugid)); %>
 if (ds.Tables[0].Rows.Count > 0)
 {
 	SortableHtmlTable.create_from_dataset(
-		Response, ds, "", "");
+		Response, ds, "", "", false);
 
 }
 else

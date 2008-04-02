@@ -1071,7 +1071,7 @@ function show_permissions_settings()
 
 	<tr>
 	<td class=lbl>Confirm Password:</td>
-	<td colspan=2><input runat="server" autofill=no type=password class=txt id="confirm_pw" maxlength=20 size=20></td>
+	<td colspan=2><input runat="server" autocomplete=off type=password class=txt id="confirm_pw" maxlength=20 size=20></td>
 	</tr>
 
 	<tr>

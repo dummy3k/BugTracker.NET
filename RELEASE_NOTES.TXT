@@ -36,13 +36,19 @@ Version 2.8.3
 * user setting to control whether first comment or last comment
 * user settings to control refreshing bugs page
 * Make first comment, last comment configurable
-
 * Use date range for search, custom fields
-
 * Let admin remove subscriber
-* Let admin see everybody's queries, with filter
 
 
+screen capture can add a bug with a bad project?  and edit_bug.aspx
+can't handle a bug with a bad project.
+
+
+test btnet service, console, new setting for ssl certificates
+
+allow Exclude thing in service with pipes for multiple filters.
+
+make sure ajax thing works with a guest who has never logged in.
 
 
 * Fixed bug: If you were inactive awhile and then clicked on logoff, 
@@ -50,6 +56,11 @@ you could an an error.
 
 * Queries.aspx now gives admins the ability to see everybody's 
 private queries.
+
+* Corrected the autocomplete behavior for confirm password in 
+edit_user.aspx autocomplete=off
+
+
 
 -----------------------------------------------------------------------
 Version 2.8.2  3/22/2008

@@ -241,7 +241,7 @@ Response.Write (Application["custom_logo"]);
 
 	<tr>
 	<td class=lbl>Confirm Password:</td>
-	<td><input runat="server" autofill=no type=password class=txt id="confirm" maxlength=20 size=20></td>
+	<td><input runat="server" autocomplete=off type=password class=txt id="confirm" maxlength=20 size=20></td>
 	<td runat="server" class=err id="confirm_err">&nbsp;</td>
 	</tr>
 
