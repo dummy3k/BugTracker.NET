@@ -608,9 +608,17 @@ namespace btnet
 			string bug_sql;
 
 			int where_pos = sql.IndexOf("WhErE"); // first look for a "special" where, case sensitive, in case there are multiple where's to choose from
-			if (where_pos == -1) where_pos = sql.ToUpper().IndexOf("WHERE");
-			int	order_pos = sql.ToUpper().LastIndexOf("ORDER BY");
-			if (order_pos < where_pos) order_pos = -1; // ignore an order by that occurs in a subquery, for example
+			if (where_pos == -1)
+				where_pos = sql.ToUpper().IndexOf("WHERE");
+
+			int	order_pos = sql.IndexOf("/*ENDWHR*/"); // marker for end of the where statement
+
+			if (order_pos == -1)
+				order_pos = sql.ToUpper().LastIndexOf("ORDER BY");
+
+			if (order_pos < where_pos)
+				order_pos = -1; // ignore an order by that occurs in a subquery, for example
+
 			Util.write_to_log(Convert.ToString(sql.Length) + " " + Convert.ToString(where_pos) + " " + Convert.ToString(order_pos));
 
 			if (where_pos != -1 && order_pos != -1)
@@ -650,8 +658,6 @@ namespace btnet
 			return bug_sql;
 
 		}
-
-
 
 
 		///////////////////////////////////////////////////////////////////////
