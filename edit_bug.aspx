@@ -2612,6 +2612,8 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		</span>
 		&nbsp;
 		<span id="comment_label" runat="server">Comment:</span>
+		<span class="smallnote" style="margin-left: 170px">
+		Entering "<% Response.Write(btnet.Util.get_setting("BugLinkMarker","bugid#")); %>999" in comment creates link to id 999</span>
 		<br>
 		<textarea  id="comment" rows=4 cols=80 runat="server" class=txt></textarea>
 		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>

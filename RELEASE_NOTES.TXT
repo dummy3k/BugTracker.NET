@@ -9,48 +9,28 @@ Release notes:
 * excel export for reports
 * field level permissions for custom fields?
 * escalation/reminder
-* "its" not "it's" in docs.
+* spellcheck docs
 * new fckEditor - read my own fckdocs at ifdefined. note that image
 uploads not supported.
 * add arbitrary users/subscribers?
 * make read only if closed
 * document workflow.cs at ifdefined.
 * document ldap at ifdefined.
-
 * bug, issue, defect - googling the various phrases
 * top things bugtracker.net can't do: foreign languages, linux, multiple databases
 * time tracking
-
 * my estimation methodology
-
 * syscolumns, column order scheme
-
 * edit_bug.aspx and css
-
-* 
-select
-'#ffffff',
-bg_id [id] ,
-bg_short_desc [desc] ,
-isnull(st_name,'') [status],
-count(*) [number of related bugs]
-from bugs
-inner join bug_relationships on re_bug1 = bg_id
-inner join statuses on bg_status = st_id
-group by bg_id, bg_short_desc, isnull(st_name,'')
-order by bg_id desc
-
-and add extra column to bugs with attachments, who added
-
-* user setting to control whether first comment or last comment
+* user setting to control whether ajax.aspx shows first comment or last comment
 * user settings to control refreshing bugs page
-* Make first comment, last comment configurable
 * Use date range for search, custom fields
 * Let admin remove subscriber
-
-screen capture can add a bug with a bad project?  and edit_bug.aspx
-can't handle a bug with a bad project.
-
+* screen capture can add a bug with a bad project?  and edit_bug.aspx
+* can't handle a bug with a bad project.
+* limiting subadmins to a given org
+* auto subscribe too auto
+* display link hint on edit bug page
 
 -----------------------------------------------------------------------
 Version 2.8.3  
@@ -87,6 +67,14 @@ add the user back as a subscriber.  This is a problem even if you
 yourself click "stop notifications" for a specific bug that your
 auto-subscribe settings say you should be subscribed to.  You'll think
 that you are no longer subscribed, but really you still are.
+
+* Added new query sample to setup.sql, "bugs with related bugs"
+
+* Added ability to use GROUP BY clauses in the bug queries which had
+previously confused the logic that alters the bug queries so that they
+obey the project and organization permissions.  See the "bugs with
+related bugs" sample.  The "/*ENDWHR*/" marks the end of the where
+clause.  (I need to document this better...)
 
 -----------------------------------------------------------------------
 Version 2.8.2  3/22/2008

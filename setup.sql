@@ -694,7 +694,7 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'bugs with attachments',
-+ char(10) + ' select bp_bug, sum(bp_size) bytes '
++ char(10) + ' select bp_bug, sum(bp_size) bytes, rpt.us_username [reported by] '
 + char(10) + ' into #t '
 + char(10) + ' from bug_posts '
 + char(10) + ' where bp_type = ''file'' '
@@ -703,8 +703,40 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 + char(10) + ' bytes ' 
 + char(10) + ' from bugs '
 + char(10) + ' inner join #t on bp_bug = bg_id '
++ char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user '
 + char(10) + ' WhErE 1 = 1 '
 + char(10) + ' order by bytes desc ' 
 + char(10) + ' drop table #t ',
 0)
 
+
+insert into queries (qu_desc, qu_sql, qu_default) values (
+'bugs with attachments',
++ char(10) + ' select bp_bug, sum(bp_size) bytes '
++ char(10) + ' into #t '
++ char(10) + ' from bug_posts '
++ char(10) + ' where bp_type = ''file'' '
++ char(10) + ' group by bp_bug '
++ char(10) + ' select ''#ffffff'', bg_id [id], bg_short_desc [desc], '
++ char(10) + ' bytes, rpt.us_username [reported by]  ' 
++ char(10) + ' from bugs '
++ char(10) + ' inner join #t on bp_bug = bg_id '
++ char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user '
++ char(10) + ' WhErE 1 = 1 '
++ char(10) + ' order by bytes desc ' 
++ char(10) + ' drop table #t ',
+0)
+
+
+insert into queries (qu_desc, qu_sql, qu_default) values (
+'bugs with related bugs',
++ char(10) + ' select ''#ffffff'', bg_id [id], bg_short_desc [desc], '
++ char(10) + ' isnull(st_name,'''') [status], '
++ char(10) + ' count(*) [number of related bugs] '
++ char(10) + ' from bugs '
++ char(10) + ' inner join bug_relationships on re_bug1 = bg_id '
++ char(10) + ' inner join statuses on bg_status = st_id '
++ char(10) + ' /*ENDWHR*/ '
++ char(10) + ' group by bg_id, bg_short_desc, isnull(st_name,'''') '
++ char(10) + ' order by bg_id desc ',
+0)
