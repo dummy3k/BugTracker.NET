@@ -28,10 +28,19 @@ uploads not supported.
 * edit_bug.aspx and css
 
 * 
+select
+'#ffffff',
+bg_id [id] ,
+bg_short_desc [desc] ,
+isnull(st_name,'') [status],
+count(*) [number of related bugs]
+from bugs
+inner join bug_relationships on re_bug1 = bg_id
+inner join statuses on bg_status = st_id
+group by bg_id, bg_short_desc, isnull(st_name,'')
+order by bg_id desc
 
------------------------------------------------------------------------
-Version 2.8.3  
------------------------------------------------------------------------
+and add extra column to bugs with attachments, who added
 
 * user setting to control whether first comment or last comment
 * user settings to control refreshing bugs page
@@ -39,28 +48,45 @@ Version 2.8.3
 * Use date range for search, custom fields
 * Let admin remove subscriber
 
-
 screen capture can add a bug with a bad project?  and edit_bug.aspx
 can't handle a bug with a bad project.
 
 
-test btnet service, console, new setting for ssl certificates
+-----------------------------------------------------------------------
+Version 2.8.3  
+-----------------------------------------------------------------------
 
-allow Exclude thing in service with pipes for multiple filters.
+Small bug fixes:
 
-make sure ajax thing works with a guest who has never logged in.
+* If you were inactive awhile and then clicked on logoff, you could get 
+an error.
 
-
-* Fixed bug: If you were inactive awhile and then clicked on logoff, 
-you could an an error.
-
-* Queries.aspx now gives admins the ability to see everybody's 
-private queries.
+* When adding a non-dropdown custom field and checking required, the 
+following error was wrongly being displayed:
+Checking "Required" is not compatible with a normal or users dropdown
 
 * Corrected the autocomplete behavior for confirm password in 
 edit_user.aspx autocomplete=off
 
+Enhancments:
 
+* Queries.aspx now gives admins the ability to see everybody's 
+private queries.
+
+* btnet_service.exe now works even if the SSL certificate is untrusted.
+
+* btnet_service.exe's setting "SubjectCannotContain" now supports
+multiple strings separated by pipes.  Also added new settings 
+"FromMustContain", "FromCannotContain".  See btnet_service.exe.config
+for more info.
+
+* Admins can now delete a bug subscriber, but note that there's a
+general quirk/bug that if a user's automatic subscription 
+criteria indicates that the user should be subscribed, the logic will
+add the user back as a subscriber.  This is a problem even if you 
+yourself click "stop notifications" for a specific bug that your
+auto-subscribe settings say you should be subscribed to.  You'll think
+that you are no longer subscribed, but really you still are.
 
 -----------------------------------------------------------------------
 Version 2.8.2  3/22/2008

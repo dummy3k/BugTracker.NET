@@ -34,7 +34,7 @@ void Page_Load(Object sender, EventArgs e)
 		datatype.Items.Insert(0, new ListItem("nvarchar", "nvarchar"));
 		datatype.Items.Insert(0, new ListItem("varchar", "varchar"));
 
-		dropdown_type.Items.Insert(0, new ListItem("not a dropdown",""));
+		dropdown_type.Items.Insert(0, new ListItem("not a dropdown","not a dropdown"));
 		dropdown_type.Items.Insert(1, new ListItem("normal","normal"));
 		dropdown_type.Items.Insert(2, new ListItem("users","users"));
 
