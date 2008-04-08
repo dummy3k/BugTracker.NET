@@ -32,7 +32,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 		else if (password.Value != confirm.Value)
 		{
-			msg.InnerHtml = "Confirm doesn't match password.";
+			msg.InnerHtml = "Re-entered password doesn't match password.";
 		}
 		else if (!Util.check_password_strength(password.Value))
 		{
@@ -45,6 +45,12 @@ void Page_Load(Object sender, EventArgs e)
 			dbutil = new DbUtil();
 
 			string guid = Request["id"];
+
+			if (guid == null || guid == "")
+			{
+				Response.Write("no guid");
+				Response.End();
+			}
 
 			string sql = @"
 declare @expiration datetime
@@ -107,12 +113,12 @@ Response.Write (Application["custom_logo"]);
 	<table border=0>
 
 	<tr>
-	<td class=lbl>Email:</td>
+	<td class=lbl>New Password:</td>
 	<td><input runat="server" type=password class=txt id="password" size=20 maxlength=20 autocomplete=off ></td>
 	</tr>
 
 	<tr>
-	<td class=lbl>Confirm:</td>
+	<td class=lbl>Reenter Password:</td>
 	<td><input runat="server" type=password class=txt id="confirm" size=20 maxlength=20 autocomplete=off ></td>
 	</tr>
 

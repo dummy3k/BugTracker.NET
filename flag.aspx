@@ -69,7 +69,21 @@ void Page_Load(Object sender, EventArgs e)
 			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 			sql = sql.Replace("$fl", Convert.ToString(flag));
 
-			dbutil.execute_nonquery(sql);
+			try
+			{
+				dbutil.execute_nonquery(sql);
+			}
+			catch (System.Data.SqlClient.SqlException ex)
+			{
+				if (ex.Message.IndexOf("Cannot insert duplicate") > -1)
+				{
+					// User has two browser windows open
+				}
+				else
+				{
+					throw ex;
+				}
+			}
 			break;
 		}
 	}

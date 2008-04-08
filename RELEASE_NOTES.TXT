@@ -33,7 +33,31 @@ uploads not supported.
 * display link hint on edit bug page
 
 -----------------------------------------------------------------------
-Version 2.8.3  
+Version 2.8.4  4/12/2008
+-----------------------------------------------------------------------
+
+To migrate to this release from 2.8.3, run this SQL:
+
+update custom_col_metadata set ccm_dropdown_type = '' 
+where ccm_dropdown_type = 'not a dropdown'
+
+* Fixed bug introduced in version 2.8.3.  If you used version 2.8.3 to
+add a custom field that was not a dropdown, you need this fix.
+
+Also fixed:
+
+* Non-dropdown custom columns whose size was big enough to be displayed
+as textareas were wrongly being displayed as textareas.
+
+* Screen label for change_password.aspx was wrong.  Should read "New
+Password", not "Email".
+
+* If you have two browswer windows open, clicking on flags could
+trigger flags.aspx to report a duplicate insert error.   The error is
+harmless, but annoying, so now suppressing it.
+
+-----------------------------------------------------------------------
+Version 2.8.3  4/5/2008
 -----------------------------------------------------------------------
 
 Small bug fixes:

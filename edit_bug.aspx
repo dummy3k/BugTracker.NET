@@ -2356,7 +2356,11 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		else
 		{
 
-			if ( fieldLength > minTextAreaSize )
+			string dropdown_type = Convert.ToString(drcc["dropdown type"]);
+
+			if ( fieldLength > minTextAreaSize
+			&& dropdown_type != "normal"
+			&& dropdown_type != "users")
 			{
 				Response.Write ("<textarea ");
 				Response.Write (" onkeydown=\"return count_chars('" + field_id + "'," + fieldLength + ")\" ");
@@ -2370,7 +2374,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			else
 			{
 
-				string dropdown_type = Convert.ToString(drcc["dropdown type"]);
 				string dropdown_vals = Convert.ToString(drcc["vals"]);
 
 
