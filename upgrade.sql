@@ -670,6 +670,5 @@ alter table users add us_most_recent_login_datetime datetime null
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-update custom_col_metadata 
-set ccm_dropdown_type = '' 
-where ccm_dropdown_type = 'not a dropdown'
+update custom_col_metadata set 
+ccm_dropdown_type = '' where ccm_dropdown_type = 'not a dropdown'

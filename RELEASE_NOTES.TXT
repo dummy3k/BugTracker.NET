@@ -33,13 +33,25 @@ uploads not supported.
 * display link hint on edit bug page
 
 -----------------------------------------------------------------------
-Version 2.8.4  4/12/2008
+Version 2.8.5  4/8/2008
+-----------------------------------------------------------------------
+
+* send, don't send private comments?
+
+* dashboard - can another person edit yours?
+
+* timezone
+
+OffsetFromDbTimesInHours
+
+-----------------------------------------------------------------------
+Version 2.8.4  4/8/2008
 -----------------------------------------------------------------------
 
 To migrate to this release from 2.8.3, run this SQL:
 
-update custom_col_metadata set ccm_dropdown_type = '' 
-where ccm_dropdown_type = 'not a dropdown'
+update custom_col_metadata set 
+ccm_dropdown_type = '' where ccm_dropdown_type = 'not a dropdown'
 
 * Fixed bug introduced in version 2.8.3.  If you used version 2.8.3 to
 add a custom field that was not a dropdown, you need this fix.

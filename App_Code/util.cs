@@ -499,10 +499,18 @@ namespace btnet
 			// somebody reported, 1257368
 			else if (date.GetType().ToString() == "System.String")
 			{
-				return date.ToString();
+                return date.ToString();
 			}
+                        
+			int offset_hours = Convert.ToInt32(get_setting("OffsetFromDbTimesInHours","0"));
 
-			return ((DateTime)date).ToString(get_setting("DateTimeFormat","g"),get_culture_info());
+			DateTime dt = (DateTime) date;
+            if (offset_hours != 0)
+            {
+                dt = dt.AddHours(offset_hours);
+            }
+
+			return dt.ToString(get_setting("DateTimeFormat","g"),get_culture_info());
 
 		}
 
