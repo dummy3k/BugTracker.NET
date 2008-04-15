@@ -24,27 +24,41 @@ uploads not supported.
 * edit_bug.aspx and css
 * user setting to control whether ajax.aspx shows first comment or last comment
 * user settings to control refreshing bugs page
-* Use date range for search, custom fields
+
 * Let admin remove subscriber
-* screen capture can add a bug with a bad project?  and edit_bug.aspx
 * can't handle a bug with a bad project.
 * limiting subadmins to a given org
 * auto subscribe too auto
 * display link hint on edit bug page
-* document the WhErE hack 
 * send, don't send private comments?
 
-* required fields, required custom datetime field
 
 -----------------------------------------------------------------------
 Version 2.8.5  4/8/2008
 -----------------------------------------------------------------------
 
-* dashboard - can another person edit yours?
+* document the WhErE hack 
+* required fields, required custom datetime field
+* custom textarea column still allows truncation?
+* Use date range for search, custom fields
 
-* [ 1935727 ] InvalidCastException drawing line chart
+Fixes:
+
+* Fixed bug where edit_dashboard.aspx was actually editing everybody's
+dashboard instead of just the one user's dashboard.
+
+* Fixed bug 1935727 InvalidCastException drawing line chart, if the
+x values were strings instead of ints.
+
+* Fixed bug where edit_bug.aspx crashed if it was trying to display a
+bug with its project value set to a non-existent project.  That can 
+happend if the bug is posted via the screen capture utility.
+
+
+Enhancements:
 
 * Added status column to relationships.aspx
+
 
 -----------------------------------------------------------------------
 Version 2.8.4  4/8/2008

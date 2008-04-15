@@ -2503,97 +2503,100 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		DataRow project_dr = dbutil.get_datarow(sql);
 
 
-		for (int i = 1; i < 4; i++)
+		if (project_dr != null)
 		{
-			if ((int)project_dr["pj_enable_custom_dropdown" + Convert.ToString(i)] == 1)
+			for (int i = 1; i < 4; i++)
 			{
-				// GC: 20-Feb-08: Modified to add an ID to each custom row for CSS customisation
-				Response.Write ("\n<tr id=\"pcdrow" + Convert.ToString(i) + "\"><td nowrap>");
-
-				Response.Write ("<span id=label_pcd" + Convert.ToString(i) + ">");
-				Response.Write (project_dr["pj_custom_dropdown_label" + Convert.ToString(i)]);
-				Response.Write ("</span>");
-				// End GC
-				Response.Write ("<td nowrap>");
-
-
-				int permission_on_original = permission_level;
-				if ((prev_project.Value != string.Empty) && (project.SelectedItem.Value != prev_project.Value))
+				if ((int)project_dr["pj_enable_custom_dropdown" + Convert.ToString(i)] == 1)
 				{
-					permission_on_original = fetch_permission_level(prev_project.Value);
-				}
-				if (permission_on_original == Security.PERMISSION_READONLY
-				|| permission_on_original == Security.PERMISSION_REPORTER)
-				{
-					// GC: 20-Feb-08: Modified to add an ID to the SPAN as well for easier CSS customisation
-					//Response.Write ("<span class=static>");
-					Response.Write ("<span class=static id=pcd" + Convert.ToString(i) + ">");
-					if (IsPostBack)
-					{
-						Response.Write (Request["pcd" + Convert.ToString(i)]);
-					}
-					else
-					{
-						if (id !=0)
-						{
-							Response.Write (dr["bg_project_custom_dropdown_value" + Convert.ToString(i)]);
-						}
-					}
-					Response.Write ("</span>");
+					// GC: 20-Feb-08: Modified to add an ID to each custom row for CSS customisation
+					Response.Write ("\n<tr id=\"pcdrow" + Convert.ToString(i) + "\"><td nowrap>");
 
-				}
-				else
-				{
-
-					// create a hidden area to carry the label
-
-					Response.Write ("<input type=hidden");
-					Response.Write (" name=label_pcd" + Convert.ToString(i));
-					Response.Write (" value=\"");
+					Response.Write ("<span id=label_pcd" + Convert.ToString(i) + ">");
 					Response.Write (project_dr["pj_custom_dropdown_label" + Convert.ToString(i)]);
-					Response.Write ("\">");
+					Response.Write ("</span>");
+					// End GC
+					Response.Write ("<td nowrap>");
 
-					// create a dropdown
 
-					Response.Write ("<select");
-					// GC: 20-Feb-08: Added an ID as well for easier CSS customisation
-					Response.Write (" name=pcd" + Convert.ToString(i));
-					Response.Write (" id=pcd" + Convert.ToString(i) + ">");
-					string[] options = btnet.Util.split_string_using_pipes(
-						(string)project_dr["pj_custom_dropdown_values" + Convert.ToString(i)]);
-
-					string selected_value = "";
-
-					if (IsPostBack)
+					int permission_on_original = permission_level;
+					if ((prev_project.Value != string.Empty) && (project.SelectedItem.Value != prev_project.Value))
 					{
-						selected_value = Request["pcd" + Convert.ToString(i)];
+						permission_on_original = fetch_permission_level(prev_project.Value);
+					}
+					if (permission_on_original == Security.PERMISSION_READONLY
+					|| permission_on_original == Security.PERMISSION_REPORTER)
+					{
+						// GC: 20-Feb-08: Modified to add an ID to the SPAN as well for easier CSS customisation
+						//Response.Write ("<span class=static>");
+						Response.Write ("<span class=static id=pcd" + Convert.ToString(i) + ">");
+						if (IsPostBack)
+						{
+							Response.Write (Request["pcd" + Convert.ToString(i)]);
+						}
+						else
+						{
+							if (id !=0)
+							{
+								Response.Write (dr["bg_project_custom_dropdown_value" + Convert.ToString(i)]);
+							}
+						}
+						Response.Write ("</span>");
+
 					}
 					else
 					{
-						// first time viewing existing
-						if (id != 0)
+
+						// create a hidden area to carry the label
+
+						Response.Write ("<input type=hidden");
+						Response.Write (" name=label_pcd" + Convert.ToString(i));
+						Response.Write (" value=\"");
+						Response.Write (project_dr["pj_custom_dropdown_label" + Convert.ToString(i)]);
+						Response.Write ("\">");
+
+						// create a dropdown
+
+						Response.Write ("<select");
+						// GC: 20-Feb-08: Added an ID as well for easier CSS customisation
+						Response.Write (" name=pcd" + Convert.ToString(i));
+						Response.Write (" id=pcd" + Convert.ToString(i) + ">");
+						string[] options = btnet.Util.split_string_using_pipes(
+							(string)project_dr["pj_custom_dropdown_values" + Convert.ToString(i)]);
+
+						string selected_value = "";
+
+						if (IsPostBack)
 						{
-							selected_value = (string) dr["bg_project_custom_dropdown_value" + Convert.ToString(i)];
+							selected_value = Request["pcd" + Convert.ToString(i)];
 						}
-					}
-
-					for (int j = 0; j < options.Length; j++)
-					{
-						Response.Write ("<option value=\"" + options[j] + "\"");
-
-						//if (options[j] == selected_value)
-						if (HttpUtility.HtmlDecode(options[j]) == selected_value)
+						else
 						{
-							Response.Write (" selected ");
+							// first time viewing existing
+							if (id != 0)
+							{
+								selected_value = (string) dr["bg_project_custom_dropdown_value" + Convert.ToString(i)];
+							}
 						}
-						Response.Write (">");
-						Response.Write (options[j]);
-					}
 
-					Response.Write ("</select>");
+						for (int j = 0; j < options.Length; j++)
+						{
+							Response.Write ("<option value=\"" + options[j] + "\"");
+
+							//if (options[j] == selected_value)
+							if (HttpUtility.HtmlDecode(options[j]) == selected_value)
+							{
+								Response.Write (" selected ");
+							}
+							Response.Write (">");
+							Response.Write (options[j]);
+						}
+
+						Response.Write ("</select>");
+					}
 				}
 			}
-		}
+		} // if result set not null
 	}
 
 
