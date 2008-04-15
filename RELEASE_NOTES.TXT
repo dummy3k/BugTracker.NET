@@ -31,18 +31,20 @@ uploads not supported.
 * limiting subadmins to a given org
 * auto subscribe too auto
 * display link hint on edit bug page
+* document the WhErE hack 
+* send, don't send private comments?
+
+* required fields, required custom datetime field
 
 -----------------------------------------------------------------------
 Version 2.8.5  4/8/2008
 -----------------------------------------------------------------------
 
-* send, don't send private comments?
-
 * dashboard - can another person edit yours?
 
-* timezone
+* [ 1935727 ] InvalidCastException drawing line chart
 
-OffsetFromDbTimesInHours
+* Added status column to relationships.aspx
 
 -----------------------------------------------------------------------
 Version 2.8.4  4/8/2008

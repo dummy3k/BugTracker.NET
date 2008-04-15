@@ -54,7 +54,7 @@ void Page_Load(Object sender, EventArgs e)
 	string rp_sql = (string)dr["rp_sql"];
     string chart_type = (string)dr["rp_chart_type"];
     string desc = (string)dr["rp_desc"];
-    
+
 	// replace the magic pseudo variable
 	rp_sql = rp_sql.Replace("$ME", Convert.ToString(security.user.usid));
 
@@ -218,25 +218,6 @@ void create_line_chart(string title, DataSet ds)
 			chart_bottom-y);
 	}
 
-/*
-	// draw high water mark
-	y = (int)(max * vertical_scale_factor);
-
-	objGraphics.DrawString(
-			Convert.ToString(i),
-			fontLegend,
-			blackBrush,
-			x_axis_text_offset, (chart_bottom-y) - (fontLegend.Height/2));
-
-	// grid line
-	objGraphics.DrawLine(
-		black_pen,
-		page_left_margin,
-		chart_bottom-y,
-		page_left_margin + chart_width,
-		chart_bottom-y);
-*/
-
 	// draw lines
 	int line_length = chart_width / (ds.Tables[0].Rows.Count-1);
 	int x = page_left_margin;
@@ -267,7 +248,17 @@ void create_line_chart(string title, DataSet ds)
 			6, 6);
 
 		// draw x axis labels
-		int x_val = (int) ds.Tables[0].Rows[i][0];
+
+		string x_val = "";
+
+		try
+		{
+			x_val = Convert.ToString((int) ds.Tables[0].Rows[i][0]);
+		}
+		catch(Exception)
+		{
+			x_val = Convert.ToString(ds.Tables[0].Rows[i][0]);
+		}
 
 		if (x - prev_x_axis_label > 50) // space them apart, so they don't bump into each other
 		{
@@ -279,7 +270,7 @@ void create_line_chart(string title, DataSet ds)
 				x, chart_bottom+14);
 
 			objGraphics.DrawString(
-				Convert.ToString(x_val),
+				x_val,
 				fontLegend,
 				blackBrush,
 				x, x_axis_text_y);
@@ -659,9 +650,9 @@ void write_no_data_message(string title, DataSet ds)
     int page_top_margin = 40 / scale; // gape between chart and top of page
 
     Font fontTitle = new Font("Verdana", 12, FontStyle.Bold);
-    Font fontLegend = new Font("Verdana", 8);    
+    Font fontLegend = new Font("Verdana", 8);
     int page_bottom_margin = 3 * fontLegend.Height;
-    int page_left_margin = (4 * fontLegend.Height) + x_axis_text_offset;  // where the y axis text goes    
+    int page_left_margin = (4 * fontLegend.Height) + x_axis_text_offset;  // where the y axis text goes
 
     // Create a Bitmap instance
     Bitmap objBitmap = new Bitmap(
@@ -697,6 +688,6 @@ void write_no_data_message(string title, DataSet ds)
     objGraphics.Dispose();
     objBitmap.Dispose();
 }
-    
-    
+
+
 </script>

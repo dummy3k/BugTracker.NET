@@ -182,6 +182,7 @@ insert into bug_posts
 	sql = @"select bg_id [id],
 		bg_short_desc [desc ],
 		re_type [comment],
+        st_name [status],
 		case
 			when re_direction = 0 then ''
 			when re_direction = 2 then 'child of $bg'
@@ -200,6 +201,7 @@ insert into bug_posts
 
 		sql += @"from bugs
 		inner join bug_relationships on bg_id = re_bug2
+        left outer join statuses on st_id = bg_status
 		where re_bug1 = $bg
 		order by bg_id desc";
 
