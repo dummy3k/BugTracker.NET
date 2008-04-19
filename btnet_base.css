@@ -173,7 +173,7 @@ padding: 3px;
 	border-bottom: 3px solid black;
 	padding: 3px;
 	position:absolute; top:0; left:0;
-	background:#ccffcc;
+	background:#ddffdd;
 	color:black;
 	display:none;
 	width: 500;
@@ -181,6 +181,8 @@ padding: 3px;
 	font-family: verdana;
 	text-overflow: clip;
 }
+
+.buglist_popup hr {width:50%; height: 1px;}
 
 .suggest_select {
 	font-size:8pt;

@@ -101,11 +101,11 @@ function stateChanged()
 			var popup = document.getElementById("popup");
 			if (xmlHttp.responseText != "")
 			{
-				popup.innerHTML = current_bug + ": " + xmlHttp.responseText
+				popup.innerHTML = xmlHttp.responseText
 				var pos = find_position(current_element)
 
 				popup.style.left = pos[0] + 30;
-				popup.style.top = pos[1] + 30;
+				popup.style.top = pos[1] + 28;
 				popup.style.display = "block";
 
 			}

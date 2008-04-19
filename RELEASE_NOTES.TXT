@@ -65,6 +65,9 @@ Enhancements:
 
 * Added status column to relationships.aspx
 
+* Popups that display when you hover over items in the bug list now
+show all comments, not just the first.
+
 
 -----------------------------------------------------------------------
 Version 2.8.4  4/8/2008

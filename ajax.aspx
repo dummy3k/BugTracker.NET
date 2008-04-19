@@ -21,51 +21,64 @@ void Page_Load(Object sender, EventArgs e)
 	if (Bug.get_bug_permission_level(Convert.ToInt32(bugid), security) != Security.PERMISSION_NONE)
 	{
 		// get the first bug comment or the email that created this bug
-		string sql = @"select top 1 substring(bp_comment,0,400), isnull(bp_content_type,'') [bp_content_type] from bug_posts
-			where bp_bug = $id
-			and bp_type in ('received','comment')
-			and bp_hidden_from_external_users = 0
-			order by bp_date";
+		string sql = @"
+/* popup */
+select substring(bp_comment_search,1,400)
+from bug_posts
+where bp_bug = $id
+and bp_type in ('received','comment', 'sent')
+and bp_hidden_from_external_users = 0
+order by bp_date desc";
 
 		sql = sql.Replace("$id",bugid);
 
-		DataRow dr = dbutil.get_datarow(sql);
+		DataSet ds = dbutil.get_dataset(sql);
 
-		if (dr != null)
+		// no rows
+		if (ds.Tables[0].Rows.Count == 0)
+		{
+			Response.Write("");
+			Response.End();
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.Append(bugid);
+		sb.Append(":<br><br>");
+
+		bool first_time = true;
+
+		foreach (DataRow dr in ds.Tables[0].Rows)
 		{
 
-			string s = (string) dbutil.execute_scalar(sql);
-
-			if (s == null)
+			if (first_time)
 			{
-				Response.Write ("");
+				first_time = false;
 			}
 			else
 			{
-				// indicate that there's more text
-				if (s.Length == 399)
-				{
-					s+= "...";
-				}
-
-				if ((string) dr["bp_content_type"] == "text/html")
-				{
-					// don't encode
-				}
-				else
-				{
-					// preserve line breaks
-					s = HttpUtility.HtmlEncode(s);
-					s = s.Replace("\n\n","\n");
-					s = s.Replace("\n","<br>");
-				}
-				Response.Write (s);
+				sb.Append("<hr>");
 			}
+
+
+			string s = (string) dr[0];
+
+			// indicate that there's more text
+			if (s.Length == 400)
+			{
+				s+= "...";
+			}
+
+			// preserve line breaks
+			s = HttpUtility.HtmlEncode(s);
+			s = s.Replace("\n\n","\n");
+			s = s.Replace("\n","<br>");
+
+			sb.Append(s);
+
 		}
-		else
-		{
-			Response.Write ("");
-		}
+
+		Response.Write(sb.ToString());
 	}
 	else
 	{
