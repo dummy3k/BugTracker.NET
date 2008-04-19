@@ -146,7 +146,7 @@ function on_mouse_over(el)
 		pos++ // start with char after the =
 		current_bug = el.href.substr(pos)
 		// get comment if the user keeps hovering over this
-		setTimeout('maybe_get_bug_comment(' + current_bug + ')', 400)
+		setTimeout('maybe_get_bug_comment(' + current_bug + ')', 250)
 	}
 }
 

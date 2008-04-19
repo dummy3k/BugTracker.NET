@@ -58,15 +58,17 @@ x values were strings instead of ints.
 bug with its project value set to a non-existent project.  That can 
 happend if the bug is posted via the screen capture utility.
 
-* No longer displaying "diff" link on subversion revisions that where
-the action is "A", add.
+* No longer displaying "diff" link on subversion revisions where the
+Subversion action was an add.  Clicking on diff was causing an error
+to display because there is no previous version to diff with.
 
 Enhancements:
 
 * Added status column to relationships.aspx
 
 * Popups that display when you hover over items in the bug list now
-show all comments, not just the first.
+show all comments, not just the first.  Also, popups show after
+hovering 250 milliseconds, instead of after 400 milliseconds.
 
 
 -----------------------------------------------------------------------
