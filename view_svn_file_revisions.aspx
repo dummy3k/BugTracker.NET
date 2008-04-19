@@ -58,7 +58,7 @@ void Page_Load(Object sender, EventArgs e)
 	if (repository_url != "")
 	{
 		sql += @",
-			case when svnap_action not like '%D%' then
+			case when svnap_action not like '%D%' and svnap_action not like 'A%' then
 				'<a target=_blank href=svn_diff.aspx?id=' + convert(varchar,svnap_id) + '>diff</a>'
 				else
 				''

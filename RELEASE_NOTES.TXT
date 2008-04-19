@@ -37,6 +37,10 @@ uploads not supported.
 Version 2.8.5  4/8/2008
 -----------------------------------------------------------------------
 
+* FIX commit script so that it doesn't hang when int isn't entered.
+* experiment with pre/post.
+* run svn as service.
+
 * document the WhErE hack 
 * required fields, required custom datetime field
 * custom textarea column still allows truncation?
@@ -54,6 +58,8 @@ x values were strings instead of ints.
 bug with its project value set to a non-existent project.  That can 
 happend if the bug is posted via the screen capture utility.
 
+* No longer displaying "diff" link on subversion revisions that where
+the action is "A", add.
 
 Enhancements:
 
