@@ -48,7 +48,7 @@ void Page_Load(Object sender, EventArgs e)
 			isnull(pj_name,'') [forced<br>project],
 			isnull(qu_desc,'') [default query],
 			case when u.us_enable_notifications = 1 then 'Y' else 'N' end [notif-<br>ications],
-
+			u.us_most_recent_login_datetime [most recent login],
 			u2.us_username [created<br>by]
 
 			from users u
@@ -86,8 +86,8 @@ void Page_Load(Object sender, EventArgs e)
 			case when og_external_user = 1 then 'Y' else 'N' end [external],
 			isnull(pj_name,'') [forced<br>project],
 			isnull(qu_desc,'') [default query],
-			case when u.us_enable_notifications = 1 then 'Y' else 'N' end [notif-<br>ications]
-
+			case when u.us_enable_notifications = 1 then 'Y' else 'N' end [notif-<br>ications],
+			u.us_most_recent_login_datetime [most recent login]
 			from users u
 			inner join orgs on us_org = og_id
 			left outer join queries on us_default_query = qu_id
