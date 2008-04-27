@@ -32,11 +32,6 @@ uploads not supported.
 * display link hint on edit bug page
 * send, don't send private comments?
 
-
------------------------------------------------------------------------
-Version 2.8.5  4/8/2008
------------------------------------------------------------------------
-
 * FIX commit script so that it doesn't hang when int isn't entered.
 * experiment with pre/post.
 * run svn as service.
@@ -46,17 +41,21 @@ Version 2.8.5  4/8/2008
 * custom textarea column still allows truncation?
 * Use date range for search, custom fields
 
-Fixes:
+-----------------------------------------------------------------------
+Version 2.8.5  4/19/2008
+-----------------------------------------------------------------------
+
+Bug fixes:
 
 * Fixed bug where edit_dashboard.aspx was actually editing everybody's
 dashboard instead of just the one user's dashboard.
 
 * Fixed bug 1935727 InvalidCastException drawing line chart, if the
-x values were strings instead of ints.
+x values were strings instead of integers.
 
 * Fixed bug where edit_bug.aspx crashed if it was trying to display a
-bug with its project value set to a non-existent project.  That can 
-happend if the bug is posted via the screen capture utility.
+bug with its project value set to a non-existent project. That can 
+happened if the bug is posted via the screen capture utility.
 
 * No longer displaying "diff" link on subversion revisions where the
 Subversion action was an add.  Clicking on diff was causing an error
@@ -70,6 +69,8 @@ Enhancements:
 show all comments, not just the first.  Also, popups show after
 hovering 250 milliseconds, instead of after 400 milliseconds.
 
+* Slightly better handling of custom dates fields and custom integer
+fields in search.
 
 -----------------------------------------------------------------------
 Version 2.8.4  4/8/2008

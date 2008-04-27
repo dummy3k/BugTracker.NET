@@ -1897,7 +1897,20 @@ function set_project_changed() {
 				size = Convert.ToInt32(drcc["length"]);
 			}
 
-			if (size > 60) size = 60;
+			// adjust the size
+			if (size > 60)
+			{
+				size = 60;
+			}
+			else if (datatype == "datetime")
+			{
+				size = 10;
+			}
+			else if (datatype == "int" || datatype == "decimal")
+			{
+				size = 30;
+			}
+
 			string size_string = Convert.ToString(size);
 
 			Response.Write (" size=" + size_string);
@@ -1914,7 +1927,17 @@ function set_project_changed() {
 			Response.Write ("\"");
 			Response.Write (">");
 
-			if ((datatype == "nvarchar" || datatype == "varchar")
+			if (datatype == "datetime")
+			{
+				Response.Write ("<a style='font-size: 8pt;'  href=\"javascript:show_calendar('");
+				Response.Write(Util.get_form_name());
+				Response.Write(".");
+				Response.Write(drcc["name"].ToString());
+				Response.Write("',null,null,'");
+				Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern));
+				Response.Write("')\">&nbsp;[select]</a>");
+			}
+			else if ((datatype == "nvarchar" || datatype == "varchar")
 			&& dropdown_type == "")
 			{
 				//

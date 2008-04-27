@@ -55,22 +55,30 @@ public void Application_Error(Object sender, EventArgs e)
 	bool error_email_enabled = (btnet.Util.get_setting("ErrorEmailEnabled","1") == "1");
 	if (error_email_enabled)
 	{
-		string to = Util.get_setting("ErrorEmailTo","");
-		string from = Util.get_setting("ErrorEmailFrom","");
-		string subject = "Error: " + exc.Message.ToString();
+		
+		if (exc.Message.ToString() == "Expected integer.  Possible SQL injection attempt?")
+		{
+			// don't bother sending email.  Too many automated attackers
+		}
+		else
+		{
+			string to = Util.get_setting("ErrorEmailTo","");
+			string from = Util.get_setting("ErrorEmailFrom","");
+			string subject = "Error: " + exc.Message.ToString();
 
-		StringBuilder body = new StringBuilder();
+			StringBuilder body = new StringBuilder();
 
 
-		body.Append("\nTIME: ");
-		body.Append(DateTime.Now.ToLongTimeString());
-		body.Append("\nURL: ");
-		body.Append(Request.Url.ToString());
-		body.Append("\nException: ");
-		body.Append(exc.ToString());
-		body.Append(server_vars.ToString());
+			body.Append("\nTIME: ");
+			body.Append(DateTime.Now.ToLongTimeString());
+			body.Append("\nURL: ");
+			body.Append(Request.Url.ToString());
+			body.Append("\nException: ");
+			body.Append(exc.ToString());
+			body.Append(server_vars.ToString());
 
-		btnet.Email.send_email(to, from, "", subject, body.ToString()); // 5 args				
+			btnet.Email.send_email(to, from, "", subject, body.ToString()); // 5 args				
+		}
 	}
 }
      
