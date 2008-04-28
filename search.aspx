@@ -405,11 +405,24 @@ void do_query()
 		if (values != "")
 		{
 
-			string custom_clause;
-			if (((string) drcc["datatype"] == "varchar" || (string) drcc["datatype"] == "nvarchar")
+			string custom_clause = "";
+
+			string datatype = (string) drcc["datatype"];
+
+			if ((datatype == "varchar" || datatype== "nvarchar")
 			&& (string) drcc["dropdown type"] == "")
 			{
 				custom_clause = " [" + variable + "] like '%" + values + "%'\n";
+			}
+			else if (datatype == "datetime")
+			{
+				custom_clause = " [" + variable + "] >= '" + values + "'\n";
+				where = build_where(where, custom_clause);
+
+				// reset, and do the to date
+				custom_clause = "";
+				values = Request["$to$_" + variable];
+				custom_clause = " [" + variable + "] <= '" + values + "'\n";
 			}
 			else
 			{
@@ -988,8 +1001,45 @@ void load_drop_downs()
 
 }
 
+void write_custom_date_control(string name)
+{
 
+	Response.Write ("<input type=text class=txt");
+	Response.Write ("  onkeyup=\"on_change()\" ");
+	int size = 10;
+	string size_string = Convert.ToString(size);
 
+	Response.Write (" size=" + size_string);
+	Response.Write (" maxlength=" + size_string);
+
+	Response.Write (" name=\"" + name + "\"");
+	Response.Write (" id=\"" + name + "\"");
+
+	Response.Write (" value=\"");
+	if (Request[name]!="")
+	{
+		Response.Write (HttpUtility.HtmlEncode(Request[name]));
+	}
+	Response.Write ("\"");
+	Response.Write (">");
+
+	Response.Write ("<a style='font-size: 8pt;'  href=\"javascript:show_calendar('");
+	Response.Write(Util.get_form_name());
+	Response.Write(".");
+	Response.Write(name);
+	Response.Write("',null,null,'");
+	Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern));
+	Response.Write("')\">&nbsp;[select]</a>");
+}
+
+void write_custom_date_controls(string name)
+{
+	// Someday, expand this logic to handle a range
+	Response.Write("from:&nbsp;&nbsp;");
+	write_custom_date_control(name);
+	Response.Write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to:&nbsp;&nbsp;");
+	write_custom_date_control("$to$_" + name); // magic
+}
 
 </script>
 <!-- #include file = "inc_bugs.inc" -->
@@ -1359,24 +1409,42 @@ function on_change()
 	{
 		string clause = "custom_clause_" + Convert.ToString(custom_count++);
 		string custom_col = drcc["name"].ToString();
+		string datatype = (string) drcc["datatype"];
 
-		if (((string) drcc["datatype"] == "varchar" || (string) drcc["datatype"] == "nvarchar")
+		Response.Write ("var " + clause + " = \"\";\n");
+		Response.Write ("el = document.getElementById('" +  custom_col + "')\n");
+
+		if ((datatype == "varchar" || datatype == "nvarchar")
 		&& (string) drcc["dropdown type"] == "")
 		{
 			// my_text_filed like '%val%'
-			Response.Write ("var " + clause + " = \"\";\n");
-			Response.Write ("el = document.getElementById('" +  custom_col + "')\n");
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
 			Response.Write (clause + " = \" [" + custom_col + "] like '%\" + el.value + \"%'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 		}
+		else if (datatype == "datetime")
+		{
+			Response.Write ("if (el.value != \"\")\n");
+			Response.Write ("{\n\t");
+			Response.Write (clause + " = \" [" + custom_col + "] >=  '\" + el.value + \"'\\n\"\n");
+			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
+			Response.Write ("}\n\n");
+
+			Response.Write ("el = document.getElementById('$to$_" +  custom_col + "')\n");
+
+
+			Response.Write ("if (el.value != \"\")\n");
+			Response.Write ("{\n\t");
+			Response.Write (clause + " = \" [" + custom_col + "] <=  '\" + el.value + \"'\\n\"\n");
+			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
+			Response.Write ("}\n\n");
+
+		}
 		else
 		{
 			// my_field in (val1, val2, val3)
-			Response.Write ("var " + clause + " = \"\";\n");
-			Response.Write ("el = document.getElementById('" +  custom_col + "')\n");
 			Response.Write ("vals = in_not_in_vals(el)\n");
 			Response.Write ("if (vals != \"\")\n");
 			Response.Write ("{\n\t");
@@ -1384,6 +1452,7 @@ function on_change()
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 		}
+
 	}
 %>
 
@@ -1881,70 +1950,66 @@ function set_project_changed() {
 		else
 		{
 
-			Response.Write ("<input type=text class=txt");
-			Response.Write ("  onkeyup=\"on_change()\" ");
-
-			// match the size of the text field to the size of the database field
-
-			int size = 0;
-
-			if (datatype == "nvarchar")
-			{
-				size = Convert.ToInt32(drcc["length"]) / 2;
-			}
-			else
-			{
-				size = Convert.ToInt32(drcc["length"]);
-			}
-
-			// adjust the size
-			if (size > 60)
-			{
-				size = 60;
-			}
-			else if (datatype == "datetime")
-			{
-				size = 10;
-			}
-			else if (datatype == "int" || datatype == "decimal")
-			{
-				size = 30;
-			}
-
-			string size_string = Convert.ToString(size);
-
-			Response.Write (" size=" + size_string);
-			Response.Write (" maxlength=" + size_string);
-
-			Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
-			Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
-
-			Response.Write (" value=\"");
-			if (Request[(string)drcc["name"]]!="")
-			{
-				Response.Write (HttpUtility.HtmlEncode(Request[(string)drcc["name"]]));
-			}
-			Response.Write ("\"");
-			Response.Write (">");
-
 			if (datatype == "datetime")
 			{
-				Response.Write ("<a style='font-size: 8pt;'  href=\"javascript:show_calendar('");
-				Response.Write(Util.get_form_name());
-				Response.Write(".");
-				Response.Write(drcc["name"].ToString());
-				Response.Write("',null,null,'");
-				Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern));
-				Response.Write("')\">&nbsp;[select]</a>");
-			}
-			else if ((datatype == "nvarchar" || datatype == "varchar")
-			&& dropdown_type == "")
-			{
-				//
+
+				write_custom_date_controls(drcc["name"].ToString());
 			}
 			else
 			{
-				Response.Write ("&nbsp;&nbsp;<span class=smallnote>Enter multiple values using commas, no spaces: 1,2,3</span>");
+
+				Response.Write ("<input type=text class=txt");
+				Response.Write ("  onkeyup=\"on_change()\" ");
+
+				// match the size of the text field to the size of the database field
+
+				int size = 0;
+
+				if (datatype == "nvarchar")
+				{
+					size = Convert.ToInt32(drcc["length"]) / 2;
+				}
+				else
+				{
+					size = Convert.ToInt32(drcc["length"]);
+				}
+
+				// adjust the size
+				if (size > 60)
+				{
+					size = 60;
+				}
+				else if (datatype == "int" || datatype == "decimal")
+				{
+					size = 30;
+				}
+
+				string size_string = Convert.ToString(size);
+
+				Response.Write (" size=" + size_string);
+				Response.Write (" maxlength=" + size_string);
+
+				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
+				Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
+
+				Response.Write (" value=\"");
+				if (Request[(string)drcc["name"]]!="")
+				{
+					Response.Write (HttpUtility.HtmlEncode(Request[(string)drcc["name"]]));
+				}
+				Response.Write ("\"");
+				Response.Write (">");
+
+
+				if ((datatype == "nvarchar" || datatype == "varchar")
+				&& dropdown_type == "")
+				{
+					//
+				}
+				else
+				{
+					Response.Write ("&nbsp;&nbsp;<span class=smallnote>Enter multiple values using commas, no spaces: 1,2,3</span>");
+				}
 			}
 		}
 	}

@@ -69,8 +69,7 @@ Enhancements:
 show all comments, not just the first.  Also, popups show after
 hovering 250 milliseconds, instead of after 400 milliseconds.
 
-* Slightly better handling of custom dates fields and custom integer
-fields in search.
+* Custom date fields - you can search them using a date range.
 
 -----------------------------------------------------------------------
 Version 2.8.4  4/8/2008
