@@ -72,7 +72,7 @@ function GetXmlHttpObject()
 }
 
 
-function stateToggleImages()
+function handle_rewrite_posts()
 {
 	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
 	{
@@ -82,10 +82,13 @@ function stateToggleImages()
 			el.innerHTML = xmlHttp.responseText;
 		}
 	}
+
+	get_db_datetime()	
 }
 
 function rewrite_posts(bugid)
 {
+	
 	var images_inline = get_cookie("images_inline")
 	var history_inline = get_cookie("history_inline")
 
@@ -99,11 +102,41 @@ function rewrite_posts(bugid)
 		+ "&history_inline=" + history_inline
 		+ "&id=" + bugid
 
-	xmlHttp.onreadystatechange=stateToggleImages
+	xmlHttp.onreadystatechange=handle_rewrite_posts
 	xmlHttp.open("GET",url,true)
 	xmlHttp.send(null)
 
 }
+
+function handle_get_bug_date()
+{
+	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+	{
+		if (xmlHttp.responseText != "")
+		{
+			var el = document.getElementById("snapshot_timestamp")
+			el.value = xmlHttp.responseText;
+		}
+	}
+}
+
+function get_db_datetime()
+{
+
+	xmlHttp=GetXmlHttpObject()
+	if (xmlHttp==null)
+	{
+		return
+	}
+
+	var url = "get_db_datetime.aspx"
+
+	xmlHttp.onreadystatechange=handle_get_bug_date
+	xmlHttp.open("GET",url,true)
+	xmlHttp.send(null)
+
+}
+
 
 function toggle_notifications(bugid)
 {

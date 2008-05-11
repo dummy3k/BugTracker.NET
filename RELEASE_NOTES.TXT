@@ -57,6 +57,13 @@ x values were strings instead of integers.
 bug with its project value set to a non-existent project. That can 
 happened if the bug is posted via the screen capture utility.
 
+* Fixed bug 1959132 where the message "Somebody changed it while you 
+were editing it" was wrongly being displayed.  Add an attachment and 
+then on the same bug, update a comment.
+
+* Fixed bug 1960395 "Running Setup.sql gives duplicate key error"
+ - the same query was in it twice.
+
 * No longer displaying "diff" link on subversion revisions where the
 Subversion action was an add.  Clicking on diff was causing an error
 to display because there is no previous version to diff with.
@@ -69,7 +76,7 @@ Enhancements:
 show all comments, not just the first.  Also, popups show after
 hovering 250 milliseconds, instead of after 400 milliseconds.
 
-* Custom date fields - you can search them using a date range.
+* Custom date fields - now you can search them using a date range.
 
 -----------------------------------------------------------------------
 Version 2.8.4  4/8/2008
