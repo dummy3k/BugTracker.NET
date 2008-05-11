@@ -2151,6 +2151,12 @@ void on_update (Object sender, EventArgs e)
                 Workflow.fill_status_dropdown(bug, security.user, status.Items);
             }
 		} // edit existing or not
+
+		if (btnet.Util.get_setting("EnableTags","0") == "1")
+		{
+			btnet.Tags.index_tags(Application);
+		}
+
 	}
 	else
 	{

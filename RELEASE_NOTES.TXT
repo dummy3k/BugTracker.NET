@@ -41,6 +41,17 @@ uploads not supported.
 * custom textarea column still allows truncation?
 * Use date range for search, custom fields
 
+
+-----------------------------------------------------------------------
+Version 2.8.6  4/26/2008
+-----------------------------------------------------------------------
+
+ 1949210  	  Deleting a user doesn't delete Self Register info
+
+1917493  	  Non-Admin users may create other users in other organization
+
+1) Record Email CC
+
 -----------------------------------------------------------------------
 Version 2.8.5  4/19/2008
 -----------------------------------------------------------------------

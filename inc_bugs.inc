@@ -177,7 +177,15 @@ void sort_and_filter_dataview() {
 		
 		try
 		{
-			dv.RowFilter = filter_string.Replace("'","''").Replace("$$$","'");
+			string filter_string2 = filter_string.Replace("'","''").Replace("$$$","'");
+			
+			if (Request["tags"] != null && Request["tags"] != "")
+			{
+				filter_string2 += btnet.Tags.build_filter_clause(Application, Request["tags"]);
+			}
+			
+			btnet.Util.write_to_log ("corey " + filter_string2);
+			dv.RowFilter = filter_string2;
 		}
 		catch(Exception)
 		{

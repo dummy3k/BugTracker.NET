@@ -98,7 +98,12 @@ public void Application_OnStart(Object sender, EventArgs e)
 	sr = System.IO.File.OpenText(path + "\\custom\\custom_logo.html" );
 	Application["custom_logo"] = sr.ReadToEnd();
 	sr.Close();
-	
+
+    if (btnet.Util.get_setting("EnableTags", "0") == "1")
+    {
+        btnet.Tags.index_tags(this.Application);
+    }
+    
 }
 
   

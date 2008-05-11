@@ -1208,7 +1208,7 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 					if (added_to_queue)
 					{
 						// spawn a worker thread to send the emails
-						System.Threading.ThreadStart worker = new System.Threading.ThreadStart(threadproc);
+						System.Threading.ThreadStart worker = new System.Threading.ThreadStart(threadproc_notifications);
 						System.Threading.Thread thread = new System.Threading.Thread(worker);
 						thread.Start();
 					}
@@ -1222,8 +1222,9 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
             return "";
         }
 
+
 		// Send the emails in the queue
-		private static void threadproc()
+		private static void threadproc_notifications()
 		{
 			// just to be safe, make the worker threads wait for each other
 			lock (dummy)
@@ -1280,9 +1281,9 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 			}
 			// exit the worker thread
 
-		}
+		} // end of notification thread proc
 
-    };
+    }
 
 }
 
