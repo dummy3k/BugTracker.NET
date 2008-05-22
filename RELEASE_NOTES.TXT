@@ -46,11 +46,22 @@ uploads not supported.
 Version 2.8.6  4/26/2008
 -----------------------------------------------------------------------
 
- 1949210  	  Deleting a user doesn't delete Self Register info
+1949210  	  Deleting a user doesn't delete Self Register info
 
 1917493  	  Non-Admin users may create other users in other organization
 
 1) Record Email CC
+
+
+* Fixed bug 1967847 - Show/hide change history doesn't refresh.  This
+was introduced in version 2.8.5.
+ 
+* Fixed bug 1963824 - Unable to cast object of type 'System.DBNull' to 
+type String.  This was also introduced in version 2.8.5.
+
+* Fixed bug 1968605 - Bug when last row meeting filter criterion is 
+changed
+
 
 -----------------------------------------------------------------------
 Version 2.8.5  4/19/2008

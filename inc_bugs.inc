@@ -273,6 +273,7 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 
 	string selected_value = "[no filter]";
 	string op = " =";
+	bool something_selected = false;
 
 	if (filter.Value.IndexOf("66 = 66") > -1)
 	{
@@ -301,6 +302,8 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 		}
 	}
 
+	// at this point we have the selected value
+
 	if (selected_value == "[no filter]")
 	{
 		Response.Write ("<select class=filter ");
@@ -317,6 +320,7 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 	if (selected_value == "[none]")
 	{
 		Response.Write ("<option selected value=''>[none]</option>");
+		something_selected = true;
 	}
 	else
 	{
@@ -327,6 +331,7 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 	if (selected_value == "[any]")
 	{
 		Response.Write ("<option selected value=''>[any]</option>");
+		something_selected = true;
 	}
 	else
 	{
@@ -342,6 +347,7 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 			if (selected_value == options[i])
 			{
 				Response.Write ("<option selected>" + options[i] + "</option>");
+				something_selected = true;
 			}
 			else
 			{
@@ -356,11 +362,21 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 			if (selected_value == Convert.ToString(dr[col]))
 			{
 				Response.Write ("<option selected>" + Convert.ToString(dr[col]) + "</option>");
+				something_selected = true;
 			}
 			else
 			{
 				Response.Write ("<option>" + Convert.ToString(dr[col]) + "</option>");
 			}
+		}
+	}
+
+
+	if (!something_selected)
+	{
+		if (selected_value != "[no filter]")
+		{
+			Response.Write ("<option selected>" + selected_value + "</option>");
 		}
 	}
 

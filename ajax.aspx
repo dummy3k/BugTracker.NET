@@ -23,12 +23,15 @@ void Page_Load(Object sender, EventArgs e)
 		// get the first bug comment or the email that created this bug
 		string sql = @"
 /* popup */
-select substring(bp_comment_search,1,400)
+select substring(isnull(bp_comment_search,bp_comment),1,400)
 from bug_posts
 where bp_bug = $id
+and isnull(bp_comment_search,bp_comment) is not null
 and bp_type in ('received','comment', 'sent')
 and bp_hidden_from_external_users = 0
 order by bp_date desc";
+
+
 
 		sql = sql.Replace("$id",bugid);
 
