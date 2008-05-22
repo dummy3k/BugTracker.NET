@@ -74,16 +74,18 @@ function GetXmlHttpObject()
 
 function handle_rewrite_posts()
 {
+	
 	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
 	{
 		if (xmlHttp.responseText != "")
 		{
 			var el = document.getElementById("posts")
 			el.innerHTML = xmlHttp.responseText;
+			get_db_datetime()
 		}
 	}
 
-	get_db_datetime()	
+		
 }
 
 function rewrite_posts(bugid)
@@ -97,11 +99,11 @@ function rewrite_posts(bugid)
 	{
 		return
 	}
-
+	
 	var url = "write_posts.aspx?images_inline=" + images_inline
 		+ "&history_inline=" + history_inline
 		+ "&id=" + bugid
-
+	
 	xmlHttp.onreadystatechange=handle_rewrite_posts
 	xmlHttp.open("GET",url,true)
 	xmlHttp.send(null)
