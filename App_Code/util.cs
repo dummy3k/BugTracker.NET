@@ -501,7 +501,7 @@ namespace btnet
 			{
                 return date.ToString();
 			}
-                        
+
 			return ((DateTime)date).ToString(get_setting("DateTimeFormat","g"),get_culture_info());
 
 		}
