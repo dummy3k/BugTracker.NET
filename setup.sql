@@ -276,8 +276,7 @@ bg_last_updated_date datetime null,
 bg_user_defined_attribute int null,
 bg_project_custom_dropdown_value1 nvarchar(120) null,
 bg_project_custom_dropdown_value2 nvarchar(120) null,
-bg_project_custom_dropdown_value3 nvarchar(120) null
-)
+bg_project_custom_dropdown_value3 nvarchar(120) null)
 
 /* BUG POSTS  - comments, attachments, change history */
 

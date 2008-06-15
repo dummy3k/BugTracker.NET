@@ -175,21 +175,24 @@ void sort_and_filter_dataview() {
 		filter_string = filter_string.Replace("[$FLAG]<>$$$$$$","[$FLAG] <>0");
 		filter_string = filter_string.Replace("[$FLAG] =$$$$$$","[$FLAG] =0");
 		
-		try
+		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-			string filter_string2 = filter_string.Replace("'","''").Replace("$$$","'");
-			
-			if (Request["tags"] != null && Request["tags"] != "")
+			try
 			{
-				filter_string2 += btnet.Tags.build_filter_clause(Application, Request["tags"]);
+				string filter_string2 = filter_string.Replace("'","''").Replace("$$$","'");
+				
+				if (Request["tags"] != null && Request["tags"] != "")
+				{
+					filter_string2 += btnet.Tags.build_filter_clause(Application, Request["tags"]);
+				}
+				
+				btnet.Util.write_to_log ("corey " + filter_string2);
+				dv.RowFilter = filter_string2;
 			}
-			
-			btnet.Util.write_to_log ("corey " + filter_string2);
-			dv.RowFilter = filter_string2;
-		}
-		catch(Exception)
-		{
-			// just in case a filter in the Session is incompatible
+			catch(Exception)
+			{
+				// just in case a filter in the Session is incompatible
+			}
 		}
 	}
 	

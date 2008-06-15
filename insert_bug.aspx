@@ -304,13 +304,13 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					try
 					{
-						orgid = Convert.ToInt32(lines[i].Substring(lines[i].IndexOf("$ORGANIZATION$:") + 11));
+						orgid = Convert.ToInt32(lines[i].Substring(lines[i].IndexOf("$ORGANIZATION$:") + 15));
 					}
 					catch (Exception)
 					{
 					}
 				}
-				if (lines[i].IndexOf("$CATEGORY$:") > -1)
+				else if (lines[i].IndexOf("$CATEGORY$:") > -1)
 				{
 					try
 					{
@@ -364,7 +364,7 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					try
 					{
-						udfid = Convert.ToInt32(lines[i].Substring(lines[i].IndexOf("$UDF$:") + 10));
+						udfid = Convert.ToInt32(lines[i].Substring(lines[i].IndexOf("$UDF$:") + 6));
 					}
 					catch (Exception)
 					{

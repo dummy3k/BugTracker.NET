@@ -52,10 +52,17 @@ void Page_Load(Object sender, EventArgs e)
 		sql = @"alter table bugs drop column [$nm]";
 		sql = sql.Replace("$nm", (string) dr["column_name"]);
 		dbutil.execute_nonquery(sql);
-		Server.Transfer ("customfields.aspx");
 
-		Response.Write(sql);
-		Response.End();
+
+		//delete row from custom column table
+		sql = @"delete from custom_col_metadata
+		where ccm_colorder = $num";
+		sql = sql.Replace("$num", row_id.Value);
+		dbutil.execute_nonquery(sql);
+
+		Response.Redirect("customfields.aspx");
+
+
 	}
 	else
 	{

@@ -41,16 +41,15 @@ uploads not supported.
 * custom textarea column still allows truncation?
 * Use date range for search, custom fields
 
-
------------------------------------------------------------------------
-Version 2.8.6  4/26/2008
------------------------------------------------------------------------
-
 1949210  	  Deleting a user doesn't delete Self Register info
 
 1917493  	  Non-Admin users may create other users in other organization
 
 1) Record Email CC
+
+-----------------------------------------------------------------------
+Version 2.8.6  6/15/2008
+-----------------------------------------------------------------------
 
 
 * Fixed bug 1967847 - Show/hide change history doesn't refresh.  This
@@ -62,6 +61,28 @@ type String.  This was also introduced in version 2.8.5.
 * Fixed bug 1968605 - Bug when last row meeting filter criterion is 
 changed
 
+* Fixed bug processing the $ORGANIZATION$, $CATEGORY$, and $UDF$ 
+magic variables in incoming emails, using the fix reported in this 
+thread:
+http://sourceforge.net/forum/forum.php?thread_id=2047054&forum_id=226938
+
+* Fixed bug with deleting custom columns, using the fix reported in 
+this thread:
+http://sourceforge.net/forum/forum.php?thread_id=2047968&forum_id=226938
+
+
+This release also includes some experimental code that allows you to
+tag bugs and the filter your bug lists using the tags.   To try out the
+experimental code update your bugs table as follows:
+
+	alter table bugs add bg_tags nvarchar(100) null
+
+and add the following line to your Web.config:
+
+	<add key="EnableTags" value="1" />
+	
+I don't think the tags code will hurt anything if you turn it on, but
+it's not very high quality yet nor does it look very good.
 
 -----------------------------------------------------------------------
 Version 2.8.5  4/19/2008
