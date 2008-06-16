@@ -70,6 +70,8 @@ http://sourceforge.net/forum/forum.php?thread_id=2047054&forum_id=226938
 this thread:
 http://sourceforge.net/forum/forum.php?thread_id=2047968&forum_id=226938
 
+* Fixed SQL error with the "bugs with attachments" query that installs
+with setup.sql.
 
 This release also includes some experimental code that allows you to
 tag bugs and the filter your bug lists using the tags.   To try out the

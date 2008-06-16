@@ -693,13 +693,13 @@ insert into queries (qu_desc, qu_sql, qu_default) values (
 
 insert into queries (qu_desc, qu_sql, qu_default) values (
 'bugs with attachments',
-+ char(10) + ' select bp_bug, sum(bp_size) bytes, rpt.us_username [reported by] '
++ char(10) + ' select bp_bug, sum(bp_size) bytes '
 + char(10) + ' into #t '
 + char(10) + ' from bug_posts '
 + char(10) + ' where bp_type = ''file'' '
 + char(10) + ' group by bp_bug '
 + char(10) + ' select ''#ffffff'', bg_id [id], bg_short_desc [desc], '
-+ char(10) + ' bytes ' 
++ char(10) + ' bytes, rpt.us_username [reported by] ' 
 + char(10) + ' from bugs '
 + char(10) + ' inner join #t on bp_bug = bg_id '
 + char(10) + ' left outer join users rpt on rpt.us_id = bg_reported_user '
