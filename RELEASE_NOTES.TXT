@@ -47,6 +47,22 @@ uploads not supported.
 
 1) Record Email CC
 
+
+-----------------------------------------------------------------------
+Version 2.8.7  6/19/2008
+-----------------------------------------------------------------------
+
+Bug fixes.
+
+1997641 - Filters in bugs.aspx and search.aspx not working.  This was
+broken in 2.8.6.   The fix is in the file inc_bugs.inc. 
+
+1992767 - Saved Search failure with custom fields in IE.  The fix is
+in the file search.aspx.
+
+To move from 2.8.6 to 2.8.7, you can just extract the two files 
+inc_bugs.inc and search.aspx.
+
 -----------------------------------------------------------------------
 Version 2.8.6  6/15/2008
 -----------------------------------------------------------------------

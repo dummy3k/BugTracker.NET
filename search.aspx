@@ -1274,7 +1274,7 @@ function in_not_in_vals(el)
 				}
 
 				opts += "N'"
-				opts += el.options[i].value.replace(/'/ig,"''")
+				opts += el.options[i].text.replace(/'/ig,"''")
 				opts += "'" // "
 			}
 		}
