@@ -613,11 +613,11 @@ void display_bugs(bool show_checkbox)
 					if (flag == 1) cls = "red";
 					else if (flag == 2) cls = "grn";
 					
-					Response.Write("<td class=bugd><span class=" 
+					Response.Write("<td class=bugd align=center><span class=" 
 						+ cls 
 						+ " onclick='flag(this, " 
 						+ Convert.ToString(dr[1])
-						+ ")'></span></td>");
+						+ ")'>&nbsp;</span></td>");
 				}
 				else
 				{
