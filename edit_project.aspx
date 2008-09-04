@@ -640,7 +640,7 @@ function show_subversion_settings()
 
 	<tr>
 	<td class=lbl>WebSvn Url:</td>
-	<td><input runat="server" type=text class=txt id="websvn_url" maxlength=100 size=80></td>
+	<td><input runat="server" type=text class=txt id="websvn_url" maxlength=255 size=80></td>
 	<td runat="server" class=err id="websvn_url_err">&nbsp;</td>
 	</tr>
 

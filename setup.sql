@@ -246,9 +246,9 @@ pj_custom_dropdown_values3 nvarchar(800) null,
 pj_default int not null default(0),
 pj_description nvarchar(200) null,
 pj_subversion_repository_url nvarchar(255) null,
-pj_subversion_username nvarchar(100) null,
+pj_subversion_username nvarchar(120) null,
 pj_subversion_password nvarchar(80) null,
-pj_websvn_url nvarchar(100) null
+pj_websvn_url nvarchar(255) null
 )
 
 create unique index unique_pj_name on projects (pj_name)
@@ -542,7 +542,7 @@ qn_retries int not null,
 qn_last_exception nvarchar(1000),
 qn_to nvarchar(200) not null,
 qn_from nvarchar(200) not null,
-qn_subject nvarchar(200) not null,
+qn_subject nvarchar(400) not null,
 qn_body ntext not null
 )
 

@@ -30,7 +30,7 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-	string action = Request["action"];
+	string action = Request["actn"];
 
 	string sql = "";
 

@@ -36,7 +36,7 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-	string action = Request["action"];
+	string action = Request["actn"];
 
 	if (action == null)
 	{
@@ -192,7 +192,7 @@ insert into bug_posts
 		if (permission_level == Security.PERMISSION_ALL)
 		{
 
-			sql += @",'<a href=relationships.aspx?action=remove&ses=$ses&id=$bg&bugid2='
+			sql += @",'<a href=relationships.aspx?actn=remove&ses=$ses&id=$bg&bugid2='
 		+ convert(varchar,re_bug2)
 		+ '>detach</a>' [detach]";
 
@@ -269,7 +269,7 @@ Related ID is parent<asp:RadioButton runat="server" GroupName="direction" value=
 <tr><td colspan=2>&nbsp;<span runat="server" class='err' id="add_err"></span>
 </table>
 <input type=hidden name="id" value=<% Response.Write(Convert.ToString(bugid));%>>
-<input type=hidden name="action" value="add">
+<input type=hidden name="actn" value="add">
 
 </form>
 <% } %>

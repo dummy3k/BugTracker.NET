@@ -1199,7 +1199,7 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 						sql = sql.Replace("$subject", subject.Replace("'","''"));
 						sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
 
-						dbutil.execute_nonquery_without_logging(sql);
+						dbutil.execute_nonquery(sql);
 
 						added_to_queue = true;
 

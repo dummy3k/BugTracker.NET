@@ -38,7 +38,7 @@ void Page_Load(Object sender, EventArgs e)
 		// posting back a filter change?
 		// posting back a sort change?
 
-		if (action.Value == "query")
+		if (actn.Value == "query")
 		{
 			qu_id_string = Convert.ToString(query.SelectedItem.Value);
 			reset_query_state();
@@ -55,7 +55,7 @@ void Page_Load(Object sender, EventArgs e)
 			}
 			else
 			{
-				if (action.Value == "sort")
+				if (actn.Value == "sort")
 				{
 					new_page.Value = "0";
 				}
@@ -65,7 +65,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	select_query_in_dropdown();
 	sort_and_filter_dataview(); // reuse sorts, filters
-	action.Value = "";
+	actn.Value = "";
 }
 
 
@@ -279,7 +279,7 @@ function get_or_post()
 
 function on_query_changed() {
 	var frm = document.getElementById(asp_form_id);
-	frm.action.value = "query";
+	frm.actn.value = "query";
 	frm.submit();
 }
 

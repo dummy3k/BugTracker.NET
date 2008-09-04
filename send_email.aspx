@@ -426,7 +426,8 @@ update bugs set
 	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 	if (security.user.use_fckeditor)
 	{
-		sql = sql.Replace("$cm", fckeBody.Value.Replace("'", "&#39;"));
+		string text = btnet.Util.strip_dangerous_tags(fckeBody.Value);
+		sql = sql.Replace("$cm", text.Replace("'", "&#39;"));
 		sql = sql.Replace("$cs", btnet.Util.strip_html(fckeBody.Value).Replace("'", "''"));
 		sql = sql.Replace("$ct", "text/html");
 	}

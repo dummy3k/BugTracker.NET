@@ -1,13 +1,13 @@
 function on_page(page) {
 	var frm =  document.getElementById(asp_form_id);
-	frm.action.value = "page";
+	frm.actn.value = "page";
 	frm.new_page.value = page
 	frm.submit();
 }
 
 function on_sort(col) {
 	var frm = document.getElementById(asp_form_id);
-	frm.action.value = "sort";
+	frm.actn.value = "sort";
 	frm.sort.value = col;
 	frm.submit();
 }
@@ -51,7 +51,7 @@ function on_filter() {
 	}
 	var frm = document.getElementById(asp_form_id);
 	frm.new_page.value = "0"
-	frm.action.value = "filter";
+	frm.actn.value = "filter";
 	frm.filter.value = filter_condition;
 	frm.submit();
 }

@@ -63,10 +63,10 @@ or you can reset the retry count and let the system continue trying.
 
 <p>
 <div class=align>
-<a href=edit_queued_notifications.aspx?action=delete&ses=<% Response.Write(ses); %> >Delete unsent notifications</a>
+<a href=edit_queued_notifications.aspx?actn=delete&ses=<% Response.Write(ses); %> >Delete unsent notifications</a>
 <br>
 <br>
-<a href=edit_queued_notifications.aspx?action=reset&ses=<% Response.Write(ses); %> >Reset retry count to zero</a>
+<a href=edit_queued_notifications.aspx?actn=reset&ses=<% Response.Write(ses); %> >Reset retry count to zero</a>
 <br>
 <br>
 <%

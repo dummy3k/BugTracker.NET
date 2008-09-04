@@ -151,7 +151,8 @@ void on_update (Object sender, EventArgs e)
 
         if (use_fckeditor)
 		{
-            sql = sql.Replace("$cm", fckeComment.Value.Replace("'", "&#39;"));
+            string text = btnet.Util.strip_dangerous_tags(fckeComment.Value);
+            sql = sql.Replace("$cm", text.Replace("'", "&#39;"));
             sql = sql.Replace("$cs", btnet.Util.strip_html(fckeComment.Value).Replace("'", "''"));
             sql = sql.Replace("$cn", "text/html");
 		}

@@ -26,11 +26,11 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-	if (Request.QueryString["action"] == "delete")
+	if (Request.QueryString["actn"] == "delete")
 	{
 		sql = @"delete from queued_notifications where qn_status = N'not sent'";
 	}
-	else if (Request.QueryString["action"] == "reset")
+	else if (Request.QueryString["actn"] == "reset")
 	{
 		sql = @"update queued_notifications set qn_retries = 0 where qn_status = N'not sent'";
 	}

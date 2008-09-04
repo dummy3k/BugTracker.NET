@@ -157,7 +157,7 @@ function toggle_notifications(bugid)
 		+ get_cookie("se_id")
 		+ "&id=" 
 		+ bugid
-		+ "&action="
+		+ "&actn="
 		
 	if (text == "get notifications")
 		url += "1"

@@ -101,7 +101,7 @@ function showhide_form()
 
 <tr><td>
 
-<form class=frm action=query.aspx method=post runat="server">
+<form class=frm action="query.aspx" method="POST" runat="server">
 	<span class=smallnote>Enter SQL:</span>
 	<br>
 	<textarea rows=15 cols=70 runat="server" id="query"></textarea>

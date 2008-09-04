@@ -55,7 +55,7 @@ void Page_Load(Object sender, EventArgs e)
         {
 
             log_text.InnerText = svn_log(revision, false);
-            if (action.Value == "add")
+            if (actn.Value == "add")
             {
                 string xml = svn_log(revision, true);
                 update_db(xml);
@@ -207,7 +207,7 @@ function set_action(val)
 {
     var frm = document.getElementById(asp_form_id);
     var action = document.getElementById("action");
-    action.value = val;
+    actn.value = val;
     frm.submit();
     return true;
 }
@@ -219,7 +219,7 @@ function set_action(val)
 <span class=lbl>Enter revision to be added to bug <span id="bugid_label" runat="server"></span>
 <input type=text class=txt id="rev" value="0" runat="server">
 <input type="hidden" id="hidden_bugid" value="0" runat="server" />
-<input type="hidden" id="action" name="action" value="" runat="server" />
+<input type="hidden" id="actn" name="actn" value="" runat="server" />
 <p>
 <input class="btn" type="button" onclick="return set_action('view')" value="View Revision Info" runat="server">
 <p>

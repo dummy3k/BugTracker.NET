@@ -34,7 +34,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 
-	string action = Request["action"];
+	string action = Request["actn"];
 
 	if (action == null)
 	{
@@ -226,7 +226,7 @@ Subscribers for <% Response.Write(Convert.ToString(bugid)); %>
 <tr><td colspan=2>&nbsp;<span runat="server" class='err' id="add_err"></span>
 </table>
 <input type=hidden name="id" value=<% Response.Write(Convert.ToString(bugid));%>>
-<input type=hidden name="action" value="add">
+<input type=hidden name="actn" value="add">
 
 </form>
 </td></tr></table>

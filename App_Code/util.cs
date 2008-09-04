@@ -478,6 +478,13 @@ namespace btnet
 
         }
 
+		///////////////////////////////////////////////////////////////////////
+		public static string strip_dangerous_tags(string text_with_tags)
+		{
+		    string s = Regex.Replace(text_with_tags, @"<script", "&lt;SCRIPT", RegexOptions.IgnoreCase);
+		    s = Regex.Replace(s, @"</script", "&lt;/SCRIPT", RegexOptions.IgnoreCase);
+			return s;
+		}
 
 		///////////////////////////////////////////////////////////////////////
 		public static System.Globalization.CultureInfo get_culture_info()
@@ -1148,8 +1155,20 @@ select isnull(bg_reported_user,0) from bugs)";
 			if ((string) dr["pj_subversion_repository_url"] != "")
 			{
 				repository_url = (string) dr["pj_subversion_repository_url"] ;
+			}
+
+			if ((string) dr["pj_subversion_username"] != "")
+			{
 				svn_username = (string) dr["pj_subversion_username"] ;
+			}
+
+			if ((string) dr["pj_subversion_password"] != "")
+			{
 				svn_password = (string) dr["pj_subversion_password"] ;
+			}
+
+			if ((string) dr["pj_websvn_url"] != "")
+			{
 				websvn_url = (string) dr["pj_websvn_url"] ;
 			}
 		}

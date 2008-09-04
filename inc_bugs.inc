@@ -197,7 +197,7 @@ void sort_and_filter_dataview() {
 	// Determine which column to sort
 	// and toggle ASC  DESC
 
-	if (action.Value == "sort") {
+	if (actn.Value == "sort") {
 		int sort_column = Convert.ToInt32(sort.Value) + 1;
 		string sort_expression = dv.Table.Columns[sort_column].ColumnName;
 		if (sort.Value == prev_sort.Value) {

@@ -49,10 +49,51 @@ uploads not supported.
 
 
 -----------------------------------------------------------------------
-Version 2.8.8 7/?/2008
+Version 2.8.8 9/7/2008
 -----------------------------------------------------------------------
 
-* Fixed how the red/green flags look in FireFox 3.
+* Fixed how the red/green flags look in FireFox 3.  The change is in
+inc_bugs.inc.
+
+* Fixed bug 2080213 - "edit_bug.aspx, use pcd1, not Request['pcd1']"
+
+* Fixed bug 2073466 - "Project level SVN overrides should be individual"
+
+* Fixed bug 2073380 - "WebSVN url is too short".  Expanded it to 120 
+chars.
+
+* Fixed bug 2064647 - ".net 3.5 sp1 issue or Unable to add attachment."
+I changed all the query string and form variables named "action" to
+"actn".
+
+* Fixed bug 2039058 - "Long bug description causes error". Increased 
+size of qn_subject column.
+
+* Fixed bug 2026669 - "Category drop down on a new bug not defaulting
+correctly"
+
+* Fixed bug (I hope) described here.
+http://knitinr.blogspot.com/2008/07/script-exploit-via-fckeditor.html
+See btnet.Util.strip_dangerous_tags. I encourage you to contact me at 
+ctrager@yahoo.com with improvements to BugTracker.NET security, and
+especially my handling of fckEditor.
+
+*
+
+Oops.  Stupid bug by me.   The "continue" just refer to the inner loops, not the outer.  I'll fix in the next release, coming soon.
+
+
+// loop through the messages
+for (int i = start;i < end; i++)
+{
+	for (int k = 0; k < SubjectCannotContainStrings.Length; k++)
+	{
+		if (subject.IndexOf(SubjectCannotContainStrings[k]) >= 0)
+		{
+			write_line("skipping because subject cannot contain: " + SubjectCannotContainStrings[k]);
+			continue;
+		}
+	}
 
 -----------------------------------------------------------------------
 Version 2.8.7  6/19/2008

@@ -52,7 +52,7 @@ void Page_Load(Object sender, EventArgs e)
 You probably should spend time looking at the README.HTML and Web.config files.   If you have any questions, post them to the <a href=http://sourceforge.net/forum/forum.php?forum_id=226938>Help Forum</a>.
 
 <hr>
-<form action=install.aspx method=get>
+<form action="install.aspx" method="GET">
 Database Name:&nbsp;<input name=dbname>
 <br>
 <input type=submit value="Create Database">

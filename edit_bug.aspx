@@ -168,24 +168,9 @@ void Page_Load(Object sender, EventArgs e)
 
 			load_project_and_user_dropdowns(ds_defaults.Tables[0]);
 
+
 			// org
-
-			if (security.user.other_orgs_permission_level != Security.PERMISSION_ALL)
-			{
-				default_value = Convert.ToString((int)security.user.org);
-			}
-			else
-			{
-				if (ds_defaults.Tables[1].Rows.Count > 0)
-				{
-					default_value = Convert.ToString((int) ds_defaults.Tables[1].Rows[0][0]);
-				}
-				else
-				{
-					default_value = "0";
-				}
-			}
-
+			default_value = Convert.ToString((int)security.user.org);
 			foreach (ListItem li in org.Items)
 			{
 				if (li.Value == default_value)
@@ -200,6 +185,14 @@ void Page_Load(Object sender, EventArgs e)
 
 
 			// category
+			if (ds_defaults.Tables[1].Rows.Count > 0)
+			{
+				default_value = Convert.ToString((int) ds_defaults.Tables[1].Rows[0][0]);
+			}
+			else
+			{
+				default_value = "0";
+			}
 			foreach (ListItem li in category.Items)
 			{
 				if (li.Value == default_value)
@@ -212,6 +205,8 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
+
+			// priority
 			if (ds_defaults.Tables[2].Rows.Count > 0)
 			{
 				default_value = Convert.ToString((int) ds_defaults.Tables[2].Rows[0][0]);
@@ -232,6 +227,8 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
+
+			// status
 			if (ds_defaults.Tables[3].Rows.Count > 0)
 			{
 				default_value = Convert.ToString((int) ds_defaults.Tables[3].Rows[0][0]);
@@ -252,6 +249,8 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
+
+			// udf
 			if (ds_defaults.Tables[4].Rows.Count > 0)
 			{
 				default_value = Convert.ToString((int) ds_defaults.Tables[4].Rows[0][0]);
@@ -271,6 +270,8 @@ void Page_Load(Object sender, EventArgs e)
 					li.Selected = false;
 				}
 			}
+
+
 
 
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
@@ -1872,8 +1873,8 @@ void on_update (Object sender, EventArgs e)
 
 
 		if (security.user.use_fckeditor) {
-		    comment_formated = fckeComment.Value;
-            comment_search = btnet.Util.strip_html(comment_formated);
+		    comment_formated = btnet.Util.strip_dangerous_tags(fckeComment.Value);
+            comment_search = btnet.Util.strip_html(fckeComment.Value);
 		    commentType = "text/html";
 		}
 		else
@@ -1920,9 +1921,9 @@ void on_update (Object sender, EventArgs e)
 				Convert.ToInt32(status.SelectedItem.Value),
 				Convert.ToInt32(assigned_to.SelectedItem.Value),
 				Convert.ToInt32(udf.SelectedItem.Value),
-				Request["pcd1"],
-				Request["pcd2"],
-				Request["pcd3"],
+				pcd1,
+				pcd2,
+				pcd3,
 				comment_formated,
                 comment_search,
 				null,
@@ -2186,7 +2187,6 @@ void on_update (Object sender, EventArgs e)
 <script type="text/javascript" language="JavaScript" src="overlib_mini.js"></script>
 <script type="text/javascript" language="JavaScript" src="calendar.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
-
 <script>
 var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditBugPage","0")); %>'
 var this_bugid = <% Response.Write(Convert.ToString(id)); %>

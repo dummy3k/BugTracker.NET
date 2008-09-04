@@ -33,7 +33,7 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-	if (Request.QueryString["action"] == "1")
+	if (Request.QueryString["actn"] == "1")
 	{
 		sql = @"insert into bug_subscriptions (bs_bug, bs_user)
 			values($bg, $us)";

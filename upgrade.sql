@@ -673,4 +673,13 @@ alter table users add us_most_recent_login_datetime datetime null
 update custom_col_metadata set 
 ccm_dropdown_type = '' where ccm_dropdown_type = 'not a dropdown'
 
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.8.7 to 2.8.8
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
 
+alter table projects alter column pj_websvn_url nvarchar(255) null
+alter table queued_notifications alter column qn_subject nvarchar(400) not null

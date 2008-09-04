@@ -48,7 +48,7 @@ order by ds_col, ds_row";
 void write_link(int id, string action, string text)
 {
 
-	Response.Write("<a href=update_dashboard.aspx?action=");
+	Response.Write("<a href=update_dashboard.aspx?actn=");
 	Response.Write(action);
 	Response.Write("&ds_id=");
 	Response.Write(Convert.ToString(id));
@@ -190,7 +190,7 @@ function add_selected_report(chart_type, id)
 <input type="hidden" name="rp_id">
 <input type="hidden" name="rp_chart_type">
 <input type="hidden" name="rp_col">
-<input type="hidden" name="action" value="add">
+<input type="hidden" name="actn" value="add">
 <input type="hidden" name="ses" value=<% Response.Write(ses); %>
 </form>
 
