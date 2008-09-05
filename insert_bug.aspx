@@ -41,9 +41,9 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		from = "";
 	}
-	else if (from.Length > 60)
+	else if (from.Length > 100)
 	{
-		from = from.Substring(0,60);
+		from = from.Substring(0,100);
 	}
 
 	// this could also be the email subject

@@ -78,22 +78,9 @@ See btnet.Util.strip_dangerous_tags. I encourage you to contact me at
 ctrager@yahoo.com with improvements to BugTracker.NET security, and
 especially my handling of fckEditor.
 
-*
-
-Oops.  Stupid bug by me.   The "continue" just refer to the inner loops, not the outer.  I'll fix in the next release, coming soon.
-
-
-// loop through the messages
-for (int i = start;i < end; i++)
-{
-	for (int k = 0; k < SubjectCannotContainStrings.Length; k++)
-	{
-		if (subject.IndexOf(SubjectCannotContainStrings[k]) >= 0)
-		{
-			write_line("skipping because subject cannot contain: " + SubjectCannotContainStrings[k]);
-			continue;
-		}
-	}
+* Fixed bug in btnet_service.exe, btnet_console.exe.  
+"SubjectCannotContain" and "FromCannotContain" settings weren't 
+working.
 
 -----------------------------------------------------------------------
 Version 2.8.7  6/19/2008

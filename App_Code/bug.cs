@@ -158,7 +158,7 @@ namespace btnet
 
             DbUtil dbutil = new DbUtil();
             DataSet ds = dbutil.get_dataset(sql);
-            if (upload_folder != null)
+            if (upload_folder != null && upload_folder == "")
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
