@@ -158,7 +158,7 @@ namespace btnet
 
             DbUtil dbutil = new DbUtil();
             DataSet ds = dbutil.get_dataset(sql);
-            if (upload_folder != null && upload_folder == "")
+            if (upload_folder != null && upload_folder != "")
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
@@ -1199,7 +1199,7 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 						sql = sql.Replace("$subject", subject.Replace("'","''"));
 						sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
 
-						dbutil.execute_nonquery(sql);
+						dbutil.execute_nonquery_without_logging(sql);
 
 						added_to_queue = true;
 
