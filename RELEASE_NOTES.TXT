@@ -49,7 +49,19 @@ uploads not supported.
 
 
 -----------------------------------------------------------------------
-Version 2.8.8 9/6/2008
+Version 2.8.9   9/6/2008 
+-----------------------------------------------------------------------
+
+* Ok, this time *REALLY* fixed bug 2064647.  I didn't really fix it
+in version 2.8.8, but I really fixed it this time.   I was able
+to reproduce the bug using ASP.NET 3.5 SP1.  
+
+The only difference between this version and 2.8.8 is in 
+add_attachment.aspx, I removed action=add_attachment.aspx form the
+<form> tag.  
+
+-----------------------------------------------------------------------
+Version 2.8.8   9/6/2008
 -----------------------------------------------------------------------
 
 * Fixed bug (I hope) described here.
