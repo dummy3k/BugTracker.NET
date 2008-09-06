@@ -365,6 +365,9 @@ function get_presets()
 	get_preset("status")
 	get_preset("udf")
 	get_preset("assigned_to")
+//	get_preset("pcd1")
+//	get_preset("pcd2")
+//	get_preset("pcd3")
 	on_body_load() // to change the select styles
 }
 
@@ -375,6 +378,10 @@ function set_presets()
 	save_var("status")
 	save_var("udf")
 	save_var("assigned_to")
+//strange side effect with these.  The browser remembers the saved presets even if user doesn't click "use"
+//	save_var("pcd1")
+//	save_var("pcd2")
+//	save_var("pcd3")
 }
 
 function clone()
