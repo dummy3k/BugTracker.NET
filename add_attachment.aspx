@@ -152,7 +152,7 @@ function body_on_load()
 Add attachment to <% Response.Write(Convert.ToString(bugid)); %>
 <p>
 	<table border=0><tr><td>
-		<form class=frm runat="server" enctype="multipart/form-data" action="add_attachment.aspx">
+		<form class=frm runat="server" enctype="multipart/form-data" >
 			<table border=0>
 
 			<tr>
