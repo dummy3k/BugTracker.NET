@@ -1249,9 +1249,9 @@ void format_prev_next_bug()
 			if (prev_bug != 0)
 			{
 				prev_next_link =
-					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=edit_bug.aspx?id="
+					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"javascript:goto_edit_bug("
 					+ Convert.ToString(prev_bug)
-					+ ">prev</a>";
+					+ ")\">prev</a>";
 			}
 			else
 			{
@@ -1261,9 +1261,9 @@ void format_prev_next_bug()
 			if (next_bug != 0)
 			{
 				prev_next_link +=
-					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=edit_bug.aspx?id="
+					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"javascript:goto_edit_bug("
 					+ Convert.ToString(next_bug)
-					+ ">next</a>";
+					+ ")\">next</a>";
 
 			}
 			else
@@ -2202,7 +2202,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 <div class=align>
 
 <% if (!security.user.adds_not_allowed) { %>
-<a href=edit_bug.aspx?id=0>add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
+<a href="javascript: goto_edit_bug(0)">add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
 <span id="prev_next" runat="server">&nbsp;</span>
@@ -2242,7 +2242,7 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 			<span runat="server" class=static id="bugid"></span>
 			&nbsp;&nbsp;&nbsp;
 			<span class=static id="static_short_desc" runat="server" style='width:500px; display:none;'></span>
-			<input runat="server" type=text class=txt id="short_desc" size="100" maxlength="200">
+			<input runat="server" type=text class=txt id="short_desc" size="100" maxlength="200"  onkeydown="mark_dirty()" onkeyup="mark_dirty()">
 			&nbsp;&nbsp;&nbsp;
 			<span runat="server" class=err id="short_desc_err">&nbsp;</span>
 
@@ -2439,7 +2439,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				}
 				else
 				{
-					Response.Write ("<input type=text class=txt ");
+					Response.Write ("<input type=text class=txt onkeydown=\"mark_dirty()\" onkeyup=\"mark_dirty()\" ");
 
 					// match the size of the text field to the size of the database field
 					if (drcc["datatype"].ToString().IndexOf("char") > -1)
@@ -2627,7 +2627,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		<span class="smallnote" style="margin-left: 170px">
 		Entering "<% Response.Write(btnet.Util.get_setting("BugLinkMarker","bugid#")); %>999" in comment creates link to id 999</span>
 		<br>
-		<textarea  id="comment" rows=4 cols=80 runat="server" class=txt></textarea>
+		<textarea  id="comment" rows=4 cols=80 runat="server" class=txt onkeydown="mark_dirty()" onkeyup="mark_dirty()"></textarea>
 		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>
 
 	<tr><td  nowrap>

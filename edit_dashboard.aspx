@@ -186,15 +186,15 @@ function add_selected_report(chart_type, id)
 
 
 </table>
-<form id="addform" method="GET" action="update_dashboard.aspx">
+<form id="addform" method="get" action="update_dashboard.aspx">
 <input type="hidden" name="rp_id">
 <input type="hidden" name="rp_chart_type">
 <input type="hidden" name="rp_col">
 <input type="hidden" name="actn" value="add">
-<input type="hidden" name="ses" value=<% Response.Write(ses); %>
+<input type="hidden" name="ses" value=<% Response.Write(ses); %>>
 </form>
 
 
-<% Response.Write(Application["custom_footer"]); %></body>
+<% Response.Write(Application["custom_footer"]); %>
 </body>
 </html>

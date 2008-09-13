@@ -103,6 +103,13 @@ void Page_Load(Object sender, EventArgs e)
 		firstname.Value = (string) dr["firstname"];
 		lastname.Value = (string) dr["lastname"];
 		bugs_per_page.Value = Convert.ToString(dr["us_bugs_per_page"]);
+
+		if (Util.get_setting("DisableFCKEditor","0") == "1")
+		{
+			use_fckeditor.Visible = false;
+			use_fckeditor_label.Visible = false;
+		}
+
 		use_fckeditor.Checked = Convert.ToBoolean((int) dr["us_use_fckeditor"]);
 		enable_popups.Checked = Convert.ToBoolean((int) dr["us_enable_bug_list_popups"]);
 		email.Value = (string) dr["email"];
@@ -235,7 +242,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$fn", firstname.Value.Replace("'","''"));
 		sql = sql.Replace("$ln", lastname.Value.Replace("'","''"));
 		sql = sql.Replace("$bp", bugs_per_page.Value.Replace("'","''"));
-        sql = sql.Replace("$fk", Util.bool_to_string(use_fckeditor.Checked));
+		sql = sql.Replace("$fk", Util.bool_to_string(use_fckeditor.Checked));
         sql = sql.Replace("$pp", Util.bool_to_string(enable_popups.Checked));
 		sql = sql.Replace("$em", email.Value.Replace("'","''"));
 		sql = sql.Replace("$en", Util.bool_to_string(enable_notifications.Checked));
@@ -439,7 +446,7 @@ function show_notification_settings()
 	</tr>
 
 	<tr>
-	<td class=lbl>Edit text using colors and fonts:</td>
+	<td class=lbl runat="server" id="use_fckeditor_label">Edit text using colors and fonts:</td>
 	<td><asp:checkbox runat="server" class=cb id="use_fckeditor"/></td>
 	<td>&nbsp</td>
 	</tr>

@@ -49,6 +49,37 @@ uploads not supported.
 
 
 -----------------------------------------------------------------------
+Version 2.9.0   9/13/2008 
+-----------------------------------------------------------------------
+
+* Fixed a bug with btnet_service.exe and btnet_console.exe that
+I introduced in 2.8.8 that caused them to skip every email. Here's a 
+thread about it, and a workaround:
+https://sourceforge.net/forum/forum.php?thread_id=2241106&forum_id=226938
+
+* Added Web.config setting "DisableFCKEditor", which turns off the
+rich text editor for everybody.  Just in case there turns out to be 
+a security hole with FCKEditor.
+
+* Changed the function strip_dangerous_tags to be more aggressive at
+cleansing text entered using FCKEditor.
+
+* Removed the "Image" button from the FCKEditor toolbar configuration
+because the upload doesn't work anyway out of the box.  You need an 
+advanced understanding of FCKEditor itself to get it to work. 
+
+* Fixed bug with Subversion post commit script described here:
+http://sourceforge.net/forum/forum.php?thread_id=2225181&forum_id=226938
+
+* Fixed bug 2100237 "invalid tag parameter in relationships.aspx"
+* Fixed bug 2100130 "HTML tags 'bug' in edit_project.aspx"
+* Fixed bug 2100042 "HTML tags 'bug' in edit_dashboard.aspx"
+
+* Removed Web.config option "PromptBeforeLeavingEditBugPage".  Now the
+page will automatically warn you if you are going to leave it with
+unsaved data.
+
+-----------------------------------------------------------------------
 Version 2.8.9   9/6/2008 
 -----------------------------------------------------------------------
 

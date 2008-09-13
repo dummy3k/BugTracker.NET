@@ -117,7 +117,7 @@ FCKConfig.ToolbarSets["Basic"] = [
 
 // Corey Trager, for BugTracker.NET
 FCKConfig.ToolbarSets["BugTracker"] = [
-	['Cut','Copy','Paste', '-','Undo','Redo','-','Find','Replace','-','Link','Unlink','Image','FitWindow'],
+	['Cut','Copy','Paste', '-','Undo','Redo','-','Find','Replace','-','Link','Unlink','FitWindow'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull','-','OrderedList','UnorderedList','-','Outdent','Indent','-','Table','SpecialChar','Source'],
 	'/',
 	['FontName','FontSize','-','Bold','Italic','Underline','-','BGColor','TextColor']

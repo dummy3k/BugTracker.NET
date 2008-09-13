@@ -38,11 +38,38 @@ function open_popup_window(url, title, bugid, width, height)
 }
 
 
+var dirty = false;
+function mark_dirty()
+{
+	dirty = true
+}
+
+function my_confirm()
+{
+	return confirm('You have unsaved changes.  Do you want to leave this page and lose your changes?.')
+}
+
+function goto_edit_bug(bugid)
+{
+	if (!dirty)
+	{
+		window.location="edit_bug.aspx?id=" + bugid;
+	}
+	else
+	{
+		var result = my_confirm()
+		if (result)
+		{
+			window.location="edit_bug.aspx?id=" + bugid;
+		}
+	}
+}
+
 function send_email(id)
 {
-	if (prompt == "1")
+	if (dirty)
 	{
-		var result = confirm('Go to "Send Email" page?  Changes here will not be saved.');
+		var result = my_confirm()
 		if (result)
 		{
 			window.document.location = "send_email.aspx?bg_id=" + id;
@@ -462,6 +489,8 @@ function on_body_load()
 		}
 	}
 	
+	dirty = false // reset, because change_dropdown_style dirties the dropdowns
+	
 }
 
 function change_dropdown_style()
@@ -486,6 +515,9 @@ function change_dropdown_style()
 			sels[i].setAttribute(cls,'edit_bug_option')
 		}
 	}
+
+	mark_dirty()
+	
 }
 
 var ren = new RegExp( "\\n", "g" )
@@ -515,6 +547,8 @@ function count_chars(textarea_id, max)
 		count_span.firstChild.nodeValue = (max - len) + " more characters allowed"
 	}
 
+	mark_dirty()
+	
 	return true
 }
 

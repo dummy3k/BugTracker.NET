@@ -481,8 +481,7 @@ namespace btnet
 		///////////////////////////////////////////////////////////////////////
 		public static string strip_dangerous_tags(string text_with_tags)
 		{
-		    string s = Regex.Replace(text_with_tags, @"<script", "&lt;SCRIPT", RegexOptions.IgnoreCase);
-		    s = Regex.Replace(s, @"</script", "&lt;/SCRIPT", RegexOptions.IgnoreCase);
+		    string s = Regex.Replace(text_with_tags, @"script", "S-C-R-I-P-T", RegexOptions.IgnoreCase);
 			return s;
 		}
 

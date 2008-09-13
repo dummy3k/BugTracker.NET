@@ -217,11 +217,11 @@ void on_update (Object sender, EventArgs e)
 	{
 		if (id == 0)  // insert new
 		{
-			msg.InnerText = "organization was not created.";
+			msg.InnerText = "Organization was not created.";
 		}
 		else // edit existing
 		{
-			msg.InnerText = "organization was not updated.";
+			msg.InnerText = "Organization was not updated.";
 		}
 
 	}

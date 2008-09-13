@@ -79,7 +79,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	string content_type = (string)dr["bp_content_type"];
 
-	if (content_type == "text/html")
+	if (content_type == "text/html" &&  Util.get_setting("DisableFCKEditor","0") == "0")
 	{
 		use_fckeditor = true;
 		fckeComment.Visible = true;
@@ -106,7 +106,14 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (content_type == "text/html")
 		{
-           	fckeComment.Value = (string)dr["bp_comment"];
+ 			if (Util.get_setting("DisableFCKEditor","0") == "1")
+ 			{
+ 				comment.Value = (string) dr["bp_comment_search"];
+			}
+			else
+			{
+       			fckeComment.Value = (string)dr["bp_comment"];
+			}
 		}
 		else
 		{

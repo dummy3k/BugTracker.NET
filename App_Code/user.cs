@@ -53,7 +53,14 @@ namespace btnet
             this.email = (string)dr["us_email"];
 
             this.bugs_per_page = Convert.ToInt32(dr["us_bugs_per_page"]);
-            this.use_fckeditor = Convert.ToBoolean(dr["us_use_fckeditor"]);
+			if (Util.get_setting("DisableFCKEditor","0") == "1")
+			{
+				this.use_fckeditor = false;
+			}
+			else
+			{
+            	this.use_fckeditor = Convert.ToBoolean(dr["us_use_fckeditor"]);
+			}
             this.enable_popups = Convert.ToBoolean(dr["us_enable_bug_list_popups"]);
 
             this.external_user = Convert.ToBoolean(dr["og_external_user"]);

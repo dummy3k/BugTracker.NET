@@ -285,11 +285,11 @@ void on_update (Object sender, EventArgs e)
 	{
 		if (id == 0)  // insert new
 		{
-			msg.InnerText = "project was not created.";
+			msg.InnerText = "Project was not created.";
 		}
 		else // edit existing
 		{
-			msg.InnerText = "project was not updated.";
+			msg.InnerText = "Project was not updated.";
 		}
 
 	}
@@ -647,26 +647,28 @@ function show_subversion_settings()
 	</table>
 </div>
 
-	<table border=0>
+	<table border="0" width="97%" >
 
 	<tr>
-	<td colspan=3>
-	&nbsp;
+	<td>&nbsp;
 	</td>
 	</tr>
 
-	<tr><td colspan=3 align=left>
-	<span runat="server" class=err id="msg">&nbsp;</span>
-	</td></tr>
-
 	<tr>
-	<td width=300px>&nbsp;
-	<td align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Create or Edit" OnServerClick="on_update">
-	<td>&nbsp</td>
+	<td align="left">
+	<span runat="server" class="err" id="msg">&nbsp;
+	</span>
 	</td>
 	</tr>
-	</td></tr></table>
+
+	<tr>
+	<td align="center">
+	<input runat="server" class="btn" type="submit" id="sub" value="Create or Edit" OnServerClick="on_update" />
+	</td>
+	</tr>
+
+
+	</table>
 </form>
 </td></tr></table></div>
 <% Response.Write(Application["custom_footer"]); %></body>
