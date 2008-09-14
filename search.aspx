@@ -1682,9 +1682,6 @@ function set_project_changed() {
 
 </script>
 
-
-
-
 </head>
 <body onload="on_change()">
 <% security.write_menu(Response, "search"); %>
@@ -2074,6 +2071,12 @@ else
 		Response.Write ("<a target=_blank href=print_bugs.aspx>print list</a>");
 		Response.Write ("&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs2.aspx>print detail</a>");
 		Response.Write ("&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx?format=excel>export to excel</a><br>");
+
+		if (btnet.Util.get_setting("EnableTags","0") == "1")
+		{
+			display_tags_line();
+		}
+
 
 		if (!security.user.is_guest && (security.user.is_admin || security.user.can_mass_edit_bugs))
 		{

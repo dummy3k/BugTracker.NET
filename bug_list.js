@@ -50,6 +50,7 @@ function on_filter() {
 		}
 	}
 	var frm = document.getElementById(asp_form_id);
+	
 	frm.new_page.value = "0"
 	frm.actn.value = "filter";
 	frm.filter.value = filter_condition;
@@ -199,3 +200,54 @@ function flag(el, bugid)
 	xmlHttp.send(null)
 
 }
+
+
+function show_tags()
+{
+	popup_window = window.open(
+		'tags.aspx',
+		'tags',
+		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=500,height=400")
+
+	popup_window.focus()
+
+}
+
+function append_tag(s)
+{
+	el = document.getElementById("tags_input")
+
+	tags = el.value.split(",")
+
+	for (i = 0; i < tags.length; i++)
+	{
+		s2 = tags[i].replace(/^\s+|\s+$/g,"") // trim
+		if (s == s2)
+		{
+			return; // already entered
+		}
+	}
+
+	if (el.value != "")
+	{
+		el.value += ","
+	}
+
+	el.value += s;
+}
+
+
+function on_tags_change()
+{
+	el = document.getElementById("tags_input")
+	var frm = document.getElementById(asp_form_id)
+	frm.tags.value = el.value
+	on_filter()
+}
+
+
+function done_selecting_tags()
+{
+	on_tags_change()
+}
+

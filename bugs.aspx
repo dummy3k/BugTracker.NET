@@ -283,7 +283,6 @@ function on_query_changed() {
 	frm.submit();
 }
 
-
 </script>
 
 </head>
@@ -317,68 +316,16 @@ function on_query_changed() {
 	<a target=_blank href=screen_capture.html>screen capture</a>
 </table>
 
-<script>
-
-function show_tags()
-{
-	popup_window = window.open(
-		'tags.aspx',
-		'tags',
-		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=500,height=400")
-
-	popup_window.focus()
-
-}
-
-function append_tag(s)
-{
-	el = document.getElementById("tags")
-
-	tags = el.value.split(",")
-
-	for (i = 0; i < tags.length; i++)
-	{
-		s2 = tags[i].replace(/^\s+|\s+$/g,"") // trim
-		if (s == s2)
-		{
-			return; // already entered
-		}
-	}
-
-	if (el.value != "")
-	{
-		el.value += ","
-	}
-
-	el.value += s;
-}
-
-function done_selecting_tags()
-{
-	on_filter()
-}
-
-</script>
-
 <p>
 <%
 if (dv != null)
 {
 	if (dv.Table.Rows.Count > 0)
 	{
-
 		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-			Response.Write("<p>show only rows with the following tags:&nbsp;");
-			Response.Write("<input class=txt size=40 name=tags id=tags onchange='javascript:on_filter()' value='");
-			Response.Write(Request["tags"]);
-			Response.Write("'>");
-			Response.Write("<a href='javascript:show_tags()'>&nbsp;&nbsp;select tags</a>");
-			//Response.Write("<a href='javascript:on_filter()'>go</a>");
-			Response.Write("<br><br>");
+			display_tags_line();
 		}
-
-
 		display_bugs();
 	}
 	else

@@ -49,21 +49,36 @@ void print_tags()
 
 	float total = tags.Count;
 	float so_far = 0.0F;
+	int previous_count = -1;
+	string previous_font = "";
+
 	foreach (TagLabel tl in tags_by_count)
 	{
 		so_far++;
 
-		if (so_far/total < .2)
+		if (tl.count == previous_count)
+			fonts[tl.label] = previous_font; // if same count, then same font
+		else if (so_far/total < .1)
 			fonts[tl.label] = "24pt";
-		else if (so_far/total < .4)
+		else if (so_far/total < .2)
+			fonts[tl.label] = "22pt";
+		else if (so_far/total < .3)
 			fonts[tl.label] = "20pt";
-		else if (so_far/total < .6)
+		else if (so_far/total < .4)
+			fonts[tl.label] = "18pt";
+		else if (so_far/total < .5)
 			fonts[tl.label] = "16pt";
-		else if (so_far/total < .8)
+		else if (so_far/total < .6)
+			fonts[tl.label] = "14pt";
+		else if (so_far/total < .7)
 			fonts[tl.label] = "12pt";
+		else if (so_far/total < .8)
+			fonts[tl.label] = "10pt";
 		else
 			fonts[tl.label] = "8pt";
 
+		previous_font = fonts[tl.label];
+		previous_count = tl.count;
 	}
 
 

@@ -178,7 +178,6 @@ void sort_and_filter_dataview() {
 		try
 		{
 			string filter_string2 = filter_string.Replace("'","''").Replace("$$$","'");
-
 			if (Request["tags"] != null && Request["tags"] != "")
 			{
 				filter_string2 += btnet.Tags.build_filter_clause(Application, Request["tags"]);
@@ -383,11 +382,21 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 
 }
 
+///////////////////////////////////////////////////////////////////////
+void display_tags_line()
+{
+	Response.Write("\n<p>Show only rows with the following tags:&nbsp;");
+	Response.Write("<input class=txt size=40 name=tags_input id=tags_input onchange='javascript:on_tags_change()' value='");
+	Response.Write(Request["tags"]);
+	Response.Write("'>");
+	Response.Write("<a href='javascript:show_tags()'>&nbsp;&nbsp;select tags</a>");
+	Response.Write("<br><br>\n");
+}
 
 ///////////////////////////////////////////////////////////////////////
 void display_bugs(bool show_checkbox)
 {
-
+	
 	string paging_string = get_paging_string();
 	string bug_count_string = get_bug_count_string();
 

@@ -262,7 +262,7 @@ option {
 	font-weight: bold;
 }
 
-// for "[no category]", etc, for dropdowns
+/* for "[no category]", etc, for dropdowns */
 .edit_bug_option_none
 {
 	font-size: 8pt;
@@ -281,7 +281,7 @@ option {
 	font-weight: bold;
 }
 
-// for "[no category]", etc, for readonly fields
+/* for "[no category]", etc, for readonly fields */
 .edit_bug_static_none {
 	font-size: 8pt;
 	color: #666666;
