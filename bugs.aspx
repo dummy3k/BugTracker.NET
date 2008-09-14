@@ -324,7 +324,7 @@ function show_tags()
 	popup_window = window.open(
 		'tags.aspx',
 		'tags',
-		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=300,height=400")
+		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=500,height=400")
 
 	popup_window.focus()
 
@@ -333,6 +333,18 @@ function show_tags()
 function append_tag(s)
 {
 	el = document.getElementById("tags")
+
+	tags = el.value.split(",")
+
+	for (i = 0; i < tags.length; i++)
+	{
+		s2 = tags[i].replace(/^\s+|\s+$/g,"") // trim
+		if (s == s2)
+		{
+			return; // already entered
+		}
+	}
+
 	if (el.value != "")
 	{
 		el.value += ","
@@ -357,12 +369,13 @@ if (dv != null)
 
 		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-			Response.Write("<p>show only with <a href='javascript:show_tags()'>tags</a>:&nbsp;");
-			Response.Write("<input name=tags id=tags onchange='javascript:on_filter()' value='");
+			Response.Write("<p>show only rows with the following tags:&nbsp;");
+			Response.Write("<input class=txt size=40 name=tags id=tags onchange='javascript:on_filter()' value='");
 			Response.Write(Request["tags"]);
 			Response.Write("'>");
+			Response.Write("<a href='javascript:show_tags()'>&nbsp;&nbsp;select tags</a>");
 			//Response.Write("<a href='javascript:on_filter()'>go</a>");
-			Response.Write("<br>");
+			Response.Write("<br><br>");
 		}
 
 

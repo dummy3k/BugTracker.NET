@@ -7,6 +7,7 @@
     {
         public int count;
         public string label;
+        public string font_size;
         public int CompareTo(TagLabel other)
         {
             if (this.count > other.count)
@@ -17,8 +18,8 @@
                 return 0;
         }
     }
-    
-    
+
+
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -34,10 +35,45 @@ void print_tags()
     System.Collections.Generic.List<TagLabel> tags_by_count = new
         System.Collections.Generic.List<TagLabel>();
 
+	Dictionary<string, string> fonts = new Dictionary<string, string>();
+
     foreach (string s in tags.Keys)
     {
-        Response.Write("<tr><td class=datad>");
-        Response.Write("<a href='javascript:opener.append_tag(\"");
+		TagLabel tl = new TagLabel();
+		tl.count = tags[s].Count;
+		tl.label = s;
+		tags_by_count.Add(tl);
+    }
+
+	tags_by_count.Sort(); // sort in descending count order
+
+	float total = tags.Count;
+	float so_far = 0.0F;
+	foreach (TagLabel tl in tags_by_count)
+	{
+		so_far++;
+
+		if (so_far/total < .2)
+			fonts[tl.label] = "24pt";
+		else if (so_far/total < .4)
+			fonts[tl.label] = "20pt";
+		else if (so_far/total < .6)
+			fonts[tl.label] = "16pt";
+		else if (so_far/total < .8)
+			fonts[tl.label] = "12pt";
+		else
+			fonts[tl.label] = "8pt";
+
+	}
+
+
+    foreach (string s in tags.Keys)
+    {
+
+
+        Response.Write("\n<a style='font-size:");
+		Response.Write(fonts[s]);
+		Response.Write(";' href='javascript:opener.append_tag(\"");
 
         Response.Write(s);
 
@@ -45,11 +81,14 @@ void print_tags()
 
         Response.Write(s);
 
-        Response.Write("</a><td class=datad>");
-        Response.Write(tags[s].Count);
+		Response.Write("(");
+		Response.Write(tags[s].Count);
+        Response.Write(")</a>&nbsp;&nbsp; ");
+
     }
-}    
-    
+
+}
+
 </script>
 <html>
 <head>
@@ -63,10 +102,9 @@ function do_unload()
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 </head>
 <body onunload="do_unload()">
-<table border=1 class=datat>
-<tr><td class=datah>tag</td><td class=datah>count</td>
-</tr>
+
+<p>
 <% print_tags(); %>
-</table>
+
 </body>
 </html>

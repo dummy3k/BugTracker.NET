@@ -1641,7 +1641,7 @@ bool record_changes()
 
 
 	// Handle project custom dropdowns
-	if (Request["pcd1"] != null && prev_pcd1.Value != Request["pcd1"])
+	if (Request["label_pcd1"] != null && Request["pcd1"] != null && prev_pcd1.Value != Request["pcd1"])
 	{
 
 		do_update = true;
@@ -1653,7 +1653,7 @@ bool record_changes()
 
 		prev_pcd1.Value = Request["pcd1"];
 	}
-    if (Request["pcd2"] != null && prev_pcd2.Value != Request["pcd2"].Replace("'","''"))
+    if (Request["label_pcd2"] != null && Request["pcd2"] != null && prev_pcd2.Value != Request["pcd2"].Replace("'","''"))
 	{
 
 		do_update = true;
@@ -1665,7 +1665,7 @@ bool record_changes()
 
 		prev_pcd2.Value = Request["pcd2"];
 	}
-	if (Request["pcd3"] != null && prev_pcd3.Value != Request["pcd3"])
+	if (Request["label_pcd3"] != null && Request["pcd3"] != null && prev_pcd3.Value != Request["pcd3"])
 	{
 
 		do_update = true;
