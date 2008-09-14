@@ -4,45 +4,29 @@ Release notes:
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-* Wordwrap, and take advantage of new api to add attachment as attachment
 * many to many, queries to organizations
 * excel export for reports
 * field level permissions for custom fields?
 * escalation/reminder
 * spellcheck docs
-* new fckEditor - read my own fckdocs at ifdefined. note that image
-uploads not supported.
+* new fckEditor - read my own fckdocs at ifdefined. 
 * add arbitrary users/subscribers?
-* make read only if closed
 * document workflow.cs at ifdefined.
 * document ldap at ifdefined.
-* bug, issue, defect - googling the various phrases
 * top things bugtracker.net can't do: foreign languages, linux, multiple databases
 * time tracking
 * my estimation methodology
 * syscolumns, column order scheme
 * edit_bug.aspx and css
-* user setting to control whether ajax.aspx shows first comment or last comment
-* user settings to control refreshing bugs page
-
-* Let admin remove subscriber
-* can't handle a bug with a bad project.
 * limiting subadmins to a given org
-* auto subscribe too auto
-* display link hint on edit bug page
+* auto subscribe if you modified
 * send, don't send private comments?
-
-* FIX commit script so that it doesn't hang when int isn't entered.
-* experiment with pre/post.
-* run svn as service.
-
 * document the WhErE hack 
 * required fields, required custom datetime field
 * custom textarea column still allows truncation?
 * Use date range for search, custom fields
 
 1949210  	  Deleting a user doesn't delete Self Register info
-
 1917493  	  Non-Admin users may create other users in other organization
 
 1) Record Email CC
