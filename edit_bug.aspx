@@ -1022,6 +1022,7 @@ void set_tags_field_permission(int bug_permission_level)
 		tags.Visible = false;
 		tags_link.Visible = false;
 		prev_tags.Visible = false;
+		//tags_row.Style.display = "none";
 	}
 	else if (perm_level == Security.PERMISSION_READONLY)
 	{
@@ -2331,13 +2332,14 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 	<table border=0 cellpadding=0 cellspacing=4>
 
-	<tr id="row0">
+	<tr id="tags_row">
 	    <td nowrap>
 	        <span class=lbl id="tags_label" runat="server">Tags:&nbsp;</span>
+	    </td>
 		<td nowrap>
 			<span class=static id="static_tags" runat="server"></span>
 			<input runat="server" type=text class=txt id="tags" size="70" maxlength="80"  onkeydown="mark_dirty()" onkeyup="mark_dirty()">
-			&nbsp;&nbsp;<a runat="server" id="tags_link" href='javascript:show_tags()'>tags</a>
+			<span id="tags_link" runat="server">&nbsp;&nbsp;<a href='javascript:show_tags()'>tags</a></span>
 
 
 	<tr id="row1">

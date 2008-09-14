@@ -33,6 +33,32 @@ Release notes:
 
 
 -----------------------------------------------------------------------
+Version 2.9.1   9/14/2008 
+-----------------------------------------------------------------------
+
+To upgrade to this release, run this SQL from upgrade.sql:
+alter table bugs add bg_tags nvarchar(200) null
+alter table orgs add og_tags_field_permission_level int not null default(2)
+
+* Fixed crash in edit_bug.aspx due to Request["label_pcd"] being null.
+
+* Add new feature: Tags.  You can mark your bugs with free-form keywords
+and then use those keywords to filter your bug lists. This feature was 
+originally added in version 2.8.6 in a very rough, experimental way, but
+this release now supports the feature well (I hope).
+
+To turn on this feature, add this line to your Web.config:
+<add key="EnableTags" value="1" />
+
+Note that you might not want to use this feature if you are also using
+tricky permissions, because the page that displays already-used tags
+and their counts looks at all bugs, not just the bugs that the user
+is elegible to see.   That is, if somebody with rights only to project A
+tags 3 bugs with "Foo", then somebody with rights only to project B
+will see "Foo(3)" in the tags.aspx page.   Maybe that matters to you, 
+maybe not.
+
+-----------------------------------------------------------------------
 Version 2.9.0   9/13/2008 
 -----------------------------------------------------------------------
 
