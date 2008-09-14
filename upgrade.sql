@@ -683,3 +683,16 @@ ccm_dropdown_type = '' where ccm_dropdown_type = 'not a dropdown'
 
 alter table projects alter column pj_websvn_url nvarchar(255) null
 alter table queued_notifications alter column qn_subject nvarchar(400) not null
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.9.0 to 2.9.1
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+alter table bugs add bg_tags nvarchar(200) null
+alter table orgs add og_tags_field_permission_level int not null default(2)
+

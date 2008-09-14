@@ -1053,7 +1053,8 @@ select isnull(bg_reported_user,0) from bugs)";
 				'bg_user_defined_attribute',
 				'bg_project_custom_dropdown_value1',
 				'bg_project_custom_dropdown_value2',
-				'bg_project_custom_dropdown_value3')
+				'bg_project_custom_dropdown_value3',
+				'bg_tags')
 				order by sc.id, isnull(ccm_sort_seq,sc.colorder)");
 
         }

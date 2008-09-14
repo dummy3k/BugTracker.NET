@@ -385,6 +385,11 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 ///////////////////////////////////////////////////////////////////////
 void display_tags_line()
 {
+	if (security.user.category_field_permission_level == Security.PERMISSION_NONE)
+	{
+		return;
+	}
+	
 	Response.Write("\n<p>Show only rows with the following tags:&nbsp;");
 	Response.Write("<input class=txt size=40 name=tags_input id=tags_input onchange='javascript:on_tags_change()' value='");
 	Response.Write(Request["tags"]);

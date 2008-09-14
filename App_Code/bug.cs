@@ -547,6 +547,7 @@ where re_bug1 = $id;
 
 select bg_id [id],
 bg_short_desc [short_desc],
+isnull(bg_tags,'') [bg_tags],
 isnull(ru.us_username,'[deleted user]') [reporter],
 isnull(ru.us_email,'') [reporter_email],
 case rtrim(ru.us_firstname)
@@ -765,6 +766,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
         public static NewIds insert_bug(
             string short_desc,
             Security security,
+            string tags,
             int projectid,
             int orgid,
             int categoryid,
@@ -793,6 +795,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 
             string sql = @"insert into bugs
 				    (bg_short_desc,
+                    bg_tags,
 				    bg_reported_user,
 				    bg_last_updated_user,
 				    bg_reported_date,
@@ -808,12 +811,13 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 				    bg_project_custom_dropdown_value2,
 				    bg_project_custom_dropdown_value3
 				    $custom_cols_placeholder1)
-				    values (N'$short_desc', $reported_user,  $reported_user, getdate(), getdate(),
+				    values (N'$short_desc', N'$tags', $reported_user,  $reported_user, getdate(), getdate(),
 				    $project, $org,
 				    $category, $priority, $status, $assigned_user, $udf,
 				    N'$pcd1',N'$pcd2',N'$pcd3' $custom_cols_placeholder2)";
 
             sql = sql.Replace("$short_desc", short_desc.Replace("'", "''"));
+            sql = sql.Replace("$tags", tags.Replace("'", "''"));
             sql = sql.Replace("$reported_user", Convert.ToString(security.user.usid));
             sql = sql.Replace("$project", Convert.ToString(projectid));
             sql = sql.Replace("$org", Convert.ToString(orgid));
@@ -1171,6 +1175,7 @@ order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
 						// fill in what we know is needed downstream
 						sec2.user.is_admin = Convert.ToBoolean(dr["us_admin"]);
 						sec2.user.external_user = Convert.ToBoolean(dr["og_external_user"]);
+						sec2.user.tags_field_permission_level = (int)dr["og_category_field_permission_level"];
 						sec2.user.category_field_permission_level = (int)dr["og_category_field_permission_level"];
             			sec2.user.priority_field_permission_level = (int)dr["og_priority_field_permission_level"];
 						sec2.user.assigned_to_field_permission_level = (int)dr["og_assigned_to_field_permission_level"];

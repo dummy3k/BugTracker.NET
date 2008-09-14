@@ -93,6 +93,9 @@ namespace btnet
 				+ "&nbsp;");
             Response.Write("\n<tr><td>Reported On<td>" + btnet.Util.format_db_date(dr["reported_date"]) + "&nbsp;");
 
+            if (security.user.tags_field_permission_level > 0)
+	            Response.Write("\n<tr><td>Tags<td>" + dr["bg_tags"] + "&nbsp;");
+
             if (security.user.project_field_permission_level > 0)
 	            Response.Write("\n<tr><td>Project<td>" + dr["current_project"] + "&nbsp;");
 
@@ -318,6 +321,10 @@ namespace btnet
 					}
 
 					string comment = (string) dr["bp_comment"];
+
+					if (user.tags_field_permission_level == 0
+					&& comment.StartsWith("changed tags from"))
+						continue;
 
 					if (user.project_field_permission_level == 0
 					&& comment.StartsWith("changed project from"))

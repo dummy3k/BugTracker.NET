@@ -41,6 +41,7 @@ namespace btnet
         public int assigned_to_field_permission_level = Security.PERMISSION_ALL;
         public int status_field_permission_level = Security.PERMISSION_ALL;
         public int category_field_permission_level = Security.PERMISSION_ALL;
+        public int tags_field_permission_level = Security.PERMISSION_ALL;
         public int priority_field_permission_level = Security.PERMISSION_ALL;
         public int project_field_permission_level = Security.PERMISSION_ALL;
         public int org_field_permission_level = Security.PERMISSION_ALL;
@@ -77,6 +78,15 @@ namespace btnet
             this.forced_project = (int)dr["us_forced_project"];
 
             this.category_field_permission_level = (int)dr["og_category_field_permission_level"];
+
+            if (Util.get_setting("EnableTags","0") == "1")
+            {
+            	this.tags_field_permission_level = (int)dr["og_tags_field_permission_level"];
+			}
+			else
+			{
+				this.tags_field_permission_level = Security.PERMISSION_NONE;
+			}
             this.priority_field_permission_level = (int)dr["og_priority_field_permission_level"];
             this.assigned_to_field_permission_level = (int)dr["og_assigned_to_field_permission_level"];
             this.status_field_permission_level = (int)dr["og_status_field_permission_level"];

@@ -334,6 +334,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			// Fill in this form
 			short_desc.Value = (string) dr["short_desc"];
+			tags.Value = (string) dr["bg_tags"];
 			titl.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))
 				+" ID " + Convert.ToString(dr["id"]) + " " + (string) dr["short_desc"];
 
@@ -419,6 +420,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			// save current values in previous, so that later we can write the audit trail when things change
 			prev_short_desc.Value = (string) dr["short_desc"];
+			prev_tags.Value = (string) dr["bg_tags"];
 			prev_project.Value = Convert.ToString((int)dr["project"]);
 			prev_project_name.Value = Convert.ToString(dr["current_project"]);
 			prev_org.Value = Convert.ToString((int)dr["organization"]);
@@ -1005,6 +1007,47 @@ void set_shortdesc_field_permission()
 
 
 ///////////////////////////////////////////////////////////////////////
+void set_tags_field_permission(int bug_permission_level)
+{
+
+/// JUNK testing using cat permission
+	// pick the most restrictive permission
+	int perm_level = bug_permission_level < security.user.tags_field_permission_level
+		? bug_permission_level : security.user.tags_field_permission_level;
+
+	if (perm_level == Security.PERMISSION_NONE)
+	{
+		static_tags.Visible = false;
+		tags_label.Visible = false;
+		tags.Visible = false;
+		tags_link.Visible = false;
+		prev_tags.Visible = false;
+	}
+	else if (perm_level == Security.PERMISSION_READONLY)
+	{
+		if (id != 0)
+		{
+			tags.Visible = false;
+			tags_link.Visible = false;
+			static_tags.Visible = true;
+			static_tags.InnerText = tags.Value;
+		}
+		else
+		{
+			tags_label.Visible = false;
+			tags.Visible = false;
+			tags_link.Visible = false;
+		}
+	}
+	else // editable
+	{
+		static_tags.Visible = false;
+	}
+
+}
+
+
+///////////////////////////////////////////////////////////////////////
 void set_category_field_permission(int bug_permission_level)
 {
 	// pick the most restrictive permission
@@ -1169,6 +1212,7 @@ void set_controls_field_permission(int bug_permission_level)
 		set_project_field_permission(Security.PERMISSION_READONLY);
 		set_org_field_permission(Security.PERMISSION_READONLY);
 		set_category_field_permission(Security.PERMISSION_READONLY);
+		set_tags_field_permission(Security.PERMISSION_READONLY);
 		set_priority_field_permission(Security.PERMISSION_READONLY);
 		set_status_field_permission(Security.PERMISSION_READONLY);
 		set_assigned_field_permission(Security.PERMISSION_READONLY);
@@ -1199,6 +1243,7 @@ void set_controls_field_permission(int bug_permission_level)
 			set_org_field_permission(Security.PERMISSION_ALL);
 		}
 		set_category_field_permission(Security.PERMISSION_ALL);
+		set_tags_field_permission(Security.PERMISSION_ALL);
 		set_priority_field_permission(Security.PERMISSION_ALL);
 		set_status_field_permission(Security.PERMISSION_ALL);
 		set_assigned_field_permission(Security.PERMISSION_ALL);
@@ -1384,6 +1429,7 @@ bool did_something_change()
 	bool something_changed = false;
 
 	if (prev_short_desc.Value != short_desc.Value
+	|| prev_tags.Value != tags.Value
 	|| comment.Value.Length > 0
 	|| fckeComment.Value.Length > 0
 	|| clone_ignore_bugid.Value == "1"
@@ -1462,6 +1508,25 @@ bool record_changes()
 			+ short_desc.Value.Replace("'","''") + "\"");
 
 		prev_short_desc.Value = short_desc.Value;
+	}
+
+	if (prev_tags.Value != tags.Value)
+	{
+
+		do_update = true;
+		sql += base_sql.Replace(
+			"$3",
+			"changed tags from \""
+			+ prev_tags.Value.Replace("'","''") + "\" to \""
+			+ tags.Value.Replace("'","''") + "\"");
+
+		prev_tags.Value = tags.Value;
+
+		if (btnet.Util.get_setting("EnableTags","0") == "1")
+		{
+			btnet.Tags.index_tags(Application);
+		}
+
 	}
 
 	if (project.SelectedItem.Value != prev_project.Value)
@@ -1914,6 +1979,7 @@ void on_update (Object sender, EventArgs e)
 			btnet.Bug.NewIds new_ids = btnet.Bug.insert_bug(
 				short_desc.Value,
 				security,
+                tags.Value,
 				Convert.ToInt32(project.SelectedItem.Value),
 				Convert.ToInt32(org.SelectedItem.Value),
 				Convert.ToInt32(category.SelectedItem.Value),
@@ -1931,6 +1997,11 @@ void on_update (Object sender, EventArgs e)
 				internal_only.Checked,
 				hash_custom_cols,
                 true); // send notifications
+
+            if (tags.Value != "" && btnet.Util.get_setting("EnableTags", "0") == "1")
+            {
+                btnet.Tags.index_tags(Application);
+            }
 
 			id = new_ids.bugid;
 			new_id.Value = Convert.ToString(id);
@@ -1977,6 +2048,7 @@ void on_update (Object sender, EventArgs e)
 
 						update bugs set
 						bg_short_desc = N'$sd',
+                        bg_tags = N'$tags',
 						bg_project = $pj,
 						bg_org = $og,
 						bg_category = $ct,
@@ -1996,6 +2068,7 @@ void on_update (Object sender, EventArgs e)
 
 
 				sql = sql.Replace("$sd", short_desc.Value.Replace("'","''"));
+                sql = sql.Replace("$tags", tags.Value.Replace("'", "''"));
 				sql = sql.Replace("$lu", Convert.ToString(security.user.usid));
 				sql = sql.Replace("$id", Convert.ToString(id));
 				sql = sql.Replace("$pj", new_project);
@@ -2153,11 +2226,6 @@ void on_update (Object sender, EventArgs e)
             }
 		} // edit existing or not
 
-		if (btnet.Util.get_setting("EnableTags","0") == "1")
-		{
-			btnet.Tags.index_tags(Application);
-		}
-
 	}
 	else
 	{
@@ -2262,6 +2330,15 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 	</table>
 
 	<table border=0 cellpadding=0 cellspacing=4>
+
+	<tr id="row0">
+	    <td nowrap>
+	        <span class=lbl id="tags_label" runat="server">Tags:&nbsp;</span>
+		<td nowrap>
+			<span class=static id="static_tags" runat="server"></span>
+			<input runat="server" type=text class=txt id="tags" size="70" maxlength="80"  onkeydown="mark_dirty()" onkeyup="mark_dirty()">
+			&nbsp;&nbsp;<a runat="server" id="tags_link" href='javascript:show_tags()'>tags</a>
+
 
 	<tr id="row1">
 		<td nowrap>
@@ -2654,6 +2731,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 	<input type=hidden id="new_id" runat="server" value="0">
 	<input type=hidden id="prev_short_desc" runat="server">
+	<input type=hidden id="prev_tags" runat="server">
 	<input type=hidden id="prev_project" runat="server">
 	<input type=hidden id="prev_project_name" runat="server">
 	<input type=hidden id="prev_org" runat="server">

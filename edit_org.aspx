@@ -54,6 +54,7 @@ void Page_Load(Object sender, EventArgs e)
 			project_field.SelectedValue = "2";
 			org_field.SelectedValue = "2";
 			category_field.SelectedValue = "2";
+			tags_field.SelectedValue = "2";
 			priority_field.SelectedValue = "2";
 			status_field.SelectedValue = "2";
 			assigned_to_field.SelectedValue = "2";
@@ -87,6 +88,7 @@ void Page_Load(Object sender, EventArgs e)
 			project_field.SelectedValue = Convert.ToString((int)dr["og_project_field_permission_level"]);
 			org_field.SelectedValue = Convert.ToString((int)dr["og_org_field_permission_level"]);
 			category_field.SelectedValue = Convert.ToString((int)dr["og_category_field_permission_level"]);
+			tags_field.SelectedValue = Convert.ToString((int)dr["og_tags_field_permission_level"]);
 			priority_field.SelectedValue = Convert.ToString((int)dr["og_priority_field_permission_level"]);
 			status_field.SelectedValue = Convert.ToString((int)dr["og_status_field_permission_level"]);
 			assigned_to_field.SelectedValue = Convert.ToString((int)dr["og_assigned_to_field_permission_level"]);
@@ -143,6 +145,7 @@ void on_update (Object sender, EventArgs e)
 			og_project_field_permission_level,
 			og_org_field_permission_level,
 			og_category_field_permission_level,
+			og_tags_field_permission_level,
 			og_priority_field_permission_level,
 			og_status_field_permission_level,
 			og_assigned_to_field_permission_level,
@@ -154,6 +157,7 @@ void on_update (Object sender, EventArgs e)
 			$flp_project,
 			$flp_org,
 			$flp_category,
+			$flp_tags,
 			$flp_priority,
 			$flp_status,
 			$flp_assigned_to,
@@ -178,6 +182,7 @@ void on_update (Object sender, EventArgs e)
 			og_project_field_permission_level = $flp_project,
 			og_org_field_permission_level = $flp_org,
 			og_category_field_permission_level = $flp_category,
+			og_tags_field_permission_level = $flp_tags,
 			og_priority_field_permission_level = $flp_priority,
 			og_status_field_permission_level = $flp_status,
 			og_assigned_to_field_permission_level = $flp_assigned_to,
@@ -203,6 +208,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$flp_project", project_field.SelectedValue);
 		sql = sql.Replace("$flp_org", org_field.SelectedValue);
 		sql = sql.Replace("$flp_category", category_field.SelectedValue);
+		sql = sql.Replace("$flp_tags", tags_field.SelectedValue);
 		sql = sql.Replace("$flp_priority", priority_field.SelectedValue);
 		sql = sql.Replace("$flp_status", status_field.SelectedValue);
 		sql = sql.Replace("$flp_assigned_to", assigned_to_field.SelectedValue);
@@ -375,6 +381,15 @@ void on_update (Object sender, EventArgs e)
 				<asp:ListItem text="none"      value="0" ID="udf0" runat="server"/>
 				<asp:ListItem text="view only" value="1" ID="udf1" runat="server"/>
 				<asp:ListItem text="edit"      value="2" ID="udf2" runat="server"/>
+			</asp:RadioButtonList>
+
+		<tr>
+		<td>"Tags" field permission
+		<td colspan=2>
+			<asp:RadioButtonList RepeatDirection="Horizontal" id="tags_field" runat="server">
+				<asp:ListItem text="none"      value="0" ID="tags0" runat="server"/>
+				<asp:ListItem text="view only" value="1" ID="tags1" runat="server"/>
+				<asp:ListItem text="edit"      value="2" ID="tags2" runat="server"/>
 			</asp:RadioButtonList>
 
 	</table>

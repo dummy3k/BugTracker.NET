@@ -3,21 +3,24 @@
 
 <script language="C#" runat="server">
 
-    class TagLabel : IComparable<TagLabel>
-    {
-        public int count;
-        public string label;
-        public string font_size;
-        public int CompareTo(TagLabel other)
-        {
-            if (this.count > other.count)
-                return -1;
-            else if (this.count < other.count)
-                return 1;
-            else
-                return 0;
-        }
-    }
+DbUtil dbutil;
+Security security;
+
+class TagLabel : IComparable<TagLabel>
+{
+	public int count;
+	public string label;
+	public string font_size;
+	public int CompareTo(TagLabel other)
+	{
+		if (this.count > other.count)
+			return -1;
+		else if (this.count < other.count)
+			return 1;
+		else
+			return 0;
+	}
+}
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -25,10 +28,19 @@ void Page_Load(Object sender, EventArgs e)
 {
 	Util.do_not_cache(Response);
     DbUtil dbutil = new DbUtil();
+	security = new Security();
+	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+
 }
 
 void print_tags()
 {
+
+    if (security.user.category_field_permission_level == Security.PERMISSION_NONE)
+    {
+		return;
+	}
+
     SortedDictionary<string, List<int>> tags =
         (SortedDictionary<string, List<int>>)Application["tags"];
 

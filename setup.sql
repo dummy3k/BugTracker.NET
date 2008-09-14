@@ -92,7 +92,8 @@ og_assigned_to_field_permission_level int not null default(2),
 og_status_field_permission_level int not null default(2),
 og_project_field_permission_level int not null default(2),
 og_org_field_permission_level int not null default(2),
-og_udf_field_permission_level int not null default(2)
+og_udf_field_permission_level int not null default(2),
+og_tags_field_permission_level int not null default(2)
 )
 
 create unique index unique_og_name on orgs (og_name)
@@ -276,7 +277,9 @@ bg_last_updated_date datetime null,
 bg_user_defined_attribute int null,
 bg_project_custom_dropdown_value1 nvarchar(120) null,
 bg_project_custom_dropdown_value2 nvarchar(120) null,
-bg_project_custom_dropdown_value3 nvarchar(120) null)
+bg_project_custom_dropdown_value3 nvarchar(120) null,
+bg_tags nvarchar(200) null
+)
 
 /* BUG POSTS  - comments, attachments, change history */
 

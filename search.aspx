@@ -478,6 +478,11 @@ order by bg_id desc
 			select += "\n,isnull(rpt.us_username,'') [reported by]";
 		}
 
+		if (security.user.tags_field_permission_level > 0)
+		{
+			select += ",\nisnull(bg_tags,'') [tags]";
+		}
+
 		if (security.user.project_field_permission_level > 0)
 		{
 			select += ",\nisnull(pj_name,'') [project]";
@@ -1499,6 +1504,14 @@ function on_change()
 			select += ",\nisnull(rpt.us_username,'') [reported by]";
 <%
 		}
+
+		if (security.user.tags_field_permission_level > 0)
+		{
+%>
+			select += ",\nisnull(bg_tags,'') [tags]";
+<%
+		}
+
 
 		if (security.user.project_field_permission_level > 0)
 		{

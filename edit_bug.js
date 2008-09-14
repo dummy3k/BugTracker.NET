@@ -552,3 +552,45 @@ function count_chars(textarea_id, max)
 	return true
 }
 
+
+function show_tags() // also in bug_list.js
+{
+	popup_window = window.open(
+		'tags.aspx',
+		'tags',
+		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=500,height=400")
+
+	popup_window.focus()
+
+}
+
+
+function append_tag(s) // also in bug_list.js, different element
+{
+	el = document.getElementById("tags")
+
+	tags = el.value.split(",")
+
+	for (i = 0; i < tags.length; i++)
+	{
+		s2 = tags[i].replace(/^\s+|\s+$/g,"") // trim
+		if (s == s2)
+		{
+			return; // already entered
+		}
+	}
+
+	if (el.value != "")
+	{
+		el.value += ","
+	}
+
+	el.value += s;
+}
+
+
+function done_selecting_tags()
+{
+	//
+}
+
