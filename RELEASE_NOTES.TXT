@@ -67,6 +67,12 @@ permission to edit.
 
 * Fixed bug with searching custom datetime fields using a range.
 
+* Added new Web.config setting "UseTransmitFileInsteadOfWriteFile"
+to handle view_attachment.aspx failing with large files. See
+discussion at the link below and see comments in Web.config.
+http://sourceforge.net/forum/forum.php?thread_id=2230054&forum_id=226938
+
+
 -----------------------------------------------------------------------
 Version 2.9.0   9/13/2008 
 -----------------------------------------------------------------------

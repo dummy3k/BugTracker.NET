@@ -24,7 +24,7 @@ namespace btnet
 
             // update the cache
             DbUtil dbutil = new DbUtil();
-            DataSet ds = dbutil.get_dataset("select bg_id, isnull(bg_tags,'') [bg_tags] from bugs");
+            DataSet ds = dbutil.get_dataset("select bg_id, bg_tags from bugs where isnull(bg_tags,'') <> ''");
 
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
@@ -33,7 +33,12 @@ namespace btnet
                 // for each tag label, build a list of bugids that have that label
                 for (int i = 0; i < labels.Length; i++)
                 {
-                    string label = labels[i].Trim();
+                    // Standardize the lower/upper case.  Initial cap, then the rest lower.
+                    string label = labels[i].Trim().ToUpper();
+                    if (label.Length > 1)
+                    {
+                    	label = label[0] + label.Substring(1).ToLower();
+					}
 
                     if (label != "")
                     {

@@ -51,7 +51,7 @@ void Page_Load(Object sender, EventArgs e)
 	string content_type = (string) dr["bp_content_type"];
 
     // First, try to find it in the bug_post_attachments table.
-    sql = @"select bpa_content 
+    sql = @"select bpa_content
             from bug_post_attachments
             where bpa_post = @bp";
 
@@ -62,7 +62,7 @@ void Page_Load(Object sender, EventArgs e)
         cmd.Parameters.AddWithValue("@bp", id);
 
         // Use an SqlDataReader so that we can write out the blob data in chunks.
-        
+
         using (SqlDataReader reader = dbutil.execute_reader(cmd, CommandBehavior.CloseConnection | CommandBehavior.SequentialAccess))
         {
             if (reader.Read()) // Did we find the content in the database?
@@ -71,111 +71,116 @@ void Page_Load(Object sender, EventArgs e)
             }
             else
             {
-                // Otherwise, try to find the content in the UploadFolder.
+				// Otherwise, try to find the content in the UploadFolder.
 
-	string upload_folder = Util.get_upload_folder();
-                if (upload_folder != null)
-                {
-	StringBuilder path = new StringBuilder(upload_folder);
-	path.Append("\\");
-	path.Append(Convert.ToString(bug_id));
-	path.Append("_");
-	path.Append(Convert.ToString(id));
-	path.Append("_");
-	path.Append(filename);
+				string upload_folder = Util.get_upload_folder();
+				if (upload_folder != null)
+				{
+					StringBuilder path = new StringBuilder(upload_folder);
+					path.Append("\\");
+					path.Append(Convert.ToString(bug_id));
+					path.Append("_");
+					path.Append(Convert.ToString(id));
+					path.Append("_");
+					path.Append(filename);
 
-	if (System.IO.File.Exists(path.ToString()))
-	{
-                        foundAtPath = path.ToString();
-                    }
-                }
-            }
-
-            // We must have found the content in the database or on the disk to proceed.
-
-            if (!foundInDatabase && foundAtPath == null)
-            {
-                Response.Write("File not found:<br>" + filename);
-                return;
-            }
-
-            // Write the ContentType header.
-
-		if (content_type == null || content_type == "")
-		{
-
-                string ext = System.IO.Path.GetExtension(filename).ToLower();
-
-			if (ext == ".txt")
-			{
-				Response.ContentType = "text/plain";
-			}
-			else if (ext == ".gif")
-			{
-				Response.ContentType = "image/GIF";
-			}
-			else if (ext == ".jpeg" || ext == ".jpg")
-			{
-				Response.ContentType = "image/JPEG";
-			}
-			else if (ext == ".doc")
-			{
-				Response.ContentType = "application/x-msword";
-			}
-			else if (ext == ".xls")
-			{
-				Response.ContentType = "application/x-msexcel";
-			}
-			else if (ext == ".zip")
-			{
-				Response.ContentType = "application/zip";
+					if (System.IO.File.Exists(path.ToString()))
+					{
+						foundAtPath = path.ToString();
+					}
+				}
 			}
 
-		}
-		else
-		{
-			Response.ContentType = content_type;
-		}
+			// We must have found the content in the database or on the disk to proceed.
+
+			if (!foundInDatabase && foundAtPath == null)
+			{
+				Response.Write("File not found:<br>" + filename);
+				return;
+			}
+
+			// Write the ContentType header.
+
+			if (content_type == null || content_type == "")
+			{
+
+				string ext = System.IO.Path.GetExtension(filename).ToLower();
+
+				if (ext == ".txt")
+				{
+					Response.ContentType = "text/plain";
+				}
+				else if (ext == ".gif")
+				{
+					Response.ContentType = "image/GIF";
+				}
+				else if (ext == ".jpeg" || ext == ".jpg")
+				{
+					Response.ContentType = "image/JPEG";
+				}
+				else if (ext == ".doc")
+				{
+					Response.ContentType = "application/x-msword";
+				}
+				else if (ext == ".xls")
+				{
+					Response.ContentType = "application/x-msexcel";
+				}
+				else if (ext == ".zip")
+				{
+					Response.ContentType = "application/zip";
+				}
+			}
+			else
+			{
+				Response.ContentType = content_type;
+			}
 
 
-		if (download)
-		{
-			Response.AddHeader ("content-disposition","attachment; filename=\"" + filename + "\"");
-		}
-		else
-		{
-			Response.AddHeader ("content-disposition","inline; filename=\"" + filename + "\"");
-		}
+			if (download)
+			{
+				Response.AddHeader ("content-disposition","attachment; filename=\"" + filename + "\"");
+			}
+			else
+			{
+				Response.AddHeader ("content-disposition","inline; filename=\"" + filename + "\"");
+			}
 
-            // Write the data.
+			// Write the data.
 
-            if (foundInDatabase)
-            {
-                long totalRead = 0;
-                long dataLength = reader.GetBytes(0, 0, null, 0, 0);
-                byte[] buffer = new byte[16 * 1024];
+			if (foundInDatabase)
+			{
+				long totalRead = 0;
+				long dataLength = reader.GetBytes(0, 0, null, 0, 0);
+				byte[] buffer = new byte[16 * 1024];
 
-                while (totalRead < dataLength)
-                {
-                    long bytesRead = reader.GetBytes(0, totalRead, buffer, 0, (int)Math.Min(dataLength - totalRead, buffer.Length));
-                    totalRead += bytesRead;
+				while (totalRead < dataLength)
+				{
+					long bytesRead = reader.GetBytes(0, totalRead, buffer, 0, (int)Math.Min(dataLength - totalRead, buffer.Length));
+					totalRead += bytesRead;
 
-                    Response.OutputStream.Write(buffer, 0, (int)bytesRead);
-                }
-            }
-            else if (foundAtPath != null)
-            {
-                Response.WriteFile(foundAtPath);
-	}
-	else
-	{
-                Response.Write("File not found:<br>" + filename);
-            }
-        }
-	}
+					Response.OutputStream.Write(buffer, 0, (int)bytesRead);
+				}
+			}
+			else if (foundAtPath != null)
+			{
+				if (Util.get_setting("UseTransmitFileInsteadOfWriteFile", "0") == "1")
+				{
+					Response.TransmitFile(foundAtPath);
+				}
+				else
+				{
+					Response.WriteFile(foundAtPath);
+				}
+			}
+			else
+			{
+				Response.Write("File not found:<br>" + filename);
+			}
 
-
-}
+		} // end using sql reader
+	} // end using sql command
+} // end page load
 
 
 </script>
