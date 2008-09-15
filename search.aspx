@@ -422,7 +422,10 @@ void do_query()
 				// reset, and do the to date
 				custom_clause = "";
 				values = Request["$to$_" + variable];
-				custom_clause = " [" + variable + "] <= '" + values + "'\n";
+				if (values != "")
+				{
+					custom_clause = " [" + variable + "] <= '" + values + "'\n";
+				}
 			}
 			else
 			{

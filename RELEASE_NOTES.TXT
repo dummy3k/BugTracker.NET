@@ -18,21 +18,24 @@ Release notes:
 * my estimation methodology
 * syscolumns, column order scheme
 * edit_bug.aspx and css
-* limiting subadmins to a given org
-* auto subscribe if you modified
 * send, don't send private comments?
 * document the WhErE hack 
 * required fields, required custom datetime field
 * custom textarea column still allows truncation?
 * Use date range for search, custom fields
+* 1949210 Deleting a user doesn't delete Self Register info
 
-1949210  	  Deleting a user doesn't delete Self Register info
-1917493  	  Non-Admin users may create other users in other organization
+User level stuff
+* auto subscribe if you modified bug
+* default value for internal comments
+
 
 1) Record Email CC
 
+
+
 -----------------------------------------------------------------------
-Version 2.9.1   9/14/2008 
+Version 2.9.1   9/20/2008 
 -----------------------------------------------------------------------
 
 To upgrade to this release, run this SQL from upgrade.sql:
@@ -61,6 +64,8 @@ maybe not.
 organization".   Now, if you give rights to a non-admin user to create
 users, he can only assign that user to organizations that he has 
 permission to edit.
+
+* Fixed bug with searching custom datetime fields using a range.
 
 -----------------------------------------------------------------------
 Version 2.9.0   9/13/2008 
