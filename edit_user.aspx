@@ -138,12 +138,29 @@ void Page_Load(Object sender, EventArgs e)
 
 // Table 2
 
-		sql += @"/* populate org dropdown */
-			select og_id, og_name
-			from orgs
-			where og_non_admins_can_use = 1
-			or $this_is_admin = 1
-			order by og_name;";
+		if (security.user.is_admin)
+		{
+			sql += @"/* populate org dropdown 1 */
+				select og_id, og_name
+				from orgs
+				order by og_name;";
+		}
+		else
+		{
+			if (security.user.other_orgs_permission_level == Security.PERMISSION_ALL)
+			{
+				sql += @"/* populate org dropdown 2 */
+					select og_id, og_name
+					from orgs
+					where og_non_admins_can_use = 1
+					order by og_name;";
+			}
+			else
+			{
+				sql += @"/* populate org dropdown 3 */
+					select 1; -- dummy";
+			}
+		}
 
 
 // Table 3
@@ -152,7 +169,8 @@ void Page_Load(Object sender, EventArgs e)
 
 			// get existing user values
 
-			sql += @"select
+			sql += @"
+			select
 				us_username,
 				isnull(us_firstname,'') [us_firstname],
 				isnull(us_lastname,'') [us_lastname],
@@ -181,11 +199,8 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 
-
 		sql = sql.Replace("$us",Convert.ToString(id));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
-		sql = sql.Replace("$this_is_admin", Util.bool_to_string(security.user.is_admin));
-
 
 		DataSet ds = dbutil.get_dataset(sql);
 
@@ -203,11 +218,19 @@ void Page_Load(Object sender, EventArgs e)
 		forced_project.Items.Insert(0, new ListItem("[no forced project]", "0"));
 
 		// org dropdown
-		org.DataSource = ds.Tables[2].DefaultView;
-		org.DataTextField = "og_name";
-		org.DataValueField = "og_id";
-		org.DataBind();
-		org.Items.Insert(0, new ListItem("[select org]", "0"));
+		if (security.user.is_admin
+		|| security.user.other_orgs_permission_level != Security.PERMISSION_NONE)
+		{
+			org.DataSource = ds.Tables[2].DefaultView;
+			org.DataTextField = "og_name";
+			org.DataValueField = "og_id";
+			org.DataBind();
+			org.Items.Insert(0, new ListItem("[select org]", "0"));
+		}
+		else
+		{
+			org.Items.Insert(0, new ListItem(security.user.org_name, Convert.ToString(security.user.org)));
+		}
 
 		// populate permissions grid
 		MyDataGrid.DataSource=ds.Tables[0].DefaultView;

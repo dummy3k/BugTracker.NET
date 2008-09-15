@@ -3,14 +3,12 @@
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
 Security security;
 
 class TagLabel : IComparable<TagLabel>
 {
 	public int count;
 	public string label;
-	public string font_size;
 	public int CompareTo(TagLabel other)
 	{
 		if (this.count > other.count)

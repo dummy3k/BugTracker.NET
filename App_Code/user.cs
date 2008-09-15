@@ -36,6 +36,7 @@ namespace btnet
 
         public int other_orgs_permission_level = Security.PERMISSION_ALL;
         public int org = 0;
+        public string org_name = "";
         public int forced_project = 0;
 
         public int assigned_to_field_permission_level = Security.PERMISSION_ALL;
@@ -75,6 +76,7 @@ namespace btnet
             this.can_be_assigned_to = Convert.ToBoolean(dr["og_can_be_assigned_to"]);
             this.other_orgs_permission_level = (int)dr["og_other_orgs_permission_level"];
             this.org = (int)dr["og_id"];
+            this.org_name = (string) dr["og_name"];
             this.forced_project = (int)dr["us_forced_project"];
 
             this.category_field_permission_level = (int)dr["og_category_field_permission_level"];

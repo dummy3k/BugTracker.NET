@@ -31,7 +31,6 @@ Release notes:
 
 1) Record Email CC
 
-
 -----------------------------------------------------------------------
 Version 2.9.1   9/14/2008 
 -----------------------------------------------------------------------
@@ -57,6 +56,11 @@ is elegible to see.   That is, if somebody with rights only to project A
 tags 3 bugs with "Foo", then somebody with rights only to project B
 will see "Foo(3)" in the tags.aspx page.   Maybe that matters to you, 
 maybe not.
+
+* Fixed bug 1917493 "Non-Admin users may create other users in other 
+organization".   Now, if you give rights to a non-admin user to create
+users, he can only assign that user to organizations that he has 
+permission to edit.
 
 -----------------------------------------------------------------------
 Version 2.9.0   9/13/2008 
