@@ -201,6 +201,32 @@ function flag(el, bugid)
 
 }
 
+function seen(el, bugid)
+{
+	var which = el.getAttribute(cls)
+	var which_int = 0;
+
+	if (which == 'new') 
+	{
+		which = 'old'
+		which_int = 1;
+	}
+	else 
+	{
+		which = 'new'; 
+		which_int = 0;
+	}
+
+	el.setAttribute(cls,which)
+	
+	var url = "seen.aspx?ses=" + get_cookie("se_id") +  "&bugid=" + bugid + "&seen=" + which_int
+	xmlHttp = GetXmlHttpObject();
+	xmlHttp.open("GET",url,true)
+	xmlHttp.send(null)
+
+}
+
+
 
 function show_tags()
 {

@@ -51,6 +51,7 @@ delete users where us_id = $us
 delete project_user_xref where pu_user = $us
 delete bug_subscriptions where bs_user = $us
 delete bug_user_flags where fl_user = $us
+delete bug_user_seen where sn_user = $us
 delete queries where qu_user = $us
 delete queued_notifications where qn_user = $us
 delete dashboard_items where ds_user = $us";

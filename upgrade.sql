@@ -696,3 +696,21 @@ alter table queued_notifications alter column qn_subject nvarchar(400) not null
 alter table bugs add bg_tags nvarchar(200) null
 alter table orgs add og_tags_field_permission_level int not null default(2)
 
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 2.9.1 to 2.9.2
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+
+create table bug_user_seen
+(
+sn_bug int not null,
+sn_user int not null,
+sn_seen int not null
+)
+
+create unique index sn_index_1 on bug_user_seen (sn_bug, sn_user)

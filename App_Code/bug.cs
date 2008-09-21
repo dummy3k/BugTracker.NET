@@ -527,6 +527,11 @@ insert into bug_posts
             DataSet ds_custom_cols)
         {
             string sql = @" /* get_bug_datarow */
+
+insert into bug_user_seen
+select $id,$this_usid,1
+where not exists (select * from bug_user_seen where sn_user = $this_usid and sn_bug = $id)
+
 declare @revision int
 set @revision = 0";
 

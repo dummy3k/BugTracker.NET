@@ -175,6 +175,9 @@ void sort_and_filter_dataview() {
 		filter_string = filter_string.Replace("[$FLAG]<>$$$$$$","[$FLAG] <>0");
 		filter_string = filter_string.Replace("[$FLAG] =$$$$$$","[$FLAG] =0");
 		
+		filter_string = filter_string.Replace("[$SEEN] =$$$no$$$","[$SEEN] =1");
+		filter_string = filter_string.Replace("[$SEEN] =$$$yes$$$","[$SEEN] =0");
+
 		try
 		{
 			string filter_string2 = filter_string.Replace("'","''").Replace("$$$","'");
@@ -315,27 +318,32 @@ void display_filter_select(string which, System.Data.DataTable table, string dro
 	Response.Write (" id='sel_" + which + "' onchange='on_filter()'>");
 	Response.Write ("<option>[no filter]</option>");
 
-	if (selected_value == "[none]")
+	if (which != "[$SEEN]")
 	{
-		Response.Write ("<option selected value=''>[none]</option>");
-		something_selected = true;
-	}
-	else
-	{
-		Response.Write ("<option value=''>[none]</option>");
-	}
-
-
-	if (selected_value == "[any]")
-	{
-		Response.Write ("<option selected value=''>[any]</option>");
-		something_selected = true;
-	}
-	else
-	{
-		Response.Write ("<option value=''>[any]</option>");
+		if (selected_value == "[none]")
+		{
+			Response.Write ("<option selected value=''>[none]</option>");
+			something_selected = true;
+		}
+		else
+		{
+			Response.Write ("<option value=''>[none]</option>");
+		}
 	}
 
+	if (which != "[$SEEN]")
+	{
+		if (selected_value == "[any]")
+		{
+			Response.Write ("<option selected value=''>[any]</option>");
+			something_selected = true;
+		}
+		else
+		{
+			Response.Write ("<option value=''>[any]</option>");
+		}
+	}
+	
 	if (dropdown_vals != null)
 	{
 		string[] options = Util.split_string_using_pipes(dropdown_vals);
@@ -441,6 +449,10 @@ void display_bugs(bool show_checkbox)
 			{
 				Response.Write ("flag");
 			}
+			else if (dc.ColumnName == "$SEEN")
+			{
+				Response.Write ("new");
+			}
 			else
 			{
 				Response.Write (dc.ColumnName);
@@ -494,6 +506,10 @@ void display_bugs(bool show_checkbox)
 			if (dc.ColumnName == "$FLAG" )
 			{
 				display_filter_select("[$FLAG]","red|green");
+			}
+			else if (dc.ColumnName == "$SEEN" )
+			{
+				display_filter_select("[$SEEN]","yes|no");
 			}
 			else if (dc.ColumnName == "project"
 			|| dc.ColumnName == "organization"
@@ -630,6 +646,25 @@ void display_bugs(bool show_checkbox)
 					Response.Write("<td class=bugd align=center><span class=" 
 						+ cls 
 						+ " onclick='flag(this, " 
+						+ Convert.ToString(dr[1])
+						+ ")'>&nbsp;</span></td>");
+				}
+				else if (dv.Table.Columns[i].ColumnName == "$SEEN")
+				{
+					int seen = (int) dr[i];
+					string cls = "old";
+					if (seen == 0) 
+					{
+						cls = "new";
+					}
+					else
+					{
+						cls = "old";
+					}
+					
+					Response.Write("<td class=bugd align=center><span class=" 
+						+ cls 
+						+ " onclick='seen(this, " 
 						+ Convert.ToString(dr[1])
 						+ ")'>&nbsp;</span></td>");
 				}

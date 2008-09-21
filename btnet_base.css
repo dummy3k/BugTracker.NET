@@ -314,6 +314,11 @@ textarea {
 	margin-bottom: 10px;
 }
 
+/* for flags */
 .wht {margin: auto; display: block; width:40%; height:80%; border: 1px solid #cccccc;}
 .red {margin: auto; display: block; width:40%; height:80%; background: red; border: 1px solid red;}
 .grn {margin: auto; display: block; width:40%; height:80%; background: #33ff33; border: 1px solid #33ff33;}
+
+/* for "new" column */
+.new {margin: auto; display: block; width:30%; height:80%; background: orange; }
+.old {margin: auto; display: block; width:30%; height:80%; border: 1px solid #cccccc; }

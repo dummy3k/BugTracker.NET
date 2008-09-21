@@ -340,6 +340,19 @@ fl_flag int not null
 create unique index fl_index_1 on bug_user_flags (fl_bug, fl_user)
 
 
+/* BUG USER SEEN */
+
+create table bug_user_seen
+(
+sn_bug int not null,
+sn_user int not null,
+sn_seen int not null
+)
+
+create unique index sn_index_1 on bug_user_seen (sn_bug, sn_user)
+
+
+
 /* BUG RELATIONSHIPS */
 
 create table bug_relationships

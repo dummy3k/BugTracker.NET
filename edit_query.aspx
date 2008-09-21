@@ -366,7 +366,7 @@ void on_update (Object sender, EventArgs e)
 		<br>
 		The second column must be "bg_id".
 		<br><br>
-		You can use the magic word "$ME" in your query which will be replaced by your user ID.
+		<b>"$ME"</b> is a magic word you can use in your query that gets replaced by your user ID.
 		<br>
 		For example:
 		<br>
@@ -377,12 +377,20 @@ void on_update (Object sender, EventArgs e)
 			where bg_assigned_to_user = $ME
 		</ul>
 		<br>
-		Another magic word is "$FLAG", which is what controls whether a query shows the "!" column that lets an individual user flag items for himself.<br>
+		<b>"$FLAG"</b> is a magic word that controls whether a query shows the "flag" column that lets an individual user flag items for himself.<br>
 		To use it, add the SQL shown below to your select columns and do a "left outer join" to the bug_user_flags table.
 		<ul>
 			Select ...., isnull(fl_flag,0) [$FLAG],...<br>
 			from bugs<br>
 			left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME
+		</ul>
+		<br>
+		<b>"$SEEN"</b> is a magic word that controls whether a query shows the "new" column.  The new column works the same as an indicator for unread email.
+		To use it, add the SQL shown below to your select columns and do a "left outer join" to the bug_user_seen table.
+		<ul>
+			Select ...., isnull(sn_seen,0) [$SEEN],...<br>
+			from bugs<br>
+			left outer join bug_user_seen on sn_bug = bg_id and sn_user = $ME
 		</ul>
 	</td>
 	</tr>
