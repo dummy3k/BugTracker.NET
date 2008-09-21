@@ -79,7 +79,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	string content_type = (string)dr["bp_content_type"];
 
-	if (content_type == "text/html" &&  Util.get_setting("DisableFCKEditor","0") == "0")
+	if (content_type == "text/html" &&  btnet.Util.get_setting("DisableFCKEditor","0") == "0")
 	{
 		use_fckeditor = true;
 		fckeComment.Visible = true;
@@ -106,7 +106,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (content_type == "text/html")
 		{
- 			if (Util.get_setting("DisableFCKEditor","0") == "1")
+ 			if (btnet.Util.get_setting("DisableFCKEditor","0") == "1")
  			{
  				comment.Value = (string) dr["bp_comment_search"];
 			}

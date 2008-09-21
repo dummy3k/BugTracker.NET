@@ -33,6 +33,15 @@ User level stuff
 1) Record Email CC
 
 
+-----------------------------------------------------------------------
+Version 2.9.2   9/XX/2008 
+-----------------------------------------------------------------------
+
+* Fixed bug 2121394 "Error when editing an old comment with FckEditor 
+enabled"
+
+* Changed display of read-only custom-fields when there is a lot of 
+text without line breaks.
 
 -----------------------------------------------------------------------
 Version 2.9.1   9/20/2008 

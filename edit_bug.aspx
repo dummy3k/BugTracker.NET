@@ -2416,10 +2416,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		Response.Write ("\n<tr id=\"" + field_id + "_row\">");
 		Response.Write ("<td nowrap><span id=\"" + field_id +  "_label\">");
 		Response.Write (drcc["name"]);
-		Response.Write (":</span><td align=left>");
-
-		//20040413 WWR - If a custom database field is over the defined character length, use a TextArea control
-		int fieldLength = int.Parse(drcc["length"].ToString());
 
 		int permission_on_original = permission_level;
 
@@ -2428,6 +2424,20 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		{
 			permission_on_original = fetch_permission_level(prev_project.Value);
 		}
+
+
+		if (permission_on_original == Security.PERMISSION_READONLY
+		|| permission_on_original == Security.PERMISSION_REPORTER)
+		{
+			Response.Write (":</span><td align=left width=600px>");
+		}
+		else
+		{
+			Response.Write (":</span><td align=left>");
+		}
+
+		//20040413 WWR - If a custom database field is over the defined character length, use a TextArea control
+		int fieldLength = int.Parse(drcc["length"].ToString());
 
 		if (permission_on_original == Security.PERMISSION_READONLY
 		|| permission_on_original == Security.PERMISSION_REPORTER)
