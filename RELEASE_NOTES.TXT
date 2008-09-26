@@ -34,8 +34,23 @@ User level stuff
 
 
 -----------------------------------------------------------------------
-Version 2.9.2   9/XX/2008 
+Version 2.9.2   9/26/2008 
 -----------------------------------------------------------------------
+
+To upgrade to this release, run the following SQL:
+	create table bug_user_seen
+	(
+	sn_bug int not null,
+	sn_user int not null,
+	sn_seen int not null
+	)
+
+	create unique index sn_index_1 on bug_user_seen (sn_bug, sn_user)
+
+* Added new feature, new/old, read/unread.  The implementation is
+similar to $FLAG.  See edit_query.aspx for details.  Also, to enable,
+add this to your Web.config:
+<add key="EnableSeen" value="1" />
 
 * Fixed bug 2121394 "Error when editing an old comment with FckEditor 
 enabled"
@@ -43,11 +58,12 @@ enabled"
 * Fixed bug 2129279 "add_svn_revision.aspx doesnt work with ie and 
 opera"
 
+* Fixed unintentional case-sensitivity in tags filtering logic.
+
 * Changed display of read-only custom-fields when there is a lot of 
 text without line breaks.  Discussed here:
 http://sourceforge.net/forum/forum.php?thread_id=2265713&forum_id=226938
 
-* Fixed unintentional case-sensitivity in tags filtering logic.
 
 -----------------------------------------------------------------------
 Version 2.9.1   9/20/2008 

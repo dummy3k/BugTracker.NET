@@ -526,12 +526,17 @@ insert into bug_posts
             Security security,
             DataSet ds_custom_cols)
         {
-            string sql = @" /* get_bug_datarow */
+            string sql = @" /* get_bug_datarow */";
 
+			if (btnet.Util.get_setting("EnableSeen", "0") == "1")
+			{
+				sql += @"
 insert into bug_user_seen
 select $id,$this_usid,1
-where not exists (select * from bug_user_seen where sn_user = $this_usid and sn_bug = $id)
+where not exists (select * from bug_user_seen where sn_user = $this_usid and sn_bug = $id)";
+			}
 
+			sql += @"
 declare @revision int
 set @revision = 0";
 
