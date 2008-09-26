@@ -40,8 +40,14 @@ Version 2.9.2   9/XX/2008
 * Fixed bug 2121394 "Error when editing an old comment with FckEditor 
 enabled"
 
+* Fixed bug 2129279 "add_svn_revision.aspx doesnt work with ie and 
+opera"
+
 * Changed display of read-only custom-fields when there is a lot of 
-text without line breaks.
+text without line breaks.  Discussed here:
+http://sourceforge.net/forum/forum.php?thread_id=2265713&forum_id=226938
+
+* Fixed unintentional case-sensitivity in tags filtering logic.
 
 -----------------------------------------------------------------------
 Version 2.9.1   9/20/2008 

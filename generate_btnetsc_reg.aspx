@@ -1,4 +1,4 @@
-%@ Page language="C#"%>
+<%@ Page language="C#"%>
 <!-- #include file = "inc.aspx" -->
 <script language="C#" runat="server">
 

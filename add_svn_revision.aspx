@@ -206,7 +206,7 @@ var asp_form_id = '<% Response.Write(Util.get_form_name()); %>';
 function set_action(val)
 {
     var frm = document.getElementById(asp_form_id);
-    var action = document.getElementById("action");
+    var actn = document.getElementById("actn");
     actn.value = val;
     frm.submit();
     return true;
