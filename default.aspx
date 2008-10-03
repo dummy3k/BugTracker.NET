@@ -64,20 +64,26 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	// If an error occured, then force the authentication to manual
-	if (Request.QueryString["msg"] == null) {
+	if (Request.QueryString["msg"] == null)
+	{
 		// If windows authentication only, then redirect
-		if (auth_mode == "1") {
+		if (auth_mode == "1")
+		{
 			redirect("loginNT.aspx");
 		}
 
 		// If previous login was with windows authentication, then try it again
-    	if ( previous_auth_mode == "1" && auth_mode == "2" )  {
+    	if ( previous_auth_mode == "1" && auth_mode == "2" )
+    	{
 		    Response.Cookies["user"]["name"] = "";
 			Response.Cookies["user"]["NTLM"] = "0";
 			redirect("loginNT.aspx");
 		}
-	} else {
-		if (Request.QueryString["msg"] != "logged off") {
+	}
+	else
+	{
+		if (Request.QueryString["msg"] != "logged off")
+		{
 			msg.InnerHtml = "Error during windows authentication:<br>"
 				+ Request.QueryString["msg"];
 		}

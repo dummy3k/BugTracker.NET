@@ -29,9 +29,19 @@ User level stuff
 * auto subscribe if you modified bug
 * default value for internal comments
 
+* improve documentation of hints
+
 
 1) Record Email CC
 
+
+-----------------------------------------------------------------------
+Version 2.9.3   10/xx/2008 
+-----------------------------------------------------------------------
+
+* Add missing file, "seen.aspx"
+
+* Windows user auto registration
 
 -----------------------------------------------------------------------
 Version 2.9.2   9/26/2008 
