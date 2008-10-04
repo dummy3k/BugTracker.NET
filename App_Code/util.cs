@@ -138,7 +138,6 @@ namespace btnet
 			else
 			{
 				user.set_from_db(dr);
-btnet.Util.write_to_log("corey 1 " + user.username);
 			}
 
 

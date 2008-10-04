@@ -81,26 +81,10 @@ where us_username = N'$username'";
             string auth_type = btnet.Util.get_setting(
                 "LdapAuthType","Basic");
 
-            if (auth_type == "Basic")
-                ldap.AuthType = AuthType.Basic;
-            else if (auth_type == "Anonymous")
-                ldap.AuthType = AuthType.Anonymous;
-            else if (auth_type == "Digest")
-                ldap.AuthType = AuthType.Digest;
-            else if (auth_type == "Dpa")
-                ldap.AuthType = AuthType.Dpa;
-            else if (auth_type == "External")
-                ldap.AuthType = AuthType.External;
-            else if (auth_type == "Kerberos")
-                ldap.AuthType = AuthType.Kerberos;
-            else if (auth_type == "Msn")
-                ldap.AuthType = AuthType.Msn;
-            else if (auth_type == "Negotiate")
-                ldap.AuthType = AuthType.Negotiate;
-            else if (auth_type == "Ntlm")
-                ldap.AuthType = AuthType.Ntlm;
-            else if (auth_type == "Sicily")
-                ldap.AuthType = AuthType.Sicily;
+            ldap.AuthType = (System.DirectoryServices.Protocols.AuthType) System.Enum.Parse
+				(typeof(System.DirectoryServices.Protocols.AuthType),
+				Util.get_setting("LdapAuthType", "Basic"));
+
 
 			try
 			{

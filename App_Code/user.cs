@@ -52,7 +52,6 @@ namespace btnet
         {
             this.usid = Convert.ToInt32(dr["us_id"]);
             this.username = (string)dr["us_username"];
-btnet.Util.write_to_log("corey 2 " + this.username);
             this.email = (string)dr["us_email"];
 
             this.bugs_per_page = Convert.ToInt32(dr["us_bugs_per_page"]);

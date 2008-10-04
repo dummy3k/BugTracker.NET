@@ -76,37 +76,62 @@ void Page_Load(Object sender, EventArgs e)
         {
             string template_user = Util.get_setting("WindowsUserAutoRegistrationUserTemplate", "guest");
 
-            string firstName = windows_username;
-            string lastName = windows_username;
-            string displayName = windows_username;
+            string first_name = windows_username;
+            string last_name = windows_username;
+            string display_name = windows_username;
             string email = string.Empty;
 
             // From the browser, we only know the Windows username.  Maybe we can get the other
             // info from LDAP?
-            if (Util.get_setting("EnableWindowsUserAutoRegistrationLdapLookup", "0") == "1")
+            if (Util.get_setting("EnableWindowsUserAutoRegistrationLdapSearch", "0") == "1")
             {
-                using (System.DirectoryServices.DirectoryEntry myLdapConnection = new System.DirectoryServices.DirectoryEntry())
+                using (System.DirectoryServices.DirectoryEntry de = new System.DirectoryServices.DirectoryEntry())
                 {
-                    myLdapConnection.Path = Util.get_setting("WindowsUserAutoRegistrationLdapLookupSearchPath", null);
-                    myLdapConnection.AuthenticationType = (System.DirectoryServices.AuthenticationTypes)System.Enum.Parse(typeof(System.DirectoryServices.AuthenticationTypes), Util.get_setting("LdapAuthType", "Basic"));
-                    myLdapConnection.Username = Util.get_setting("WindowsUserAutoRegistrationLdapLookupUser", string.Empty);
-                    myLdapConnection.Password = Util.get_setting("WindowsUserAutoRegistrationLdapLookupPassword", string.Empty);
+                    de.Path = Util.get_setting("LdapDirectoryEntryPath","LDAP://127.0.0.1/DC=mycompany,DC=com");
 
-                    using (System.DirectoryServices.DirectorySearcher search = new System.DirectoryServices.DirectorySearcher(myLdapConnection))
+                    de.AuthenticationType =
+                    	(System.DirectoryServices.AuthenticationTypes)System.Enum.Parse(
+						typeof(System.DirectoryServices.AuthenticationTypes),
+                    	Util.get_setting("LdapDirectoryEntryAuthenticationType", "Anonymous"));
+
+                    de.Username = Util.get_setting("LdapDirectoryEntryUsername", "");
+                    de.Password = Util.get_setting("LdapDirectoryEntryPassword", "");
+
+                    using (System.DirectoryServices.DirectorySearcher search =
+                    	new System.DirectoryServices.DirectorySearcher(de))
                     {
-                        string searchFilter = Util.get_setting("WindowsUserAutoRegistrationLdapLookupUserFiler", "(sAMAccountName=%windows_username%)");
-                        search.Filter = searchFilter.Replace("%windows_username%", windows_username);
+                        string search_filter = Util.get_setting("LdapDirectorySearcherFilter", "(uid=$REPLACE_WITH_USERNAME$)");
+                        search.Filter = search_filter.Replace("$REPLACE_WITH_USERNAME$", windows_username);
+                        System.DirectoryServices.SearchResult result = null;
 
-                        System.DirectoryServices.SearchResult result = search.FindOne();
+						try
+						{
+							result = search.FindOne();
+						}
+						catch (Exception e2)
+						{
+							string s = e2.Message;
+
+							if (e2.InnerException != null)
+							{
+								s += "\n";
+								s += e2.InnerException.Message;
+							}
+
+							// write the message to the log
+							Response.Write (s);
+							Response.End();
+							btnet.Util.write_to_log("LDAP search failed: " + s);
+						}
+
                         if (result != null)
                         {
-                            firstName = get_ldap_property_value(result, "givenname", firstName);
-                            lastName = get_ldap_property_value(result, "sn", lastName);
-                            displayName = get_ldap_property_value(result, "displayName", displayName); ;
-                            email = get_ldap_property_value(result, "mail", email); ;
+                            first_name = get_ldap_property_value(result, Util.get_setting("LdapFirstName", "gn"), first_name);
+                            last_name = get_ldap_property_value(result, Util.get_setting("LdapLastName", "sn"), last_name);
+                            email = get_ldap_property_value(result, Util.get_setting("LdapEmail", "mail"), email); ;
+                            display_name = get_ldap_property_value(result, Util.get_setting("LdapEmailSigniture", "cn"), display_name); ;
                         }
                     }
-
                 }
             }
 
@@ -202,10 +227,10 @@ BEGIN
 END";
 
             sql = sql.Replace("$username", windows_username.Replace("'", "''"));
-            sql = sql.Replace("$firstname", firstName.Replace("'", "''"));
-            sql = sql.Replace("$lastname", lastName.Replace("'", "''"));
+            sql = sql.Replace("$firstname", first_name.Replace("'", "''"));
+            sql = sql.Replace("$lastname", last_name.Replace("'", "''"));
             sql = sql.Replace("$email", email.Replace("'", "''"));
-            sql = sql.Replace("$signature", displayName.Replace("'", "''"));
+            sql = sql.Replace("$signature", display_name.Replace("'", "''"));
             sql = sql.Replace("$template_user", template_user.Replace("'", "''"));
 
             // Password doesn't matter, but don't let it be something that others can guess
