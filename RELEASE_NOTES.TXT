@@ -36,12 +36,38 @@ User level stuff
 
 
 -----------------------------------------------------------------------
-Version 2.9.3   10/xx/2008 
+Version 2.9.3   10/04/2008 
 -----------------------------------------------------------------------
 
-* Add missing file, "seen.aspx"
+To upgrade to this version, change your Web.config from this:
 
-* Windows user auto registration
+	<assemblies>
+		<add assembly="System.DirectoryServices.Protocols, 
+			Version=2.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A"/>
+	</assemblies>
+
+	to this, adding the additional assembly reference:
+
+	<assemblies>
+		<add assembly="System.DirectoryServices.Protocols, 
+			Version=2.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A"/>
+		<add assembly="System.DirectoryServices, 
+			Version=2.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A"/>
+	</assemblies>
+
+
+* The file "seen.aspx" was missing from the 2.9.2 .zip file, so the 
+new/old, read/unread feature didn't work.  Added to this .zip file.
+
+* Fixed bug in setup.sql that happens if you were to run it twice. No
+problem if you run it just once.
+
+* Fixed bug 2140368 "Calendar broken if custom field has space like 
+"Due Date" versus "DueDate".
+
+* Richard Adleta has contributed a new feature, Windows user auto 
+registration.  Thanks Richard!  Look at Web.config in this .zip for
+the new Web.config settings related to this feature.
 
 -----------------------------------------------------------------------
 Version 2.9.2   9/26/2008 

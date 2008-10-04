@@ -2560,7 +2560,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 						Response.Write("<a style=\"font-size: 8pt;\"href=\"javascript:show_calendar('"
 							+ btnet.Util.get_form_name()
 							+ "."
-							+ drcc["name"].ToString()
+							+ field_id
 							+ "',null,null,'"
 							+ btnet.Util.get_setting("JustDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)
 							+ "');\">[select]</a>");

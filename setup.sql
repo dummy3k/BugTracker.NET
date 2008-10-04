@@ -58,6 +58,9 @@ drop table [orgs]
 if exists (select * from dbo.sysobjects where id = object_id(N'[bug_user_flags]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [bug_user_flags]
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[bug_user_seen]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [bug_user_seen]
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[emailed_links]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [emailed_links]
 
