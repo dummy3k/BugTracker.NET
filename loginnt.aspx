@@ -107,6 +107,13 @@ void Page_Load(Object sender, EventArgs e)
 						try
 						{
 							result = search.FindOne();
+							if (result != null)
+							{
+								first_name = get_ldap_property_value(result, Util.get_setting("LdapFirstName", "gn"), first_name);
+								last_name = get_ldap_property_value(result, Util.get_setting("LdapLastName", "sn"), last_name);
+								email = get_ldap_property_value(result, Util.get_setting("LdapEmail", "mail"), email); ;
+								display_name = get_ldap_property_value(result, Util.get_setting("LdapEmailSigniture", "cn"), display_name); ;
+							}
 						}
 						catch (Exception e2)
 						{
@@ -119,18 +126,9 @@ void Page_Load(Object sender, EventArgs e)
 							}
 
 							// write the message to the log
-							Response.Write (s);
-							Response.End();
 							btnet.Util.write_to_log("LDAP search failed: " + s);
 						}
 
-                        if (result != null)
-                        {
-                            first_name = get_ldap_property_value(result, Util.get_setting("LdapFirstName", "gn"), first_name);
-                            last_name = get_ldap_property_value(result, Util.get_setting("LdapLastName", "sn"), last_name);
-                            email = get_ldap_property_value(result, Util.get_setting("LdapEmail", "mail"), email); ;
-                            display_name = get_ldap_property_value(result, Util.get_setting("LdapEmailSigniture", "cn"), display_name); ;
-                        }
                     }
                 }
             }

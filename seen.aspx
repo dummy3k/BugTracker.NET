@@ -21,11 +21,11 @@ void Page_Load(Object sender, EventArgs e)
 
 	if (!security.user.is_guest)
 	{
-//		if (Request.QueryString["ses"] != (string) Session["session_cookie"])
-//		{
-//			Response.Write ("session in URL doesn't match session cookie");
-//			Response.End();
-//		}
+		if (Request.QueryString["ses"] != (string) Session["session_cookie"])
+		{
+			Response.Write ("session in URL doesn't match session cookie");
+			Response.End();
+		}
 	}
 
 	DataView dv = (DataView) Session["bugs"];
