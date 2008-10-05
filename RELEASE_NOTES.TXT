@@ -66,8 +66,15 @@ problem if you run it just once.
 "Due Date" versus "DueDate".
 
 * Richard Adleta has contributed a new feature, Windows user auto 
-registration.  Thanks Richard!  Look at Web.config in this .zip for
-the new Web.config settings related to this feature.
+registration.  That means, if you are using windows security, and a
+Windows user visits the site, BugTracker.NET will automatically insert
+a user into its user table.  Thanks Richard Adleta!  
+
+Look at Web.config in this .zip for the new Web.config settings related 
+to this feature, starting with "EnableWindowsUserAutoRegistration".
+
+Note the settings in Web.config that allow BugTracker.NET to fetch 
+additional info about a user from an LDAP server.
 
 -----------------------------------------------------------------------
 Version 2.9.2   9/26/2008 
