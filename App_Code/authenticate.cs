@@ -68,7 +68,7 @@ where us_username = N'$username'";
 		{
 			string dn = btnet.Util.get_setting(
 				"LdapUserDistinguishedName",
-				"");
+				"uid=$REPLACE_WITH_USERNAME$,ou=people,dc=mycompany,dc=com");
 
 			string ldap_server = btnet.Util.get_setting(
 				"LdapServer",
@@ -78,13 +78,9 @@ where us_username = N'$username'";
 			LdapConnection ldap = new LdapConnection(ldap_server);
 			System.Net.NetworkCredential cred = new System.Net.NetworkCredential(dn, password);
 
-            string auth_type = btnet.Util.get_setting(
-                "LdapAuthType","Basic");
-
             ldap.AuthType = (System.DirectoryServices.Protocols.AuthType) System.Enum.Parse
 				(typeof(System.DirectoryServices.Protocols.AuthType),
 				Util.get_setting("LdapAuthType", "Basic"));
-
 
 			try
 			{
@@ -92,7 +88,7 @@ where us_username = N'$username'";
 				btnet.Util.write_to_log("LDAP authentication ok: " + username);
 				return true;
 			}
-			catch (LdapException e)
+			catch (Exception e)
 			{
 				string s = e.Message;
 
