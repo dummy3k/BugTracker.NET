@@ -6,39 +6,52 @@ Release notes:
 For instructions on how to upgrade, see:
 http://ifdefined.com/readme.html#upgrading
 
-
 -----------------------------------------------------------------------
+Version 2.9.4   10/xx/2008 
 -----------------------------------------------------------------------
 
-* many to many, queries to organizations
-* excel export for reports
-* field level permissions for custom fields?
-* escalation/reminder
-* spellcheck docs
-* new fckEditor - read my own fckdocs at ifdefined. 
-* add arbitrary users/subscribers?
-* document workflow.cs at ifdefined.
-* document ldap at ifdefined.
-* top things bugtracker.net can't do: foreign languages, linux, multiple databases
-* time tracking
-* my estimation methodology
-* syscolumns, column order scheme
-* edit_bug.aspx and css
-* send, don't send private comments?
-* document the WhErE hack 
-* required fields, required custom datetime field
-* custom textarea column still allows truncation?
-* Use date range for search, custom fields
-* 1949210 Deleting a user doesn't delete Self Register info
+* Fixed bug where SMTP servers were rejecting emails because of empty
+CC field.
 
-User level stuff
-* auto subscribe if you modified bug
-* default value for internal comments
-
-* improve documentation of hints
+* Fixed bug were adding an attachment failed because of null content
+type.
 
 
-1) Record Email CC
+
+ticker?
+
+email rfc thing?
+
+I recently started seeing "object reference" exceptions when uploading some
+files.  I store my files in the DB and all the directory permissions were good.
+Nothing in the code itself had changed from when it worked to when it did not.
+What I tracked it down to was the following:
+
+On line 319 of bug.cs, the value effective_content_type was a NULL reference,
+which caused the Replace() to fail.
+
+I made the following change and it all works fine:
+
+sql = sql.Replace("$ct", effective_content_type != null
+? effective_content_type.Replace("'", "''") : string.Empty);
+
+
+
+I recently started seeing "object reference" exceptions when uploading some
+files.  I store my files in the DB and all the directory permissions were good.
+Nothing in the code itself had changed from when it worked to when it did not.
+What I tracked it down to was the following:
+
+On line 319 of bug.cs, the value effective_content_type was a NULL reference,
+which caused the Replace() to fail.
+
+I made the following change and it all works fine:
+
+sql = sql.Replace("$ct", effective_content_type != null
+? effective_content_type.Replace("'", "''") : string.Empty);
+
+Tony
+
 
 
 -----------------------------------------------------------------------
