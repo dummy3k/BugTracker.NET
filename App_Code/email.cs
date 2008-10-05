@@ -74,8 +74,13 @@ namespace btnet
 			System.Web.Mail.MailMessage msg = new System.Web.Mail.MailMessage();
 			msg.To = to;
 			msg.From = from;
-			msg.Cc = cc;
-			msg.Subject = subject;
+
+            if (!string.IsNullOrEmpty(cc))
+            {
+                msg.CC.Add(new MailAddress(cc));
+            }
+			
+            msg.Subject = subject;
 			msg.Priority = priority;
 
 			// This fixes a bug for a couple people, but make it configurable, just in case.
@@ -87,7 +92,7 @@ namespace btnet
 
 			if (return_receipt)
 			{
-				msg.Headers.Add("Disposition-Notification-To", from);
+                msg.Headers.Add("Disposition-Notification-To", from);
 			}
 
 			// workaround for a bug I don't understand...
@@ -96,7 +101,7 @@ namespace btnet
 				body = body.Replace("\n", "\r\n");
 			}
 
-			msg.Body = body;
+            msg.Body = body;
 			msg.BodyFormat = body_format;
 
 

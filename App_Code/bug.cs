@@ -317,6 +317,13 @@ insert into bug_posts
                 sql = sql.Replace("$si", Convert.ToString(effective_content_length));
                 sql = sql.Replace("$us", Convert.ToString(security.user.usid));
                 sql = sql.Replace("$ct", effective_content_type.Replace("'", "''"));
+
+				// Sometimes, somehow, content type is null.  Not sure how.
+				sql = sql.Replace("$ct",
+					effective_content_type != null
+						? effective_content_type.Replace("'", "''")
+						: string.Empty);
+
                 if (parent == -1)
                 {
                     sql = sql.Replace("$pa", "null");
