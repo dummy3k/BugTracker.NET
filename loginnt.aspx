@@ -317,5 +317,3 @@ string get_ldap_property_value(System.DirectoryServices.SearchResult result, str
         <a href="default.aspx?msg=configuration+problem">Go to logon page.</a></p>
 </body>
 </html>
-
-
