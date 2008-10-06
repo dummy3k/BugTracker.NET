@@ -75,9 +75,9 @@ namespace btnet
 			msg.To = to;
 			msg.From = from;
 
-            if (!string.IsNullOrEmpty(cc))
+            if (!string.IsNullOrEmpty(cc.Trim())) 
             {
-                msg.CC.Add(new MailAddress(cc));
+                msg.Cc = cc; 
             }
 			
             msg.Subject = subject;

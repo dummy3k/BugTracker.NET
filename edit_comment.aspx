@@ -181,6 +181,9 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only.Checked));
 		dbutil.execute_nonquery(sql);
 
+		// Don't send notifications for internal only comments.
+		// We aren't putting them the email notifications because it that makes it
+		// easier for them to accidently get forwarded to the "wrong" people...
 		if (!internal_only.Checked)
 		{
 			btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security);

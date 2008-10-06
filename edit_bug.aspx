@@ -2155,6 +2155,8 @@ void on_update (Object sender, EventArgs e)
 
 				DateTime last_update_date = (DateTime) dbutil.execute_scalar(sql);
 
+				btnet.WhatsNew.add_news(last_update_date, id, short_desc.Value, "changed", security);
+
 				string date_from_db = last_update_date.ToString("yyyyMMdd HH\\:mm\\:ss\\:fff");
 				string date_from_webpage = snapshot_timestamp.Value;
 
