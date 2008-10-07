@@ -141,6 +141,8 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	security = new Security();
+	security.context = HttpContext.Current;
+	security.user.username = from;
 	security.user.usid = (int) dr["us_id"];
 	security.user.is_admin = Convert.ToBoolean(dr["us_admin"]);
 	security.user.org = (int) dr["us_org"];
@@ -510,6 +512,7 @@ void Page_Load(Object sender, EventArgs e)
 
 
         btnet.Bug.send_notifications(btnet.Bug.INSERT, new_ids.bugid, security);
+        btnet.WhatsNew.add_news(new_ids.bugid, short_desc, "added", security);
 
 		Response.AddHeader("BTNET","OK:" + Convert.ToString(new_ids.bugid));
 		Response.Write ("OK:" + Convert.ToString(new_ids.bugid));
@@ -521,18 +524,24 @@ void Page_Load(Object sender, EventArgs e)
 
 		string StatusResultingFromIncomingEmail = Util.get_setting("StatusResultingFromIncomingEmail","0");
 
+		sql = "";
+
 		if (StatusResultingFromIncomingEmail != "0")
 		{
 
 			sql = @"update bugs
 				set bg_status = $st
-				where bg_id = $bg";
+				where bg_id = $bg
+				";
 
-			sql = sql.Replace("$bg", Convert.ToString(bugid));
-			sql = sql.Replace("$st", StatusResultingFromIncomingEmail);
-			dbutil.execute_nonquery(sql);
+				sql = sql.Replace("$st", StatusResultingFromIncomingEmail);
+
 		}
 
+		sql += "select bg_short_desc from bugs where bg_id = $bg";
+
+		sql = sql.Replace("$bg", Convert.ToString(bugid));
+		DataRow dr2 = dbutil.get_datarow(sql);
 
 		if (mime_message != null)
 		{
@@ -598,6 +607,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 		btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security);
+		btnet.WhatsNew.add_news(bugid, (string) dr2["bg_short_desc"], "updated", security);
 
 		Response.AddHeader("BTNET","OK:" + Convert.ToString(bugid));
 		Response.Write ("OK:" + Convert.ToString(bugid));

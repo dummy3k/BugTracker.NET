@@ -154,7 +154,9 @@ void on_update (Object sender, EventArgs e)
                     bp_comment_search = N'$cs',
                     bp_content_type = N'$cn',
                     bp_hidden_from_external_users = $internal
-                where bp_id = $id";
+                where bp_id = $id
+
+                select bg_short_desc from bugs where bg_id = $bugid";
 
         if (use_fckeditor)
 		{
@@ -178,8 +180,9 @@ void on_update (Object sender, EventArgs e)
 		}
 
 		sql = sql.Replace("$id", Convert.ToString(id));
+		sql = sql.Replace("$bugid", Convert.ToString(bugid));
 		sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only.Checked));
-		dbutil.execute_nonquery(sql);
+		DataRow dr = dbutil.get_datarow(sql);
 
 		// Don't send notifications for internal only comments.
 		// We aren't putting them the email notifications because it that makes it
@@ -187,6 +190,7 @@ void on_update (Object sender, EventArgs e)
 		if (!internal_only.Checked)
 		{
 			btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security);
+			btnet.WhatsNew.add_news(bugid, (string) dr["bg_short_desc"], "updated", security);
 		}
 
 		Response.Redirect ("edit_bug.aspx?id=" + Request["bug_id"]);

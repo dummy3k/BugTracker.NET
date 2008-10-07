@@ -328,6 +328,8 @@ void Page_Load(Object sender, EventArgs e)
 
 		}
 
+		short_desc.Value = (string) dr["bg_short_desc"];
+
 		if (string_bp_id != null || string_bg_id != null)
 		{
 
@@ -506,6 +508,7 @@ update bugs set
 		return_receipt.Checked);
 
 	btnet.Bug.send_notifications(btnet.Bug.UPDATE, Convert.ToInt32(bg_id.Value), security);
+	btnet.WhatsNew.add_news(Convert.ToInt32(bg_id.Value), short_desc.Value, "email sent", security);
 
 	if (result == "")
 	{
@@ -805,6 +808,7 @@ function findPosY(obj)
 	</tr>
     </table>
 	<input type=hidden id="bg_id" runat="server">
+	<input type=hidden id="short_desc" runat="server">
 </form>
 </table>
 </div>

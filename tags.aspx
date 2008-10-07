@@ -42,8 +42,7 @@ void print_tags()
     SortedDictionary<string, List<int>> tags =
         (SortedDictionary<string, List<int>>)Application["tags"];
 
-    System.Collections.Generic.List<TagLabel> tags_by_count = new
-        System.Collections.Generic.List<TagLabel>();
+    List<TagLabel> tags_by_count = new List<TagLabel>();
 
 	Dictionary<string, string> fonts = new Dictionary<string, string>();
 

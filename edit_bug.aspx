@@ -2005,6 +2005,9 @@ void on_update (Object sender, EventArgs e)
             }
 
 			id = new_ids.bugid;
+
+			btnet.WhatsNew.add_news(id, short_desc.Value, "added", security);
+
 			new_id.Value = Convert.ToString(id);
 			msg.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was created.";
 			sub.Value = "Update";
@@ -2155,7 +2158,7 @@ void on_update (Object sender, EventArgs e)
 
 				DateTime last_update_date = (DateTime) dbutil.execute_scalar(sql);
 
-				btnet.WhatsNew.add_news(last_update_date, id, short_desc.Value, "changed", security);
+				btnet.WhatsNew.add_news(id, short_desc.Value, "updated", security);
 
 				string date_from_db = last_update_date.ToString("yyyyMMdd HH\\:mm\\:ss\\:fff");
 				string date_from_webpage = snapshot_timestamp.Value;

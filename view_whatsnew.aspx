@@ -9,6 +9,10 @@ DataSet ds = null;
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
+	if (btnet.Util.get_setting("EnableWhatsNewPage","0") != "1")
+	{
+		Response.End();
+	}
 
 	Util.do_not_cache(Response);
 	dbutil = new DbUtil();
@@ -86,7 +90,9 @@ function get_whats_new()
 
 function do_onload()
 {
-	interval_id = setInterval(get_whats_new, 1000)
+	get_whats_new()
+	interval = 1000 * <% Response.Write(btnet.Util.get_setting("WhatsNewPageIntervalInSeconds","30")); %>
+	interval_id = setInterval(get_whats_new, interval)
 }
 
 </script>
@@ -97,6 +103,8 @@ function do_onload()
 <table border=0 cellspacing=0 cellpadding=10>
 <tr>
 <td valign=top>
+
+Recent updates:<p>
 
 <div id=whatsnew>&nbsp;</div>
 

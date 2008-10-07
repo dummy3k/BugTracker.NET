@@ -16,7 +16,12 @@ CC field.
 * Fixed bug were adding an attachment failed because of null content
 type.
 
+* WhatsNew - doesn't obey permissions
 
+make sure new files are added to CVS, zip
+
+EnableWhatsNewPage=1
+WhatsNewPageIntervalInSeconds=30
 
 ticker?
 
