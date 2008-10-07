@@ -13,9 +13,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 	Util.do_not_cache(Response);
 
-	if (btnet.Util.get_setting("EnableWhatsNew","1") == "0")
+	if (Util.get_setting("EnableWhatsNewPage","0") == "0")
 	{
-		Response.Write("no news");
+		Response.Write("Sorry, Web.config EnableWhatsNewPage is set to 0");
 		Response.End();
 	}
 

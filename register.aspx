@@ -17,6 +17,12 @@ void Page_Load(Object sender, EventArgs e)
 	Util.set_context(HttpContext.Current);
 	Util.do_not_cache(Response);
 
+	if (Util.get_setting("AllowSelfRegistration","0") == "0")
+	{
+		Response.Write("Sorry, Web.config AllowSelfRegistration is set to 0");
+		Response.End();
+	}
+
 	if (!IsPostBack)
 	{
 		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "

@@ -17,9 +17,9 @@ void Page_Load(Object sender, EventArgs e)
 	Util.set_context(HttpContext.Current);
 	Util.do_not_cache(Response);
 
-	if (Util.get_setting("AllowSelfRegistration","0") == "0")
+	if (Util.get_setting("ShowForgotPasswordLink","0") == "0")
 	{
-		Response.Write("Sorry, Web.config AllowSelfRegistration is set to 0");
+		Response.Write("Sorry, Web.config ShowForgotPasswordLink is set to 0");
 		Response.End();
 	}
 
@@ -54,19 +54,22 @@ void Page_Load(Object sender, EventArgs e)
 				string guid = Guid.NewGuid().ToString();
 				string sql = @"
 declare @user_id int
+declare @username nvarchar(255)
 
-select @user_id = us_id
+select @user_id = us_id, @username = us_username
 	from users
 	where us_email = N'$email'
 
 insert into emailed_links
 	(el_id, el_date, el_email, el_action, el_user_id)
-	values ('$guid', getdate(), N'$email', N'forgot', @user_id)";
+	values ('$guid', getdate(), N'$email', N'forgot', @user_id)
+
+select @username us_username";
 
 				sql = sql.Replace("$guid",guid);
 				sql = sql.Replace("$email", email.Value.Replace("'","''"));
 
-				dbutil.execute_nonquery(sql);
+				DataRow dr = dbutil.get_datarow(sql);
 
 				string result = btnet.Email.send_email(
 					email.Value,
@@ -78,7 +81,9 @@ insert into emailed_links
 						+ Util.get_setting("AbsoluteUrlPrefix","")
 						+ "change_password.aspx?id="
 						+ guid
-						+ "'>reset password</a>.",
+						+ "'>reset password</a> for user \""
+						+ (string) dr["us_username"]
+						+ "\".",
 
 					System.Web.Mail.MailFormat.Html);
 

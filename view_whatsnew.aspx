@@ -20,17 +20,7 @@ void Page_Load(Object sender, EventArgs e)
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "what's new?";
-
-	if (security.user.is_admin || security.user.can_use_reports) ////////////////////////////////  change org
-	{
-		//
-	}
-	else
-	{
-		Response.Write ("You are not allowed to use this page.");
-		Response.End();
-	}
+		+ "news?";
 
 }
 
@@ -39,16 +29,8 @@ void Page_Load(Object sender, EventArgs e)
 <html>
 <title id="titl" runat="server">btnet dashboard</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
-<style>
-
-
-
-</style>
 
 <script>
-
-var cnt = 0
-var internal_id = 0
 
 function GetXmlHttpObject()
 {
@@ -88,6 +70,7 @@ function get_whats_new()
 	xmlHttp.send(null)
 }
 
+
 function do_onload()
 {
 	get_whats_new()
@@ -98,13 +81,11 @@ function do_onload()
 </script>
 
 <body onload=do_onload()>
-<% security.write_menu(Response, "reports"); %>
+<% security.write_menu(Response, "news"); %>
 
 <table border=0 cellspacing=0 cellpadding=10>
 <tr>
 <td valign=top>
-
-Recent updates:<p>
 
 <div id=whatsnew>&nbsp;</div>
 

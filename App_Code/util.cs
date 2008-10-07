@@ -217,6 +217,11 @@ namespace btnet
             write_menu_item(Response, this_link, Util.get_setting("PluralBugLabel", "bugs"), "bugs.aspx");
             write_menu_item(Response, this_link, "search", "search.aspx");
 
+            if (Util.get_setting("EnableWhatsNewPage", "0") == "1")
+            {
+				write_menu_item(Response, this_link, "news", "view_whatsnew.aspx");
+			}
+
             if (!user.is_guest)
             {
                 write_menu_item(Response, this_link, "queries", "queries.aspx");
