@@ -14,52 +14,24 @@ Version 2.9.4   10/xx/2008
 CC field.
 
 * Fixed bug were adding an attachment failed because of null content
-type.
+type.  
 
-* Fixed bug that prevented forgot.aspx from being used unless
-register.aspx was also being used.
+* Fixed bug that prevented the "I forgot my password" from being used
+unless you also enabled self-registration.
 
-* WhatsNew - doesn't obey permissions
+* Add new feature, a "news" link.  To enable it, add the following to
+your Web.config:
 
-make sure new files are added to CVS, zip
+	EnableWhatsNewPage=1
+	WhatsNewPageIntervalInSeconds=30
 
-EnableWhatsNewPage=1
-WhatsNewPageIntervalInSeconds=30
-
-ticker?
-
-email rfc thing?
-
-I recently started seeing "object reference" exceptions when uploading some
-files.  I store my files in the DB and all the directory permissions were good.
-Nothing in the code itself had changed from when it worked to when it did not.
-What I tracked it down to was the following:
-
-On line 319 of bug.cs, the value effective_content_type was a NULL reference,
-which caused the Replace() to fail.
-
-I made the following change and it all works fine:
-
-sql = sql.Replace("$ct", effective_content_type != null
-? effective_content_type.Replace("'", "''") : string.Empty);
-
-
-
-I recently started seeing "object reference" exceptions when uploading some
-files.  I store my files in the DB and all the directory permissions were good.
-Nothing in the code itself had changed from when it worked to when it did not.
-What I tracked it down to was the following:
-
-On line 319 of bug.cs, the value effective_content_type was a NULL reference,
-which caused the Replace() to fail.
-
-I made the following change and it all works fine:
-
-sql = sql.Replace("$ct", effective_content_type != null
-? effective_content_type.Replace("'", "''") : string.Empty);
-
-Tony
-
+That will add a new menu item, "news", which links to view_whatsnew.aspx.
+That new page will automatically refresh itself with what bugs were 
+recently added, changed, etc.   Note that this feature does not obey
+any permission.   It will display information about all bugs, whether
+the user has permission to view them or not.  If the user clicks on a
+link in order to view the details of that bug, THEN permissions WILL be 
+enforced, but not on the list itself.
 
 
 -----------------------------------------------------------------------
