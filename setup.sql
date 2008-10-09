@@ -302,7 +302,8 @@ bp_size int null,
 bp_content_type nvarchar(200) null,
 bp_parent int null,
 bp_original_comment_id int null,
-bp_hidden_from_external_users int not null default(0)
+bp_hidden_from_external_users int not null default(0),
+bp_email_cc nvarchar(800) null
 )
 
 create index bp_index_1 on bug_posts (bp_bug)

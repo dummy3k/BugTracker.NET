@@ -10,6 +10,10 @@ http://ifdefined.com/readme.html#upgrading
 Version 2.9.4   10/xx/2008 
 -----------------------------------------------------------------------
 
+To upgrade to the version:
+
+alter table bug_posts add bp_email_cc nvarchar(800) null
+
 * Fixed bug where SMTP servers were rejecting emails because of empty
 CC field.
 
@@ -32,6 +36,13 @@ any permission.   It will display information about all bugs, whether
 the user has permission to view them or not.  If the user clicks on a
 link in order to view the details of that bug, THEN permissions WILL be 
 enforced, but not on the list itself.
+
+* Removed the "CommentSortOrder" from Web.config. No longer supporting
+it.
+
+* Now recording email "CC" for outgoing emails.
+
+IIIINNNNCCCOMING???
 
 
 -----------------------------------------------------------------------

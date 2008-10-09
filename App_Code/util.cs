@@ -853,6 +853,71 @@ namespace btnet
 		}
 
 		///////////////////////////////////////////////////////////////////////
+		public static string how_long_ago(int seconds)
+		{
+			return how_long_ago(new TimeSpan(0,0,seconds));
+		}
+
+		///////////////////////////////////////////////////////////////////////
+		public static string how_long_ago(TimeSpan ts)
+        {
+
+            if (ts.Days > 0)
+            {
+                if (ts.Days == 1)
+                {
+                    if (ts.Hours > 2)
+                    {
+                        return "1 day and " + ts.Hours + " hours ago";
+                    }
+                    else
+                    {
+                        return "1 day ago";
+                    }
+                }
+                else
+                {
+                    return ts.Days + " days ago";
+                }
+            }
+            else if (ts.Hours > 0)
+            {
+                if (ts.Hours == 1)
+                {
+                    if (ts.Minutes > 5)
+                    {
+                        return "1 hour and " + ts.Minutes + " minutes ago";
+                    }
+                    else
+                    {
+                        return "1 hour ago";
+                    }
+                }
+                else
+                {
+                    return ts.Hours + " hours ago";
+                }
+            }
+            else if (ts.Minutes > 0)
+            {
+                if (ts.Minutes == 1)
+                {
+                    return "1 minute ago";
+                }
+                else
+                {
+                    return ts.Minutes + " minutes ago";
+                }
+            }
+            else
+            {
+                return ts.Seconds + " seconds ago";
+            }
+
+		}
+
+
+		///////////////////////////////////////////////////////////////////////
 		// only used by search?
 		public static DataTable get_related_users(Security security, DbUtil dbutil)
 		{

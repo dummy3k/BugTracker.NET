@@ -449,6 +449,24 @@ namespace btnet
 					Response.Write (HttpUtility.HtmlEncode((string)dr["bp_email_to"]));
 				}
 
+				if ((string) dr["bp_email_cc"] != "")
+				{
+					Response.Write (", cc: ");
+
+					if (write_links)
+					{
+						Response.Write (format_email_to(
+							bugid,
+							HttpUtility.HtmlEncode((string)dr["bp_email_cc"])));
+					}
+					else
+					{
+						Response.Write (HttpUtility.HtmlEncode((string)dr["bp_email_cc"]));
+					}
+
+					Response.Write (", ");
+				}
+
 				Response.Write (" by ");
 
 				Response.Write (format_email_username(
@@ -457,6 +475,7 @@ namespace btnet
 					(string) dr["us_email"],
 					(string) dr["us_username"],
 					(string) dr["us_fullname"]));
+
 			}
 			else if (type == "received" )
 			{
@@ -509,7 +528,8 @@ namespace btnet
 			// Format the date
 			Response.Write (" on ");
 			Response.Write (btnet.Util.format_db_date(dr["bp_date"]));
-			Response.Write (", " + Convert.ToString(dr["days_ago"]) + " days ago");
+			Response.Write (", ");
+			Response.Write (btnet.Util.how_long_ago((int) dr["seconds_ago"]));
 			Response.Write ("</span>");
 
 

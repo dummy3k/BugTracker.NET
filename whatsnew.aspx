@@ -50,15 +50,15 @@ void Page_Load(Object sender, EventArgs e)
 
 		TimeSpan ts = new TimeSpan(ticks_now - news.when.Ticks);
 
-		if (ts.Minutes < 1)
+		if (ts.TotalSeconds < 90)
 		{
 			sb.Append("<td class=datad style='background:red;'>");
 		}
-		else if (ts.Minutes < 2)
+		else if (ts.TotalSeconds < 180)
 		{
 			sb.Append("<td class=datad style='background:orange;'>");
 		}
-		else if (ts.Minutes < 3)
+		else if (ts.TotalSeconds < 300)
 		{
 			sb.Append("<td class=datad style='background:yellow;'>");
 		}
@@ -66,7 +66,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			sb.Append("<td class=datad>");
 		}
-		sb.Append(how_long_ago(ts));
+		sb.Append(btnet.Util.how_long_ago(ts));
 
 		sb.Append("<td class=datad>");
 		sb.Append(Convert.ToString(news.id));
@@ -90,50 +90,5 @@ void Page_Load(Object sender, EventArgs e)
 
 }
 
-string how_long_ago(TimeSpan ts)
-{
-
-	// From http://stackoverflow.com/questions/11/how-do-i-calculate-relative-time#12
-
-
-	double delta = ts.TotalSeconds;
-
-	if (delta < 60)
-	{
-	  return ts.Seconds == 1 ? "1 second ago" : ts.Seconds + " seconds ago";
-	}
-	if (delta < 120)
-	{
-	  return "1 minute ago";
-	}
-	if (delta < 2700) // 45 * 60
-	{
-	  return ts.Minutes + " minutes ago";
-	}
-	if (delta < 5400) // 90 * 60
-	{
-	  return "1 hour ago";
-	}
-	if (delta < 86400) // 24 * 60 * 60
-	{
-	  return ts.Hours + " hours ago";
-	}
-	if (delta < 172800) // 48 * 60 * 60
-	{
-	  return "yesterday";
-	}
-	if (delta < 2592000) // 30 * 24 * 60 * 60
-	{
-	  return ts.Days + " days ago";
-	}
-	if (delta < 31104000) // 12 * 30 * 24 * 60 * 60
-	{
-	  int months = Convert.ToInt32(Math.Floor((double)ts.Days / 30));
-	  return months <= 1 ? "1 month ago" : months + " months ago";
-	}
-	int years = Convert.ToInt32(Math.Floor((double)ts.Days / 365));
-	return years <= 1 ? "1 year ago" : years + " years ago";
-
-}
 
 </script>

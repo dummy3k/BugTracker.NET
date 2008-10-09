@@ -416,8 +416,8 @@ void on_update(object Source, EventArgs e)
 
 	sql = @"
 insert into bug_posts
-	(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_email_to, bp_type, bp_content_type)
-	values($id, $us, getdate(), N'$cm', N'$cs', N'$fr',  N'$to', 'sent', N'$ct');
+	(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_email_to, bp_type, bp_content_type, bp_email_cc)
+	values($id, $us, getdate(), N'$cm', N'$cs', N'$fr',  N'$to', 'sent', N'$ct', N'$cc');
 select scope_identity()
 update bugs set
 	bg_last_updated_user = $us,
@@ -441,6 +441,7 @@ update bugs set
 	}
 	sql = sql.Replace("$fr", from.SelectedItem.Value.Replace("'", "''"));
 	sql = sql.Replace("$to", to.Value.Replace("'","''"));
+	sql = sql.Replace("$cc", cc.Value.Replace("'","''"));
 
 	int comment_id = Convert.ToInt32(dbutil.execute_scalar(sql));
 

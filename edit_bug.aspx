@@ -350,8 +350,8 @@ void Page_Load(Object sender, EventArgs e)
 			s += " on ";
 			s += btnet.Util.format_db_date (dr["reported_date"]);
 			s += ", ";
-			s += Convert.ToString(dr["days_ago"]);
-			s += " days ago";
+			s += btnet.Util.how_long_ago((int)dr["seconds_ago"]);
+
 
 			reported_by.InnerHtml = s;
 

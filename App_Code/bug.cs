@@ -573,7 +573,7 @@ case rtrim(ru.us_firstname)
 	else isnull(ru.us_lastname + ', ' + ru.us_firstname,'')
 	end [reporter_fullname],
 bg_reported_date [reported_date],
-datediff(d,bg_reported_date,getdate()) [days_ago],
+datediff(s,bg_reported_date,getdate()) [seconds_ago],
 isnull(lu.us_username,'') [last_updated_user],
 case rtrim(lu.us_firstname)
 	when null then isnull(lu.us_lastname, '')
@@ -688,11 +688,12 @@ case rtrim(us_firstname)
 	end [us_fullname],
 isnull(us_email,'') [us_email],
 a.bp_date,
-datediff(d,a.bp_date,getdate()) [days_ago],
+datediff(s,a.bp_date,getdate()) [seconds_ago],
 a.bp_id,
 a.bp_type,
 isnull(a.bp_email_from,'') bp_email_from,
 isnull(a.bp_email_to,'') bp_email_to,
+isnull(a.bp_email_cc,'') bp_email_cc,
 isnull(a.bp_file,'') bp_file,
 isnull(a.bp_size,0) bp_size,
 isnull(a.bp_content_type,'') bp_content_type,
@@ -706,7 +707,7 @@ left outer join users on us_id = a.bp_user
 left outer join bug_posts ba on ba.bp_parent = a.bp_id and ba.bp_bug = a.bp_bug
 where a.bp_bug = $id
 and a.bp_parent is null
-order by a.bp_date " + Util.get_setting("CommentSortOrder", "desc");
+order by a.bp_date desc";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             DbUtil dbutil = new DbUtil();
