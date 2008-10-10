@@ -563,7 +563,7 @@ namespace btnet
 					//		+ string_post_id + "&bug_id=" + string_bug_id);
 					//	Response.Write (">edit</a>");
 
-					// This delete leaves debris around, but it's better than nothing
+						// This delete leaves debris around, but it's better than nothing
 						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
 						Response.Write (" href=delete_comment.aspx?id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
@@ -644,7 +644,7 @@ namespace btnet
 			// the text itself
 			string comment = (string) dr["bp_comment"];
 			string comment_type = (string) dr["bp_content_type"];
-			comment = format_comment(comment, comment_type);
+			comment = format_comment(post_id, comment, comment_type);
 
 
 			if (type == "file")
@@ -853,7 +853,7 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public static string format_comment(string s1, string t1)
+        public static string format_comment(int post_id, string s1, string t1)
         {
             string s2;
             string link_marker;
@@ -867,10 +867,22 @@ namespace btnet
                     s2,
                     new MatchEvaluator(convert_to_hyperlink));
 
-                // convert email addresses to mailto links
+                // convert email addresses to send_email links
                 s2 = reEmail.Replace(
                     s2,
-                    new MatchEvaluator(convert_to_email));
+                    delegate(Match m)
+                    {
+                        return
+                          "<a href=send_email.aspx?bp_id="
+                          + Convert.ToString(post_id)
+                          + "&to="
+                          + m.ToString()
+                          + ">"
+                          + m.ToString()
+                          + "</a>";
+                            }
+                    );
+
 
                 s2 = s2.Replace("\n", "<br>");
                 s2 = s2.Replace("  ", "&nbsp; ");

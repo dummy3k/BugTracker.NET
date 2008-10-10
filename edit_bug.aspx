@@ -1993,7 +1993,8 @@ void on_update (Object sender, EventArgs e)
 				pcd3,
 				comment_formated,
                 comment_search,
-				null,
+				null, // from
+                null, // cc
 				commentType,
 				internal_only.Checked,
 				hash_custom_cols,
@@ -2190,7 +2191,8 @@ void on_update (Object sender, EventArgs e)
                 security.user.usid,
                 comment_formated,
                 comment_search,
-                null,
+                null, // from
+                null, // cc
                 commentType,
                 internal_only.Checked) != 0);
 

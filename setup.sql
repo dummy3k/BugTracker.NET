@@ -175,8 +175,8 @@ us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query,
 values ('reporter', 'Report And', 'Comment Only', 'admin', 0, 1, 1)
 
 insert into users (
-us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_forced_project)
-values ('guest', 'Special', 'cannot save searches, settings', 'guest', 0, 1, 1)
+us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_forced_project, us_active)
+values ('guest', 'Special', 'cannot save searches, settings', 'guest', 0, 1, 1, 0)
 
 /* SESSIONS */
 

@@ -4,7 +4,6 @@
 
 DbUtil dbutil;
 Security security;
-DataSet ds = null;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -27,7 +26,7 @@ void Page_Load(Object sender, EventArgs e)
 </script>
 
 <html>
-<title id="titl" runat="server">btnet dashboard</title>
+<title id="titl" runat="server">btnet news</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 
 <script>

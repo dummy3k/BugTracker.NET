@@ -30,6 +30,7 @@ void Page_Load(Object sender, EventArgs e)
 	string projectid_string = Request["projectid"];
 	string comment = Request["comment"];
 	string from = Request["from"];
+	string cc = "";
 	string message = Request["message"];
 	string attachment_as_base64 = Request["attachment"];
 	string attachment_content_type = Request["attachment_content_type"];
@@ -162,7 +163,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 
-	// Even thoug btnet_service.exe has already parsed out the bugid,
+	// Even though btnet_service.exe has already parsed out the bugid,
 	// we can do a better job here with SharpMimeTools.dll
 	string subject = "";
 
@@ -202,6 +203,17 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			subject = "[No Subject]";
 		}
+
+
+		if (mime_message.Header.Cc != null && mime_message.Header.Cc != "")
+		{
+			cc = SharpMimeTools.parserfc2047Header(mime_message.Header.Cc);
+
+			// handle multiline
+			cc = cc.Replace("\t","");
+
+		}
+
 	}
 
 	if (bugid != 0)
@@ -243,23 +255,8 @@ void Page_Load(Object sender, EventArgs e)
 				short_desc = short_desc.Substring(0,200);
 			}
 
-			string headers = "";
+			string headers = get_headers_for_comment(mime_message);
 
-			if (mime_message.Header.Subject != null && mime_message.Header.Subject != "")
-			{
-				headers += "Subject: " + SharpMimeTools.parserfc2047Header(mime_message.Header.Subject) + "\n";
-			}
-
-			if (mime_message.Header.To != null && mime_message.Header.To != "")
-			{
-				headers += "To: " + mime_message.Header.To + "\n";
-				email_to = mime_message.Header.To;
-			}
-
-			if (mime_message.Header.Cc != null && mime_message.Header.Cc != "")
-			{
-				headers += "Cc: " + mime_message.Header.Cc + "\n";
-			}
 
 			if (headers != "")
 			{
@@ -433,6 +430,7 @@ void Page_Load(Object sender, EventArgs e)
 			adjusted_comment,
             adjusted_comment,
 			from,
+			cc,
 			"text/plain",
 			false, // internal only
 			null, // custom columns
@@ -546,22 +544,7 @@ void Page_Load(Object sender, EventArgs e)
 		if (mime_message != null)
 		{
 
-			string headers = "";
-
-			if (mime_message.Header.Subject != null && mime_message.Header.Subject != "")
-			{
-				headers = "Subject: " + subject + "\n";
-			}
-
-			if (mime_message.Header.To != null && mime_message.Header.To != "")
-			{
-				headers += "To: " + mime_message.Header.To + "\n";
-			}
-
-			if (mime_message.Header.Cc != null && mime_message.Header.Cc != "")
-			{
-				headers += "Cc: " + mime_message.Header.Cc + "\n";
-			}
+			string headers = get_headers_for_comment(mime_message);
 
 			if (headers != "")
 			{
@@ -576,6 +559,7 @@ void Page_Load(Object sender, EventArgs e)
 		 	comment,
             comment,
 		 	from,
+		 	cc,
 		 	"text/plain",
 		 	false); // internal only
 
@@ -832,6 +816,29 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
 			select scope_identity()";
 }
 
+
+///////////////////////////////////////////////////////////////////////
+string get_headers_for_comment(SharpMimeMessage mime_message)
+{
+    string headers = "";
+    
+    if (mime_message.Header.Subject != null && mime_message.Header.Subject != "")
+	{
+        headers = "Subject: " + mime_message.Header.Subject + "\n";
+	}
+
+	if (mime_message.Header.To != null && mime_message.Header.To != "")
+	{
+		headers += "To: " + mime_message.Header.To + "\n";
+	}
+
+	if (mime_message.Header.Cc != null && mime_message.Header.Cc != "")
+	{
+		headers += "Cc: " + mime_message.Header.Cc + "\n";
+	}
+
+    return headers;
+}
 
 
 </script>

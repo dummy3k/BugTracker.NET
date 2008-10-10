@@ -23,6 +23,9 @@ type.
 * Fixed bug that prevented the "I forgot my password" from being used
 unless you also enabled self-registration.
 
+* Now capturing the email "cc" in outgoing emails and displaying it
+
+
 * Add new feature, a "news" link.  To enable it, add the following to
 your Web.config:
 
@@ -40,9 +43,16 @@ enforced, but not on the list itself.
 * Removed the "CommentSortOrder" from Web.config. No longer supporting
 it.
 
-* Now recording email "CC" for outgoing emails.
+* Better job of handling email "Cc" and the "Subject" of 
+outgoing emails in edit_bugs.aspx
 
-IIIINNNNCCCOMING???
+* All links to email addresses go to send_email.aspx, rather than being
+href:mail_to= links.
+
+* performance improvements when fetching list of users for search.aspx
+
+* view_memory_log, write_memory_log.   These pages
+make logging easier.
 
 
 -----------------------------------------------------------------------

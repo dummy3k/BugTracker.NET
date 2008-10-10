@@ -167,6 +167,7 @@ void on_update (Object sender, EventArgs e)
 		}
 		else
 		{
+            // Oops! This is backwards, but don't change it now!
             if (btnet.Util.get_setting("HtmlDecodeComment", "1") == "1")
             {
                 sql = sql.Replace("$cm", comment.Value.Replace("'", "''"));

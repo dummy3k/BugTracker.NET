@@ -187,7 +187,9 @@ namespace btnet
             using (SqlConnection conn = get_sqlconnection())
             {
                 SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+//btnet.Util.write_to_memory_log(sql.Replace("\r\n"," | "));
                 da.Fill(ds);
+//btnet.Util.write_to_memory_log("");
                 return ds;
             }
         }

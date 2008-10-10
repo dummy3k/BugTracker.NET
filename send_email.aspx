@@ -200,18 +200,30 @@ void Page_Load(Object sender, EventArgs e)
 					}
 				}
 
+				bool next_line_is_date = false;
 				for (int i = 0; i < lines.Length; i++)
 				{
-					if (lines[i].IndexOf("To:") == 0 && i < 3)
+					if (i < 4 && (lines[i].IndexOf("To:") == 0 || lines[i].IndexOf("Cc:") == 0))
 					{
+						next_line_is_date = true;
 						if (security.user.use_fckeditor)
 						{
                             fckeBody.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
-							fckeBody.Value += "&#62;Date: " + Convert.ToString(dr["bp_date"]) + "<br>&#62;<br>";
 						}
 						else
 						{
 							body.Value += ">" + lines[i] + "\n";
+						}
+					}
+					else if (next_line_is_date)
+					{
+						next_line_is_date = false;
+						if (security.user.use_fckeditor)
+						{
+							fckeBody.Value += "&#62;Date: " + Convert.ToString(dr["bp_date"]) + "<br>&#62;<br>";
+						}
+						else
+						{
 							body.Value += ">Date: " + Convert.ToString(dr["bp_date"]) + "\n>\n";
 						}
 					}
@@ -428,15 +440,31 @@ update bugs set
 	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 	if (security.user.use_fckeditor)
 	{
-		string text = btnet.Util.strip_dangerous_tags(fckeBody.Value);
-		sql = sql.Replace("$cm", text.Replace("'", "&#39;"));
-		sql = sql.Replace("$cs", btnet.Util.strip_html(fckeBody.Value).Replace("'", "''"));
+		string adjusted_body = "Subject: " + subject.Value + "<br><br>";
+		adjusted_body += btnet.Util.strip_dangerous_tags(fckeBody.Value);
+
+		sql = sql.Replace("$cm", adjusted_body.Replace("'", "&#39;"));
+		sql = sql.Replace("$cs", adjusted_body.Replace("'", "''"));
 		sql = sql.Replace("$ct", "text/html");
 	}
 	else
 	{
-	sql = sql.Replace("$cm", HttpUtility.HtmlDecode(body.Value.Replace("'", "''")));
-		sql = sql.Replace("$cs", body.Value.Replace("'", "''"));
+		string adjusted_body = "Subject: " + subject.Value + "\n\n";
+
+		// This is backwards, but look at edit_comment.aspx!  That was backwards too, so we left this.
+		if (btnet.Util.get_setting("HtmlDecodeComment", "1") == "1")
+		{
+			adjusted_body += body.Value;
+		}
+		else
+		{
+			adjusted_body += HttpUtility.HtmlDecode(body.Value);
+		}
+
+		adjusted_body = adjusted_body.Replace("'", "''");
+
+		sql = sql.Replace("$cm", adjusted_body);
+		sql = sql.Replace("$cs", adjusted_body);
 		sql = sql.Replace("$ct", "text/plain");
 	}
 	sql = sql.Replace("$fr", from.SelectedItem.Value.Replace("'", "''"));

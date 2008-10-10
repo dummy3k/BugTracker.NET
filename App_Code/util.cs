@@ -408,6 +408,44 @@ namespace btnet
 			}
 		}
 
+		///////////////////////////////////////////////////////////////////////
+		public static void write_to_memory_log(string s)
+		{
+
+			if (HttpContext.Current == null)
+			{
+				return;
+			}
+
+			if (Util.get_setting("MemoryLogEnabled","0") == "0")
+			{
+				return;
+			}
+
+			string url = "";
+			if (Util.Request != null)
+			{
+				url = Util.Request.Url.ToString();
+			}
+
+			string line = DateTime.Now.ToString("yyy-MM-dd HH:mm:ss:fff")
+				+ " "
+				+ url
+				+ " "
+				+ s;
+
+
+			List<string> list = (List<string>) HttpContext.Current.Application["log"];
+
+			if (list == null)
+			{
+				list = new List<string>();
+				HttpContext.Current.Application["log"] = list;
+			}
+
+			list.Add(line);
+
+		}
 
 		///////////////////////////////////////////////////////////////////////
 		public static void do_not_cache(HttpResponse Response)
@@ -1026,11 +1064,16 @@ drop table #temp";
 			if (Util.get_setting("LimitUsernameDropdownsInSearch","0") == "1")
 			{
 				string sql_limit_user_names = @"
-delete from #temp
-where us_id not in
-(select isnull(bg_assigned_to_user,0) from bugs
+
+select isnull(bg_assigned_to_user,0) keep_me
+into #temp2
+from bugs
 union
-select isnull(bg_reported_user,0) from bugs)";
+select isnull(bg_reported_user,0) from bugs
+
+delete from #temp
+where us_id not in (select keep_me from #temp2)
+drop table #temp2";
 
 				sql = sql.Replace("$limit_users",sql_limit_user_names);
 			}

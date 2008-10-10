@@ -798,6 +798,7 @@ order by a.bp_date desc";
             string comment_formated,
             string comment_search,
             string from,
+            string cc,
             string content_type,
             bool internal_only,
             System.Collections.Hashtable hash_custom_cols,
@@ -909,7 +910,15 @@ order by a.bp_date desc";
 
 
             int bugid = Convert.ToInt32(dbutil.execute_scalar(sql));
-            int postid = btnet.Bug.insert_comment(bugid, security.user.usid, comment_formated, comment_search, from, content_type, internal_only);
+            int postid = btnet.Bug.insert_comment(
+				bugid,
+				security.user.usid,
+				comment_formated,
+				comment_search,
+				from,
+                cc,
+				content_type,
+				internal_only);
 
             btnet.Bug.auto_subscribe(bugid);
 
@@ -930,6 +939,7 @@ order by a.bp_date desc";
             string comment_formated,
             string comment_search,
             string from,
+            string cc,
             string content_type,
             bool internal_only)
         {
@@ -939,8 +949,9 @@ order by a.bp_date desc";
                 string sql = @"
     declare @now datetime
     set @now = getdate()
+
     insert into bug_posts
-    (bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_type, bp_content_type,
+    (bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_email_cc, bp_type, bp_content_type,
     bp_hidden_from_external_users)
     values(
     $id,
@@ -949,6 +960,7 @@ order by a.bp_date desc";
     N'$comment_formatted',
     N'$comment_search',
     N'$from',
+    N'$cc',
     N'$type',
     N'$content_type',
     $internal)
@@ -979,6 +991,7 @@ order by a.bp_date desc";
                 sql = sql.Replace("$comment_formatted", comment_formated.Replace("'", "''"));
                 sql = sql.Replace("$comment_search", comment_search.Replace("'", "''"));
                 sql = sql.Replace("$content_type", content_type);
+                sql = sql.Replace("$cc", cc);
                 sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only));
 
 
