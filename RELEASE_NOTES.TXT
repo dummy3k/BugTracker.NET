@@ -6,6 +6,55 @@ Release notes:
 For instructions on how to upgrade, see:
 http://ifdefined.com/readme.html#upgrading
 
+
+
+DOes capture history setting really work?
+Add settings for printing, not printing?
+
+Echo back what was searched.  That's what goes in the cookie.
+
+Nicer default list?
+
+
+Modify about page with Lucene.Net info.
+
+incorporate tags into index?
+
+how does tag filtering work?  <<< what did i mean by this?
+
+try to get highlighter working
+
+index custom text fields?
+
+don't show score.
+
+don't allow internal-only comments to be searchable
+
+Move "add" to top menu?
+
+reimplement tag edit control as column header?
+
+dont forget to include Lucene.Net.dll itself!!!
+
+what is a sql server pseudocolumn?
+
+-----------------------------------------------------------------------
+Version 2.9.5   10/xx/2008 
+-----------------------------------------------------------------------
+
+* Added full text search, available at the top of every page.  The
+search uses Lucene.Net.  The search feature enabled by default and uses
+the App_Data\lucene_index folder for its index.   The folder gets
+created automatically.
+
+* Now using App_Data by new installations for logs and uploads.
+
+(The uploads folder isn't used if you are using file-based attachments 
+instead of storing attachments in the database.  The default is to 
+store in the database).
+
+* $ALTER_HERE
+
 -----------------------------------------------------------------------
 Version 2.9.4   10/10/2008 
 -----------------------------------------------------------------------

@@ -1525,7 +1525,7 @@ bool record_changes()
 
 		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-			btnet.Tags.index_tags(Application);
+            btnet.Tags.build_tag_index(Application);
 		}
 
 	}
@@ -1746,7 +1746,7 @@ bool record_changes()
 
 
 	if (do_update
-	&& btnet.Util.get_setting("TrackBugHistory","1") == "1")
+	&& btnet.Util.get_setting("TrackBugHistory","1") == "1") // you might not want the debris to grow
 	{
 		dbutil.execute_nonquery(sql);
 	}
@@ -1758,6 +1758,11 @@ bool record_changes()
 	}
 
 
+    if (do_update && btnet.Util.get_setting("EnableLucene", "1") == "1")
+    {
+        MyLucene.update_lucene_index(id);
+    }        
+    
 	// return true if something did change
 	return do_update;
 }
@@ -2002,10 +2007,15 @@ void on_update (Object sender, EventArgs e)
 
             if (tags.Value != "" && btnet.Util.get_setting("EnableTags", "0") == "1")
             {
-                btnet.Tags.index_tags(Application);
+                btnet.Tags.build_tag_index(Application);
             }
 
 			id = new_ids.bugid;
+
+            if (btnet.Util.get_setting("EnableLucene", "1") == "1")
+            {
+                MyLucene.update_lucene_index(id);
+            }
 
 			btnet.WhatsNew.add_news(id, short_desc.Value, "added", security);
 

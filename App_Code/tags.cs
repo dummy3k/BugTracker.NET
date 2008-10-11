@@ -63,7 +63,7 @@ namespace btnet
 
 		}
 
-		public static void index_tags(System.Web.HttpApplicationState app)
+        public static void build_tag_index(System.Web.HttpApplicationState app)
 		{
 			System.Threading.Thread thread = new System.Threading.Thread(threadproc_tags);
 			thread.Start(app);

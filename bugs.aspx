@@ -27,9 +27,17 @@ void Page_Load(Object sender, EventArgs e)
 
 	if (!IsPostBack) {
 
-		load_query_dropdown();
+        load_query_dropdown();
 
-		do_query();
+        if (Session["just_did_text_search"] == null)
+        {
+            do_query();
+        }
+        else
+        {
+            Session["just_did_text_search"] = null;
+            dv = (DataView)Session["bugs"];
+        }
 
 	}
 	else {

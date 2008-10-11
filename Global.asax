@@ -84,10 +84,36 @@ public void Application_Error(Object sender, EventArgs e)
      
 public void Application_OnStart(Object sender, EventArgs e)
 {
-     
-	string path = HttpContext.Current.Server.MapPath(null);
 
-	System.IO.StreamReader sr = System.IO.File.OpenText(path + "\\custom\\custom_header.html" );
+    string path = HttpContext.Current.Server.MapPath(null);
+    
+    string dir = path + "\\App_Data";
+    if (!System.IO.Directory.Exists(dir))
+    {
+        System.IO.Directory.CreateDirectory(dir);   
+    }
+
+    dir = path + "\\App_Data\\logs";
+    if (!System.IO.Directory.Exists(dir))
+    {
+        System.IO.Directory.CreateDirectory(dir);
+    }
+
+    dir = path + "\\App_Data\\uploads";
+    if (!System.IO.Directory.Exists(dir))
+    {
+        System.IO.Directory.CreateDirectory(dir);
+    }
+
+    dir = path + "\\App_Data\\lucene_index";
+    if (!System.IO.Directory.Exists(dir))
+    {
+        System.IO.Directory.CreateDirectory(dir);
+    }
+
+    btnet.Util.set_context(HttpContext.Current); // required for map path calls to work in util.cs
+        
+    System.IO.StreamReader sr = System.IO.File.OpenText(path + "\\custom\\custom_header.html");
 	Application["custom_header"] = sr.ReadToEnd();
 	sr.Close();
 	
@@ -101,9 +127,14 @@ public void Application_OnStart(Object sender, EventArgs e)
 
     if (btnet.Util.get_setting("EnableTags", "0") == "1")
     {
-        btnet.Tags.index_tags(this.Application);
+        btnet.Tags.build_tag_index(this.Application);
     }
     
+    
+    if (btnet.Util.get_setting("EnableLucene", "1") == "1")
+    {
+        btnet.MyLucene.build_lucene_index(this.Application);
+    }    
 }
 
   

@@ -272,13 +272,22 @@ namespace btnet
             // go to
             Response.Write("<td nowrap valign=middle>");
             Response.Write("<form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>");
-            Response.Write("<font size=1>&nbsp;id:&nbsp;</font>");
-            Response.Write("<input style='font-size: 8pt;' size=4 type=text class=txt name=id accesskey=i>");
-            Response.Write("<input class=btn style='font-size: 8pt;' type=submit value='go to ");
-            Response.Write(Util.get_setting("SingularBugLabel", "bug"));
-            Response.Write("'>");
+            Response.Write("<input class=btn style='font-size: 8pt;' type=submit value='go to:'>&nbsp;");
+            Response.Write("<input style='font-size: 8pt;' size=4 type=text class=txt name=id accesskey=g>");
             Response.Write("</form>");
             Response.Write("</td>");
+
+
+            // search
+            if (Util.get_setting("EnableLucene", "1") == "1")
+            {
+				Response.Write("<td nowrap valign=middle>");
+				Response.Write("<form style='margin: 0px; padding: 0px;' action=search_text.aspx method=get>");
+				Response.Write("<input class=btn style='font-size: 8pt;' type=submit value='search text:'>&nbsp;");
+				Response.Write("<input style='padding: 0px; font-size: 8pt;' size=20 type=text class=txt name=query accesskey=s>");
+				Response.Write("</form>");
+				Response.Write("</td>");
+			}
 
             Response.Write("<td nowrap valign=middle>");
 			if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
@@ -654,59 +663,68 @@ namespace btnet
 				= project_permissions_sql.Replace("$user",Convert.ToString(security.user.usid));
 
 
-			// figure out where to alter sql for project permissions
+			// Figure out where to alter sql for project permissions
+            // I've tried lots of different schemes over the years....
 
-			string bug_sql;
+            int alter_here_pos = sql.IndexOf("$ALTER_HERE"); // places - can be multiple - are explicitly marked
+            if (alter_here_pos != -1)
+            {
+                return sql.Replace("$ALTER_HERE", "/* ALTER_HERE */ " + project_permissions_sql);
+            }
+            else
+            {
+                string bug_sql;
 
-			int where_pos = sql.IndexOf("WhErE"); // first look for a "special" where, case sensitive, in case there are multiple where's to choose from
-			if (where_pos == -1)
-				where_pos = sql.ToUpper().IndexOf("WHERE");
+                int where_pos = sql.IndexOf("WhErE"); // first look for a "special" where, case sensitive, in case there are multiple where's to choose from
+                if (where_pos == -1)
+                    where_pos = sql.ToUpper().IndexOf("WHERE");
 
-			int	order_pos = sql.IndexOf("/*ENDWHR*/"); // marker for end of the where statement
+                int order_pos = sql.IndexOf("/*ENDWHR*/"); // marker for end of the where statement
 
-			if (order_pos == -1)
-				order_pos = sql.ToUpper().LastIndexOf("ORDER BY");
+                if (order_pos == -1)
+                    order_pos = sql.ToUpper().LastIndexOf("ORDER BY");
 
-			if (order_pos < where_pos)
-				order_pos = -1; // ignore an order by that occurs in a subquery, for example
+                if (order_pos < where_pos)
+                    order_pos = -1; // ignore an order by that occurs in a subquery, for example
 
-			Util.write_to_log(Convert.ToString(sql.Length) + " " + Convert.ToString(where_pos) + " " + Convert.ToString(order_pos));
+                Util.write_to_log(Convert.ToString(sql.Length) + " " + Convert.ToString(where_pos) + " " + Convert.ToString(order_pos));
 
-			if (where_pos != -1 && order_pos != -1)
-			{
-				// both WHERE and ORDER BY clauses
-				bug_sql = sql.Substring(0,where_pos + 5)
-					+ " /* altered - both  */ ( "
-					+ sql.Substring(where_pos + 5, order_pos-(where_pos+5))
-					+ " ) AND ( "
-					+ project_permissions_sql
-					+ " ) "
-					+ sql.Substring(order_pos);
-			}
-			else if (order_pos == -1 && where_pos == -1)
-			{
-				// Neither
-				bug_sql = sql + " /* altered - neither */ WHERE " + project_permissions_sql;
-			}
-			else if (order_pos == -1)
-			{
-				// WHERE, without order
-				bug_sql = sql.Substring(0,where_pos + 5)
-					+ " /* altered - just where */ ( "
-					+ sql.Substring(where_pos + 5)
-					+ " ) AND ( "
-					+  project_permissions_sql + " )";
-			}
-			else
-			{
-				// ORDER BY, without WHERE
-				bug_sql = sql.Substring(0,order_pos)
-					+ " /* altered - just order by  */ WHERE "
-					+ project_permissions_sql
-					+ sql.Substring(order_pos);
-			}
+                if (where_pos != -1 && order_pos != -1)
+                {
+                    // both WHERE and ORDER BY clauses
+                    bug_sql = sql.Substring(0, where_pos + 5)
+                        + " /* altered - both  */ ( "
+                        + sql.Substring(where_pos + 5, order_pos - (where_pos + 5))
+                        + " ) AND ( "
+                        + project_permissions_sql
+                        + " ) "
+                        + sql.Substring(order_pos);
+                }
+                else if (order_pos == -1 && where_pos == -1)
+                {
+                    // Neither
+                    bug_sql = sql + " /* altered - neither */ WHERE " + project_permissions_sql;
+                }
+                else if (order_pos == -1)
+                {
+                    // WHERE, without order
+                    bug_sql = sql.Substring(0, where_pos + 5)
+                        + " /* altered - just where */ ( "
+                        + sql.Substring(where_pos + 5)
+                        + " ) AND ( "
+                        + project_permissions_sql + " )";
+                }
+                else
+                {
+                    // ORDER BY, without WHERE
+                    bug_sql = sql.Substring(0, order_pos)
+                        + " /* altered - just order by  */ WHERE "
+                        + project_permissions_sql
+                        + sql.Substring(order_pos);
+                }
 
-			return bug_sql;
+                return bug_sql;
+            }
 
 		}
 
@@ -838,44 +856,43 @@ namespace btnet
 
 		}
 
-		///////////////////////////////////////////////////////////////////////
-		public static string get_upload_folder()
-		{
-            String folder = Util.get_setting("UploadFolder", "");
+        ///////////////////////////////////////////////////////////////////////
+        public static string get_folder(string name)
+        {
+            String folder = Util.get_setting(name, "");
             if (folder == "")
                 return null;
 
             folder = get_absolute_or_relative_folder(folder);
-			if (!System.IO.Directory.Exists(folder))
-			{
-				throw (new Exception("UploadFolder specified in Web.config, \""
-				+ folder
-				+ "\", not found.  Edit Web.config."));
-			}
+            if (!System.IO.Directory.Exists(folder))
+            {
+                throw (new Exception(name + " specified in Web.config, \""
+                + folder
+                + "\", not found.  Edit Web.config."));
+            }
+
+            return folder;
+
+        }
 
 
-			return folder;
+   		///////////////////////////////////////////////////////////////////////
+        public static string get_lucene_index_folder()
+        {
+            return get_folder("LuceneIndexFolder");
+        }
 
+		///////////////////////////////////////////////////////////////////////
+		public static string get_upload_folder()
+		{
+            return get_folder("UploadFolder");
 		}
 
 		///////////////////////////////////////////////////////////////////////
 		public static string get_log_folder()
 		{
-
-			string folder = get_absolute_or_relative_folder(
-				Util.get_setting("LogFileFolder","c:\\"));
-
-			if (!System.IO.Directory.Exists(folder))
-			{
-				throw (new Exception("LogFileFolder specified in Web.config, \""
-				+ folder
-				+ "\", not found.  Edit Web.config."));
-			}
-
-
-			return folder;
-
-		}
+            return get_folder("LogFileFolder");
+        }
 
 		///////////////////////////////////////////////////////////////////////
 		public static string[] split_string_using_commas(string s)
