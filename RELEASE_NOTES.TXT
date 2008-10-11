@@ -7,27 +7,44 @@ For instructions on how to upgrade, see:
 http://ifdefined.com/readme.html#upgrading
 
 -----------------------------------------------------------------------
-Version 2.9.4   10/xx/2008 
+Version 2.9.4   10/10/2008 
 -----------------------------------------------------------------------
 
-To upgrade to the version:
+To upgrade to this version, run this SQL:
 
-alter table bug_posts add bp_email_cc nvarchar(800) null
+	alter table bug_posts add bp_email_cc nvarchar(800) null
 
 * Fixed bug where SMTP servers were rejecting emails because of empty
 CC field.
 
-* Fixed bug were adding an attachment failed because of null content
+* Fixed bug where adding an attachment failed because of null content
 type.  
 
 * Fixed bug that prevented the "I forgot my password" from being used
 unless you also enabled self-registration.
 
-* Now capturing the email "cc" in outgoing emails and displaying it
+* Removed the "CommentSortOrder" from Web.config.  No longer supporting
+that option.
 
+* Improved how the "Cc" and the "Subject" of emails are handled. They 
+are saved and displayed in edit_bugs.aspx
 
-* Add new feature, a "news" link.  To enable it, add the following to
-your Web.config:
+* Changed how email address links work in edit_bugs.aspx.  They
+used to be "<a href=mailto:" links.  Now they are 
+"<a href=send_email.aspx" links. 
+
+* Improved performance of search.aspx when you have a lot of users and
+you are trying to limit the display of them   I needed that performance
+improvement at the demo at http://ifdefined.com/btnet.
+
+* Added a new page "view_memory_log.aspx", mainly for my own debugging. 
+Instead of logging to a text file I can log to a memory cache, and that 
+cache with this page.  It helped me debug things with the site running 
+at GoDaddy.  If you want to use this, search the text for "memory_log" 
+and you'll figure it out.
+
+* Add new experimental feature, a "news" link.  To enable it, add the 
+following to your Web.config:
 
 	EnableWhatsNewPage=1
 	WhatsNewPageIntervalInSeconds=30
@@ -40,20 +57,12 @@ the user has permission to view them or not.  If the user clicks on a
 link in order to view the details of that bug, THEN permissions WILL be 
 enforced, but not on the list itself.
 
-* Removed the "CommentSortOrder" from Web.config. No longer supporting
-it.
+The news only exists in a memory cache, so the page will be blank if
+you restart your web server or even just edit Web.config.
 
-* Better job of handling email "Cc" and the "Subject" of 
-outgoing emails in edit_bugs.aspx
-
-* All links to email addresses go to send_email.aspx, rather than being
-href:mail_to= links.
-
-* performance improvements when fetching list of users for search.aspx
-
-* view_memory_log, write_memory_log.   These pages
-make logging easier.
-
+Let me know if this feature is useful for you.  It's a light weight
+alternative to refreshing the bugs.aspx page, or having that page 
+automatically refresh itself, hitting the database over and over.
 
 -----------------------------------------------------------------------
 Version 2.9.3   10/05/2008 
