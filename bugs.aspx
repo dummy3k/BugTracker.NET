@@ -72,8 +72,11 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	select_query_in_dropdown();
-	sort_and_filter_dataview(); // reuse sorts, filters
-	actn.Value = "";
+    
+    call_sort_and_filter_buglist_dataview();
+
+    actn.Value = "";
+
 }
 
 
@@ -332,9 +335,9 @@ if (dv != null)
 	{
 		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-			display_tags_line();
+			btnet.Util.display_buglist_tags_line(Response, security);
 		}
-		display_bugs();
+		display_bugs(false);
 	}
 	else
 	{

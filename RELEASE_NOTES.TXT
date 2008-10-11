@@ -16,7 +16,6 @@ Echo back what was searched.  That's what goes in the cookie.
 Nicer default list?
 
 
-Modify about page with Lucene.Net info.
 
 incorporate tags into index?
 
@@ -37,6 +36,12 @@ reimplement tag edit control as column header?
 dont forget to include Lucene.Net.dll itself!!!
 
 what is a sql server pseudocolumn?
+
+add highligher.net
+
+http://lucene.apache.org/java/2_1_0/queryparsersyntax.html
+
+get rid of build_lu, and replace with my_lu
 
 -----------------------------------------------------------------------
 Version 2.9.5   10/xx/2008 

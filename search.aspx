@@ -17,7 +17,6 @@ DataTable dt_users = null;
 
 string project_dropdown_select_cols = "";
 
-
 ///////////////////////////////////////////////////////////////////////
 class ProjectDropdown
 {
@@ -150,7 +149,7 @@ or isnull(pj_enable_custom_dropdown3,0) = 1";
 			{
 				do_query();
 			}
-			sort_and_filter_dataview();
+			call_sort_and_filter_buglist_dataview();
 		}
 	}
 
@@ -1301,7 +1300,7 @@ function in_not_in_vals(el)
 
 function on_change()
 {
-	var frm = document.forms[1];
+	var frm = document.forms[2];
 
 
 	// Build "WHERE" clause
@@ -1669,7 +1668,7 @@ function on_change()
 }
 
 function set_hit_submit_button() {
-	document.forms[1].hit_submit_button.value = "1";
+	document.forms[2].hit_submit_button.value = "1";
 }
 
 
@@ -1693,7 +1692,7 @@ function showhide_form()
 
 function set_project_changed() {
 	on_change();
-	document.forms[1].project_changed.value = "1";
+	document.forms[2].project_changed.value = "1";
 }
 
 </script>
@@ -2090,7 +2089,7 @@ else
 
 		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-			display_tags_line();
+			btnet.Util.display_buglist_tags_line(Response, security);
 		}
 
 

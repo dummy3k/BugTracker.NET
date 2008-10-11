@@ -12,7 +12,7 @@ using System.Data.SqlClient;
 
 // disable System.Net.Mail warnings
 #pragma warning disable 618
-#warning System.Web.Mail is obsolete, but System.Net.Mail doesn't seem to work with GMail, so keeping System.Web.Mail for now - corey
+#warning System.Web.Mail is deprecated, but it doesn't work yet with "explicit" SSL, so keeping it for now - corey
 
 namespace btnet
 {
