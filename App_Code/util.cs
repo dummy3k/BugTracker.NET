@@ -865,11 +865,11 @@ namespace btnet
 		}
 
         ///////////////////////////////////////////////////////////////////////
-        public static string get_folder(string name)
+        public static string get_folder(string name, string dflt)
         {
             String folder = Util.get_setting(name, "");
             if (folder == "")
-                return null;
+                return dflt;
 
             folder = get_absolute_or_relative_folder(folder);
             if (!System.IO.Directory.Exists(folder))
@@ -887,19 +887,19 @@ namespace btnet
    		///////////////////////////////////////////////////////////////////////
         public static string get_lucene_index_folder()
         {
-            return get_folder("LuceneIndexFolder");
+            return get_folder("LuceneIndexFolder", context.Server.MapPath("./") + "\\App_Data\\lucene_index");
         }
 
 		///////////////////////////////////////////////////////////////////////
 		public static string get_upload_folder()
 		{
-            return get_folder("UploadFolder");
+            return get_folder("UploadFolder", context.Server.MapPath("./") + "\\App_Data\\uploads");
 		}
 
 		///////////////////////////////////////////////////////////////////////
 		public static string get_log_folder()
 		{
-            return get_folder("LogFileFolder");
+            return get_folder("LogFileFolder", context.Server.MapPath("./") + "\\App_Data\\logs");
         }
 
 		///////////////////////////////////////////////////////////////////////
