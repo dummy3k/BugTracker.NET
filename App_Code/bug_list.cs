@@ -491,7 +491,9 @@ namespace btnet
 
             int db_column_count = 0;
             int description_column = -1;
+            
             int search_desc_column = -1;
+            int search_source_column = -1;
             int search_text_column = -1;
 
             foreach (DataColumn dc in dv.Table.Columns)
@@ -543,6 +545,11 @@ namespace btnet
                     {
                         search_text_column = db_column_count;
                         Response.Write("comment/email text");
+                    }
+                    else if (dc.ColumnName == "search_source")
+                    {
+                        search_source_column = db_column_count;
+                        Response.Write("text source");
                     }
                     else
                     {
@@ -806,6 +813,28 @@ namespace btnet
                                         + Convert.ToString(dr[1]) + ">");
                                         Response.Write(dr[i].ToString()); // already encoded
                                         Response.Write("</a>");
+                                    }
+                                    else if (i == search_source_column)
+                                    {
+                                        string val = dr[i].ToString();
+                                        if (string.IsNullOrEmpty(val))
+                                        {
+                                            Response.Write("&nbsp;");
+                                        }
+                                        else
+                                        {
+                                            string[] parts = btnet.Util.split_string_using_commas(val);
+
+                                            Response.Write("<a href=edit_bug.aspx?id=");
+                                            Response.Write(Convert.ToString(dr[1])); // bg_id
+                                            Response.Write("#");
+                                            Response.Write(parts[1]);  // bp_id, the post id
+                                            Response.Write(">");
+                                            Response.Write(parts[0]); // sent, received, comment
+                                            Response.Write(" #");
+                                            Response.Write(parts[1]);
+                                            Response.Write("</a>");
+                                        }
                                     }
                                     else if (i == search_text_column)
                                     {

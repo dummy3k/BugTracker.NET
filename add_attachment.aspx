@@ -70,7 +70,7 @@ void on_update(object Source, EventArgs e)
 	}
 
 	string filename = System.IO.Path.GetFileName(attached_file.PostedFile.FileName);
-	if (filename == "")
+	if (string.IsNullOrEmpty(filename))
 	{
 		msg.InnerText = "Please select file.";
 		return;

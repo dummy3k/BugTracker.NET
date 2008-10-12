@@ -34,7 +34,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	string scale_string = Request["scale"];
 
-	if (scale_string == null || scale_string == "")
+	if (string.IsNullOrEmpty(scale_string))
 	{
 		scale = 1;
 	}

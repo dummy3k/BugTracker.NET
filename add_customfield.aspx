@@ -59,7 +59,7 @@ Boolean validate()
 
 	Boolean good = true;
 
-	if (name.Value == "")
+	if (string.IsNullOrEmpty(name.Value))
 	{
 		good = false;
 		name_err.InnerText = "Field name is required.";
@@ -82,7 +82,7 @@ Boolean validate()
 	}
 
 
-	if (length.Value == "")
+	if (string.IsNullOrEmpty(length.Value))
 	{
 		if (datatype.SelectedItem.Value == "int"
 		|| datatype.SelectedItem.Value == "datetime")
@@ -108,7 +108,7 @@ Boolean validate()
 
 	if (required.Checked)
 	{
-		if (default_text.Value == "")
+		if (string.IsNullOrEmpty(default_text.Value))
 		{
 			good = false;
 			default_err.InnerText = "If \"Required\" is checked, then Default is required.";
@@ -125,7 +125,7 @@ Boolean validate()
 
 	if (dropdown_type.SelectedItem.Value == "normal")
 	{
-		if (vals.Value == "")
+		if (string.IsNullOrEmpty(vals.Value))
 		{
 			good = false;
 			vals_err.InnerText = "Dropdown values are required for dropdown type of \"normal\".";
@@ -184,7 +184,7 @@ Boolean validate()
 	}
 
 
-	if (sort_seq.Value == "")
+	if (string.IsNullOrEmpty(sort_seq.Value))
 	{
 		good = false;
 		sort_seq_err.InnerText = "Sort Sequence is required.";

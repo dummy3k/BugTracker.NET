@@ -101,7 +101,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			// Write the ContentType header.
 
-			if (content_type == null || content_type == "")
+			if (string.IsNullOrEmpty(content_type))
 			{
 
 				string ext = System.IO.Path.GetExtension(filename).ToLower();

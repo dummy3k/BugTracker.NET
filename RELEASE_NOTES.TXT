@@ -9,13 +9,11 @@ http://ifdefined.com/readme.html#upgrading
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-To do:
+To do soon?
 
-* add settings for printing, not printing?
+* add settings for printing, not printing in text?
 
 * dont forget to include Lucene.Net.dll and highlighter dlls itself!!!
-
-* Rename upgrade_723_to_724.aspx
 
 * Allow the command line of SVN to be configurable
 
@@ -23,7 +21,7 @@ To do:
 
 
 -----------------------------------------------------------------------
-Version 2.9.5   10/xx/2008 
+Version 2.9.5   10/12/2008 
 -----------------------------------------------------------------------
 
 * New feature!  Full text search! Available at the top of every page.
@@ -872,7 +870,7 @@ As users log in, if their passwords had been stored unencrypted,
 the app will automatically update the database with the encrypted 
 passwords. Or, you can encrypt all the passwords by invoking this
 page:
-upgrade_723_to_724.aspx
+upgrade_273_to_274.aspx
 
 Even passwords that had been encrypted before will be re-encrypted
 with a stronger encryption scheme.

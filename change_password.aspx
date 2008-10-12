@@ -26,7 +26,7 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		msg.InnerHtml = "";
 
-		if (password.Value == "" || confirm.Value == "")
+		if (string.IsNullOrEmpty(password.Value))
 		{
 			msg.InnerHtml = "Enter your password twice.";
 		}
@@ -46,7 +46,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			string guid = Request["id"];
 
-			if (guid == null || guid == "")
+			if (string.IsNullOrEmpty(guid))
 			{
 				Response.Write("no guid");
 				Response.End();

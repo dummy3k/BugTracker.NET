@@ -484,7 +484,7 @@ namespace btnet
 
 			NameValueCollection name_values
                 = (NameValueCollection)System.Configuration.ConfigurationManager.GetSection("btnetSettings");
-			if (name_values[name] == null || name_values[name] == "")
+			if (string.IsNullOrEmpty(name_values[name]))
 			{
 				return default_value;
 			}

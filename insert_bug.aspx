@@ -661,7 +661,7 @@ string extract_comment_text_from_email(SharpMimeMessage mime_message, string mim
 bool is_attachment(SharpMimeMessage part)
 {
 	string filename = part.Header.ContentDispositionParameters["filename"];
-	if (filename == null || filename == "")
+	if (string.IsNullOrEmpty(filename))
 	{
 		filename = part.Header.ContentTypeParameters["name"];
 	}
@@ -687,7 +687,7 @@ string determine_part_filename(SharpMimeMessage part)
 
 
 	// try again
-	if (filename == null || filename == "")
+	if (string.IsNullOrEmpty(filename))
 	{
 		filename = part.Header.ContentTypeParameters["name"];
 	}
@@ -695,7 +695,7 @@ string determine_part_filename(SharpMimeMessage part)
 
 	// Maybe it's still some sort of non-text part but without a filename.
 	// Like an inline image, or the html alternative of a plain text body.
-	if (filename == null || filename == "")
+	if (string.IsNullOrEmpty(filename))
 	{
 
 		if (part.Header.ContentType.ToLower().IndexOf("text/plain") > -1)

@@ -278,7 +278,8 @@ void on_update (Object sender, EventArgs e)
 	&nbsp;
 	</td>
 	</tr>
-
+    
+    </table>
 	<table border=0>
 
 

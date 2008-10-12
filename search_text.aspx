@@ -88,7 +88,7 @@ temp_text nvarchar(MAX)
     
     sb.Append(@"
 select '#ffffff', bg_id [id], temp_text [search_desc], 
-' ' [source], '' [search_text], bg_reported_date [date], isnull(st_name,'') [status], temp_score [$SCORE] 
+'' [search_source], '' [search_text], bg_reported_date [date], isnull(st_name,'') [status], temp_score [$SCORE] 
 from bugs 
 inner join #$GUID t on t.temp_bg_id = bg_id and t.temp_bp_id = 0
 left outer join statuses on st_id = bg_status
@@ -97,7 +97,8 @@ where $ALTER_HERE
 union
 
 select '#ffffff', bg_id, bg_short_desc,
-bp_type, temp_text, bp_date, isnull(st_name,''), temp_score
+bp_type + ',' + convert(varchar,bp_id), 
+temp_text, bp_date, isnull(st_name,''), temp_score
 from bugs inner join #$GUID t on t.temp_bg_id = bg_id 
 inner join bug_posts on temp_bp_id = bp_id
 left outer join statuses on st_id = bg_status  
