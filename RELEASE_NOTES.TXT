@@ -7,27 +7,13 @@ For instructions on how to upgrade, see:
 http://ifdefined.com/readme.html#upgrading
 
 
-
-DOes capture history setting really work?
+Does capture history setting really work?
 Add settings for printing, not printing?
 
-Echo back what was searched.  That's what goes in the cookie.
-
-Nicer default list?
-
-
-
-incorporate tags into index?
-
-how does tag filtering work?  <<< what did i mean by this?
 
 try to get highlighter working
 
 index custom text fields?
-
-don't show score.
-
-don't allow internal-only comments to be searchable
 
 Move "add" to top menu?
 
@@ -37,26 +23,43 @@ dont forget to include Lucene.Net.dll and highlighter dlls itself!!!
 
 what is a sql server pseudocolumn?
 
+upgrade_723_to_724.aspx
 
+Do the guys SVN setting change
 
+Direct link to post
 
 
 -----------------------------------------------------------------------
 Version 2.9.5   10/xx/2008 
 -----------------------------------------------------------------------
 
-* Added full text search, available at the top of every page.  The
-search uses Lucene.Net.  The search feature enabled by default and uses
-the App_Data\lucene_index folder for its index.   The folder gets
-created automatically.
+* New feature!  Full text search! Available at the top of every page.
+The search uses the Lucene.Net search engine.  Enabled by default.  
+Uses the  App_Data\lucene_index folder for its index.  The folder gets
+created automatically.  
 
-* Now using App_Data by new installations for logs and uploads.
+This full text search *DOES* obey project and org permissions.  
+Comments where are hidden from external users are not searchable, 
+even by internal users.
+
+* Now using App_Data by default for new installations for logs, uploads, 
+and the new Lucene index. You can still override the locations via 
+Web.config.
 
 (The uploads folder isn't used if you are using file-based attachments 
-instead of storing attachments in the database.  The default is to 
-store in the database).
+instead of storing attachments in the database.  The default handling of
+attachments is to store in the database).
 
-* $ALTER_HERE
+* Added a magic word, $ALTER_HERE, to tell my permissions logic where
+to alter you bug queries, in cases where my logic gets confused.   This
+allows for more complicated bug queries than my old logic could handle.
+
+* Moved almost all the code out of the old "inc" files.
+
+(Note, the version of Lucene.Net included with this release has a 
+slightly changed FSDirectory class.  I've included the source code so
+that you can see what my changes were.)
 
 -----------------------------------------------------------------------
 Version 2.9.4   10/10/2008 

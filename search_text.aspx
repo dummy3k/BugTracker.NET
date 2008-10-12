@@ -88,7 +88,7 @@ temp_text nvarchar(MAX)
     
     sb.Append(@"
 select '#ffffff', bg_id [id], temp_text [search_desc], 
-' ' [type], '' [search_text], bg_reported_date [date], isnull(st_name,'') [status], temp_score [$SCORE] 
+' ' [source], '' [search_text], bg_reported_date [date], isnull(st_name,'') [status], temp_score [$SCORE] 
 from bugs 
 inner join #$GUID t on t.temp_bg_id = bg_id and t.temp_bp_id = 0
 left outer join statuses on st_id = bg_status
