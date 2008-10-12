@@ -9,27 +9,49 @@ http://ifdefined.com/readme.html#upgrading
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
-To do soon?
-
-* add settings for printing, not printing in text?
+Corey's TO DO list:
 
 * dont forget to include Lucene.Net.dll and highlighter dlls itself!!!
 
-* Allow the command line of SVN to be configurable
 
-* Direct link to post from search results.
+* allow the command line of SVN to be configurable
+* add settings for turning off printing of change history.
+* auto subscribe if you modified bug
+* default value for internal comments
+* many to many, queries to organizations
+* excel export for reports
+* field level permissions for custom fields?
+* escalation/reminder, "Due Date"
+* new fckEditor 
+* some sort of contact management?
+* time tracking
+* syscolumns, column order scheme - make less fragile
+* edit_bug.aspx and css - support for multiple columns
+* send, don't send private comments? search, don't search?
+* set fields to required?  By org.
+* Use date range for search, custom fields
+* 1949210 Deleting a user doesn't delete Self Register info
+* Table prefixes - Use one database for multiple instances (for hosting)
+
+* Documentation improvements:
+workflow.cs
+ldap
+$ALTER_HERE, queries
+more spellchecking...
+search and full text search.
 
 
 -----------------------------------------------------------------------
 Version 2.9.5   10/12/2008 
 -----------------------------------------------------------------------
 
-* New feature!  Full text search! Available at the top of every page.
-The search uses the Lucene.Net search engine.  Enabled by default.  
-Uses the  App_Data\lucene_index folder for its index.  The folder gets
-created automatically.  
+* New feature: Full text search! Available at the top of every page.
+The search uses the Lucene.Net search engine.  This feature is enabled
+by default.  It uses the App_Data\lucene_index folder for its index.
+The folder gets created automatically.  
 
-This full text search *DOES* obey project and org permissions.  
+This full text search *DOES* obey project and org permissions, so it's
+safe to use even if you are using permissions.
 
 The text that is searchable includes the description, tags, comments, 
 and both incoming and outgoing emails.  Text that is not searchable,
