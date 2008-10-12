@@ -5,35 +5,70 @@
 <meta content="Apache Forrest" name="Generator">
 <meta name="Forrest-version" content="0.7">
 <meta name="Forrest-skin-name" content="pelt">
+
 <title>
 	Apache Lucene - Query Parser Syntax
-		</title>
+</title>
+
+
+<!--
 <link type="text/css" href="http://lucene.apache.org/java/2_1_0/skin/basic.css" rel="stylesheet">
 <link media="screen" type="text/css" href="http://lucene.apache.org/java/2_1_0/skin/screen.css" rel="stylesheet">
 <link media="print" type="text/css" href="http://lucene.apache.org/java/2_1_0/skin/print.css" rel="stylesheet">
 <link type="text/css" href="http://lucene.apache.org/java/2_1_0/skin/profile.css" rel="stylesheet">
+-->
 <!--
 <script src="http://lucene.apache.org/java/2_1_0/skin/getBlank.js" language="javascript" type="text/javascript"></script>
 <script src="http://lucene.apache.org/java/2_1_0/skin/getMenu.js" language="javascript" type="text/javascript"></script>
 <script src="http://lucene.apache.org/java/2_1_0/skin/fontsize.js" language="javascript" type="text/javascript"></script>
 -->
+
+<style>
+.code {
+font-family:courier;
+border: solid 1px black;
+background: lightgray;
+padding: 6px;
+margin-left:80px;
+font-weight: bold;
+}
+
+pre {display: inline;}
+
+p {margin-left: 40px;}
+
+
+</style>
 </head>
 <body style="margin-top: 10px; margin-left:20px; width: 800px;">
-Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparsersyntax.html>http://lucene.apache.org/java/2_1_0/queryparsersyntax.html</a><p>
+
+<span style='background:yellow; padding: 10px; border: 1px solid lightgray;'>
+Copied from <a href=http://lucene.apache.org/java/2_1_0/queryparsersyntax.html>http://lucene.apache.org/java/2_1_0/queryparsersyntax.html</a> and modified by Corey Trager<p>
+</span>
 
 <h1>
-	Apache Lucene - Query Parser Syntax
-		</h1>
+<!--
+Apache Lucene - Query Parser Syntax
+-->
+
+Advanced Lucene Search
+
+</h1>
+
+
 <div id="minitoc-area">
 <ul class="minitoc">
 
 <li>
 <a href="#Terms">Terms</a>
 </li>
+
+<!--
 <li>
 <a href="#Fields">Fields</a>
-
 </li>
+-->
+
 <li>
 <a href="#Term Modifiers">Term Modifiers</a>
 <ul class="minitoc">
@@ -47,9 +82,12 @@ Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparser
 <a href="#Proximity Searches">Proximity Searches</a>
 </li>
 
+<!--
 <li>
 <a href="#Range Searches">Range Searches</a>
 </li>
+-->
+
 <li>
 <a href="#Boosting a Term">Boosting a Term</a>
 </li>
@@ -103,7 +141,7 @@ Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparser
         So it is important to choose an analyzer that will not interfere with the terms used in the query string.</p>
 </div>
 
-
+<!--
 <a name="N10048"></a><a name="Fields"></a>
 <h2 class="boxed">Fields</h2>
 
@@ -121,7 +159,7 @@ Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparser
 <pre class="code">title:Do it right</pre>
 <p>Will only find "Do" in the title field. It will find "it" and "right" in the default field (in this case the text field). </p>
 </div>
-
+-->
 
 <a name="N1006D"></a><a name="Term Modifiers"></a>
 <h2 class="boxed">Term Modifiers</h2>
@@ -154,6 +192,8 @@ Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparser
 
 <p>Lucene supports finding words are a within a specific distance away. To do a proximity search use the tilde, "~", symbol at the end of a Phrase. For example to search for a "apache" and "jakarta" within 10 words of each other in a document use the search: </p>
 <pre class="code">"jakarta apache"~10</pre>
+
+<!--
 <a name="N100C1"></a><a name="Range Searches"></a>
 <h3 class="boxed">Range Searches</h3>
 <p>Range Queries allow one to match documents whose field(s) values
@@ -168,6 +208,8 @@ Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparser
 
 <p>Inclusive range queries are denoted by square brackets.  Exclusive range queries are denoted by
             curly brackets.</p>
+-->
+
 <a name="N100DA"></a><a name="Boosting a Term"></a>
 <h3 class="boxed">Boosting a Term</h3>
 <p>Lucene provides the relevance level of matching documents based on the terms found. To boost a term use the caret, "^", symbol with a boost factor (a number) at the end of the term you are searching. The higher the boost factor, the more relevant the term will be.</p>
@@ -263,12 +305,12 @@ Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparser
 <div class="clearboth">&nbsp;</div>
 </div>
 <div id="footer">
-<div class="lastmodified">
-<script type="text/javascript"><!--
-document.write("<text>Last Published:</text> " + document.lastModified);
-//  --></script>
 
+<div>
+<br><br><br>
+Copied and modified from <a href=http://lucene.apache.org/java/2_1_0/queryparsersyntax.html>http://lucene.apache.org/java/2_1_0/queryparsersyntax.html</a><p>
 </div>
+
 <div class="copyright">
 
         Copyright &copy;
