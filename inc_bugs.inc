@@ -7,7 +7,7 @@
   ///////////////////////////////////////////////////////////////////////
   void display_bugs(bool show_checkboxes)
   {
-  btnet.Util.display_bugs (
+  btnet.BugList.display_bugs (
   show_checkboxes,
   dv,
   Response,
@@ -28,7 +28,7 @@
   string prev_dir_val = prev_dir.Value;
 
 
-  btnet.Util.sort_and_filter_buglist_dataview(dv, IsPostBack,
+  btnet.BugList.sort_and_filter_buglist_dataview(dv, IsPostBack,
   actn.Value,
   ref filter_val,
   ref sort_val,

@@ -2089,7 +2089,7 @@ else
 
 		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-			btnet.Util.display_buglist_tags_line(Response, security);
+			btnet.BugList.display_buglist_tags_line(Response, security);
 		}
 
 

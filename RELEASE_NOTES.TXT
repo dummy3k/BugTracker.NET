@@ -1,33 +1,25 @@
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
-Release notes:
 
+                           Release Notes
 
 For instructions on how to upgrade, see:
 http://ifdefined.com/readme.html#upgrading
 
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
 
-Does capture history setting really work?
-Add settings for printing, not printing?
+To do:
 
+* add settings for printing, not printing?
 
-try to get highlighter working
+* dont forget to include Lucene.Net.dll and highlighter dlls itself!!!
 
-index custom text fields?
+* Rename upgrade_723_to_724.aspx
 
-Move "add" to top menu?
+* Allow the command line of SVN to be configurable
 
-reimplement tag edit control as column header?
-
-dont forget to include Lucene.Net.dll and highlighter dlls itself!!!
-
-what is a sql server pseudocolumn?
-
-upgrade_723_to_724.aspx
-
-Do the guys SVN setting change
-
-Direct link to post
+* Direct link to post from search results.
 
 
 -----------------------------------------------------------------------
@@ -40,8 +32,15 @@ Uses the  App_Data\lucene_index folder for its index.  The folder gets
 created automatically.  
 
 This full text search *DOES* obey project and org permissions.  
-Comments where are hidden from external users are not searchable, 
-even by internal users.
+
+The text that is searchable includes the description, tags, comments, 
+and both incoming and outgoing emails.  Text that is not searchable,
+at least for now, includes comments marked hidden from external users
+and text in custom text fields.
+
+(Note, the version of Lucene.Net included with this release has a 
+slightly changed FSDirectory class.  I've included the source code 
+of the file I changed.)
 
 * Now using App_Data by default for new installations for logs, uploads, 
 and the new Lucene index. You can still override the locations via 
@@ -57,9 +56,8 @@ allows for more complicated bug queries than my old logic could handle.
 
 * Moved almost all the code out of the old "inc" files.
 
-(Note, the version of Lucene.Net included with this release has a 
-slightly changed FSDirectory class.  I've included the source code so
-that you can see what my changes were.)
+* The util.cs function strip_dangerous_tags has been made a little 
+smarter and little stronger, but it's still weak...
 
 -----------------------------------------------------------------------
 Version 2.9.4   10/10/2008 

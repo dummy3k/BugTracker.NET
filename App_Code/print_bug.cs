@@ -86,10 +86,10 @@ namespace btnet
 			// start of the table with the bug fields
 			Response.Write ("\n<table border=1 cellpadding=3 cellspacing=0>");
             Response.Write("\n<tr><td>Last changed by<td>"
-				+ btnet.Util.format_username((string)dr["last_updated_user"],(string)dr["last_updated_fullname"])
+				+ format_username((string)dr["last_updated_user"],(string)dr["last_updated_fullname"])
 				+ "&nbsp;");
             Response.Write("\n<tr><td>Reported By<td>"
-				+ btnet.Util.format_username((string)dr["reporter"],(string)dr["reporter_fullname"])
+				+ format_username((string)dr["reporter"],(string)dr["reporter_fullname"])
 				+ "&nbsp;");
             Response.Write("\n<tr><td>Reported On<td>" + btnet.Util.format_db_date(dr["reported_date"]) + "&nbsp;");
 
@@ -110,7 +110,7 @@ namespace btnet
 
             if (security.user.assigned_to_field_permission_level > 0)
 	            Response.Write("\n<tr><td>Assigned<td>"
-					+ btnet.Util.format_username((string)dr["assigned_to_username"],(string)dr["assigned_to_fullname"])
+					+ format_username((string)dr["assigned_to_username"],(string)dr["assigned_to_fullname"])
 					+ "&nbsp;");
 
             if (security.user.status_field_permission_level > 0)
@@ -392,7 +392,7 @@ namespace btnet
 		}
 
 		///////////////////////////////////////////////////////////////////////
-		public static void write_post(
+		static void write_post(
 			HttpResponse Response,
 			int bugid,
 			int permission_level,
@@ -704,7 +704,7 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		protected static void write_email_attachment(HttpResponse Response, int bugid, DataRow dr, bool write_links, bool images_inline)
+		static void write_email_attachment(HttpResponse Response, int bugid, DataRow dr, bool write_links, bool images_inline)
 		{
 
 			string string_post_id = Convert.ToString(dr["ba_id"]); // intentially "ba"
@@ -751,7 +751,7 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		protected static void write_file_inline (HttpResponse Response, string file, string string_post_id, string string_bug_id)
+		static void write_file_inline (HttpResponse Response, string file, string string_post_id, string string_bug_id)
 		{
 
 			if (file.ToLower().EndsWith(".gif")
@@ -800,18 +800,18 @@ namespace btnet
                 + Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/")
                 + "send_email.aspx?bg_id=" + Convert.ToString(bugid)
                 + "&to=" + email + ">"
-                + btnet.Util.format_username(username, fullname)
+                + format_username(username, fullname)
                 + "</a>";
             }
             else
             {
-                return btnet.Util.format_username(username, fullname);
+                return format_username(username, fullname);
             }
 
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public static string format_email_to(int bugid, string email)
+        static string format_email_to(int bugid, string email)
         {
             return "<a href="
             + Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/")
@@ -823,7 +823,7 @@ namespace btnet
 
 
         ///////////////////////////////////////////////////////////////////////
-        public static string format_email_from(int comment_id, string from)
+        static string format_email_from(int comment_id, string from)
         {
 
             string display_part = "";
@@ -853,7 +853,7 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public static string format_comment(int post_id, string s1, string t1)
+        static string format_comment(int post_id, string s1, string t1)
         {
             string s2;
             string link_marker;
@@ -941,6 +941,21 @@ namespace btnet
         {
             return String.Format("<a target=_blank href='{0}'>{0}</a>", m.ToString());
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        static string format_username(string username, string fullname)
+        {
+
+            if (Util.get_setting("UseFullNames", "0") == "0")
+            {
+                return username;
+            }
+            else
+            {
+                return fullname;
+            }
+        }
+
 
 
 	} // end PrintBug

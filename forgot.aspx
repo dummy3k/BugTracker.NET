@@ -7,8 +7,10 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+#pragma warning disable 618
+#warning System.Web.Mail is deprecated, but it doesn't work yet with "explicit" SSL, so keeping it for now - corey
 
+DbUtil dbutil;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
