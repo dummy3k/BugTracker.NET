@@ -63,7 +63,7 @@ temp_text nvarchar(MAX)
                     sb.Append(doc.Get("bp_id"));
                     sb.Append(",");
                     sb.Append(Convert.ToString((hits.Score(i))));
-                    sb.Append(",'");
+                    sb.Append(",N'");
 
                     string raw_text = Server.HtmlEncode(doc.Get("raw_text"));
                     Lucene.Net.Analysis.TokenStream stream = MyLucene.anal.TokenStream("", new System.IO.StringReader(raw_text));
@@ -87,18 +87,20 @@ temp_text nvarchar(MAX)
     
     
     sb.Append(@"
-select 'ffffff', bg_id [id], temp_text [search_desc], 
-' ' [type], '' [search_text], bg_reported_date [date], temp_score [$SCORE] 
+select '#ffffff', bg_id [id], temp_text [search_desc], 
+' ' [type], '' [search_text], bg_reported_date [date], isnull(st_name,'') [status], temp_score [$SCORE] 
 from bugs 
 inner join #$GUID t on t.temp_bg_id = bg_id and t.temp_bp_id = 0
+left outer join statuses on st_id = bg_status
 where $ALTER_HERE 
 
 union
 
-select 'ffffff', bg_id, bg_short_desc,
-bp_type, temp_text, bp_date, temp_score
+select '#ffffff', bg_id, bg_short_desc,
+bp_type, temp_text, bp_date, isnull(st_name,''), temp_score
 from bugs inner join #$GUID t on t.temp_bg_id = bg_id 
-inner join bug_posts on temp_bp_id = bp_id  
+inner join bug_posts on temp_bp_id = bp_id
+left outer join statuses on st_id = bg_status  
 where $ALTER_HERE
 
 order by t.temp_score desc, bg_id desc
@@ -110,17 +112,13 @@ drop table #$GUID
     string sql = sb.ToString().Replace("$GUID", guid);
     sql =  btnet.Util.alter_sql_per_project_permissions(sql, security);
 
-//    if (btnet.Util.get_setting("EnableTags","0") == "1")
-//    {
-//        sql = sql.Replace("$TAGS", "bg_tags [tags],");
-//    }
-//    else
-//    {
-//        sql = sql.Replace("$TAGS","");
-//    }
 
-    Session["bugs"] = dbutil.get_dataview(sql);
-    Session["just_did_text_search"] = "yes";
+    DataSet ds = dbutil.get_dataset (sql);
+    Session["bugs_unfiltered"] = ds.Tables[0];
+    Session["bugs"] = new DataView(ds.Tables[0]);
+    
+    Session["just_did_text_search"] = "yes"; // switch for bugs.aspx
+    Session["query"] = Request["query"]; // for util.cs, to persist the text in the search <input>
     Response.Redirect("bugs.aspx");
 }
         

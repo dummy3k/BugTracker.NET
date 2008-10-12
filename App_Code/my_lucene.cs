@@ -34,7 +34,9 @@ namespace btnet
            // btnet.Util.write_to_log("indexing " + Convert.ToString(bug_id));
 
             Lucene.Net.Documents.Document doc = new Lucene.Net.Documents.Document();
-
+            
+            //Fields f = new Lucene.Net.Documents.Field(
+                            
             doc.Add(new Lucene.Net.Documents.Field(
                 "bg_id",
                 Convert.ToString(bug_id),
@@ -47,6 +49,7 @@ namespace btnet
                 Lucene.Net.Documents.Field.Store.YES,
                 Lucene.Net.Documents.Field.Index.UN_TOKENIZED));
 
+            // For the highlighter, store the raw text
             doc.Add(new Lucene.Net.Documents.Field(
                 "raw_text",
                 text,

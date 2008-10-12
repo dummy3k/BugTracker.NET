@@ -34,18 +34,8 @@ namespace btnet
         static string goto_form = @"
 <td nowrap valign=middle>
     <form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>
-        <input class=btn style='font-size: 8pt;' type=submit value='go to id:'>&nbsp;
+        <input class=btn style='font-size: 7pt;' type=submit value='go to id:'>
         <input style='font-size: 8pt;' size=4 type=text class=txt name=id accesskey=g>
-    </form>
-</td>";
-
-
-        static string search_form = @"
-<td nowrap valign=middle>
-    <form style='margin: 0px; padding: 0px;' action=search_text.aspx method=get>
-        <input class=btn style='font-size: 8pt;' type=submit value='search:'>&nbsp;
-        <input style='padding: 0px; font-size: 8pt;' size=20 type=text class=txt name=query accesskey=s>&nbsp;
-        <a href=lucene_syntax.html target=_blank style='font-size: 7pt;'>advanced</a>
     </form>
 </td>";
 
@@ -294,6 +284,22 @@ namespace btnet
             // search
             if (Util.get_setting("EnableLucene", "1") == "1")
             {
+                string query = (string) context.Session["query"];
+                if (query == null)
+                {
+                    query = "";
+                }
+                string search_form = @"
+
+<td nowrap valign=middle>
+    <form style='margin: 0px; padding: 0px;' action=search_text.aspx method=get>
+        <input class=btn style='font-size: 7pt;' type=submit value='search:'>
+        <input style='padding: 0px; font-size: 8pt;' size=20 type=text class=txt 
+        value='" + query + @"'name=query accesskey=s>
+        <a href=lucene_syntax.html target=_blank style='font-size: 7pt;'>advanced</a>
+    </form>
+</td>";
+                //context.Session["query"] = null;
                 Response.Write(search_form);
 			}
 
@@ -887,19 +893,19 @@ namespace btnet
    		///////////////////////////////////////////////////////////////////////
         public static string get_lucene_index_folder()
         {
-            return get_folder("LuceneIndexFolder", context.Server.MapPath("./") + "\\App_Data\\lucene_index");
+            return get_folder("LuceneIndexFolder", context.Server.MapPath("./") + "App_Data\\lucene_index");
         }
 
 		///////////////////////////////////////////////////////////////////////
 		public static string get_upload_folder()
 		{
-            return get_folder("UploadFolder", context.Server.MapPath("./") + "\\App_Data\\uploads");
+            return get_folder("UploadFolder", context.Server.MapPath("./") + "App_Data\\uploads");
 		}
 
 		///////////////////////////////////////////////////////////////////////
 		public static string get_log_folder()
 		{
-            return get_folder("LogFileFolder", context.Server.MapPath("./") + "\\App_Data\\logs");
+            return get_folder("LogFileFolder", context.Server.MapPath("./") + "App_Data\\logs");
         }
 
 		///////////////////////////////////////////////////////////////////////
@@ -2141,7 +2147,7 @@ drop table #temp2";
                                     }
                                     else if (i == search_text_column)
                                     {
-                                        Response.Write(dr[i].ToString()); // alrady encoded
+                                        Response.Write(dr[i].ToString()); // already encoded
                                     }
                                     else
                                     {

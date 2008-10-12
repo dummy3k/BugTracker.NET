@@ -33,15 +33,13 @@ Move "add" to top menu?
 
 reimplement tag edit control as column header?
 
-dont forget to include Lucene.Net.dll itself!!!
+dont forget to include Lucene.Net.dll and highlighter dlls itself!!!
 
 what is a sql server pseudocolumn?
 
-add highligher.net
 
-http://lucene.apache.org/java/2_1_0/queryparsersyntax.html
 
-get rid of build_lu, and replace with my_lu
+
 
 -----------------------------------------------------------------------
 Version 2.9.5   10/xx/2008 
