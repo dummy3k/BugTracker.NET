@@ -39,7 +39,19 @@ ldap
 $ALTER_HERE, queries
 more spellchecking...
 search and full text search.
+blog about lucene.net
 
+-----------------------------------------------------------------------
+Version 2.9.6   10/12/2008 
+-----------------------------------------------------------------------
+
+* Fixed missing second-from-last-line in Web.config: 
+</btnetSettings>
+
+* In search_text.aspx, the new full text search, nvarchar(MAX) doesn't 
+work on SQL Server 2000. Changed to nvarchar(3000).
+
+* Minor security improvements related to fckEditor
 
 -----------------------------------------------------------------------
 Version 2.9.5   10/12/2008 

@@ -554,6 +554,8 @@ namespace btnet
 		    s = Regex.Replace(s, @"</script", "</scrSAFEipt", RegexOptions.IgnoreCase);
 		    s = Regex.Replace(s, @"<object", "<obSAFEject", RegexOptions.IgnoreCase);
 		    s = Regex.Replace(s, @"</object", "</obSAFEject", RegexOptions.IgnoreCase);
+		    s = Regex.Replace(s, @"<embed", "<emSAFEbed", RegexOptions.IgnoreCase);
+		    s = Regex.Replace(s, @"</embed", "</emSAFEbed", RegexOptions.IgnoreCase);
 		    s = Regex.Replace(s, @"onabort", "onSAFEabort", RegexOptions.IgnoreCase);
 		    s = Regex.Replace(s, @"onblur", "onSAFEblur", RegexOptions.IgnoreCase);
 		    s = Regex.Replace(s, @"onchange", "onSAFEchange", RegexOptions.IgnoreCase);
