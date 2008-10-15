@@ -25,7 +25,8 @@ namespace btnet
                     "</span>");
         
         public static Lucene.Net.Highlight.SimpleFragmenter fragmenter = new Lucene.Net.Highlight.SimpleFragmenter(400);
-        
+        protected static Lucene.Net.Search.Searcher searcher = null;
+
         public static object my_lock = new object(); // for a lock
 
         ///////////////////////////////////////////////////////////////////////
@@ -121,16 +122,43 @@ namespace btnet
             }
 		}
 
+        public static Lucene.Net.Search.Hits search(Lucene.Net.Search.Query query)
+        {
+            Lucene.Net.Search.Hits hits = null;
+            lock (my_lock) // prevent contention between searches and writing?
+            {
+                if (searcher == null)
+                {
+                    searcher = new Lucene.Net.Search.IndexSearcher(MyLucene.index_path);
+                }
+                hits = searcher.Search(query);
+            }
+            return hits;
+        }
+
         // update an existing index
         static void threadproc_update(object obj)
         {
             // just to be safe, make the worker threads wait for each other
             //System.Console.Beep(540, 20);
-            lock (my_lock)
+            lock (my_lock) // prevent contention between searching and writing?
             {
                 //System.Console.Beep(840, 20);
                 try
                 {
+                    if (searcher != null)
+                    {
+                        try
+                        {
+                            searcher.Close();
+                        }
+                        catch (Exception e)
+                        {
+                            btnet.Util.write_to_log("Exception closing lucene searcher:" + e.Message);
+                        }
+                        searcher = null;
+                    }
+
                     Lucene.Net.Index.IndexModifier modifier = new Lucene.Net.Index.IndexModifier(index_path, anal, false);
 
                     // same as buid, but uses "modifier" instead of write.
@@ -184,7 +212,7 @@ namespace btnet
                 }
                 catch (Exception e)
                 {
-                    btnet.Util.write_to_log("exception building Lucene index: " + e.Message);
+                    btnet.Util.write_to_log("exception updating Lucene index: " + e.Message);
                 }
             }
         }

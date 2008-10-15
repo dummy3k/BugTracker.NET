@@ -18,7 +18,24 @@ void Page_Load(Object sender, EventArgs e)
     security = new Security();
     security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
-    Lucene.Net.Search.Query query = MyLucene.parser.Parse(Request["query"]);
+    Lucene.Net.Search.Query query = null;
+
+    try
+    {
+        if (string.IsNullOrEmpty(Request["query"]))
+        {
+            throw new Exception("You forgot to enter something to search for...");
+        }
+        
+        query = MyLucene.parser.Parse(Request["query"]);
+        
+    }
+    catch (Exception e3)
+    {
+        display_exception(e3);
+    }
+    
+    
     Lucene.Net.Highlight.QueryScorer scorer = new Lucene.Net.Highlight.QueryScorer(query);
     Lucene.Net.Highlight.Highlighter highlighter = new Lucene.Net.Highlight.Highlighter(MyLucene.formatter, scorer);
     highlighter.SetTextFragmenter(MyLucene.fragmenter); // new Lucene.Net.Highlight.SimpleFragmenter(400));
@@ -37,15 +54,20 @@ temp_text nvarchar(3000)
 )
     ");
 
-    //System.Console.Beep(1500, 20);
     lock (MyLucene.my_lock)
     {
-        //System.Console.Beep(1800, 20);
-        Lucene.Net.Search.Searcher searcher = new Lucene.Net.Search.IndexSearcher(MyLucene.index_path);
-        Lucene.Net.Search.Hits hits = searcher.Search(query);
 
+        Lucene.Net.Search.Hits hits = null;
+        try
+        {
+            hits = MyLucene.search(query);
+        }
+        catch (Exception e2)
+        {
+            display_exception(e2);
+        }
+        
         // insert the search results into a temp table which we will join with what's in the database
-
         for (int i = 0; i < hits.Length(); i++)
         {
             if (dict_already_seen_ids.Count < 100)
@@ -62,7 +84,8 @@ temp_text nvarchar(3000)
                     sb.Append(",");
                     sb.Append(doc.Get("bp_id"));
                     sb.Append(",");
-                    sb.Append(Convert.ToString((hits.Score(i))));
+                    //sb.Append(Convert.ToString((hits.Score(i))));
+                    sb.Append(Convert.ToString((hits.Score(i))).Replace(",", "."));  // Somebody said this fixes a bug. Localization issue?
                     sb.Append(",N'");
 
                     string raw_text = Server.HtmlEncode(doc.Get("raw_text"));
@@ -86,7 +109,7 @@ temp_text nvarchar(3000)
                 break;
             }
         }
-        searcher.Close();
+        //searcher.Close();
     }
 
 
@@ -127,4 +150,32 @@ drop table #$GUID
     Response.Redirect("bugs.aspx");
 }
 
+    void display_exception(Exception e)
+    {
+        string s = e.Message;
+        if (e.InnerException != null)
+        {
+            s += "<br>";
+            s+= e.InnerException.Message;
+        }
+        Response.Write(@"
+<html>
+<link rel=StyleSheet href=btnet.css type=text/css>
+<p>&nbsp;</p>
+<div class=align>
+<div class=err>");
+    
+    
+        Response.Write(s);
+
+        Response.Write(@"
+<p>
+<a href='javascript:history.go(-1)'>back</a>            
+</div></div>
+</html>");
+    
+        Response.End();
+        
+    }    
+    
 </script>

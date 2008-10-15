@@ -24,7 +24,8 @@ namespace btnet
 			string subject,
 			string body)
 		{
-			return send_email(
+          
+            return send_email(
 				to,
 				from,
 				cc,
@@ -196,7 +197,9 @@ namespace btnet
 
 			try
 			{
-				System.Web.Mail.SmtpMail.Send(msg);
+                // This fixes a bug for some people.  Not sure how it happens....
+                msg.Body = msg.Body.Replace(Convert.ToChar(0), ' ').Trim();
+                System.Web.Mail.SmtpMail.Send(msg);
 
 				// We delete late here because testing showed that SmtpMail class
 				// got confused when we deleted too soon.

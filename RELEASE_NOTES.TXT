@@ -11,7 +11,8 @@ http://ifdefined.com/readme.html#upgrading
 
 Corey's TO DO list:
 
-* dont forget to include Lucene.Net.dll and highlighter dlls itself!!!
+* find on empty string
+
 
 
 * allow the command line of SVN to be configurable
@@ -40,6 +41,24 @@ $ALTER_HERE, queries
 more spellchecking...
 search and full text search.
 blog about lucene.net
+
+
+-----------------------------------------------------------------------
+Version 2.9.7   10/xx/2008 
+-----------------------------------------------------------------------
+
+You might want to skip this release unless you are experiencing the 
+problems listed here.
+
+* Lucene.Net search now handling floats like 1,23 instead of 1.23.
+
+* Very minor performance improvement in Lucene search.
+
+* Less ugly error handling when user enters a blank or invalid search
+string.
+
+* Fixed bug 2165900 - "Error sending email notifiations" due to null
+characters in the message body.  How does that happen?
 
 -----------------------------------------------------------------------
 Version 2.9.6   10/12/2008 

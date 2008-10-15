@@ -81,9 +81,26 @@ public void Application_Error(Object sender, EventArgs e)
 		}
 	}
 }
+
+/*     
+static void my_threadproc(object obj)     
+{
+	for (int i = 0; i < 50; i++)
+	{
+		System.Threading.Thread.Sleep(1000);
+		System.Console.Beep(440,10);
+	}
+	
+}
+*/
+
      
 public void Application_OnStart(Object sender, EventArgs e)
 {
+/*
+	System.Threading.Thread thread = new System.Threading.Thread(my_threadproc);
+	thread.Start(null);
+*/
 
     string path = HttpContext.Current.Server.MapPath(null);
     
