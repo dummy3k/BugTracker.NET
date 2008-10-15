@@ -53,6 +53,11 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (action == "remove") // remove
 		{
+			if (security.user.is_guest)
+			{
+				Response.Write("You are not allowed to delete a releationship");
+				Response.End();
+			}
 
 			if (Request.QueryString["ses"] != (string) Session["session_cookie"])
 			{
@@ -189,7 +194,7 @@ insert into bug_posts
 			else 'parent of $bg' end [parent/child],
 		'<a target=_blank href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view]";
 
-		if (permission_level == Security.PERMISSION_ALL)
+		if (!security.user.is_guest && permission_level == Security.PERMISSION_ALL)
 		{
 
 			sql += @",'<a href=relationships.aspx?actn=remove&ses=$ses&id=$bg&bugid2='

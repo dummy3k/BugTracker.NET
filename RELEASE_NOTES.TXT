@@ -47,10 +47,21 @@ blog about lucene.net
 Version 2.9.7   10/xx/2008 
 -----------------------------------------------------------------------
 
-You might want to skip this release unless you are experiencing the 
-problems listed here.
+** IMPORTANT CHANGE: Changed how the special "guest" user works. Before
+this release, even if you gave the guest user permission to edit bugs,
+the system automatically reduced his permissions to "Reporter".  I've
+removed the logic that automatically reduces his permissions.  You now
+control the guest user's permissions like any other user.  If you
+don't want a guest user to be able to edit bugs, change his permissions
+before you upgrade to this release.
 
-* changed how guest user works
+A guest user is still different in these ways:
+- no settings
+- no "edit dashboard"
+- can't save searchs as sql queries
+- can't delete anything.
+
+Also in this release:
 
 * Lucene.Net search now handling floats like 1,23 instead of 1.23.
 
