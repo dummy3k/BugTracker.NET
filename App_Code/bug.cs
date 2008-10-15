@@ -747,10 +747,10 @@ order by a.bp_date desc";
             int bg_org = (int)dr[1];
 
             // reduce permissions for guest
-            if (security.user.is_guest && pl == Security.PERMISSION_ALL)
-            {
-                pl = Security.PERMISSION_REPORTER;
-            }
+//            if (security.user.is_guest && pl == Security.PERMISSION_ALL)
+//            {
+//                pl = Security.PERMISSION_REPORTER;
+//            }
 
             // maybe reduce permissions
             if (bg_org != security.user.org)

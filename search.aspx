@@ -2055,7 +2055,7 @@ function set_project_changed() {
 				frm.submit();
 			}
 			</script>
-<% if (security.user.is_guest)  { %>
+<% if (security.user.is_guest) /* can't save search */ { %>
             <span style="color:Gray; font-size: 7pt;">Save Search not available to "guest" user</span>
 <% } else { %>
 			<input class=btn type=submit onclick="on_save_query()" value="Save search criteria as query">

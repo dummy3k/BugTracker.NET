@@ -304,10 +304,10 @@ void Page_Load(Object sender, EventArgs e)
 			permission_level = (int)dr["pu_permission_level"];
 
 			// reduce permissions for guest
-			if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
-			{
-				permission_level = Security.PERMISSION_REPORTER;
-			}
+//			if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
+//			{
+//				permission_level = Security.PERMISSION_REPORTER;
+//			}
 
 			if (permission_level == Security.PERMISSION_NONE)
 			{
@@ -532,8 +532,8 @@ void Page_Load(Object sender, EventArgs e)
 				+ " title='Display this item in a printer-friendly format'>print</a>";
 
 
-			// edit bug
-			if (!security.user.is_guest)
+			// merge
+			if (!security.user.is_guest) // don't allow delete
 			{
 				if (security.user.is_admin
 				|| security.user.can_merge_bugs)
@@ -546,17 +546,19 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-			// delete bug
-			if (security.user.is_admin
-			|| security.user.can_delete_bug)
+			// delete 
+			if (!security.user.is_guest)
 			{
-				string delete_bug_link = "<a href=delete_bug.aspx?id="
-					+ Convert.ToString(id)
-					+ " title='Delete this item'>delete</a>";
+				if (security.user.is_admin
+				|| security.user.can_delete_bug)
+				{
+					string delete_bug_link = "<a href=delete_bug.aspx?id="
+						+ Convert.ToString(id)
+						+ " title='Delete this item'>delete</a>";
 
-				delete_bug.InnerHtml = delete_bug_link;
+					delete_bug.InnerHtml = delete_bug_link;
+				}
 			}
-
 
 			// custom bug link
 			if (btnet.Util.get_setting("CustomBugLinkLabel","") != "")
@@ -939,7 +941,7 @@ void format_subcribe_cancel_link()
 			subscribed = (int) dbutil.execute_scalar(sql);
 		}
 
-		if (security.user.is_guest)
+		if (security.user.is_guest) // wouldn't make sense to share an email address
 		{
 			subscriptions.InnerHtml = "";
 		}
@@ -1787,10 +1789,10 @@ int fetch_permission_level(string projectToCheck)
 	int pl = (int) dbutil.execute_scalar(sql);
 
 	// reduce permissions for guest
-	if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
-	{
-		pl = Security.PERMISSION_REPORTER;
-	}
+	//if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
+	//{
+	//	pl = Security.PERMISSION_REPORTER;
+	//}
 
 	return pl;
 

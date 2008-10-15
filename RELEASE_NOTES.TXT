@@ -50,6 +50,8 @@ Version 2.9.7   10/xx/2008
 You might want to skip this release unless you are experiencing the 
 problems listed here.
 
+* changed how guest user works
+
 * Lucene.Net search now handling floats like 1,23 instead of 1.23.
 
 * Very minor performance improvement in Lucene search.
