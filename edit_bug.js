@@ -109,6 +109,7 @@ function handle_rewrite_posts()
 			var el = document.getElementById("posts")
 			el.innerHTML = xmlHttp.responseText;
 			get_db_datetime()
+			start_animation()
 		}
 	}
 
@@ -490,7 +491,8 @@ function on_body_load()
 	}
 	
 	dirty = false // reset, because change_dropdown_style dirties the dropdowns
-	
+
+	start_animation()	
 }
 
 function change_dropdown_style()
@@ -594,3 +596,31 @@ function done_selecting_tags()
 	//
 }
 
+
+var color = 128
+var timer = null
+var new_posts = null
+var new_posts_length
+
+function RGB2HTML(red, green, blue)
+{
+    var decColor = red + 256 * green + 65536 * blue;
+    return decColor.toString(16);
+}
+
+function timer_callback()
+{
+	color++
+	
+	
+	for (i = 0; i < new_posts_length; i++)
+	{
+		new_posts[i].style.background = '#' +  RGB2HTML(color,255,color)
+	}
+	
+	if (color == 255) // if the color is now white
+	{
+		clearInterval(timer)
+	}
+
+}

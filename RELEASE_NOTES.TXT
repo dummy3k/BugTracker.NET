@@ -11,9 +11,6 @@ http://ifdefined.com/readme.html#upgrading
 
 Corey's TO DO list:
 
-* find on empty string
-
-
 
 * allow the command line of SVN to be configurable
 * add settings for turning off printing of change history.
@@ -72,6 +69,9 @@ string.
 
 * Fixed bug 2165900 - "Error sending email notifiations" due to null
 characters in the message body.  How does that happen?
+
+* Added an animation effect.  It highlights a newly added comment, 
+attachment, or email post.
 
 -----------------------------------------------------------------------
 Version 2.9.6   10/12/2008 

@@ -409,7 +409,14 @@ namespace btnet
 			string string_post_id = Convert.ToString(post_id);
 			string string_bug_id = Convert.ToString(bugid);
 
-			Response.Write ("\n\n<tr><td class=cmt>\n<table width=100%>\n<tr><td align=left>");
+			if ((int) dr["seconds_ago"] < 2 && write_links)
+			{
+				Response.Write ("\n\n<tr><td class=cmt name=new_post>\n<table width=100%>\n<tr><td align=left>");
+			}
+			else
+			{
+				Response.Write ("\n\n<tr><td class=cmt>\n<table width=100%>\n<tr><td align=left>");
+			}
 
 
 			/*

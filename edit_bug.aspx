@@ -2276,8 +2276,26 @@ void on_update (Object sender, EventArgs e)
 <script type="text/javascript" language="JavaScript" src="calendar.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
 <script>
-var prompt = '<% Response.Write(btnet.Util.get_setting("PromptBeforeLeavingEditBugPage","0")); %>'
 var this_bugid = <% Response.Write(Convert.ToString(id)); %>
+
+function start_animation()
+{
+
+<% if (btnet.Util.get_setting("EnableNewPostAnimation","1") == "1") { %>
+
+	color = 100
+	new_posts = document.getElementsByName("new_post") 
+	new_posts_length = new_posts.length
+	if (new_posts_length > 0)
+	{
+		
+		timer = setInterval(timer_callback,5)
+	}
+
+<% } %>	
+
+}
+
 </script>
 
 </head>
