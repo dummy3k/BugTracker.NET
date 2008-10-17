@@ -2278,14 +2278,22 @@ void on_update (Object sender, EventArgs e)
 <script>
 var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
+
 function start_animation()
 {
 
 <% if (btnet.Util.get_setting("EnableNewPostAnimation","1") == "1") { %>
 
 	color = 100
-	new_posts = document.getElementsByName("new_post") 
+	
+	if (navigator.userAgent.indexOf("MSIE") > 0)
+		new_posts = getElementsByName_for_ie6_and_ie7("td","new_post") 
+	else
+		new_posts = document.getElementsByName("new_post") 
+	
+	
 	new_posts_length = new_posts.length
+
 	if (new_posts_length > 0)
 	{
 		

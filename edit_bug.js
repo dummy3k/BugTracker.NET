@@ -16,14 +16,6 @@ function set_relationship_cnt(bugid, cnt)
 	}
 }
 
-function maybe_rewrite_posts(bugid, updated_something)
-{
-	if (bugid == this_bugid && updated_something == 1)
-	{
-		rewrite_posts(bugid)
-	}
-}
-
 var popup_window = null
 function open_popup_window(url, title, bugid, width, height)
 {
@@ -624,3 +616,20 @@ function timer_callback()
 	}
 
 }
+
+
+function getElementsByName_for_ie6_and_ie7(tag, name) {
+     
+     var elem = document.getElementsByTagName(tag);
+     var arr = new Array();
+     for(i = 0,iarr = 0; i < elem.length; i++)
+     {
+          att = elem[i].getAttribute("name");
+          if(att == name)
+          {
+               arr[iarr] = elem[i];
+               iarr++;
+          }
+     }
+     return arr;
+}	

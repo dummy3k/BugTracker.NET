@@ -30,14 +30,11 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "add attachment";
 
-	msg.InnerText = "";
-
 	string string_id = Util.sanitize_integer(Request.QueryString["id"]);
-//	back_href.HRef = "edit_bug.aspx?id=" + string_id;
 
 	if (string_id == null || string_id == "0")
 	{
-		Response.Write ("Invalid id.");
+		write_msg("Invalid id.", false);
 		Response.End();
 	}
 	else
@@ -47,7 +44,7 @@ void Page_Load(Object sender, EventArgs e)
 		if (permission_level == Security.PERMISSION_NONE
 		|| permission_level == Security.PERMISSION_READONLY)
 		{
-			Response.Write("You are not allowed to edit this item");
+			write_msg("You are not allowed to edit this item", false);
 			Response.End();
 		}
 	}
@@ -60,19 +57,42 @@ void Page_Load(Object sender, EventArgs e)
 	}
 }
 
+
+///////////////////////////////////////////////////////////////////////
+void write_msg(string msg, bool rewrite_posts)
+{
+	string script = "script"; // C# compiler doesn't like s c r i p t
+	Response.Write("<" + script + ">");
+	Response.Write("function foo() {");
+	Response.Write("parent.set_msg('");
+	Response.Write(msg);
+	Response.Write("'); ");
+	
+	if (rewrite_posts)
+	{
+		Response.Write 	("parent.opener.rewrite_posts(" + Convert.ToString(bugid) + ")");
+	}
+	Response.Write("}</" + script + ">");
+	Response.Write("<html><body onload='foo()'>");
+	Response.Write("</body></html>");
+	Response.End();
+}
+
+///////////////////////////////////////////////////////////////////////
 void on_update(object Source, EventArgs e)
 {
 
+	
 	if (attached_file.PostedFile == null)
 	{
-		msg.InnerText = "Please select file.";
+		write_msg("Please select file", false);
 		return;
 	}
 
 	string filename = System.IO.Path.GetFileName(attached_file.PostedFile.FileName);
 	if (string.IsNullOrEmpty(filename))
 	{
-		msg.InnerText = "Please select file.";
+		write_msg("Please select file", false);
 		return;
 	}
 
@@ -80,18 +100,20 @@ void on_update(object Source, EventArgs e)
 	int content_length = attached_file.PostedFile.ContentLength;
 	if (content_length > max_upload_size)
 	{
-		msg.InnerText = "File exceeds maximum allowed length of "
+		write_msg("File exceeds maximum allowed length of "
 			+ Convert.ToString(max_upload_size)
-			+ ".";
+			+ ".", false);
 		return;
 	}
 
 	if (content_length == 0)
 	{
-		msg.InnerText = "No data was uploaded.";
+		write_msg("No data was uploaded.", false);
 		return;
 	}
 
+	bool good = false;
+	
 	try
 	{
         Bug.insert_post_attachment(
@@ -105,17 +127,34 @@ void on_update(object Source, EventArgs e)
 			-1, // parent
 			internal_only.Checked,
 			true);
-
-		added_attachment = 1;
+			
+		good = true;			
 
 	}
 	catch (Exception ex)
 	{
-		msg.InnerText = ex.Message;
+		write_msg("caught exception:" + ex.Message, false);
 		return;
 	}
 
-	//Response.Redirect ("edit_bug.aspx?id=" + Convert.ToString(bugid), false);
+
+	if (good)
+	{
+		write_msg(
+			filename 
+			+ " was successfully upload ("
+			+ attached_file.PostedFile.ContentType
+			+ "), "
+			+ Convert.ToString(content_length)
+			+ " bytes"
+			,true);
+	}
+	else
+	{
+		// This should never happen....
+		write_msg("Unexpected error with file upload.", false);
+	}
+
 }
 
 
@@ -125,34 +164,36 @@ void on_update(object Source, EventArgs e)
 <head>
 <title id="titl" runat="server">btnet add attachment</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
-</head>
 
 <script>
 
-function body_on_load()
+function set_msg(s)
 {
+	document.getElementById("msg").innerHTML = s
+	document.getElementById("file_input").innerHTML 
+		='<input type=file class=txt name="attached_file" id="attached_file" maxlength=255 size=60>'
+}
 
-	opener.maybe_rewrite_posts(
-	<%
-		Response.Write(Convert.ToString(bugid));
-		Response.Write(",");
-		Response.Write(added_attachment);
-	%>
-	)
-
+function waiting()
+{
+	document.getElementById("msg").innerHTML = "Uploading..."
+	return true
 }
 
 </script>
+</head>
 
+<body>
 
-<body onload="body_on_load()">
+<iframe name="hiddenframe" style="display:none" >x</iframe>
 
 <div class=align>
 
 Add attachment to <% Response.Write(Convert.ToString(bugid)); %>
 <p>
 	<table border=0><tr><td>
-		<form class=frm runat="server" enctype="multipart/form-data">
+		<form target="hiddenframe" class=frm runat="server" enctype="multipart/form-data" onsubmit="return waiting()" 
+>
 			<table border=0>
 
 			<tr>
@@ -163,7 +204,10 @@ Add attachment to <% Response.Write(Convert.ToString(bugid)); %>
 
 			<tr>
 			<td class=lbl>File:</td>
-			<td><input runat="server" type=file class=txt id="attached_file" maxlength=255 size=60></td>
+			<td><div id="file_input">
+			<input runat="server" type=file class=txt id="attached_file" maxlength=255 size=60>
+			</div>
+			</td>
 			<td runat="server" class=err id="attached_file_err">&nbsp;</td>
 			</tr>
 
