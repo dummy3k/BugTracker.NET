@@ -432,6 +432,11 @@ namespace btnet
 
 			if (type == "update")
 			{
+				if (write_links)
+				{
+					Response.Write ("<img src=database.png align=top>&nbsp;");
+				}			
+			
 				// posted by
 				Response.Write ("<span class=pst>changed by ");
 				Response.Write (format_email_username(
@@ -443,6 +448,11 @@ namespace btnet
 			}
 			else if (type == "sent")
 			{
+				if (write_links)
+				{
+					Response.Write ("<img src=email_edit.png align=top>&nbsp;");
+				}
+				
 				Response.Write ("<span class=pst>email <a name=" + Convert.ToString(post_id) +  "></a>" + Convert.ToString(post_id) + " sent to ");
 
 				if (write_links)
@@ -486,6 +496,10 @@ namespace btnet
 			}
 			else if (type == "received" )
 			{
+				if (write_links)
+				{
+					Response.Write ("<img src=email_open.png align=top>&nbsp;");
+				}
 				Response.Write ("<span class=pst>email <a name=" + Convert.ToString(post_id) +  "></a>" + Convert.ToString(post_id) + " received from ");
 				if (write_links)
 				{
@@ -518,6 +532,12 @@ namespace btnet
 				{
 					Response.Write("<div class=private>Internal Only!</div>");
 				}
+				
+				if (write_links)
+				{
+					Response.Write ("<img src=comment.png align=top>&nbsp;");
+				}
+				
 				Response.Write ("<span class=pst>comment <a name=" + Convert.ToString(post_id) +  "></a>" + Convert.ToString(post_id) + " posted by ");
 				Response.Write (format_email_username(
 					write_links,

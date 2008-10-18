@@ -465,14 +465,14 @@ void Page_Load(Object sender, EventArgs e)
 			if (permission_level == Security.PERMISSION_ALL)
 			{
 				string clone_link = "<a href=\"javascript:clone()\" "
-					+ " title='Create a copy of this item'>create copy</a>";
+					+ " title='Create a copy of this item'><img src=paste_plain.png border=0 align=top>&nbsp;create copy</a>";
 				clone.InnerHtml = clone_link;
 			}
 
 
 			if (permission_level != Security.PERMISSION_READONLY)
 			{
-				string attachment_link = "<a href=\"javascript:open_popup_window('add_attachment.aspx','add attachment ',"
+				string attachment_link = "<img src=attach.gif align=top>&nbsp;<a href=\"javascript:open_popup_window('add_attachment.aspx','add attachment ',"
 					+ Convert.ToString(id)
 					+ ",600,300)\" title='Attach an image, document, or other file to this item'>add attachment</a>";
 				attachment.InnerHtml = attachment_link;
@@ -483,7 +483,7 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				string send_email_link = "<a href='javascript:send_email("
 					+ Convert.ToString(id)
-					+ ")' title='Send an email about this item'>send email</a>";
+					+ ")' title='Send an email about this item'><img src=email_edit.png border=0 align=top>&nbsp;send email</a>";
 				send_email.InnerHtml = send_email_link;
 			}
 
@@ -491,7 +491,7 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				string subscribers_link = "<a target=_blank href=view_subscribers.aspx?id="
 					+ Convert.ToString(id)
-					+ " title='View users who have subscribed to email notifications for this item'>subscribers</a>";
+					+ " title='View users who have subscribed to email notifications for this item'><img src=telephone_edit.png border=0 align=top>&nbsp;subscribers</a>";
 				subscribers.InnerHtml = subscribers_link;
 			}
 
@@ -503,7 +503,7 @@ void Page_Load(Object sender, EventArgs e)
 			}
 			string relationships_link = "<a target=_blank href=relationships.aspx?id="
 				+ Convert.ToString(id)
-				+ " title='Create a relationship between this item and another item'>relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
+				+ " title='Create a relationship between this item and another item'><img src=database_link.png border=0 align=top>&nbsp;relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
 			relationships.InnerHtml = relationships_link;
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")
@@ -515,7 +515,7 @@ void Page_Load(Object sender, EventArgs e)
 				}
 				string revisions_link = "<a target=_blank href=view_svn_file_revisions.aspx?id="
 					+ Convert.ToString(id)
-				+ " title='View Subversion revisions related to this item'>svn revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
+				+ " title='View Subversion revisions related to this item'><img src=accept.png border=0 align=top>&nbsp;svn revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
 				revisions.InnerHtml = revisions_link;
 			}
 			else
@@ -529,7 +529,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			print.InnerHtml = "<a target=_blank href=print_bug.aspx?id="
 				+ Convert.ToString(id)
-				+ " title='Display this item in a printer-friendly format'>print</a>";
+				+ " title='Display this item in a printer-friendly format'><img src=printer.png border=0 align=top>&nbsp;print</a>";
 
 
 			// merge
@@ -540,7 +540,7 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					string merge_bug_link = "<a href=merge_bug.aspx?id="
 						+ Convert.ToString(id)
-						+ " title='Merge this item and another item together'>merge</a>";
+						+ " title='Merge this item and another item together'><img src=database_refresh.png border=0 align=top>&nbsp;merge</a>";
 
 					merge_bug.InnerHtml = merge_bug_link;
 				}
@@ -554,7 +554,7 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					string delete_bug_link = "<a href=delete_bug.aspx?id="
 						+ Convert.ToString(id)
-						+ " title='Delete this item'>delete</a>";
+						+ " title='Delete this item'><img src=delete.png border=0 align=top>&nbsp;delete</a>";
 
 					delete_bug.InnerHtml = delete_bug_link;
 				}
@@ -567,7 +567,7 @@ void Page_Load(Object sender, EventArgs e)
 					+ btnet.Util.get_setting("CustomBugLinkUrl","")
 					+ "?bugid="
 					+ Convert.ToString(id)
-					+ ">"
+					+ "><img src=brick.png border=0 align=top>&nbsp;"
 					+ btnet.Util.get_setting("CustomBugLinkLabel","")
 					+ "</a>";
 
@@ -947,10 +947,11 @@ void format_subcribe_cancel_link()
 		}
 		else
 		{
+
 			string subscription_link = "<a id='notifications' title='Get or stop getting email notifications about changes to this item.'"
 				+ " href='javascript:toggle_notifications("
 				+ Convert.ToString(id)
-				+ ")'><span id='get_stop_notifications'>";
+				+ ")'><span id='get_stop_notifications'><img src=telephone.png border=0 align=top>&nbsp;";
 
 			if (subscribed > 0)
 			{
@@ -1299,7 +1300,7 @@ void format_prev_next_bug()
 				prev_next_link =
 					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"javascript:goto_edit_bug("
 					+ Convert.ToString(prev_bug)
-					+ ")\">prev</a>";
+					+ ")\"><img src=arrow_up.png border=0 align=top>prev</a>";
 			}
 			else
 			{
@@ -1311,7 +1312,7 @@ void format_prev_next_bug()
 				prev_next_link +=
 					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"javascript:goto_edit_bug("
 					+ Convert.ToString(next_bug)
-					+ ")\">next</a>";
+					+ ")\">next<img src=arrow_down.png border=0 align=top></a>";
 
 			}
 			else
@@ -2316,7 +2317,7 @@ function start_animation()
 <div class=align>
 
 <% if (!security.user.adds_not_allowed) { %>
-<a href="javascript: goto_edit_bug(0)">add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
+<a href="javascript: goto_edit_bug(0)"><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
 <span id="prev_next" runat="server">&nbsp;</span>
