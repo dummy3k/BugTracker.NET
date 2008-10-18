@@ -309,7 +309,7 @@ function on_query_changed()
 <table border=0><tr>
 	<td  nowrap>
 	<% if (!security.user.adds_not_allowed) { %>
-	<a href=edit_bug.aspx>add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
+	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<% } %>
 

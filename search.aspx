@@ -1707,7 +1707,7 @@ function set_project_changed() {
 <div class=align>
 
 <% if (!security.user.adds_not_allowed) { %>
-<a href=edit_bug.aspx>add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
+<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
 <% } %>
 
 <a style='margin-left: 40px;' href='javascript:showhide_form()' id='showhide'>hide form</a>

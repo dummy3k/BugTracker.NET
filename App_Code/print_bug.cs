@@ -275,7 +275,7 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		public static void write_posts(
+		public static int write_posts(
 			HttpResponse Response,
 			int bugid,
 			int permission_level,
@@ -295,10 +295,12 @@ namespace btnet
 			}
 
 			DataSet ds_posts = btnet.Bug.get_bug_posts(bugid);
-
+			int post_cnt = ds_posts.Tables[0].Rows.Count;
+			
 			int bp_id;
 			int prev_bp_id = -1;
 
+			
 			foreach (DataRow dr in ds_posts.Tables[0].Rows)
 			{
 
@@ -384,11 +386,14 @@ namespace btnet
 
 			}
 
-			if (prev_bp_id != -1) {
+			if (prev_bp_id != -1)
+			{
 				Response.Write ("\n</table>"); // end the previous table
 			}
 
 			Response.Write ("\n</table>");
+			
+			return post_cnt;
 		}
 
 		///////////////////////////////////////////////////////////////////////

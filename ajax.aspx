@@ -37,7 +37,7 @@ font-size: 7pt;
 </style>");
 		
 
-		PrintBug.write_posts(
+		int post_cnt = PrintBug.write_posts(
 			Response,
 			Convert.ToInt32(bugid),
 			permission_level,
@@ -46,6 +46,12 @@ font-size: 7pt;
 			false,
 			security.user);		
 	
+		// We can't unwrite what we wrote, but let's tell javascript to ignore it.
+		if (post_cnt == 0)
+		{
+			Response.Write ("<!--zeroposts-->");
+		}
+	
 	}
 	else
 	{
@@ -53,6 +59,4 @@ font-size: 7pt;
 	}
 }
 
-
 </script>
-

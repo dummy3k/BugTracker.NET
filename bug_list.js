@@ -113,6 +113,9 @@ function stateChanged()
 
 function display_popup(s)
 { 
+	if (s.indexOf("zeroposts") > 0)
+		return;
+	
 	popup.innerHTML = s
 	var pos = find_position(current_element)
 
