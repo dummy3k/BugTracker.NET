@@ -34,8 +34,8 @@ namespace btnet
         static string goto_form = @"
 <td nowrap valign=middle>
     <form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>
-        <input class=btn style='font-size: 7pt;' type=submit value='go to id:'>
-        <input style='font-size: 8pt;' size=4 type=text class=txt name=id accesskey=g>
+        <input class=menubtn type=submit value='go to ID'>
+        <input class=menuinput size=4 type=text class=txt name=id accesskey=g>
     </form>
 </td>";
 
@@ -243,37 +243,9 @@ function dbg(s)
                 write_menu_item(Response, this_link, "queries", "queries.aspx");
             }
 
-            if (user.is_admin)
-            {
-                write_menu_item(Response, this_link, "admin", "admin.aspx");
-            }
-            else if (user.is_project_admin)
-            {
-                write_menu_item(Response, this_link, "users", "users.aspx");
-            }
-
             if (user.is_admin || user.can_use_reports || user.can_edit_reports)
             {
                 write_menu_item(Response, this_link, "reports", "reports.aspx");
-            }
-
-
-            // for guest account, suppress display of "edit_self
-            if (!user.is_guest)
-            {
-                write_menu_item(Response, this_link, "settings", "edit_self.aspx");
-            }
-
-            if (auth_method == "plain")
-            {
-                if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
-                {
-                	write_menu_item(Response, this_link, "login", "default.aspx");
-				}
-				else
-				{
-					write_menu_item(Response, this_link, "logoff", "logoff.aspx");
-				}
             }
 
             if (Util.get_setting("CustomMenuLinkLabel", "") != "")
@@ -283,7 +255,15 @@ function dbg(s)
                     Util.get_setting("CustomMenuLinkUrl", ""));
             }
 
-            write_menu_item(Response, this_link, "about", "about.html");
+            if (user.is_admin)
+            {
+                write_menu_item(Response, this_link, "admin", "admin.aspx");
+            }
+            else if (user.is_project_admin)
+            {
+                write_menu_item(Response, this_link, "users", "users.aspx");
+            }
+
 
             // go to
 
@@ -301,8 +281,8 @@ function dbg(s)
 
 <td nowrap valign=middle>
     <form style='margin: 0px; padding: 0px;' action=search_text.aspx method=get>
-        <input class=btn style='font-size: 7pt;' type=submit value='search:'>
-        <input style='padding: 0px; font-size: 8pt;' size=20 type=text class=txt
+        <input class=menubtn type=submit value='search text'>
+        <input class=menuinput  size=24 type=text class=txt
         value='" + query + @"'name=query accesskey=s>
         <a href=lucene_syntax.html target=_blank style='font-size: 7pt;'>advanced</a>
     </form>
@@ -322,6 +302,27 @@ function dbg(s)
 			}
            	Response.Write(user.username);
             Response.Write("</span></td>");
+
+            if (auth_method == "plain")
+            {
+                if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
+                {
+                	write_menu_item(Response, this_link, "login", "default.aspx");
+				}
+				else
+				{
+					write_menu_item(Response, this_link, "logoff", "logoff.aspx");
+				}
+            }
+            
+            // for guest account, suppress display of "edit_self
+            if (!user.is_guest)
+            {
+                write_menu_item(Response, this_link, "settings", "edit_self.aspx");
+            }
+
+
+            write_menu_item(Response, this_link, "about", "about.html");
 
             Response.Write("<td nowrap valign=middle>");
             Response.Write("<a target=_blank href=http://ifdefined.com/README.html>help</a></td>");

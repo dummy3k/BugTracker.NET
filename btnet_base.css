@@ -1,10 +1,20 @@
-body {font-family: verdana, arial; font-size: 10pt; background: #ffffff; }
-td {font-size: 8pt;}
-p {font-size: 10pt;}
+body {
+	font-family: verdana, arial; 
+	font-size: 10pt; 
+	background: #ffffff;
+}
 
-a {color:#0000ff; font-size: 10pt; text-decoration: none; }
+td {
+	font-size: 8pt;
+}
+
+p {
+	font-size: 10pt;
+}
+
+a         {color:#0000ff; font-size: 10pt; text-decoration: none; }
 a:visited {color:#0000ff; font-size: 10pt; text-decoration: none; }
-a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
+a:hover   {color:#ff6633; font-size: 10pt; text-decoration: none; }
 
 
 /* bug tables */
@@ -74,10 +84,10 @@ a:hover {color:#ff6633; font-size: 10pt; text-decoration: none; }
 
 /* table cell */
 .datad {
-background: #ffffff;
-vertical-align: top;
-border: 1px solid #aaaaaa;
-padding: 3px;
+	background: #ffffff;
+	vertical-align: top;
+	border: 1px solid #aaaaaa;
+	padding: 3px;
 }
 
 
@@ -91,6 +101,22 @@ padding: 3px;
 	background: #ffeeaa;
 	color: #0000ff;
 }
+
+.menubtn {
+	padding-left: 2px;
+	padding-right: 2px;
+	margin-right: 0px;
+	background:#d0ddd0;
+	style='font-size: 7pt;'
+}
+
+.menuinput {
+	margin-left: 0px;
+	padding-left: 0px;
+	padding: 0px; 
+	font-size: 8pt;
+}
+
 
 .menubar {
 	background: #f0fff0;
@@ -183,8 +209,6 @@ padding: 3px;
 	overflow: hidden;
 }
 
-.buglist_popup hr {width:50%; height: 1px;}
-
 .suggest_select {
 	font-size:8pt;
 	background: #ccffcc;
@@ -215,8 +239,7 @@ padding: 3px;
 
 
 
-.tab_btn
-{
+.tab_btn {
 	padding-left: 10px;
 	padding-right: 10px;
 	padding-top: 5px;
@@ -230,8 +253,7 @@ padding: 3px;
 	border-right: 2px black solid;
 }
 
-.tab_btn_pushed
-{
+.tab_btn_pushed {
 	padding-left: 10px;
 	padding-right: 10px;
 	padding-top: 5px;
@@ -245,7 +267,12 @@ padding: 3px;
 	border-right: 1px silver solid;
 }
 
-.private {font-size: 7pt; color:red; font-weight: bold; letter-spacing: 3px;}
+.private {
+	font-size: 7pt; 
+	color:red; 
+	font-weight: bold; 
+	letter-spacing: 3px;
+}
 
 
 select {
@@ -257,15 +284,13 @@ option {
 	font-size: 8pt;
 }
 
-.edit_bug_option
-{
+.edit_bug_option {
 	font-size: 8pt;
 	font-weight: bold;
 }
 
 /* for "[no category]", etc, for dropdowns */
-.edit_bug_option_none
-{
+.edit_bug_option_none {
 	font-size: 8pt;
 	color: #666666;
 	background: #f3f3f3;
