@@ -70,8 +70,12 @@ string.
 * Fixed bug 2165900 - "Error sending email notifiations" due to null
 characters in the message body.  How does that happen?
 
+* Revised how the text looks that appears when you hover over a bug
+link and I mostly fixed the flicker effect when the popup text would 
+trigger the browser to display a scrollbar.
+
 * Added an animation effect.  It highlights a newly added comment, 
-attachment, or email post.
+attachment, or email post.  Inspired by Stackoverflow.com.
 
 * Changed adding attachment page to give a little bit better feedback.
 

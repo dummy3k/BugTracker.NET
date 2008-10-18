@@ -288,19 +288,19 @@ function get_or_post()
 	frm.method = '<% Response.Write(Util.get_setting("BugListFormSubmitMethod","POST")); %>';
 }
 
-function on_query_changed() {
+function on_query_changed()
+{
 	var frm = document.getElementById(asp_form_id);
 	frm.actn.value = "query";
 	frm.submit();
 }
+
 
 </script>
 
 </head>
 <body onload="get_or_post()">
 <% security.write_menu(Response, Util.get_setting("PluralBugLabel","bugs")); %>
-
-<div id="popup" class="buglist_popup"></div>
 
 <form method="get" runat="server">
 

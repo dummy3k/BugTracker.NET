@@ -215,7 +215,15 @@ namespace btnet
             string custom_header = (string)Util.context.Application["custom_header"];
             Response.Write(custom_header);
 
-            Response.Write("<table border=0 width=100% cellpadding=0 cellspacing=0 class=menubar><tr>");
+            Response.Write(@"
+<span id=debug style='position:absolute;top:0;left:0;'></span>
+<script>
+function dbg(s)
+{
+	document.getElementById('debug').innerHTML += (s + '<br>')
+}
+</script>
+<table border=0 width=100% cellpadding=0 cellspacing=0 class=menubar><tr>");
 
             // logo
             string logo = (string)Util.context.Application["custom_logo"];

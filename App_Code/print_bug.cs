@@ -667,8 +667,9 @@ namespace btnet
 				{
 					Response.Write("<img src=attach.gif>");
 				}
-				Response.Write ("attachment:&nbsp;</span>");
+				Response.Write ("attachment:&nbsp;</span><span class=cmt_text>");
 				Response.Write (dr["bp_file"]);
+				Response.Write ("</span>");
 
 				if (write_links)
 				{

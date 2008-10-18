@@ -11,6 +11,7 @@ var enable_popups = <% Response.Write(security.user.enable_popups ? "1" : "0"); 
 var asp_form_id = '<% Response.Write(Util.get_form_name()); %>';
 </script>
 
+<div id="popup" class="buglist_popup"></div>
 
 
 

@@ -1703,7 +1703,6 @@ function set_project_changed() {
 
 <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
 <div id="suggest_popup" style="position:absolute; display:none; z-index:1000;"></div>
-<div id="popup" class="buglist_popup"></div>
 
 <div class=align>
 

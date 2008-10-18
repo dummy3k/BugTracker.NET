@@ -64,13 +64,16 @@ var ajax_url="ajax.aspx?bugid="
 var current_element
 var current_bug
 
-function find_position(obj) {
+function find_position(obj)
+{
 	var curleft = curtop = 0;
 	curleft = obj.offsetLeft
 	curtop = obj.offsetTop
 
-	if (obj.offsetParent) {
-		while (obj = obj.offsetParent) {
+	if (obj.offsetParent)
+	{
+		while (obj = obj.offsetParent)
+		{
 			curleft += obj.offsetLeft
 			curtop += obj.offsetTop
 		}
@@ -102,17 +105,35 @@ function stateChanged()
 			var popup = document.getElementById("popup");
 			if (xmlHttp.responseText != "")
 			{
-				popup.innerHTML = xmlHttp.responseText
-				var pos = find_position(current_element)
-
-				popup.style.left = pos[0] + 30;
-				popup.style.top = pos[1] + 28;
-				popup.style.display = "block";
-
+				display_popup(xmlHttp.responseText)
 			}
 		}
 	}
 }
+
+function display_popup(s)
+{ 
+	popup.innerHTML = s
+	var pos = find_position(current_element)
+
+	popup.style.height= ""
+	popup.style.display = "block";
+	myleft = pos[0] + 30
+	mytop = pos[1] + 28
+	viewport_height = get_viewport_size()[1]
+	// prevent flicker because of new scrollbar changing mouse/text relative position
+	if (mytop + popup.offsetHeight > viewport_height)
+	{
+		overflow = (mytop + popup.offsetHeight) - viewport_height
+		newh = popup.offsetHeight -  overflow
+		newh -= 20 // not sure why i need the margin..
+		popup.style.height = newh 
+	}
+	popup.style.left = myleft
+	popup.style.top = mytop
+			
+}
+
 
 function GetXmlHttpObject()
 {
@@ -277,3 +298,21 @@ function done_selecting_tags()
 	on_tags_change()
 }
 
+
+function get_viewport_size() {
+  var myWidth = 0, myHeight = 0;
+  if( typeof( window.innerWidth ) == 'number' ) {
+    //Non-IE
+    myWidth = window.innerWidth;
+    myHeight = window.innerHeight;
+  } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+    //IE 6+ in 'standards compliant mode'
+    myWidth = document.documentElement.clientWidth;
+    myHeight = document.documentElement.clientHeight;
+  } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+    //IE 4 compatible
+    myWidth = document.body.clientWidth;
+    myHeight = document.body.clientHeight;
+  }
+  return [myWidth, myHeight];
+}

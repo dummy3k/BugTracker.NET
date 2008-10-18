@@ -105,7 +105,7 @@ padding: 3px;
 }
 
 .cmt_text {
-	font-family:courier;
+	font-family:courier new;
 	font-size: 10pt;
 }
 
@@ -170,16 +170,17 @@ padding: 3px;
 	border-left: 1px solid silver;
 	border-top: 1px solid silver;
 	border-right: 2px solid black;
-	border-bottom: 3px solid black;
+	border-bottom: 1px dashed #666666; 
 	padding: 3px;
 	position:absolute; top:0; left:0;
 	background:#ddffdd;
 	color:black;
 	display:none;
 	width: 500;
-	font-size: 8pt;
+	font-size: 7pt;
 	font-family: verdana;
-	text-overflow: clip;
+	margin:0;
+	overflow: hidden;
 }
 
 .buglist_popup hr {width:50%; height: 1px;}
