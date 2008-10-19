@@ -222,6 +222,22 @@ function dbg(s)
 {
 	document.getElementById('debug').innerHTML += (s + '<br>')
 }
+function on_submit_search()
+{
+	el = document.getElementById('lucene_input')
+	if (el.value == '')
+	{
+		alert('Enter the words you are search for.');
+		el.focus()
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+
+}
+
 </script>
 <table border=0 width=100% cellpadding=0 cellspacing=0 class=menubar><tr>");
 
@@ -280,9 +296,9 @@ function dbg(s)
                 string search_form = @"
 
 <td nowrap valign=middle>
-    <form style='margin: 0px; padding: 0px;' action=search_text.aspx method=get>
+    <form style='margin: 0px; padding: 0px;' action=search_text.aspx method=get onsubmit='return on_submit_search()'>
         <input class=menubtn type=submit value='search text'>
-        <input class=menuinput  size=24 type=text class=txt
+        <input class=menuinput  id=lucene_input size=24 type=text class=txt
         value='" + query + @"'name=query accesskey=s>
         <a href=lucene_syntax.html target=_blank style='font-size: 7pt;'>advanced</a>
     </form>

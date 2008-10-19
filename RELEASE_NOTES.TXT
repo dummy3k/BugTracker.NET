@@ -41,7 +41,7 @@ blog about lucene.net
 
 
 -----------------------------------------------------------------------
-Version 2.9.7   10/xx/2008 
+Version 2.9.7   10/18/2008 
 -----------------------------------------------------------------------
 
 ** IMPORTANT CHANGE: Changed how the special "guest" user works. Before
@@ -60,24 +60,26 @@ A guest user is still different in these ways:
 
 Also in this release:
 
-* Lucene.Net search now handling floats like 1,23 instead of 1.23.
+* Fixed bug when Lucene.Net was dealing with floats in the form 1,23 
+instead of 1.23.
 
-* Very minor performance improvement in Lucene search.
+* Fixed bug 2171746 "Server error with blank Lucene search"
 
-* Less ugly error handling when user enters a blank or invalid search
-string.
+* Fixed bug 1969789 "bugs.aspx popup flickers when it's a big popup"
 
-* Fixed bug 2165900 - "Error sending email notifiations" due to null
+* Fixed bug 2165900 "Error sending email notifiations" due to null
 characters in the message body.  How does that happen?
 
-* Revised how the text looks that appears when you hover over a bug
-link and I mostly fixed the flicker effect when the popup text would 
-trigger the browser to display a scrollbar.
+* Fixed bug 1968648 "Internal comments not on popup"
 
-* Added an animation effect.  It highlights a newly added comment, 
-attachment, or email post.  Inspired by Stackoverflow.com.
+* Cosmetic improvements.  Well, I hope you think the cosmetic changes
+are improvements.  Highlights of the changes include re-arragnement
+of the menu bar across the page, icons next to some of the links, icons
+to distinguish the different post types, popup now looks like a 
+miniture version of the posts on the edit_bug.aspx page, animation
+effect when adding posts.   
 
-* Changed adding attachment page to give a little bit better feedback.
+Please do let me know what you think of the changes.
 
 -----------------------------------------------------------------------
 Version 2.9.6   10/12/2008 
