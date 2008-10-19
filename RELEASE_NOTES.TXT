@@ -14,6 +14,7 @@ Corey's TO DO list:
 
 * allow the command line of SVN to be configurable
 * add settings for turning off printing of change history.
+
 * auto subscribe if you modified bug
 * default value for internal comments
 * many to many, queries to organizations
@@ -44,11 +45,13 @@ blog about lucene.net
 Version 2.9.8   10/XX/2008 
 -----------------------------------------------------------------------
 
-When the popup just has history, it doesn't look right
 
-creator shouldn't be hotlink when view only, and maybe never.
+email hotlinks in view only?, like creator
 
-* Some cosmetic changes.  
+* A few more cosmetic changes
+
+* added 
+DisplayAnotherButtonInEditBugPage
 
 -----------------------------------------------------------------------
 Version 2.9.7   10/18/2008 

@@ -312,8 +312,9 @@ function maybe_autopostback(eventTarget, eventArgument)
 }
 
 
-// prevent user from hitting "Submit" twice
 var cnt = 0
+
+// prevent user from hitting "Submit" twice
 function disable_me()
 {
 	cnt++
@@ -321,7 +322,11 @@ function disable_me()
 	{
 		el = window.document.getElementById("sub");
 		el.disabled = true;
+	
+		disable_another_button() // if there is one...
 	}
+	
+	
 }
 
 function set_cookie(name,value) {

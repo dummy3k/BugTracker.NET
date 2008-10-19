@@ -294,7 +294,7 @@ namespace btnet
 				Response.Write ("\n<table id='posts_table' border=0 cellpadding=0 cellspacing=3>");
 			}
 
-			DataSet ds_posts = btnet.Bug.get_bug_posts(bugid);
+			DataSet ds_posts = get_bug_posts(bugid, user.external_user, history_inline);
 			int post_cnt = ds_posts.Tables[0].Rows.Count;
 			
 			int bp_id;
@@ -306,10 +306,10 @@ namespace btnet
 
 				if (user.external_user)
 				{
-					if ((int)dr["bp_hidden_from_external_users"] == 1)
-					{
-						continue; // don't show
-					}
+					//if ((int)dr["bp_hidden_from_external_users"] == 1)
+					//{
+					//	continue; // don't show
+					//}
 				}
 
 				bp_id = (int) dr["bp_id"];
@@ -317,10 +317,10 @@ namespace btnet
 
 				if ((string)dr["bp_type"] == "update")
 				{
-					if (!history_inline)
-					{
-						continue;
-					}
+					//if (!history_inline)
+					//{
+					//	continue;
+					//}
 
 					string comment = (string) dr["bp_comment"];
 
@@ -989,6 +989,61 @@ namespace btnet
             }
         }
 
+
+        ///////////////////////////////////////////////////////////////////////
+        public static DataSet get_bug_posts(int bugid, bool external_user, bool history_inline)
+        {
+            string sql = @"
+/* get_bug_posts */
+select
+a.bp_bug,
+a.bp_comment,
+isnull(us_username,'') [us_username],
+case rtrim(us_firstname)
+	when null then isnull(us_lastname, '')
+	when '' then isnull(us_lastname, '')
+	else isnull(us_lastname + ', ' + us_firstname,'')
+	end [us_fullname],
+isnull(us_email,'') [us_email],
+a.bp_date,
+datediff(s,a.bp_date,getdate()) [seconds_ago],
+a.bp_id,
+a.bp_type,
+isnull(a.bp_email_from,'') bp_email_from,
+isnull(a.bp_email_to,'') bp_email_to,
+isnull(a.bp_email_cc,'') bp_email_cc,
+isnull(a.bp_file,'') bp_file,
+isnull(a.bp_size,0) bp_size,
+isnull(a.bp_content_type,'') bp_content_type,
+a.bp_hidden_from_external_users,
+isnull(ba.bp_file,'') ba_file,  -- intentionally ba
+isnull(ba.bp_id,'') ba_id, -- intentionally ba
+isnull(ba.bp_size,'') ba_size,  -- intentionally ba
+isnull(ba.bp_content_type,'') ba_content_type -- intentionally ba
+from bug_posts a
+left outer join users on us_id = a.bp_user
+left outer join bug_posts ba on ba.bp_parent = a.bp_id and ba.bp_bug = a.bp_bug
+where a.bp_bug = $id
+and a.bp_parent is null";
+
+
+			if (!history_inline)
+			{
+				sql += "\n and a.bp_type <> 'update'";
+			}
+			
+			if (external_user)
+			{
+				sql += "\n and a.bp_hidden_from_external_users = 0";
+			}
+			
+			sql += "\n order by a.bp_date desc";
+
+            sql = sql.Replace("$id", Convert.ToString(bugid));
+            DbUtil dbutil = new DbUtil();
+            return dbutil.get_dataset(sql);
+
+        }
 
 
 	} // end PrintBug

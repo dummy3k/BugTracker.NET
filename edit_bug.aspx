@@ -135,13 +135,15 @@ void Page_Load(Object sender, EventArgs e)
 		if (id == 0)
 		{
 			sub.Value = "Create";
-			comment.Rows = 12;
-		}
-		else
-		{
-			sub.Value = "Update";
 		}
 
+		if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1")
+		{
+			if (id == 0)
+			{
+				sub2.Value = "Create";
+			}
+		}
 
 		if (id == 0)  // prepare the page for adding a new bug
 		{
@@ -1207,6 +1209,12 @@ void set_controls_field_permission(int bug_permission_level)
 		{
 			sub.Disabled = true;
 			sub.Visible = false;
+			if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1")
+			{
+				sub2.Disabled = true;
+				sub2.Visible = false;
+			}
+
 			plus_label.Visible = false;
 			comment_label.Visible = false;
 			comment.Visible = false;
@@ -2024,7 +2032,6 @@ void on_update (Object sender, EventArgs e)
 
 			new_id.Value = Convert.ToString(id);
 			msg.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was created.";
-			sub.Value = "Update";
 			Response.Redirect("edit_bug.aspx?id=" + Convert.ToString(id));
 			status_changed = true;
 
@@ -2302,6 +2309,15 @@ function start_animation()
 	}
 
 <% } %>	
+}
+
+
+function disable_second_button()
+{
+<% if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1") { %>
+	el = window.document.getElementById("sub");
+	el.disabled = true;
+<% } %>	
 
 }
 
@@ -2349,6 +2365,19 @@ function start_animation()
 
 <div id="bugform_div">
 <form class=frm runat="server">
+
+	<% if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1") { %>
+	<div style="text-align: center;">
+		<input
+			runat="server"
+			class=btn
+			type=submit
+			id="sub2"
+			onclick="disable_me()"
+			value="Update"
+			OnServerClick="on_update">
+	</div>			
+	<% } %>			
 	<table border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td nowrap valign=top>
@@ -2496,11 +2525,20 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		if (permission_on_original == Security.PERMISSION_READONLY
 		|| permission_on_original == Security.PERMISSION_REPORTER)
 		{
-			Response.Write ("<span class='stat' id=\"" + field_id +  "_static\">");
-			//modified by CJU on jan 9 2008
-			Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
-			//end modified by CJU on jan 9 2008
-			Response.Write ("</span>");
+			string text = btnet.Util.format_db_value(hash_custom_cols[(string)drcc["name"]]);
+			if ( fieldLength > minTextAreaSize && !string.IsNullOrEmpty(text))
+			{
+				// more readable if there is a lot of text
+				Response.Write ("<div class='short_desc_static'  id=\"" + field_id +  "_static\">");
+				Response.Write (text);
+				Response.Write ("</div>");
+			}
+			else
+			{
+				Response.Write ("<span class='stat' id=\"" + field_id +  "_static\">");
+				Response.Write (text);
+				Response.Write ("</span>");
+			}
 		}
 		else
 		{
@@ -2790,7 +2828,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			type=submit
 			id="sub"
 			onclick="disable_me()"
-			value="Create or Edit"
+			value="Update"
 			OnServerClick="on_update">
 
 	</table>
