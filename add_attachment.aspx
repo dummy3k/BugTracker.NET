@@ -11,7 +11,6 @@ Distributed under the terms of the GNU General Public License
 int bugid;
 DbUtil dbutil;
 Security security;
-int added_attachment = 0;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
 

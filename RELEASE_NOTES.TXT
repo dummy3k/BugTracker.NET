@@ -13,6 +13,7 @@ Corey's TO DO list:
 
 
 * allow the command line of SVN to be configurable
+
 * add settings for turning off printing of change history.
 
 * auto subscribe if you modified bug
@@ -52,6 +53,9 @@ email hotlinks in view only?, like creator
 
 * added 
 DisplayAnotherButtonInEditBugPage
+
+* added
+SubversionAdditionalArgs
 
 -----------------------------------------------------------------------
 Version 2.9.7   10/18/2008 

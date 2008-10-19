@@ -1,5 +1,4 @@
 <%@ Page language="C#" ValidateRequest="false" %>
-<%@ Import Namespace="System.Collections.Generic" %>
 <!--
 Copyright 2002-2008 Corey Trager
 Distributed under the terms of the GNU General Public License

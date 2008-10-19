@@ -1261,6 +1261,13 @@ drop table #temp2";
 			p.StartInfo.RedirectStandardError = true;
 
 			args_without_password += " --non-interactive";
+
+			string more_args = Util.get_setting("SubversionAdditionalArgs", "");			
+			if (more_args != "")
+			{
+				args_without_password += " " + more_args;
+			}
+			
 			Util.write_to_log ("Subversion command:" + svn_path + " " + args_without_password);
 
 			string args_with_password = args_without_password;
