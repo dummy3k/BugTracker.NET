@@ -101,8 +101,6 @@ function stateChanged()
 	{
 		if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
 		{
-
-			var popup = document.getElementById("popup");
 			if (xmlHttp.responseText != "")
 			{
 				display_popup(xmlHttp.responseText)
@@ -115,6 +113,8 @@ function display_popup(s)
 { 
 	if (s.indexOf("zeroposts") > 0)
 		return;
+
+	var popup = document.getElementById("popup");
 	
 	popup.innerHTML = s
 	var pos = find_position(current_element)

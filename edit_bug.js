@@ -519,6 +519,8 @@ var ren2 = new RegExp( "\\n\\n", "g" )
 
 function count_chars(textarea_id, max)
 {
+	mark_dirty()
+	
 	var textarea = document.getElementById(textarea_id)
 	var count_span = document.getElementById(textarea_id + "_cnt");
 
@@ -541,8 +543,6 @@ function count_chars(textarea_id, max)
 		count_span.firstChild.nodeValue = (max - len) + " more characters allowed"
 	}
 
-	mark_dirty()
-	
 	return true
 }
 

@@ -1000,7 +1000,7 @@ void set_shortdesc_field_permission()
 	// turn on the spans to hold the data
 	if (id != 0)
 	{
-		static_short_desc.Style["display"] = "";
+		static_short_desc.Style["display"] = "block";
 		short_desc.Visible = false;
 	}
 
@@ -2350,17 +2350,25 @@ function start_animation()
 <div id="bugform_div">
 <form class=frm runat="server">
 	<table border=0 cellpadding=3 cellspacing=0>
-
 	<tr>
-		<td nowrap colspan=2>
+		<td nowrap valign=top>
 			<span class=lbl id="bugid_label" runat="server"></span>
-			<span runat="server" class=static id="bugid"></span>
-			&nbsp;&nbsp;&nbsp;
-			<span class=static id="static_short_desc" runat="server" style='width:500px; display:none;'></span>
-			<input runat="server" type=text class=txt id="short_desc" size="100" maxlength="200"  onkeydown="mark_dirty()" onkeyup="mark_dirty()">
-			&nbsp;&nbsp;&nbsp;
-			<span runat="server" class=err id="short_desc_err">&nbsp;</span>
+			<span runat="server" class="bugid" id="bugid"></span>&nbsp;
 
+		<td valign=top>			
+
+			<span class="short_desc_static" id="static_short_desc" runat="server" style='width:500px; display:none;'></span>
+
+
+			<input runat="server" type=text class="short_desc_input" id="short_desc" maxlength="200"  
+				onkeydown="count_chars('short_desc',200)" onkeyup="count_chars('short_desc',200)">
+				&nbsp;&nbsp;&nbsp;
+				<span runat="server" class=err id="short_desc_err"></span>
+				
+			<div class=smallnote id="short_desc_cnt">&nbsp;</div>
+
+	</table>			
+	<table width=100% border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td nowrap>
 			<span runat="server" id=reported_by></span>
@@ -2371,7 +2379,7 @@ function start_animation()
 				href="javascript:get_presets()">use</a>
 			&nbsp;/&nbsp;
 			<a title="Save current settings for project, category, priority, etc., so that you can reuse later."
-				href="javascript:set_presets()">save</a>
+				href="javascript:set_presets()">save</a>&nbsp;&nbsp;
 		<% } %>
 
 	</table>
@@ -2383,7 +2391,7 @@ function start_animation()
 	        <span class=lbl id="tags_label" runat="server">Tags:&nbsp;</span>
 	    </td>
 		<td nowrap>
-			<span class=static id="static_tags" runat="server"></span>
+			<span class="stat" id="static_tags" runat="server"></span>
 			<input runat="server" type=text class=txt id="tags" size="70" maxlength="80"  onkeydown="mark_dirty()" onkeyup="mark_dirty()">
 			<span id="tags_link" runat="server">&nbsp;&nbsp;<a href='javascript:show_tags()'>tags</a></span>
 
@@ -2392,7 +2400,7 @@ function start_animation()
 		<td nowrap>
 			<span class=lbl id="project_label" runat="server">Project:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_project" runat="server"></span>
+			<span class="stat" id="static_project" runat="server"></span>
 
 			<asp:DropDownList id="project" runat="server"
 			AutoPostBack="True"></asp:DropDownList>
@@ -2405,35 +2413,35 @@ function start_animation()
 		<td nowrap>
 			<span class=lbl id="org_label" runat="server">Organization:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_org" runat="server"></span>
+			<span class="stat" id="static_org" runat="server"></span>
 			<asp:DropDownList id="org" runat="server"></asp:DropDownList>
 
 	<tr id="row3">
 		<td nowrap>
 			<span class=lbl id="category_label" runat="server">Category:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_category" runat="server"></span>
+			<span class="stat" id="static_category" runat="server"></span>
 			<asp:DropDownList id="category" runat="server"></asp:DropDownList>
 
 	<tr id="row4">
 		<td nowrap>
 			<span class=lbl id="priority_label" runat="server">Priority:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_priority" runat="server"></span>
+			<span class="stat" id="static_priority" runat="server"></span>
 			<asp:DropDownList id="priority" runat="server"></asp:DropDownList>
 
 	<tr id="row5">
 		<td nowrap>
 			<span class=lbl id="assigned_to_label" runat="server">Assigned to:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_assigned_to" runat="server"></span>
+			<span class="stat" id="static_assigned_to" runat="server"></span>
 			<asp:DropDownList id="assigned_to" runat="server"></asp:DropDownList>
 
 	<tr id="row6">
 		<td nowrap>
 			<span class=lbl id="status_label" runat="server">Status:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_status" runat="server"></span>
+			<span class="stat" id="static_status" runat="server"></span>
 			<asp:DropDownList id="status" runat="server"></asp:DropDownList>
 
 <%
@@ -2445,7 +2453,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			<span class=lbl id="udf_label" runat="server">
 			<% Response.Write(btnet.Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE")); %>:&nbsp;</span>
 		<td nowrap>
-			<span class=static id="static_udf" runat="server"></span>
+			<span class="stat" id="static_udf" runat="server"></span>
 			<asp:DropDownList id="udf" runat="server">
 			</asp:DropDownList>
 <%
@@ -2488,7 +2496,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		if (permission_on_original == Security.PERMISSION_READONLY
 		|| permission_on_original == Security.PERMISSION_REPORTER)
 		{
-			Response.Write ("<span class=static id=\"" + field_id +  "_static\">");
+			Response.Write ("<span class='stat' id=\"" + field_id +  "_static\">");
 			//modified by CJU on jan 9 2008
 			Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
 			//end modified by CJU on jan 9 2008
@@ -2669,8 +2677,8 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 					|| permission_on_original == Security.PERMISSION_REPORTER)
 					{
 						// GC: 20-Feb-08: Modified to add an ID to the SPAN as well for easier CSS customisation
-						//Response.Write ("<span class=static>");
-						Response.Write ("<span class=static id=pcd" + Convert.ToString(i) + ">");
+						//Response.Write ("<span class="stat">");
+						Response.Write ("<span class='stat' id=pcd" + Convert.ToString(i) + ">");
 						if (IsPostBack)
 						{
 							Response.Write (Request["pcd" + Convert.ToString(i)]);
@@ -2762,7 +2770,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		<span class="smallnote" style="margin-left: 170px">
 		Entering "<% Response.Write(btnet.Util.get_setting("BugLinkMarker","bugid#")); %>999" in comment creates link to id 999</span>
 		<br>
-		<textarea  id="comment" rows=4 cols=80 runat="server" class=txt onkeydown="mark_dirty()" onkeyup="mark_dirty()"></textarea>
+		<textarea  id="comment" rows=5 cols=100 runat="server" class=txt onkeydown="mark_dirty()" onkeyup="mark_dirty()"></textarea>
 		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>
 
 	<tr><td  nowrap>

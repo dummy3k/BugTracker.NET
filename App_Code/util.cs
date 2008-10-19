@@ -310,11 +310,11 @@ function on_submit_search()
             Response.Write("<td nowrap valign=middle>");
 			if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
 			{
-				Response.Write("<span class=smallnote>");
+				Response.Write("<span class=smallnote>using as<br>");
 			}
 			else
 			{
-				Response.Write("<span class=smallnote>logged in as:<br>");
+				Response.Write("<span class=smallnote>logged in as<br>");
 			}
            	Response.Write(user.username);
             Response.Write("</span></td>");
