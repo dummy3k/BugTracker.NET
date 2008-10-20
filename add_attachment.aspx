@@ -24,8 +24,6 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
-	added_attachment = 0;
-
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "add attachment";
 
