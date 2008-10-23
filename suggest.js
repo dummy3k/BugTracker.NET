@@ -37,7 +37,7 @@ function get_suggestion()
 	mylike = document.getElementById("like")
 	s = mylike.value
 
-	if (s.length >= saerch_suggest_min_chars)
+	if (s.length >= search_suggest_min_chars)
 	{
 		if (s != prev_desc)
 		{
@@ -52,10 +52,6 @@ function get_suggestion()
 			xmlHttp.onreadystatechange=stateChanged2
 			xmlHttp.open("GET",url,true)
 			xmlHttp.send(null)
-		}
-		else
-		{
-			hide_suggest()
 		}
 	}
 	else
@@ -147,7 +143,7 @@ function search_criteria_onkeydown(el, ev)
 		}
 	}
 	// tab
-	else if (keynum = 9)
+	else if (keynum == 9)
 	{
 		hide_suggest()
 	}

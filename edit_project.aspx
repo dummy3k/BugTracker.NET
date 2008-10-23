@@ -150,6 +150,50 @@ Boolean validate()
 	{
 		name_err.InnerText = "";
 	}
+	
+	string vals_error_string = "";
+	bool errors_with_custom_dropdowns = false;
+	vals_error_string = btnet.Util.validate_dropdown_values(custom_dropdown_values1.Value);
+	if (!string.IsNullOrEmpty(vals_error_string))
+	{
+		good = false;
+		custom_dropdown_values1_err.InnerText = vals_error_string;
+		errors_with_custom_dropdowns = true;
+	}
+	else
+	{
+		custom_dropdown_values1_err.InnerText = "";
+	}
+	
+	vals_error_string = btnet.Util.validate_dropdown_values(custom_dropdown_values2.Value);
+	if (!string.IsNullOrEmpty(vals_error_string))
+	{
+		good = false;
+		custom_dropdown_values2_err.InnerText = vals_error_string;
+		errors_with_custom_dropdowns = true;
+	}
+	else
+	{
+		custom_dropdown_values2_err.InnerText = "";
+	}
+	
+	vals_error_string = btnet.Util.validate_dropdown_values(custom_dropdown_values3.Value);
+	if (!string.IsNullOrEmpty(vals_error_string))
+	{
+		good = false;
+		custom_dropdown_values3_err.InnerText = vals_error_string;
+		errors_with_custom_dropdowns = true;
+	}
+	else
+	{
+		custom_dropdown_values3_err.InnerText = "";
+	}
+
+
+	if (errors_with_custom_dropdowns)
+	{
+		msg.InnerText += "Custom fields have errors.  ";
+	}
 
 
 	return good;
@@ -285,11 +329,11 @@ void on_update (Object sender, EventArgs e)
 	{
 		if (id == 0)  // insert new
 		{
-			msg.InnerText = "Project was not created.";
+			msg.InnerText += "Project was not created.";
 		}
 		else // edit existing
 		{
-			msg.InnerText = "Project was not updated.";
+			msg.InnerText += "Project was not updated.";
 		}
 
 	}
@@ -513,11 +557,17 @@ function show_subversion_settings()
 	Use the following if you want to have a custom field for this project only.
 	<br>1. Check the box to enable the field.
 	<br>2. Fill in the label.
-	<br>3. Create a pipe seperated list of values as shown below.
-	<br>Each individual value can't be longer than 40 characters:
-	<br>Don't use double quotes in the list of values.
+	<br>3. Create a list of values.  One value per line.
+	<br>No individiual value should be longer than the length of your custom field.
+	<br>Don't use commas, &gt;, &lt;, or quotes in the list of values.
+	<br>Line breaks for your readability are ok.
+	<br>Here are some examples:
 	<br>
-	"version 1.0|Version 1.1|Version 1.2"
+	"1.0|1.1|1.2"
+	<br>
+	"red|blue|green"
+	<br>It's ok to have one of the values be blank:<br>
+	"|red|blue|green"
 	</span>
 	</td>
 	</tr>
@@ -544,7 +594,7 @@ function show_subversion_settings()
 	<tr>
 	<td class=lbl>Custom Dropdown Values 1:</td>
 	<td><textarea cols=40 rows=2 runat="server" type=text class=txt id="custom_dropdown_values1"></textarea></td>
-	<td>&nbsp</td>
+	<td runat="server" class=err id="custom_dropdown_values1_err">&nbsp;</td>
 	</tr>
 
 	<tr>
@@ -568,7 +618,7 @@ function show_subversion_settings()
 	<tr>
 	<td class=lbl>Custom Dropdown Values 2:</td>
 	<td><textarea cols=40 rows=2 runat="server" type=text class=txt id="custom_dropdown_values2"></textarea></td>
-	<td>&nbsp</td>
+	<td runat="server" class=err id="custom_dropdown_values2_err">&nbsp;</td>
 	</tr>
 
 	<tr>
@@ -592,7 +642,7 @@ function show_subversion_settings()
 	<tr>
 	<td class=lbl>Custom Dropdown Values 3:</td>
 	<td><textarea cols=40 rows=2 runat="server" type=text class=txt id="custom_dropdown_values3"></textarea></td>
-	<td>&nbsp</td>
+	<td runat="server" class=err id="custom_dropdown_values3_err">&nbsp;</td>
 	</tr>
 
 	</table>

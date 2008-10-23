@@ -130,39 +130,26 @@ Boolean validate()
 			good = false;
 			vals_err.InnerText = "Dropdown values are required for dropdown type of \"normal\".";
 		}
-		else if (vals.Value.Contains("'")
-		|| vals.Value.Contains("\"")
-		|| vals.Value.Contains("<")
-		|| vals.Value.Contains(">")
-		|| vals.Value.Contains("\n")
-		|| vals.Value.Contains("\t")
-		|| vals.Value.Contains("\r"))
-		{
-			good = false;
-			vals_err.InnerText = "Special characters like quotes, line breaks not allowed.";
-		}
 		else
 		{
-			string[] options = Util.split_string_using_pipes(vals.Value);
-
-			for (int i = 0; i < options.Length; i++)
+			string vals_error_string = btnet.Util.validate_dropdown_values(vals.Value);
+			if (!string.IsNullOrEmpty(vals_error_string))
 			{
-				if (options[i].StartsWith(" ") || options[i].EndsWith(" "))
+				good = false;
+				vals_err.InnerText = vals_error_string;
+			}
+			else
+			{
+				if (datatype.SelectedItem.Value == "int"
+				|| datatype.SelectedItem.Value == "decimal"
+				|| datatype.SelectedItem.Value == "datetime")
 				{
 					good = false;
-					vals_err.InnerText = "Dropdown values not allowed to have leading or trailing spaces.";
-					break;
+					datatype_err.InnerText = "For a normal dropdown datatype must be char, varchar, nchar, or nvarchar.";
 				}
 			}
 		}
-
-		if (datatype.SelectedItem.Value == "int"
-		|| datatype.SelectedItem.Value == "decimal"
-		|| datatype.SelectedItem.Value == "datetime")
-		{
-			good = false;
-			datatype_err.InnerText = "For a normal dropdown datatype must be char, varchar, nchar, or nvarchar.";
-		}
+		
 	}
 	else if (dropdown_type.SelectedItem.Value == "users")
 	{
@@ -280,7 +267,7 @@ void on_update (Object sender, EventArgs e)
 
 				insert into custom_col_metadata
 				(ccm_colorder, ccm_dropdown_vals, ccm_sort_seq, ccm_dropdown_type)
-				values(@colorder, '$v', $ss, '$dt')";
+				values(@colorder, N'$v', $ss, '$dt')";
 
 
 			sql = sql.Replace("$nm", name.Value);
@@ -415,8 +402,9 @@ void on_update (Object sender, EventArgs e)
 	Use the following if you want the custom field to be a "normal" dropdown.
 	<br>Create a pipe seperated list of values as shown below.
 	<br>No individiual value should be longer than the length of your custom field.
-	<br>Don't use commas, &gt;, &lt;, quotes, or leading/trailing spaces in the list of values.
-	<br>Here some good examples:
+	<br>Don't use commas, &gt;, &lt;, or quotes in the list of values.
+	<br>Line breaks for your readability are ok.
+	<br>Here are some examples:
 	<br>
 	"1.0|1.1|1.2"
 	<br>

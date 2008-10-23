@@ -447,6 +447,7 @@ namespace btnet
 				Response.Write (format_email_username(
 					write_links,
 					bugid,
+                    permission_level,
 					(string) dr["us_email"],
 					(string) dr["us_username"],
 					(string) dr["us_fullname"]));
@@ -494,6 +495,7 @@ namespace btnet
 				Response.Write (format_email_username(
 					write_links,
 					bugid,
+                    permission_level,
 					(string) dr["us_email"],
 					(string) dr["us_username"],
 					(string) dr["us_fullname"]));
@@ -527,6 +529,7 @@ namespace btnet
 				Response.Write (format_email_username(
 					write_links,
 					bugid,
+                    permission_level,
 					(string) dr["us_email"],
 					(string) dr["us_username"],
 					(string) dr["us_fullname"]));
@@ -547,6 +550,7 @@ namespace btnet
 				Response.Write (format_email_username(
 					write_links,
 					bugid,
+                    permission_level,
 					(string) dr["us_email"],
 					(string) dr["us_username"],
 					(string) dr["us_fullname"]));
@@ -823,16 +827,20 @@ namespace btnet
         public static string format_email_username(
             bool write_links,
             int bugid,
+            int permission_level,
             string email,
             string username,
             string fullname)
         {
-            if (email != null && email != "" && write_links)
+            if (email != null && email != "" && write_links && permission_level != Security.PERMISSION_READONLY)
             {
                 return "<a href="
                 + Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/")
-                + "send_email.aspx?bg_id=" + Convert.ToString(bugid)
-                + "&to=" + email + ">"
+                + "send_email.aspx?bg_id=" 
+                + Convert.ToString(bugid)
+                + "&to=" 
+                + email 
+                + ">"
                 + format_username(username, fullname)
                 + "</a>";
             }

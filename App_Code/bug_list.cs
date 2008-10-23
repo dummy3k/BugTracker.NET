@@ -362,7 +362,7 @@ namespace btnet
 
             if (dropdown_vals != null)
             {
-                string[] options = Util.split_string_using_pipes(dropdown_vals);
+                string[] options = Util.split_dropdown_vals(dropdown_vals);
                 for (int i = 0; i < options.Length; i++)
                 {
 

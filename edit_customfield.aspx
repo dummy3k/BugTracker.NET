@@ -104,29 +104,13 @@ Boolean validate()
 			good = false;
 			vals_err.InnerText = "Dropdown values are required for dropdown type of \"normal\".";
 		}
-		else if (vals.Value.Contains("'")
-		|| vals.Value.Contains("\"")
-		|| vals.Value.Contains("<")
-		|| vals.Value.Contains(">")
-		|| vals.Value.Contains("\n")
-		|| vals.Value.Contains("\t")
-		|| vals.Value.Contains("\r"))
-		{
-			good = false;
-			vals_err.InnerText = "Special characters like quotes, line breaks not allowed.";
-		}
 		else
 		{
-			string[] options = Util.split_string_using_pipes(vals.Value);
-
-			for (int i = 0; i < options.Length; i++)
+			string vals_error_string = btnet.Util.validate_dropdown_values(vals.Value);
+			if (!string.IsNullOrEmpty(vals_error_string))
 			{
-				if (options[i].StartsWith(" ") || options[i].EndsWith(" "))
-				{
-					good = false;
-					vals_err.InnerText = "Dropdown values not allowed to have leading or trailing spaces.";
-					break;
-				}
+				good = false;
+				vals_err.InnerText = vals_error_string;
 			}
 		}
 	}
@@ -150,10 +134,10 @@ void on_update (Object sender, EventArgs e)
 			if @count = 0
 				insert into custom_col_metadata
 				(ccm_colorder, ccm_dropdown_vals, ccm_sort_seq, ccm_dropdown_type)
-				values($co, '$v', $ss, '$dt')
+				values($co, N'$v', $ss, '$dt')
 			else
 				update custom_col_metadata
-				set ccm_dropdown_vals = '$v',
+				set ccm_dropdown_vals = N'$v',
 				ccm_sort_seq = $ss
 				where ccm_colorder = $co";
 
@@ -208,8 +192,9 @@ void on_update (Object sender, EventArgs e)
 	Use the following if you want the custom field to be a "normal" dropdown.
 	<br>Create a pipe seperated list of values as shown below.
 	<br>No individiual value should be longer than the length of your custom field.
-	<br>Don't use commas, &gt;, &lt;, quotes, or leading/trailing spaces in the list of values.
-	<br>Here some good examples:
+	<br>Don't use commas, &gt;, &lt;, or quotes in the list of values.
+	<br>Line breaks for your readability are ok.
+	<br>Here are some examples:
 	<br>
 	"1.0|1.1|1.2"
 	<br>

@@ -230,10 +230,6 @@ string build_clause_from_listbox(ListBox lb, string column_name)
 ///////////////////////////////////////////////////////////////////////
 string format_in_not_in(string s)
 {
-	if (s == "")
-	{
-		return "";
-	}
 
 	string vals = "(";
 	string opts = "";
@@ -246,13 +242,17 @@ string format_in_not_in(string s)
 			opts += ",";
 		}
 
-		opts += "N'";
-		opts += s2[i].Replace("'","''");
-		opts += "'";
+		string one_opt = "N'";
+		one_opt += s2[i].Replace("'","''");
+		one_opt += "'";
+		
+		opts += one_opt;
 	}
 	vals += opts;
 	vals += ")";
+	
 	return vals;
+	
 }
 
 
@@ -395,12 +395,8 @@ void do_query()
 	{
 		string variable = (string)drcc["name"];
 		string values = Request[variable];
-		if (values == null)
-		{
-			values = "";
-		}
 
-		if (values != "")
+		if (values != null)
 		{
 
 			string custom_clause = "";
@@ -408,29 +404,37 @@ void do_query()
 			string datatype = (string) drcc["datatype"];
 
 			if ((datatype == "varchar" || datatype== "nvarchar")
-			&& (string) drcc["dropdown type"] == "")
+			&& (string) drcc["dropdown type"] == ""	)
 			{
-				custom_clause = " [" + variable + "] like '%" + values + "%'\n";
+				if (values != "")
+				{
+					custom_clause = " [" + variable + "] like '%" + values + "%'\n";
+					where = build_where(where, custom_clause);
+				}
 			}
 			else if (datatype == "datetime")
 			{
-				custom_clause = " [" + variable + "] >= '" + values + "'\n";
-				where = build_where(where, custom_clause);
-
-				// reset, and do the to date
-				custom_clause = "";
-				values = Request["$to$_" + variable];
 				if (values != "")
 				{
-					custom_clause = " [" + variable + "] <= '" + values + "'\n";
+					custom_clause = " [" + variable + "] >= '" + values + "'\n";
+					where = build_where(where, custom_clause);
+
+					// reset, and do the to date
+					custom_clause = "";
+					values = Request["$to$_" + variable];
+					if (values != "")
+					{
+						custom_clause = " [" + variable + "] <= '" + values + "'\n";
+						where = build_where(where, custom_clause);
+					}
 				}
 			}
 			else
 			{
 				string in_not_in = format_in_not_in(values);
 				custom_clause = " [" + variable + "] in " + in_not_in + "\n";
+				where = build_where(where, custom_clause);
 			}
-			where = build_where(where, custom_clause);
 		}
 	}
 
@@ -696,7 +700,7 @@ order by bg_id desc
 ///////////////////////////////////////////////////////////////////////
 void load_project_custom_dropdown(ListBox dropdown, string vals_string, Dictionary<String, String> duplicate_detection_dictionary)
 {
-	string[] vals_array = btnet.Util.split_string_using_pipes(vals_string);
+	string[] vals_array = btnet.Util.split_dropdown_vals(vals_string);
 	for (int i = 0; i < vals_array.Length; i++)
 	{
 	    if (!duplicate_detection_dictionary.ContainsKey(vals_array[i]))
@@ -1064,7 +1068,7 @@ void write_custom_date_controls(string name)
 
 <script>
 
-saerch_suggest_min_chars = <% Response.Write(Util.get_setting("SearchSuggestMinChars","3")); %>
+search_suggest_min_chars = <% Response.Write(Util.get_setting("SearchSuggestMinChars","3")); %>
 
 
 // start of mass edit javascript
@@ -1279,14 +1283,12 @@ function in_not_in_vals(el)
 					opts += ","
 				}
 
-				opts += "N'"
-				opts += el.options[i].text.replace(/'/ig,"''")
-				opts += "'" // "
+				var one_opt = "N'"
+				one_opt += el.options[i].text.replace(/'/ig,"''")
+				one_opt += "'" 
+				
+				opts += one_opt
 			}
-		}
-		if (opts == "N''")
-		{
-			return ""
 		}
 		vals += opts
 		vals += ")\n"
@@ -1423,7 +1425,7 @@ function on_change()
 		if ((datatype == "varchar" || datatype == "nvarchar")
 		&& (string) drcc["dropdown type"] == "")
 		{
-			// my_text_filed like '%val%'
+			// my_text_field like '%val%'
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
 			Response.Write (clause + " = \" [" + custom_col + "] like '%\" + el.value + \"%'\\n\"\n");
@@ -1900,13 +1902,14 @@ function set_project_changed() {
 			string selected_vals = Request[Convert.ToString(drcc["name"])];
 			if (selected_vals == null)
 			{
-				selected_vals = "";
+				selected_vals = "$Q6Q6Q6$"; // the point here is, don't select anything in the dropdowns
 			}
 			string[] selected_vals_array = Util.split_string_using_commas(selected_vals);
 
 			if (dropdown_type != "users")
 			{
-				string[] options = Util.split_string_using_pipes(dropdown_options);
+			
+				string[] options = Util.split_dropdown_vals(dropdown_options);
 				for (int j = 0; j < options.Length; j++)
 				{
 					Response.Write ("<option ");

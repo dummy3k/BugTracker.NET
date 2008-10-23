@@ -12,7 +12,6 @@ http://ifdefined.com/readme.html#upgrading
 Corey's TO DO list:
 
 
-* allow the command line of SVN to be configurable
 
 * add settings for turning off printing of change history.
 
@@ -47,15 +46,29 @@ Version 2.9.8   10/XX/2008
 -----------------------------------------------------------------------
 
 
-email hotlinks in view only?, like creator
+   TEST PROJECT DROPDOWNS
+   DOES INSERT PUT A "NULL" Or spaces in blank varchar field?
+   WHAT ABOUT ** PROJECT ** Level insert or update?
 
-* A few more cosmetic changes
 
-* added 
-DisplayAnotherButtonInEditBugPage
+* A few more cosmetic changes...
 
-* added
-SubversionAdditionalArgs
+* Better anti-flickering logic for the bug popups when you hover over
+a description.
+
+* When you enter values for custom dropdown, it's now ok to use line
+breaks to format what you entered to be more readable.
+
+* If one of your custom dropdown values is blank, you can search on it.
+
+* Added Web.config setting "DisplayAnotherButtonInEditBugPage" which
+causes a second Update button to appear on the edit_bug.aspx, at the
+top of the form, so you don't have to scroll down to find the button if
+you have a lot of custom fields.
+
+* Added a Web.config setting "SubversionAdditionalArgs".  These are
+appended to every command BugTracker.NET sends to Subversion.
+
 
 -----------------------------------------------------------------------
 Version 2.9.7   10/18/2008 

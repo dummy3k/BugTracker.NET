@@ -346,6 +346,7 @@ void Page_Load(Object sender, EventArgs e)
 			s += btnet.PrintBug.format_email_username(
 					true,
 					Convert.ToInt32(dr["id"]),
+                    permission_level,
 					Convert.ToString(dr["reporter_email"]),
 					Convert.ToString(dr["reporter"]),
 					Convert.ToString(dr["reporter_fullname"]));
@@ -2140,36 +2141,53 @@ void on_update (Object sender, EventArgs e)
 					{
 						custom_cols_sql += ",[" + drcc["name"].ToString() + "]";
 						custom_cols_sql += " = ";
-
+						
+						string datatype = drcc["datatype"].ToString( );
+						
 						string val = Request[drcc["name"].ToString()];
+						
 						if (val == null)
+						{
 							val = "";
+						}
 						else
+						{
 							val = val.Replace("'","''");
+						}
 
 						//modified by CJU on jan 9 2008 : added handling of the decimal datatype case
-						if( val.Length > 0 ) {
-							switch( drcc["datatype"].ToString( ) ) {
-						// if a date was entered, convert to db format
+						if( val.Length > 0 )
+						{
+							
+							switch(datatype)
+							{
+								// if a date was entered, convert to db format
 								case "datetime":
-							val = btnet.Util.format_local_date_into_db_format(val);
+									val = btnet.Util.format_local_date_into_db_format(val);
 									break;
 								case "decimal":
 									val = btnet.Util.format_local_decimal_into_db_format( val );
 									break;
 							}
-						}
-						//end modified by CJU on jan 9 2008
-
-
-						if (val.Length == 0)
-						{
-							custom_cols_sql += "null";
-						}
-						else
-						{
+							
 							custom_cols_sql += "N'" + val + "'";
 						}
+						//end modified by CJU on jan 9 2008
+						else
+						{
+							if (datatype == "varchar"
+							|| datatype == "nvarchar"
+							|| datatype == "char"
+							|| datatype == "nchar")
+							{
+								custom_cols_sql += "N''";
+							}
+							else
+							{
+								custom_cols_sql += "null";
+							}
+						}
+						
 
 					}
 					sql = sql.Replace("$custom_cols_placeholder", custom_cols_sql);
@@ -2279,7 +2297,6 @@ void on_update (Object sender, EventArgs e)
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
 <link rel="StyleSheet" href="custom/btnet_edit_bug.css" type="text/css">
-<script type="text/javascript" language="JavaScript" src="sortable.js"></script>
 <script type="text/javascript" language="JavaScript" src="overlib_mini.js"></script>
 <script type="text/javascript" language="JavaScript" src="calendar.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
@@ -2576,7 +2593,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 					if (dropdown_type != "users")
 					{
-						string[] options = btnet.Util.split_string_using_pipes(dropdown_vals);
+						string[] options = btnet.Util.split_dropdown_vals(dropdown_vals);
 						for (int j = 0; j < options.Length; j++)
 						{
 							Response.Write ("<option");
@@ -2748,7 +2765,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 						// GC: 20-Feb-08: Added an ID as well for easier CSS customisation
 						Response.Write (" name=pcd" + Convert.ToString(i));
 						Response.Write (" id=pcd" + Convert.ToString(i) + ">");
-						string[] options = btnet.Util.split_string_using_pipes(
+						string[] options = btnet.Util.split_dropdown_vals(
 							(string)project_dr["pj_custom_dropdown_values" + Convert.ToString(i)]);
 
 						string selected_value = "";

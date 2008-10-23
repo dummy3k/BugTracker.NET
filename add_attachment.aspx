@@ -189,8 +189,7 @@ function waiting()
 Add attachment to <% Response.Write(Convert.ToString(bugid)); %>
 <p>
 	<table border=0><tr><td>
-		<form target="hiddenframe" class=frm runat="server" enctype="multipart/form-data" onsubmit="return waiting()" 
->
+		<form target="hiddenframe" class=frm runat="server" enctype="multipart/form-data" onsubmit="return waiting()">
 			<table border=0>
 
 			<tr>

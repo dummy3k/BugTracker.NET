@@ -121,15 +121,15 @@ function display_popup(s)
 
 	popup.style.height= ""
 	popup.style.display = "block";
-	myleft = pos[0] + 30
-	mytop = pos[1] + 28
+	myleft = pos[0] + 40
+	mytop = pos[1] + current_element.offsetHeight + 4
 	viewport_height = get_viewport_size()[1]
 	// prevent flicker because of new scrollbar changing mouse/text relative position
 	if (mytop + popup.offsetHeight > viewport_height)
 	{
 		overflow = (mytop + popup.offsetHeight) - viewport_height
 		newh = popup.offsetHeight -  overflow
-		newh -= 20 // not sure why i need the margin..
+		newh -= 15 // not sure why i need the margin..
 		popup.style.height = newh 
 	}
 	popup.style.left = myleft

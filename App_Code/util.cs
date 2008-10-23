@@ -957,10 +957,34 @@ function on_submit_search()
 		}
 
 
+		
 		///////////////////////////////////////////////////////////////////////
-		public static string[] split_string_using_pipes(string s)
+		public static string[] split_dropdown_vals(string s)
 		{
-			return rePipes.Split(s);
+			string[] array = rePipes.Split(s);
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i] = array[i].Trim().Replace("\r","").Replace("\n","");
+			}
+			return array;
+		}
+
+		///////////////////////////////////////////////////////////////////////
+		// common to add/edit custom files, project
+		public static string validate_dropdown_values(string vals)
+		{
+			if (vals.Contains("'")
+			|| vals.Contains("\"")
+			|| vals.Contains("<")
+			|| vals.Contains(">")
+			|| vals.Contains("\t"))
+			{
+				return "Special characters like <, >, or quotes not allowed.";
+			}
+			else
+			{
+				return "";
+			}
 		}
 
 		///////////////////////////////////////////////////////////////////////
@@ -1176,10 +1200,6 @@ drop table #temp2";
 			return dbutil.get_dataset(sql).Tables[0];
 
 		}
-
-
-
-
 
 
 		///////////////////////////////////////////////////////////////////////
