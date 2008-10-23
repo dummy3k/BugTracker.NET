@@ -842,14 +842,15 @@ where bg_id = $id";
                     custom_cols_sql1 += ",[" + custom_col.Key + "]";
                     string custom_col_val = custom_col.Value.ToString();
 
+					string datatype = hash_custom_col_datatypes[custom_col.Key].ToString();
                     // look up datatype
-                    if (hash_custom_col_datatypes[custom_col.Key].ToString() == "datetime")
+                    if (datatype == "datetime")
                     {
                         custom_col_val = btnet.Util.format_local_date_into_db_format(custom_col_val);
                     }
-                    if (custom_col_val.Length == 0)
+                    if (custom_col_val.Length == 0 && (datatype == "int" || datatype == "decimal") )
                     {
-                        custom_cols_sql2 += ", null";
+                       	custom_cols_sql2 += ", null";
                     }
                     else
                     {
@@ -949,7 +950,7 @@ where bg_id = $id";
                 sql = sql.Replace("$comment_formatted", comment_formated.Replace("'", "''"));
                 sql = sql.Replace("$comment_search", comment_search.Replace("'", "''"));
                 sql = sql.Replace("$content_type", content_type);
-                sql = sql.Replace("$cc", cc);
+                sql = sql.Replace("$cc", cc.Replace("'", "''"));
                 sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only));
 
 

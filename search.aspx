@@ -431,9 +431,16 @@ void do_query()
 			}
 			else
 			{
-				string in_not_in = format_in_not_in(values);
-				custom_clause = " [" + variable + "] in " + in_not_in + "\n";
-				where = build_where(where, custom_clause);
+				if (values == "" && (datatype == "int" || datatype == "decimal"))
+				{
+					// skip
+				}
+				else
+				{
+					string in_not_in = format_in_not_in(values);
+					custom_clause = " [" + variable + "] in " + in_not_in + "\n";
+					where = build_where(where, custom_clause);
+				}
 			}
 		}
 	}

@@ -954,7 +954,7 @@ void format_subcribe_cancel_link()
 			string subscription_link = "<a id='notifications' title='Get or stop getting email notifications about changes to this item.'"
 				+ " href='javascript:toggle_notifications("
 				+ Convert.ToString(id)
-				+ ")'><span id='get_stop_notifications'><img src=telephone.png border=0 align=top>&nbsp;";
+				+ ")'><img src=telephone.png border=0 align=top>&nbsp;<span id='get_stop_notifications'>";
 
 			if (subscribed > 0)
 			{

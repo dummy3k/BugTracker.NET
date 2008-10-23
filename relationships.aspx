@@ -191,7 +191,8 @@ insert into bug_posts
 		case
 			when re_direction = 0 then ''
 			when re_direction = 2 then 'child of $bg'
-			else 'parent of $bg' end [parent/child],
+			else                       'parent of $bg' 
+		end as [parent or child],
 		'<a target=_blank href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view]";
 
 		if (!security.user.is_guest && permission_level == Security.PERMISSION_ALL)
@@ -219,6 +220,43 @@ insert into bug_posts
 
 }
 
+
+void display_hierarchy()
+{
+
+	string parents = "";
+	string siblings = "";
+	string children = "";
+	
+
+	foreach (DataRow dr in ds.Tables[0].Rows)
+	{
+		string level = (string) dr["parent or child"];
+		
+		if (level.StartsWith("parent"))
+		{
+			parents += Convert.ToString(dr["id"]);
+			parents += "&nbsp;";
+		}
+		else if (level.StartsWith("child"))
+		{
+			children += Convert.ToString(dr["id"]);
+			children += "&nbsp;";
+		}
+		else
+		{
+			siblings += Convert.ToString(dr["id"]);
+			siblings += "&nbsp;";
+		}
+	}
+
+	Response.Write(parents);
+	Response.Write("<br>");
+	Response.Write(siblings);
+	Response.Write("<br>");
+	Response.Write(children);
+
+}
 
 </script>
 
@@ -289,6 +327,7 @@ if (ds.Tables[0].Rows.Count > 0)
 	SortableHtmlTable.create_from_dataset(
 		Response, ds, "", "", false);
 
+	display_hierarchy();
 }
 else
 {

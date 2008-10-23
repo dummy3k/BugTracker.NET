@@ -42,24 +42,25 @@ blog about lucene.net
 
 
 -----------------------------------------------------------------------
-Version 2.9.8   10/XX/2008 
+Version 2.9.8   10/25/2008 
 -----------------------------------------------------------------------
 
+* Fixed "get notifications", "stop notifications" link.  It was
+broken in version 2.9.7.
 
-   TEST PROJECT DROPDOWNS
-   DOES INSERT PUT A "NULL" Or spaces in blank varchar field?
-   WHAT ABOUT ** PROJECT ** Level insert or update?
+* Fixed bug related to receiving emails with Cc addresses.
 
+* Fixed bug with flickering of popup when bug description was
+multiple lines.
 
-* A few more cosmetic changes...
-
-* Better anti-flickering logic for the bug popups when you hover over
-a description.
+* Fixed bug with search and custom dropdowns where one of the dropdown
+values is blank.  You can now search for bugs where the custom dropdown
+value has not been specified.  This only completely works on newly
+inserted bugs.  To make the fix retroactive, run sql like this:
+update bugs set [YOUR FIELD] = N'' where my_custom_field is null
 
 * When you enter values for custom dropdown, it's now ok to use line
 breaks to format what you entered to be more readable.
-
-* If one of your custom dropdown values is blank, you can search on it.
 
 * Added Web.config setting "DisplayAnotherButtonInEditBugPage" which
 causes a second Update button to appear on the edit_bug.aspx, at the
@@ -67,8 +68,10 @@ top of the form, so you don't have to scroll down to find the button if
 you have a lot of custom fields.
 
 * Added a Web.config setting "SubversionAdditionalArgs".  These are
-appended to every command BugTracker.NET sends to Subversion.
+appended to every command BugTracker.NET sends to Subversion.  Use this
+if you need to set, for example, "--config-dir"
 
+* A few more cosmetic changes...
 
 -----------------------------------------------------------------------
 Version 2.9.7   10/18/2008 
