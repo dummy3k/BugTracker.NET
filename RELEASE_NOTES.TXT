@@ -60,6 +60,10 @@ value has not been specified.  This only completely works on newly
 inserted bugs.  To make the fix retroactive, run sql like this:
 update bugs set [YOUR COLUMN] = N'' where [YOUR COLUMN] is null
 
+* Fixed bug with flickering of "suggest" feature, the green dropdown
+that appears when you are typing a bug description to search for on
+search.aspx.
+
 * When you enter the pipe-delimited values for custom dropdown, it's 
 now ok to use line breaks to format what you entered to be more readable
 for the admin.
