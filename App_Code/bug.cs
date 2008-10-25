@@ -970,9 +970,9 @@ where bg_id = $id";
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public static string send_notifications(int insert_or_update, int bugid, Security security, int just_to_this)
+        public static void send_notifications(int insert_or_update, int bugid, Security security, int just_to_this)
         {
-            return send_notifications(insert_or_update,
+            send_notifications(insert_or_update,
                 bugid,
                 security,
                 just_to_this,
@@ -982,9 +982,9 @@ where bg_id = $id";
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public static string send_notifications(int insert_or_update, int bugid, Security security)
+        public static void send_notifications(int insert_or_update, int bugid, Security security)
         {
-            return send_notifications(insert_or_update,
+            send_notifications(insert_or_update,
                 bugid,
                 security,
                 0,  // just to this
@@ -997,7 +997,7 @@ where bg_id = $id";
         ///////////////////////////////////////////////////////////////////////
         // This used to send the emails, but not now.  Now it just queues
         // the emails to be sent, then spawns a thread to send them.
-        public static string send_notifications(int insert_or_update,
+        public static void send_notifications(int insert_or_update,
             int bugid,
             Security security,
             int just_to_this_userid,
@@ -1217,8 +1217,6 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
             } // notifications enabled or not
 
 
-
-            return "";
         }
 
 

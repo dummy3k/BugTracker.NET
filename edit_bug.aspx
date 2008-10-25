@@ -47,8 +47,8 @@ void Page_Load(Object sender, EventArgs e)
 	fckeComment.BasePath = @"fckeditor/";
 	fckeComment.ToolbarSet = "BugTracker";
 
-	msg.InnerText = "";
-	custom_field_msg.InnerHtml = "";
+	set_msg("");
+	set_custom_field_msg("");
 
 
 	if (security.user.use_fckeditor)
@@ -1861,7 +1861,7 @@ Boolean validate()
 				}
 				catch (FormatException)
 				{
-					custom_field_msg.InnerHtml += "\"" + name + "\" not in a valid date format.<br>";
+					append_custom_field_msg("\"" + name + "\" not in a valid date format.<br>");
 					good = false;
 				}
 			}
@@ -1869,7 +1869,7 @@ Boolean validate()
 			{
 				if (!btnet.Util.is_int(val))
 				{
-					custom_field_msg.InnerHtml += "\"" + name + "\" must be an integer.<br>";
+					append_custom_field_msg("\"" + name + "\" must be an integer.<br>");
 					good = false;
 				}
 
@@ -1882,7 +1882,7 @@ Boolean validate()
 				decimal x;
 				if( !Decimal.TryParse( val, System.Globalization.NumberStyles.Float, ci, out x ) )
 				{
-					custom_field_msg.InnerHtml += "\"" + name + "\" not in a valid decimal format.<br>";
+					append_custom_field_msg("\"" + name + "\" not in a valid decimal format.<br>");
 					good = false;
 				}
 
@@ -1892,7 +1892,7 @@ Boolean validate()
 				int prec = (vals.Length == 1 ? vals[0].Length : vals[0].Length + vals[1].Length);
 				if( prec > xprec )
 				{
-					custom_field_msg.InnerHtml += "\"" + name + "\" has too many digits.<br>";
+					append_custom_field_msg("\"" + name + "\" has too many digits.<br>");
 					good = false;
 				}
 
@@ -1902,8 +1902,8 @@ Boolean validate()
 				{
 					if (vals[0].Length > xprec - xscale)
 					{
-						custom_field_msg.InnerHtml += "\"" + name + "\" has more than "
-							+ Convert.ToString(xprec - xscale) + " digits to the left of the decimal point.<br>";
+						append_custom_field_msg("\"" + name + "\" has more than "
+							+ Convert.ToString(xprec - xscale) + " digits to the left of the decimal point.<br>");
 						good = false;
 					}
 				}
@@ -1912,8 +1912,8 @@ Boolean validate()
 				{
 					if (vals[1].Length > xscale)
 					{
-						custom_field_msg.InnerHtml += "\"" + name + "\" has more than "
-							+  Convert.ToString(xscale) + " digits to the right of the decimal point.<br>";
+						append_custom_field_msg("\"" + name + "\" has more than "
+							+  Convert.ToString(xscale) + " digits to the right of the decimal point.<br>");
 						good = false;
 					}
 				}
@@ -1925,7 +1925,7 @@ Boolean validate()
 			int nullable = (int) drcc["isnullable"];
 			if (nullable == 0)
 			{
-				custom_field_msg.InnerHtml += "\"" + name + "\" is required.<br>";
+				append_custom_field_msg("\"" + name + "\" is required.<br>");
 				good = false;
 			}
 		}
@@ -2032,7 +2032,7 @@ void on_update (Object sender, EventArgs e)
 			btnet.WhatsNew.add_news(id, short_desc.Value, "added", security);
 
 			new_id.Value = Convert.ToString(id);
-			msg.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was created.";
+			set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was created.");
 			Response.Redirect("edit_bug.aspx?id=" + Convert.ToString(id));
 			status_changed = true;
 
@@ -2049,7 +2049,7 @@ void on_update (Object sender, EventArgs e)
 					int permission_on_new_project = fetch_permission_level(new_project);
 					if ((Security.PERMISSION_NONE == permission_on_new_project) || (Security.PERMISSION_READONLY == permission_on_new_project))
 					{
-						msg.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was not updated. You do not have the necessary permissions to change this " + btnet.Util.get_setting("SingularBugLabel","bug") + " to the specified Project.";
+						set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was not updated. You do not have the necessary permissions to change this " + btnet.Util.get_setting("SingularBugLabel","bug") + " to the specified Project.");
 						return;
 					}
 				}
@@ -2211,12 +2211,12 @@ void on_update (Object sender, EventArgs e)
 				}
 				else
 				{
-					msg.InnerHtml = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))
+					set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"))
 						+ " was NOT updated.<br>"
 						+ " Somebody changed it while you were editing it.<br>"
 						+ " Click <a href=edit_bug.aspx?id="
 						+ Convert.ToString(id)
-						+ ">[here]</a> to refresh the page and discard your changes.<br>";
+						+ ">[here]</a> to refresh the page and discard your changes.<br>");
 					return;
 				}
 
@@ -2238,21 +2238,13 @@ void on_update (Object sender, EventArgs e)
 			string result = "";
 			if (bug_fields_have_changed || (bugpost_fields_have_changed && !internal_only.Checked))
 			{
-				result = btnet.Bug.send_notifications(btnet.Bug.UPDATE,	id,	security, 0,
+				btnet.Bug.send_notifications(btnet.Bug.UPDATE,	id,	security, 0,
 					status_changed,
 					assigned_to_changed,
 					Convert.ToInt32(assigned_to.SelectedItem.Value));
 			}
 
-
-			if (result == "")
-			{
-				msg.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was updated.";
-			}
-			else
-			{
-				msg.InnerHtml = result + "<br><br>" + btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was updated.";
-			}
+			set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was updated.");
 
 			comment.Value = "";
 			fckeComment.Value = "";
@@ -2277,15 +2269,45 @@ void on_update (Object sender, EventArgs e)
 	{
 		if (id == 0)  // insert new
 		{
-			msg.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was not created.";
+			set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was not created.");
 		}
 		else // edit existing
 		{
-			msg.InnerText = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was not updated.";
+			set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was not updated.");
 		}
 	}
 
 
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_msg(string s)
+{
+	msg.InnerHtml = s;
+	if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1")
+	{
+		msg2.InnerHtml = s;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+void set_custom_field_msg(string s)
+{
+	custom_field_msg.InnerHtml = s;
+	if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1")
+	{
+		custom_field_msg2.InnerHtml = s;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////
+void append_custom_field_msg(string s)
+{
+	custom_field_msg.InnerHtml += s;
+	if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1")
+	{
+		custom_field_msg2.InnerHtml += s;
+	}
 }
 
 
@@ -2384,16 +2406,20 @@ function disable_second_button()
 <form class=frm runat="server">
 
 	<% if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1") { %>
-	<div style="text-align: center;">
-		<input
-			runat="server"
-			class=btn
-			type=submit
-			id="sub2"
-			onclick="disable_me()"
-			value="Update"
-			OnServerClick="on_update">
-	</div>			
+		<div>
+				<span runat="server" class=err id="custom_field_msg2">&nbsp;</span>
+				<span runat="server" class=err id="msg2">&nbsp;</span>
+		</div>
+		<div style="text-align: center;">
+			<input
+				runat="server"
+				class=btn
+				type=submit
+				id="sub2"
+				onclick="disable_me()"
+				value="Update"
+				OnServerClick="on_update">
+		</div>			
 	<% } %>			
 	<table border=0 cellpadding=3 cellspacing=0>
 	<tr>

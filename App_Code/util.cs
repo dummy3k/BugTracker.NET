@@ -378,11 +378,15 @@ function on_submit_search()
 		public static void set_context(HttpContext asp_net_context)
 		{
 			context = asp_net_context;
-			Request = context.Request;
-			//Response = context.Response;
-			//Server = context.Server;
-
-			Util.write_to_log ("url=" + Request.Url.PathAndQuery);
+			
+			try
+			{
+				Request = context.Request;
+			}
+			catch(Exception e)
+			{
+				Util.write_to_log (e.Message);
+			}
 
 		}
 
