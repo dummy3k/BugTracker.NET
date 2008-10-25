@@ -2414,7 +2414,7 @@ function disable_second_button()
 			<div class=smallnote id="short_desc_cnt">&nbsp;</div>
 
 	</table>			
-	<table width=100% border=0 cellpadding=3 cellspacing=0>
+	<table width=90% border=0 cellpadding=3 cellspacing=0>
 	<tr>
 		<td nowrap>
 			<span runat="server" id=reported_by></span>
@@ -2425,7 +2425,7 @@ function disable_second_button()
 				href="javascript:get_presets()">use</a>
 			&nbsp;/&nbsp;
 			<a title="Save current settings for project, category, priority, etc., so that you can reuse later."
-				href="javascript:set_presets()">save</a>&nbsp;&nbsp;
+				href="javascript:set_presets()">save</a>
 		<% } %>
 
 	</table>

@@ -45,6 +45,9 @@ blog about lucene.net
 Version 2.9.98   11/XX/2008 
 -----------------------------------------------------------------------
 
+* Fixed bug where the display of the popup was truncated if the window
+was scrolled down from the top.
+
 * relationships in print?
 * change history in print?
 * images in print?
