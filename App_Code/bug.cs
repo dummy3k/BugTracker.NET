@@ -950,6 +950,10 @@ where bg_id = $id";
                 sql = sql.Replace("$comment_formatted", comment_formated.Replace("'", "''"));
                 sql = sql.Replace("$comment_search", comment_search.Replace("'", "''"));
                 sql = sql.Replace("$content_type", content_type);
+                if (cc == null)
+                {
+                	cc = "";
+                }
                 sql = sql.Replace("$cc", cc.Replace("'", "''"));
                 sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only));
 

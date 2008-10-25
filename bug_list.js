@@ -118,23 +118,36 @@ function display_popup(s)
 	
 	popup.innerHTML = s
 	var pos = find_position(current_element)
-
-	popup.style.height= ""
-	popup.style.display = "block";
-	myleft = pos[0] + 40
-	mytop = pos[1] + current_element.offsetHeight + 4
 	viewport_height = get_viewport_size()[1]
-	// prevent flicker because of new scrollbar changing mouse/text relative position
-	if (mytop + popup.offsetHeight > viewport_height)
+	mytop = pos[1] + current_element.offsetHeight + 4
+	
+	if (mytop < viewport_height) // are we even visible?
 	{
-		overflow = (mytop + popup.offsetHeight) - viewport_height
-		newh = popup.offsetHeight -  overflow
-		newh -= 15 // not sure why i need the margin..
-		popup.style.height = newh 
-	}
-	popup.style.left = myleft
-	popup.style.top = mytop
+		// Display the popup, but truncate it if it overflows	
+		// to prevent scrollbar, which shifts element under mouse
+		// which leads to flicker...
+
+		popup.style.height= ""
+		popup.style.display = "block";
+
+		if (mytop + popup.offsetHeight > viewport_height)
+		{
+			overflow = (mytop + popup.offsetHeight) - viewport_height
+			newh = popup.offsetHeight -  overflow
+			newh -= 15 // not sure why i need the margin..
 			
+			if (newh > 0)
+			{
+				popup.style.height = newh 
+			}
+			else
+			{
+				popup.style.display = "none";
+			}
+		}
+		popup.style.left = pos[0] + 40
+		popup.style.top = mytop
+	}
 }
 
 

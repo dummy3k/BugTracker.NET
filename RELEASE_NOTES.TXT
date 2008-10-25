@@ -51,16 +51,18 @@ broken in version 2.9.7.
 * Fixed bug related to receiving emails with Cc addresses.
 
 * Fixed bug with flickering of popup when bug description was
-multiple lines.
+multiple lines.   Fixed javascript bug when popup would be displaying
+below the bottom edge of the screen.
 
 * Fixed bug with search and custom dropdowns where one of the dropdown
 values is blank.  You can now search for bugs where the custom dropdown
 value has not been specified.  This only completely works on newly
 inserted bugs.  To make the fix retroactive, run sql like this:
-update bugs set [YOUR FIELD] = N'' where my_custom_field is null
+update bugs set [YOUR COLUMN] = N'' where [YOUR COLUMN] is null
 
-* When you enter values for custom dropdown, it's now ok to use line
-breaks to format what you entered to be more readable.
+* When you enter the pipe-delimited values for custom dropdown, it's 
+now ok to use line breaks to format what you entered to be more readable
+for the admin.
 
 * Added Web.config setting "DisplayAnotherButtonInEditBugPage" which
 causes a second Update button to appear on the edit_bug.aspx, at the
@@ -72,6 +74,8 @@ appended to every command BugTracker.NET sends to Subversion.  Use this
 if you need to set, for example, "--config-dir"
 
 * A few more cosmetic changes...
+
+* Some experiments on the relationships.aspx page.
 
 -----------------------------------------------------------------------
 Version 2.9.7   10/18/2008 

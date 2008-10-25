@@ -8,6 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 int bugid;
+int previd;
 DataSet ds;
 DbUtil dbutil;
 Security security;
@@ -27,6 +28,17 @@ void Page_Load(Object sender, EventArgs e)
 	add_err.InnerText = "";
 
 	bugid = Convert.ToInt32(Util.sanitize_integer(Request["id"]));
+	
+	if (string.IsNullOrEmpty(Request["id"]))
+	{
+		previd = 0;
+	}
+	else
+	{
+		previd = Convert.ToInt32(Util.sanitize_integer(Request["prev"]));
+	}
+	
+	
 	int bugid2 = 0;
 
 	permission_level = Bug.get_bug_permission_level(bugid, security);
@@ -185,7 +197,7 @@ insert into bug_posts
 	}
 
 	sql = @"select bg_id [id],
-		bg_short_desc [desc ],
+		bg_short_desc [desc],
 		re_type [comment],
         st_name [status],
 		case
@@ -220,7 +232,39 @@ insert into bug_posts
 
 }
 
+///////////////////////////////////////////////////////////////////////
+string get_bug_html(DataRow dr)
+{
+	string s = @"
+	
+	
+<td valign=top>
+<div
+style='background: #dddddd; border: 1px solid blue; padding 15px;  width: 140px; height: 50px; overflow: hidden;'
+><a 
+href='relationships.aspx?id=$id&prev=$prev'>$id&nbsp;&nbsp;&nbsp;&nbsp;$title</a></div>";
 
+	
+	if (previd == (int) dr["id"])
+	{
+		s = s.Replace("1px solid blue", "2px solid red");
+	}
+	
+	s = s.Replace("$id", Convert.ToString(dr["id"]));
+	s = s.Replace("$prev", Convert.ToString(bugid));
+	s = s.Replace(
+		"$title", 
+		Server.HtmlEncode(
+				Convert.ToString(dr["desc"])
+			)
+		);
+
+	return s;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////
 void display_hierarchy()
 {
 
@@ -235,27 +279,27 @@ void display_hierarchy()
 		
 		if (level.StartsWith("parent"))
 		{
-			parents += Convert.ToString(dr["id"]);
-			parents += "&nbsp;";
+			parents += get_bug_html(dr);
 		}
 		else if (level.StartsWith("child"))
 		{
-			children += Convert.ToString(dr["id"]);
-			children += "&nbsp;";
+			children += get_bug_html(dr);
 		}
 		else
 		{
-			siblings += Convert.ToString(dr["id"]);
-			siblings += "&nbsp;";
+			siblings += get_bug_html(dr);
 		}
 	}
 
+	Response.Write("Parents:&nbsp;<table border=0 cellspacing=15 cellpadding=0><tr>");
 	Response.Write(parents);
-	Response.Write("<br>");
+	Response.Write("</table><p>");
+	Response.Write("Siblings:&nbsp;<table border=0 cellspacing=15 cellpadding=0><tr>");
 	Response.Write(siblings);
-	Response.Write("<br>");
+	Response.Write("</table><p>");
+	Response.Write("Children:&nbsp;<table border=0 cellspacing=15 cellpadding=0><tr>");
 	Response.Write(children);
-
+	Response.Write("</table>");
 }
 
 </script>
