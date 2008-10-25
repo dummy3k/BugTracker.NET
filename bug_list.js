@@ -118,10 +118,14 @@ function display_popup(s)
 	
 	popup.innerHTML = s
 	var pos = find_position(current_element)
-	viewport_height = get_viewport_size()[1]
+	viewport_height = get_viewport_size()[1] // does this factor in scrollbar?
 	mytop = pos[1] + current_element.offsetHeight + 4
 	
-	if (mytop < viewport_height) // are we even visible?
+	scroll_offset_y = get_scroll_offset()[1]
+	
+	y_in_viewport = mytop - scroll_offset_y
+	
+	if (y_in_viewport < viewport_height) // are we even visible?
 	{
 		// Display the popup, but truncate it if it overflows	
 		// to prevent scrollbar, which shifts element under mouse
@@ -130,11 +134,12 @@ function display_popup(s)
 		popup.style.height= ""
 		popup.style.display = "block";
 
-		if (mytop + popup.offsetHeight > viewport_height)
+		if (y_in_viewport + popup.offsetHeight > viewport_height)
 		{
-			overflow = (mytop + popup.offsetHeight) - viewport_height
+			overflow = (y_in_viewport + popup.offsetHeight) - viewport_height
+
 			newh = popup.offsetHeight -  overflow
-			newh -= 15 // not sure why i need the margin..
+			newh -= 10 // not sure why i need the margin..
 			
 			if (newh > 0)
 			{
@@ -315,20 +320,51 @@ function done_selecting_tags()
 }
 
 
+function get_scroll_offset()
+{
+	var myX = 0, myY = 0;
+	
+	if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft))
+	{
+		myX = document.documentElement.scrollLeft
+		myY = document.documentElement.scrollTop
+	}
+	else if (document.body && (document.body.scrollTop || document.body.scrollLeft))
+	{
+		myX = document.body.scrollLeft
+		myY = document.body.scrollTop
+	}
+	else if (window.pageXOffset || window.pageYOffset)
+	{
+		myX = window.pageXOffset
+		myY = window.pageYOffset
+	}
+	
+	return [myX, myY]
+}
+
+
 function get_viewport_size() {
   var myWidth = 0, myHeight = 0;
-  if( typeof( window.innerWidth ) == 'number' ) {
+  
+  if( typeof( window.innerWidth ) == 'number' )
+  {
     //Non-IE
     myWidth = window.innerWidth;
     myHeight = window.innerHeight;
-  } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+  }
+  else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) )
+  {
     //IE 6+ in 'standards compliant mode'
     myWidth = document.documentElement.clientWidth;
     myHeight = document.documentElement.clientHeight;
-  } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+  }
+  else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) )
+  {
     //IE 4 compatible
     myWidth = document.body.clientWidth;
     myHeight = document.body.clientHeight;
   }
+  
   return [myWidth, myHeight];
 }
