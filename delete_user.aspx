@@ -65,13 +65,18 @@ delete dashboard_items where ds_user = $us";
 		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 			+ "delete user";
 
-		sql = @"declare @cnt int
-			select @cnt = count(1) from bugs where bg_reported_user = $us or bg_assigned_to_user = $us
-			if @cnt = 0
-			begin
-				select @cnt = count(1) from bug_posts where bp_user = $us
-			end
-			select us_username, @cnt [cnt] from users where us_id = $us";
+		sql = @"
+declare @cnt int
+--set @cnt = 0
+
+select @cnt = count(1) from bugs where bg_reported_user = $us or bg_assigned_to_user = $us
+if @cnt = 0
+begin
+	select @cnt = count(1) from bug_posts where bp_user = $us
+end
+select us_username, @cnt [cnt] from users where us_id = $us";
+
+
 		sql = sql.Replace("$us", id);
 
 		DataRow dr = dbutil.get_datarow(sql);
