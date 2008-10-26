@@ -2317,14 +2317,17 @@ void append_custom_field_msg(string s)
 <head>
 <title id=titl runat="server">add new</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<link rel="StyleSheet" href="jquery/ui.datepicker.css" type="text/css">
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
 <link rel="StyleSheet" href="custom/btnet_edit_bug.css" type="text/css">
-<script type="text/javascript" language="JavaScript" src="overlib_mini.js"></script>
-<script type="text/javascript" language="JavaScript" src="calendar.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.2.6.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.5.2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
+
 <script>
 var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
+$(document).ready(do_doc_ready);
 
 function start_animation()
 {
@@ -2350,15 +2353,27 @@ function start_animation()
 <% } %>	
 }
 
-
 function disable_second_button()
 {
 <% if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1") { %>
-	el = window.document.getElementById("sub");
+	el = get_el("sub");
 	el.disabled = true;
 <% } %>	
 
 }
+
+
+function show_calendar(el)
+{
+	$("#" + el).datepicker("show")
+}
+
+function do_doc_ready()
+{
+	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>'
+	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
+}
+
 
 </script>
 
@@ -2663,12 +2678,14 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				}
 				else
 				{
-					Response.Write ("<input type=text class=txt onkeydown=\"mark_dirty()\" onkeyup=\"mark_dirty()\" ");
+					Response.Write ("<input type=text onkeydown=\"mark_dirty()\" onkeyup=\"mark_dirty()\" ");
 
 					// match the size of the text field to the size of the database field
-					if (drcc["datatype"].ToString().IndexOf("char") > -1)
+					string datatype = drcc["datatype"].ToString();
+					
+					if (datatype.IndexOf("char") > -1)
 					{
-						if (drcc["datatype"].ToString() == "nvarchar")
+						if (datatype == "nvarchar")
 						{
 							Response.Write (" size=" + Convert.ToString((Convert.ToInt32(drcc["length"]) / 2)));
 							Response.Write (" maxlength=" + Convert.ToString((Convert.ToInt32(drcc["length"]) / 2)));
@@ -2685,22 +2702,23 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 
 					// output a date field according to the specified format
-						Response.Write (" value=\"");
+					Response.Write (" value=\"");
 					//modified by CJU on jan 9 2008
 					Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
 					//end modified by CJU on jan 9 2008
-					Response.Write ("\">");
-					if (drcc["datatype"].ToString() == "datetime")
-					{
-						Response.Write("<a style=\"font-size: 8pt;\"href=\"javascript:show_calendar('"
-							+ btnet.Util.get_form_name()
-							+ "."
-							+ field_id
-							+ "',null,null,'"
-							+ btnet.Util.get_setting("JustDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)
-							+ "');\">[select]</a>");
 
+					if (datatype == "datetime")
+					{
+						Response.Write ("\" class='txt date'  >");
+						Response.Write("<a style=\"font-size: 8pt;\"href=\"javascript:show_calendar('"
+							+ field_id
+							+ "');\">[select]</a>");
 					}
+					else
+					{
+						Response.Write ("\" class='txt' >");
+					}
+					
 				}
 			}
 		}

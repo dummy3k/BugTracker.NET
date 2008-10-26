@@ -9,10 +9,10 @@ function on_body_unload()
 
 function set_relationship_cnt(bugid, cnt)
 {
-	if (bugid == this_bugid) // don't really need this code now that we're closing child windows at unload time
+	if (bugid == this_bugid) // don't really need this check now that we're closing child windows at unload time
 	{
-		el = window.document.getElementById("relationship_cnt");
-		el.firstChild.nodeValue = cnt;
+		el = get_el("relationship_cnt");
+		set_text(el,cnt)
 	}
 }
 
@@ -28,7 +28,6 @@ function open_popup_window(url, title, bugid, width, height)
 		
 	popup_window.focus()
 }
-
 
 var dirty = false;
 function mark_dirty()
@@ -90,7 +89,6 @@ function GetXmlHttpObject()
 	return objXMLHttp
 }
 
-
 function handle_rewrite_posts()
 {
 	
@@ -98,19 +96,16 @@ function handle_rewrite_posts()
 	{
 		if (xmlHttp.responseText != "")
 		{
-			var el = document.getElementById("posts")
+			var el = get_el("posts")
 			el.innerHTML = xmlHttp.responseText;
 			get_db_datetime()
 			start_animation()
 		}
 	}
-
-		
 }
 
 function rewrite_posts(bugid)
 {
-	
 	var images_inline = get_cookie("images_inline")
 	var history_inline = get_cookie("history_inline")
 
@@ -127,7 +122,6 @@ function rewrite_posts(bugid)
 	xmlHttp.onreadystatechange=handle_rewrite_posts
 	xmlHttp.open("GET",url,true)
 	xmlHttp.send(null)
-
 }
 
 function handle_get_bug_date()
@@ -136,7 +130,7 @@ function handle_get_bug_date()
 	{
 		if (xmlHttp.responseText != "")
 		{
-			var el = document.getElementById("snapshot_timestamp")
+			var el = get_el("snapshot_timestamp")
 			el.value = xmlHttp.responseText;
 		}
 	}
@@ -144,7 +138,6 @@ function handle_get_bug_date()
 
 function get_db_datetime()
 {
-
 	xmlHttp=GetXmlHttpObject()
 	if (xmlHttp==null)
 	{
@@ -156,15 +149,13 @@ function get_db_datetime()
 	xmlHttp.onreadystatechange=handle_get_bug_date
 	xmlHttp.open("GET",url,true)
 	xmlHttp.send(null)
-
 }
 
 
 function toggle_notifications(bugid)
 {
-
-	var el = document.getElementById("get_stop_notifications");
-	var text = el.firstChild.nodeValue;
+	var el = get_el("get_stop_notifications");
+	var text = get_text(el)
 	
 	xmlHttp=GetXmlHttpObject()
 	if (xmlHttp==null)
@@ -190,62 +181,57 @@ function toggle_notifications(bugid)
 	// modify text in web page	
 	if (text == "get notifications")
 	{
-		el.firstChild.nodeValue = "stop notifications"
+		set_text(el,"stop notifications")
 	}
 	else
 	{
-		el.firstChild.nodeValue = "get notifications"
+		set_text(el, "get notifications")
 	}
-
 }
 
 
 function toggle_images2(bugid)
 {
-
 	var images_inline = get_cookie("images_inline")
 	if (images_inline == "1")
 	{
 		images_inline = "0"
-		document.getElementById("hideshow_images").firstChild.nodeValue = "show inline images"
+		set_text(get_el("hideshow_images"), "show inline images")
 	}
 	else
 	{
 		images_inline = "1"
-		document.getElementById("hideshow_images").firstChild.nodeValue = "hide inline images"
+		set_text(get_el("hideshow_images"),"hide inline images")
 	}
 
 	set_cookie("images_inline",images_inline)
 
 	rewrite_posts(bugid)
-
 }
 
 function toggle_history2(bugid)
 {
-
 	var history_inline = get_cookie("history_inline")
 	if (history_inline == "1")
 	{
 		history_inline = "0"
-		document.getElementById("hideshow_history").firstChild.nodeValue = "show change history"
+		set_text(get_el("hideshow_history"), "show change history")
 	}
 	else
 	{
 		history_inline = "1"
-		document.getElementById("hideshow_history").firstChild.nodeValue = "hide change history"
+		set_text(get_el("hideshow_history"), "hide change history")
 	}
 
 	set_cookie("history_inline",history_inline)
 
 	rewrite_posts(bugid)
-
 }
 
 
 function resize_comment(delta)
 {
-	el = window.document.getElementById("comment");
+	el = get_el("comment");
 
 	if (el.rows + delta < 1)
 	{
@@ -255,13 +241,11 @@ function resize_comment(delta)
 	{
 		el.rows += delta;
 	}
-
 }
-
 
 function resize_iframe(elid, delta)
 {
-	var el = window.document.getElementById(elid);
+	var el = get_el(elid);
 
 	if (parseInt(el.height) + parseInt(delta) < 20)
 	{
@@ -271,13 +255,12 @@ function resize_iframe(elid, delta)
 	{
 		el.height = parseInt(el.height) + parseInt(delta);
 	}
-
 }
 
 
 function resize_image(elid, delta)
 {
-	var el = window.document.getElementById(elid);
+	var el = get_el(elid);
 	if (parseFloat(el.height) * parseFloat(delta) < 5
 	|| parseFloat(el.width) * parseFloat(delta) < 5)
 	{
@@ -290,12 +273,10 @@ function resize_image(elid, delta)
 		el.height = h;
 		el.width = w;
 	}
-
 }
 
 function maybe_autopostback(eventTarget, eventArgument)
 {
-
 	var theForm = document.forms['<% Response.Write(Util.get_form_name()); %>'];
 
 	if (theForm.short_desc.value == "")
@@ -320,16 +301,15 @@ function disable_me()
 	cnt++
 	if (cnt > 1)
 	{
-		el = window.document.getElementById("sub");
+		el = get_el("sub");
 		el.disabled = true;
 	
 		disable_another_button() // if there is one...
 	}
-	
-	
 }
 
-function set_cookie(name,value) {
+function set_cookie(name,value)
+{
 	var date = new Date();
 
 	// expire in 10 years
@@ -341,7 +321,8 @@ function set_cookie(name,value) {
 }
 
 
-function get_cookie(name) {
+function get_cookie(name)
+{
 	var nameEQ = name + "=";
 	var ca = document.cookie.split(';');
 	for(var i=0;i < ca.length;i++) {
@@ -354,7 +335,7 @@ function get_cookie(name) {
 
 function save_var(name)
 {
-	var el = document.getElementById(name)
+	var el = get_el(name)
 	if (el != null)
 	{
 		var val = el.options[el.selectedIndex].text;
@@ -364,7 +345,7 @@ function save_var(name)
 
 function get_preset(name)
 {
-	var el = document.getElementById(name)
+	var el = get_el(name)
 	if (el != null)
 	{
 		val = get_cookie(name)
@@ -391,8 +372,7 @@ function get_presets()
 	get_preset("udf")
 	get_preset("assigned_to")
 //	get_preset("pcd1")
-//	get_preset("pcd2")
-//	get_preset("pcd3")
+
 	on_body_load() // to change the select styles
 }
 
@@ -405,28 +385,26 @@ function set_presets()
 	save_var("assigned_to")
 //strange side effect with these.  The browser remembers the saved presets even if user doesn't click "use"
 //	save_var("pcd1")
-//	save_var("pcd2")
-//	save_var("pcd3")
 }
 
 function clone()
 {
-	el = document.getElementById("bugid")
-	el.firstChild.nodeValue = ""
+	el = get_el("bugid")
+	set_text(el,"")
 
-	el = document.getElementById("bugid_label")
-	el.firstChild.nodeValue = ""
+	el = get_el("bugid_label")
+	set_text(el,"")
 
-	el = document.getElementById("sub")
+	el = get_el("sub")
 	el.value = "Create"
 
-	el = document.getElementById("posts")
+	el = get_el("posts")
 	el.innerHTML = ""
 
-	el = document.getElementById("clone_ignore_bugid")
+	el = get_el("clone_ignore_bugid")
 	el.value = "1"
 
-	el = document.getElementById("edit_bug_menu")
+	el = get_el("edit_bug_menu")
 	el.style.display = "none"
 
 }
@@ -434,12 +412,22 @@ function clone()
 var cls = null
 var ie = null
 
+function get_el(id) 
+{
+	return document.getElementById(id)
+}
+
 function get_text(el)
 {
-	if (ie) return el.innerText
-	else return el.textContent
-	
+	return el.firstChild.nodeValue
 }
+
+
+function set_text(el, text)
+{
+	return el.firstChild.nodeValue = text
+}
+
 
 function on_body_load()
 {
@@ -494,7 +482,6 @@ function on_body_load()
 
 function change_dropdown_style()
 {
-	
 	sels = document.getElementsByTagName("select");
 
 	// change the select styles depending on whether something has been selected or not
@@ -516,7 +503,7 @@ function change_dropdown_style()
 	}
 
 	mark_dirty()
-	
+
 }
 
 var ren = new RegExp( "\\n", "g" )
@@ -526,8 +513,8 @@ function count_chars(textarea_id, max)
 {
 	mark_dirty()
 	
-	var textarea = document.getElementById(textarea_id)
-	var count_span = document.getElementById(textarea_id + "_cnt");
+	var textarea = get_el(textarea_id)
+	var count_span = get_el(textarea_id + "_cnt");
 
 	// \n counts as two chars by the time we insert,
 	// so double them here for the purpose of counting
@@ -541,11 +528,11 @@ function count_chars(textarea_id, max)
 		// convert the \n\n back to \n
 		textarea.value = s.replace(ren2,"\n")
 
-		count_span.firstChild.nodeValue = "0 more characters allowed"
+		set_text(count_span,"0 more characters allowed")
 	}
 	else
 	{
-		count_span.firstChild.nodeValue = (max - len) + " more characters allowed"
+		set_text(count_span, (max - len) + " more characters allowed")
 	}
 
 	return true
@@ -560,13 +547,11 @@ function show_tags() // also in bug_list.js
 		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=500,height=400")
 
 	popup_window.focus()
-
 }
-
 
 function append_tag(s) // also in bug_list.js, different element
 {
-	el = document.getElementById("tags")
+	el = get_el("tags")
 
 	tags = el.value.split(",")
 
@@ -590,9 +575,7 @@ function append_tag(s) // also in bug_list.js, different element
 
 function done_selecting_tags()
 {
-	//
 }
-
 
 var color = 128
 var timer = null
@@ -619,22 +602,20 @@ function timer_callback()
 	{
 		clearInterval(timer)
 	}
-
 }
 
-
 function getElementsByName_for_ie6_and_ie7(tag, name) {
-     
-     var elem = document.getElementsByTagName(tag);
-     var arr = new Array();
-     for(i = 0,iarr = 0; i < elem.length; i++)
-     {
-          att = elem[i].getAttribute("name");
-          if(att == name)
-          {
-               arr[iarr] = elem[i];
-               iarr++;
-          }
-     }
-     return arr;
+
+	var elem = document.getElementsByTagName(tag);
+	var arr = new Array();
+	for(i = 0,iarr = 0; i < elem.length; i++)
+	{
+		att = elem[i].getAttribute("name");
+		if(att == name)
+		{
+			arr[iarr] = elem[i];
+			iarr++;
+		}
+	}
+	return arr;
 }	

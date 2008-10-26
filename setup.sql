@@ -329,8 +329,8 @@ bs_user int not null,
 )
 
 
-create index bs_index_1 on bug_subscriptions (bs_user, bs_bug)
-create index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
+create unique index bs_index_1 on bug_subscriptions (bs_user, bs_bug)
+create unique index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
 
 /* BUG USER FLAGS */
 

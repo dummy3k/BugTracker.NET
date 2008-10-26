@@ -421,7 +421,7 @@ void do_query()
 
 					// reset, and do the to date
 					custom_clause = "";
-					values = Request["$to$_" + variable];
+					values = Request["to__" + variable];
 					if (values != "")
 					{
 						custom_clause = " [" + variable + "] <= '" + values + "'\n";
@@ -1021,7 +1021,7 @@ void load_drop_downs()
 void write_custom_date_control(string name)
 {
 
-	Response.Write ("<input type=text class=txt");
+	Response.Write ("<input type=text class='txt date'");
 	Response.Write ("  onkeyup=\"on_change()\" ");
 	int size = 10;
 	string size_string = Convert.ToString(size);
@@ -1041,11 +1041,7 @@ void write_custom_date_control(string name)
 	Response.Write (">");
 
 	Response.Write ("<a style='font-size: 8pt;'  href=\"javascript:show_calendar('");
-	Response.Write(Util.get_form_name());
-	Response.Write(".");
 	Response.Write(name);
-	Response.Write("',null,null,'");
-	Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern));
 	Response.Write("')\">&nbsp;[select]</a>");
 }
 
@@ -1055,7 +1051,7 @@ void write_custom_date_controls(string name)
 	Response.Write("from:&nbsp;&nbsp;");
 	write_custom_date_control(name);
 	Response.Write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to:&nbsp;&nbsp;");
-	write_custom_date_control("$to$_" + name); // magic
+	write_custom_date_control("to__" + name); // magic
 }
 
 </script>
@@ -1065,11 +1061,11 @@ void write_custom_date_controls(string name)
 <head>
 <title id="titl" runat="server">btnet search</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<link rel="StyleSheet" href="jquery/ui.datepicker.css" type="text/css">
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
 <link rel="StyleSheet" href="custom/btnet_search.css" type="text/css">
-
-<script type="text/javascript" language="JavaScript" src="overlib_mini.js"></script>
-<script type="text/javascript" language="JavaScript" src="calendar.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.2.6.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.5.2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="bug_list.js"></script>
 <script type="text/javascript" language="JavaScript" src="suggest.js"></script>
 
@@ -1447,7 +1443,7 @@ function on_change()
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
-			Response.Write ("el = document.getElementById('$to$_" +  custom_col + "')\n");
+			Response.Write ("el = document.getElementById('to__" +  custom_col + "')\n");
 
 
 			Response.Write ("if (el.value != \"\")\n");
@@ -1703,6 +1699,22 @@ function set_project_changed() {
 	document.forms[2].project_changed.value = "1";
 }
 
+
+$(document).ready(do_doc_ready);
+
+
+function show_calendar(el)
+{
+	$("#" + el).datepicker("show")
+}
+
+function do_doc_ready()
+{
+	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>'
+	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
+}
+
+
 </script>
 
 </head>
@@ -1819,9 +1831,9 @@ function set_project_changed() {
 
 	<tr>
 		<td nowrap><span class=lbl><% Response.Write(Util.capitalize_first_letter(Util.get_setting("SingularBugLabel","bug"))); %> comments since:&nbsp;</span>
-		<td colspan=2><input type=text class=txt id="comments_since" runat="server" onkeyup="on_change()" size=10>
+		<td colspan=2><input type=text class="txt date" id="comments_since" runat="server" onkeyup="on_change()" size=10>
 			<a style="font-size: 8pt;"
-			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.comments_since',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			href="javascript:show_calendar('comments_since')">
 			[select]
 			</a>
 		</td>
@@ -1830,17 +1842,17 @@ function set_project_changed() {
 
 	<tr>
 		<td nowrap><span class=lbl>"Reported on" from date:&nbsp;</span>
-		<td colspan=2><input runat="server" type=text class=txt  id="from_date" maxlength=10 size=10 onchange="on_change()">
+		<td colspan=2><input runat="server" type=text class="txt date"  id="from_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
-			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.from_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			href="javascript:show_calendar('from_date')">
 			[select]
 			</a>
 
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			<span class=lbl>to:&nbsp;</span>
-			<input runat="server" type=text class=txt  id="to_date" maxlength=10 size=10 onchange="on_change()">
+			<input runat="server" type=text class="txt date"  id="to_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
-			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.to_date',    null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			href="javascript:show_calendar('to_date')">
 			[select]
 			</a>
 		</td>
@@ -1848,17 +1860,17 @@ function set_project_changed() {
 
 	<tr>
 		<td  nowrap><span class=lbl>"Last updated on" from date:&nbsp;</span>
-		<td colspan=2><input runat="server" type=text class=txt  id="lu_from_date" maxlength=10 size=10 onchange="on_change()">
+		<td colspan=2><input runat="server" type=text class="txt date"  id="lu_from_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
-			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_from_date',null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			href="javascript:show_calendar('lu_from_date')">
 			[select]
 			</a>
 
 			&nbsp;&nbsp;&nbsp;&nbsp;
 			<span class=lbl>to:&nbsp;</span>
-			<input runat="server" type=text class=txt  id="lu_to_date" maxlength=10 size=10 onchange="on_change()">
+			<input runat="server" type=text class="txt date"  id="lu_to_date" maxlength=10 size=10 onchange="on_change()">
 			<a style="font-size: 8pt;"
-			href="javascript:show_calendar('<% Response.Write(Util.get_form_name()); %>.lu_to_date',  null,null,'<% Response.Write(Util.get_setting("JustDateFormat",Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>');">
+			href="javascript:show_calendar('lu_to_date')">
 			[select]
 			</a>
 		</td>
