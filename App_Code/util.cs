@@ -622,7 +622,27 @@ function on_submit_search()
 		}
 
 		///////////////////////////////////////////////////////////////////////
-		public static string format_db_date(object date)
+		public static string format_db_date_only(object date)
+		{
+
+
+			if (date.GetType().ToString() == "System.DBNull")
+			{
+				return "";
+			}
+			// not sure when this case happens, but it's a workaround for a bug
+			// somebody reported, 1257368
+			else if (date.GetType().ToString() == "System.String")
+			{
+                return date.ToString();
+			}
+
+			return ((DateTime)date).ToString(get_setting("JustDateFormat","g"),get_culture_info());
+
+		}
+
+		///////////////////////////////////////////////////////////////////////
+		public static string format_db_date_and_time(object date)
 		{
 
 
@@ -641,6 +661,7 @@ function on_submit_search()
 
 		}
 
+
 		//modified by CJU on jan 9 2008
 		///////////////////////////////////////////////////////////////////////
 		public static string format_db_value( Decimal val ) {
@@ -652,7 +673,7 @@ function on_submit_search()
 		///////////////////////////////////////////////////////////////////////
 		public static string format_db_value( DateTime val ) {
 
-			return format_db_date( val );
+			return format_db_date_only( val );
 
 		}
 

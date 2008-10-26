@@ -117,7 +117,7 @@ void write_blame()
         foreach (XmlNode node in commit.ChildNodes)
         {
             if (node.Name == "author") author = node.InnerText;
-            else if (node.Name == "date") date = btnet.Util.format_db_date(XmlConvert.ToDateTime(node.InnerText, XmlDateTimeSerializationMode.Local));
+            else if (node.Name == "date") date = btnet.Util.format_db_date_and_time(XmlConvert.ToDateTime(node.InnerText, XmlDateTimeSerializationMode.Local));
         }
 
         Response.Write("<td nowrap>" + author);

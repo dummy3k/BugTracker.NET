@@ -45,14 +45,16 @@ blog about lucene.net
 Version 2.9.98   11/XX/2008 
 -----------------------------------------------------------------------
 
-* IMPORTANT - You probably need to change your Web.config 
-"JustDateFormat" for this release so that the month part is specified
-as "mm" instead of "MM".
+**** MARK FORM VARS DIRTY
 
-* Changed the calendar popup to the jQuery datepicker.  It uses 
-Web.config "JustDateFormat" to decide how to return the selected date.
+* IMPORTANT - 
 
- 
+* Now using jQuery. Changed the calendar popup to the jQuery datepicker.
+It uses  Web.config "DatepickerDateFormat" to decide how to return the 
+selected date.
+
+* "JustDateFormat" is now used for formatting the output of all
+custom date fields.
 
 * Fixed bug where the display of the popup was truncated if the window
 was scrolled down from the top.

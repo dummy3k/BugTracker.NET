@@ -91,7 +91,7 @@ namespace btnet
             Response.Write("\n<tr><td>Reported By<td>"
 				+ format_username((string)dr["reporter"],(string)dr["reporter_fullname"])
 				+ "&nbsp;");
-            Response.Write("\n<tr><td>Reported On<td>" + btnet.Util.format_db_date(dr["reported_date"]) + "&nbsp;");
+            Response.Write("\n<tr><td>Reported On<td>" + btnet.Util.format_db_date_and_time(dr["reported_date"]) + "&nbsp;");
 
             if (security.user.tags_field_permission_level > 0)
 	            Response.Write("\n<tr><td>Tags<td>" + dr["bg_tags"] + "&nbsp;");
@@ -144,7 +144,7 @@ namespace btnet
 				{
 					object dt = dr[(string)drcc["name"]];
 
-					Response.Write (btnet.Util.format_db_date(dt));
+					Response.Write (btnet.Util.format_db_date_only(dt));
 				}
 				else
 				{
@@ -563,7 +563,7 @@ namespace btnet
 
 			// Format the date
 			Response.Write (" on ");
-			Response.Write (btnet.Util.format_db_date(dr["bp_date"]));
+			Response.Write (btnet.Util.format_db_date_and_time(dr["bp_date"]));
 			Response.Write (", ");
 			Response.Write (btnet.Util.how_long_ago((int) dr["seconds_ago"]));
 			Response.Write ("</span>");

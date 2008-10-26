@@ -192,7 +192,7 @@ namespace btnet
                         {
                             if (datatype == "System.DateTime")
                             {
-                                r.Write(Util.format_db_date(dr[i]));
+                                r.Write(Util.format_db_date_and_time(dr[i]));
                             }
                             else
                             {

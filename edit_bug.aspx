@@ -351,7 +351,7 @@ void Page_Load(Object sender, EventArgs e)
 					Convert.ToString(dr["reporter"]),
 					Convert.ToString(dr["reporter_fullname"]));
 			s += " on ";
-			s += btnet.Util.format_db_date (dr["reported_date"]);
+			s += btnet.Util.format_db_date_and_time (dr["reported_date"]);
 			s += ", ";
 			s += btnet.Util.how_long_ago((int)dr["seconds_ago"]);
 
@@ -2234,8 +2234,6 @@ void on_update (Object sender, EventArgs e)
                 commentType,
                 internal_only.Checked) != 0);
 
-
-			string result = "";
 			if (bug_fields_have_changed || (bugpost_fields_have_changed && !internal_only.Checked))
 			{
 				btnet.Bug.send_notifications(btnet.Bug.UPDATE,	id,	security, 0,

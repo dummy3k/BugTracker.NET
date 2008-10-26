@@ -129,7 +129,7 @@ void fetch_and_write_history(string file_path)
         foreach (XmlNode node in logentry.ChildNodes)
         {
             if (node.Name == "author") author = node.InnerText;
-            else if (node.Name == "date") date = btnet.Util.format_db_date(XmlConvert.ToDateTime(node.InnerText, XmlDateTimeSerializationMode.Local));
+            else if (node.Name == "date") date = btnet.Util.format_db_date_and_time(XmlConvert.ToDateTime(node.InnerText, XmlDateTimeSerializationMode.Local));
             else if (node.Name == "msg") msg = node.InnerText;
             else if (node.Name == "paths")
             {

@@ -794,7 +794,7 @@ namespace btnet
                             {
                                 if (datatype == "System.DateTime")
                                 {
-                                    Response.Write(Util.format_db_date(dr[i]));
+                                    Response.Write(Util.format_db_date_and_time(dr[i]));
                                 }
                                 else
                                 {
