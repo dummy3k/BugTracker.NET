@@ -794,6 +794,8 @@ namespace btnet
                             {
                                 if (datatype == "System.DateTime")
                                 {
+                                    // Some columns we'd like both date and time, some just date,
+                                    // so let's be clever and if the time is exactly midnight, space it out
                                     Response.Write(Util.format_db_date_and_time(dr[i]));
                                 }
                                 else

@@ -40,18 +40,14 @@ function my_confirm()
 	return confirm('You have unsaved changes.  Do you want to leave this page and lose your changes?.')
 }
 
-function goto_edit_bug(bugid)
+function warn_if_dirty(event)
 {
-	if (!dirty)
+	if (dirty)
 	{
-		window.location="edit_bug.aspx?id=" + bugid;
-	}
-	else
-	{
-		var result = my_confirm()
-		if (result)
+		result = my_confirm()
+		if (!result)
 		{
-			window.location="edit_bug.aspx?id=" + bugid;
+			event.preventDefault()
 		}
 	}
 }
@@ -98,6 +94,7 @@ function handle_rewrite_posts()
 		{
 			var el = get_el("posts")
 			el.innerHTML = xmlHttp.responseText;
+			$(".warn").click(warn_if_dirty)
 			get_db_datetime()
 			start_animation()
 		}
@@ -619,3 +616,9 @@ function getElementsByName_for_ie6_and_ie7(tag, name) {
 	}
 	return arr;
 }	
+
+function show_calendar(el)
+{
+	$("#" + el).datepicker("show")
+}
+

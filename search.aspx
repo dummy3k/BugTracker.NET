@@ -1068,6 +1068,7 @@ void write_custom_date_controls(string name)
 <script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.5.2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="bug_list.js"></script>
 <script type="text/javascript" language="JavaScript" src="suggest.js"></script>
+<script type="text/javascript" language="JavaScript" src="datejs/date.js"></script>
 
 <script>
 
@@ -1301,6 +1302,13 @@ function in_not_in_vals(el)
 	return vals;
 }
 
+function format_date_for_db(s)
+{
+	// convert the date for sql
+	// Uses date.js, 
+	return Date.parse(s).toString("yyyyMMdd HH:mm:ss")
+}
+
 
 function on_change()
 {
@@ -1439,7 +1447,7 @@ function on_change()
 		{
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col + "] >=  '\" + el.value + \"'\\n\"\n");
+			Response.Write (clause + " = \" [" + custom_col + "] >=  '\" + format_date_for_db(el.value) + \"'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
@@ -1448,7 +1456,7 @@ function on_change()
 
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col + "] <=  '\" + el.value + \"'\\n\"\n");
+			Response.Write (clause + " = \" [" + custom_col + "] <=  '\" + format_date_for_db(el.value) + \"'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
@@ -1712,6 +1720,7 @@ function do_doc_ready()
 {
 	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>'
 	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
+	$(".date").change(on_change)
 }
 
 

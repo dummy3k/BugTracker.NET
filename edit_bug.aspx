@@ -467,7 +467,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			if (permission_level == Security.PERMISSION_ALL)
 			{
-				string clone_link = "<a href=\"javascript:clone()\" "
+				string clone_link = "<a class=warn href=\"javascript:clone()\" "
 					+ " title='Create a copy of this item'><img src=paste_plain.png border=0 align=top>&nbsp;create copy</a>";
 				clone.InnerHtml = clone_link;
 			}
@@ -1307,9 +1307,9 @@ void format_prev_next_bug()
 			if (prev_bug != 0)
 			{
 				prev_next_link =
-					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"javascript:goto_edit_bug("
+					"&nbsp;&nbsp;&nbsp;&nbsp;<a class=warn href=edit_bug.aspx?id="
 					+ Convert.ToString(prev_bug)
-					+ ")\"><img src=arrow_up.png border=0 align=top>prev</a>";
+					+ "><img src=arrow_up.png border=0 align=top>prev</a>";
 			}
 			else
 			{
@@ -1319,9 +1319,9 @@ void format_prev_next_bug()
 			if (next_bug != 0)
 			{
 				prev_next_link +=
-					"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"javascript:goto_edit_bug("
+					"&nbsp;&nbsp;&nbsp;&nbsp;<a class=warn href=edit_bug.aspx?id="
 					+ Convert.ToString(next_bug)
-					+ ")\">next<img src=arrow_down.png border=0 align=top></a>";
+					+ ">next<img src=arrow_down.png border=0 align=top></a>";
 
 			}
 			else
@@ -2327,6 +2327,14 @@ var this_bugid = <% Response.Write(Convert.ToString(id)); %>
 
 $(document).ready(do_doc_ready);
 
+function do_doc_ready()
+{
+	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>'
+	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
+	$(".date").change(mark_dirty)
+	$(".warn").click(warn_if_dirty) 
+}
+
 function start_animation()
 {
 
@@ -2360,19 +2368,6 @@ function disable_second_button()
 
 }
 
-
-function show_calendar(el)
-{
-	$("#" + el).datepicker("show")
-}
-
-function do_doc_ready()
-{
-	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>'
-	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
-}
-
-
 </script>
 
 </head>
@@ -2385,7 +2380,7 @@ function do_doc_ready()
 <div class=align>
 
 <% if (!security.user.adds_not_allowed) { %>
-<a href="javascript: goto_edit_bug(0)"><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
+<a class=warn href="edit_bug.aspx?id=0"><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
 <span id="prev_next" runat="server">&nbsp;</span>

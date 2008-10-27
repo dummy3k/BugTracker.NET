@@ -144,7 +144,7 @@ namespace btnet
 				{
 					object dt = dr[(string)drcc["name"]];
 
-					Response.Write (btnet.Util.format_db_date_only(dt));
+					Response.Write (btnet.Util.format_db_date_and_time(dt));
 				}
 				else
 				{
@@ -304,23 +304,10 @@ namespace btnet
 			foreach (DataRow dr in ds_posts.Tables[0].Rows)
 			{
 
-				if (user.external_user)
-				{
-					//if ((int)dr["bp_hidden_from_external_users"] == 1)
-					//{
-					//	continue; // don't show
-					//}
-				}
-
 				bp_id = (int) dr["bp_id"];
-
 
 				if ((string)dr["bp_type"] == "update")
 				{
-					//if (!history_inline)
-					//{
-					//	continue;
-					//}
 
 					string comment = (string) dr["bp_comment"];
 
@@ -355,7 +342,6 @@ namespace btnet
 					if (user.udf_field_permission_level == 0
 					&& comment.StartsWith("changed " + Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE") + " from"))
 						continue;
-
 
 				}
 
@@ -580,7 +566,7 @@ namespace btnet
 				{
 					if (type == "comment" || type == "sent" || type == "received")
 					{
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=send_email.aspx?quote=1&bp_id=" + string_post_id + "&reply=forward");
 						Response.Write (">forward</a>");
 					}
@@ -600,7 +586,7 @@ namespace btnet
 					//	Response.Write (">edit</a>");
 
 						// This delete leaves debris around, but it's better than nothing
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=delete_comment.aspx?id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">delete</a>");
@@ -609,11 +595,11 @@ namespace btnet
 
 					if (permission_level != Security.PERMISSION_READONLY)
 					{
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=send_email.aspx?quote=1&bp_id=" + string_post_id);
 						Response.Write (">reply</a>");
 
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=send_email.aspx?quote=1&bp_id=" + string_post_id + "&reply=all");
 						Response.Write (">reply all</a>");
 					}
@@ -626,12 +612,12 @@ namespace btnet
 					|| (this_can_edit_and_delete_posts
 					&& permission_level == Security.PERMISSION_ALL))
 					{
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=edit_attachment.aspx?id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">edit</a>");
 
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=delete_attachment.aspx?id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">delete</a>");
@@ -644,12 +630,12 @@ namespace btnet
 					|| (this_can_edit_and_delete_posts
 					&& permission_level == Security.PERMISSION_ALL))
 					{
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=edit_comment.aspx?id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">edit</a>");
 
-						Response.Write ("&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;'");
+						Response.Write ("&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;'");
 						Response.Write (" href=delete_comment.aspx?id="
 							+ string_post_id + "&bug_id=" + string_bug_id);
 						Response.Write (">delete</a>");
@@ -661,7 +647,7 @@ namespace btnet
 				if (btnet.Util.get_setting("CustomPostLinkLabel","") != "")
 				{
 
-					string custom_post_link = "&nbsp;&nbsp;&nbsp;<a style='font-size: 8pt;' href="
+					string custom_post_link = "&nbsp;&nbsp;&nbsp;<a class=warn style='font-size: 8pt;' href="
 						+ btnet.Util.get_setting("CustomPostLinkUrl","")
 						+ "?postid="
 						+ string_post_id
@@ -672,8 +658,6 @@ namespace btnet
 					Response.Write (custom_post_link);
 
 				}
-
-
 			}
 
 			Response.Write ("\n</table>\n<table border=0>\n<tr><td>");

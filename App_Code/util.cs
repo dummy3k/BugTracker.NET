@@ -190,18 +190,11 @@ namespace btnet
             Response.Write("<td valign=middle align=left'>");
             if (this_link == menu_item)
             {
-                Response.Write("<a href=" + href + "><span class=selected_menu_item  style='margin-left:3px;'>" + menu_item + "</span></a>");
+                Response.Write("<a href=" + href + "><span class='selected_menu_item warn'  style='margin-left:3px;'>" + menu_item + "</span></a>");
             }
             else
             {
-                if (menu_item == "about")
-                {
-                    Response.Write("<a target=_blank href=" + href + "><span class=menu_item style='margin-left:3px;'>" + menu_item + "</span></a>");
-                }
-                else
-                {
-                    Response.Write("<a href=" + href + "><span class=menu_item style='margin-left:3px;'>" + menu_item + "</span></a>");
-                }
+                Response.Write("<a href=" + href + "><span class='menu_item warn' style='margin-left:3px;'>" + menu_item + "</span></a>");
             }
             Response.Write("</td>");
         }
@@ -338,8 +331,8 @@ function on_submit_search()
             }
 
 
-            write_menu_item(Response, this_link, "about", "about.html");
-
+            Response.Write("<td valign=middle align=left'>");
+            Response.Write("<a target=_blank href=about.html><span class='menu_item' style='margin-left:3px;'>about</span></a></td>");
             Response.Write("<td nowrap valign=middle>");
             Response.Write("<a target=_blank href=http://ifdefined.com/README.html>help</a></td>");
 
@@ -622,30 +615,9 @@ function on_submit_search()
 		}
 
 		///////////////////////////////////////////////////////////////////////
-		public static string format_db_date_only(object date)
-		{
-
-
-			if (date.GetType().ToString() == "System.DBNull")
-			{
-				return "";
-			}
-			// not sure when this case happens, but it's a workaround for a bug
-			// somebody reported, 1257368
-			else if (date.GetType().ToString() == "System.String")
-			{
-                return date.ToString();
-			}
-
-			return ((DateTime)date).ToString(get_setting("JustDateFormat","g"),get_culture_info());
-
-		}
-
-		///////////////////////////////////////////////////////////////////////
 		public static string format_db_date_and_time(object date)
 		{
-
-
+			
 			if (date.GetType().ToString() == "System.DBNull")
 			{
 				return "";
@@ -656,9 +628,34 @@ function on_submit_search()
 			{
                 return date.ToString();
 			}
+			else
+			{
 
-			return ((DateTime)date).ToString(get_setting("DateTimeFormat","g"),get_culture_info());
+				// We don't know whether time is significant or not,
+				// but we can guess.  Probably, not for sure, but probably
+				// if the time is 12:00 AM, the time is just debris.
 
+                DateTime dt = (DateTime)date;
+
+                if (dt.Year == 1900)
+                {
+                    return "";
+                }
+                else
+                {
+                    string date_time_format = "";
+                    if (dt.Hour == 0 && dt.Minute == 0 && dt.Second == 0)
+                    {
+                        date_time_format = get_setting("JustDateFormat", "g");
+                    }
+                    else
+                    {
+                        date_time_format = get_setting("DateTimeFormat", "g");
+                    }
+	                return dt.ToString(date_time_format,get_culture_info());
+                }
+
+			}
 		}
 
 
@@ -673,7 +670,7 @@ function on_submit_search()
 		///////////////////////////////////////////////////////////////////////
 		public static string format_db_value( DateTime val ) {
 
-			return format_db_date_only( val );
+			return format_db_date_and_time( val );
 
 		}
 
