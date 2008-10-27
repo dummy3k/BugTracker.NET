@@ -59,23 +59,6 @@ function on_filter() {
 var current_element
 var current_bug
 
-function find_position(obj)
-{
-	var curleft = curtop = 0;
-	curleft = obj.offsetLeft
-	curtop = obj.offsetTop
-
-	if (obj.offsetParent)
-	{
-		while (obj = obj.offsetParent)
-		{
-			curleft += obj.offsetLeft
-			curtop += obj.offsetTop
-		}
-	}
-	return [curleft,curtop];
-}
-
 function get_bug_comment(bugid)
 {
 	var url = "ajax.aspx?bugid=" + bugid
@@ -99,14 +82,13 @@ function display_popup(s)
 		return;
 
 	var popup = document.getElementById("popup");
-	
 	popup.innerHTML = s
-	var pos = find_position(current_element)
+
+	//viewport_height = $(document).height()  doesn't work
 	viewport_height = get_viewport_size()[1] // does this factor in scrollbar?
-	mytop = pos[1] + current_element.offsetHeight + 4
 	
-	scroll_offset_y = get_scroll_offset()[1]
-	
+	mytop = $(current_element).offset().top + $(current_element).height() + 4
+	scroll_offset_y = $(document).scrollTop()
 	y_in_viewport = mytop - scroll_offset_y
 	
 	if (y_in_viewport < viewport_height) // are we even visible?
@@ -134,11 +116,10 @@ function display_popup(s)
 				popup.style.display = "none";
 			}
 		}
-		popup.style.left = pos[0] + 40
+		popup.style.left = $(current_element).offset().left + 40
 		popup.style.top = mytop
 	}
 }
-
 
 function maybe_get_bug_comment(bug)
 {
@@ -208,7 +189,6 @@ function flag(el, bugid)
 	
 	var url = "flag.aspx?ses=" + get_cookie("se_id") +  "&bugid=" + bugid + "&flag=" + which_int
 	$.get(url)
-
 }
 
 function seen(el, bugid)
@@ -233,8 +213,6 @@ function seen(el, bugid)
 	$.get(url)
 }
 
-
-
 function show_tags()
 {
 	popup_window = window.open(
@@ -243,7 +221,6 @@ function show_tags()
 		"menubar=0,scrollbars=1,toolbar=0,resizable=1,width=500,height=400")
 
 	popup_window.focus()
-
 }
 
 function append_tag(s)
@@ -269,7 +246,6 @@ function append_tag(s)
 	el.value += s;
 }
 
-
 function on_tags_change()
 {
 	el = document.getElementById("tags_input")
@@ -278,38 +254,13 @@ function on_tags_change()
 	on_filter()
 }
 
-
 function done_selecting_tags()
 {
 	on_tags_change()
 }
 
-
-function get_scroll_offset()
+function get_viewport_size()
 {
-	var myX = 0, myY = 0;
-	
-	if (document.documentElement && (document.documentElement.scrollTop || document.documentElement.scrollLeft))
-	{
-		myX = document.documentElement.scrollLeft
-		myY = document.documentElement.scrollTop
-	}
-	else if (document.body && (document.body.scrollTop || document.body.scrollLeft))
-	{
-		myX = document.body.scrollLeft
-		myY = document.body.scrollTop
-	}
-	else if (window.pageXOffset || window.pageYOffset)
-	{
-		myX = window.pageXOffset
-		myY = window.pageYOffset
-	}
-	
-	return [myX, myY]
-}
-
-
-function get_viewport_size() {
   var myWidth = 0, myHeight = 0;
   
   if( typeof( window.innerWidth ) == 'number' )
