@@ -40,21 +40,27 @@ more spellchecking...
 search and full text search.
 blog about lucene.net
 
+* relationships in print?
+* change history in print?
+* images in print?
+
 
 -----------------------------------------------------------------------
 Version 2.9.98   11/XX/2008 
 -----------------------------------------------------------------------
 
-**** MARK FORM VARS DIRTY
-
-* IMPORTANT - 
+* IMPORTANT FOR OUTSIDE THE US: 
 
 * Now using jQuery. Changed the calendar popup to the jQuery datepicker.
-It uses  Web.config "DatepickerDateFormat" to decide how to return the 
-selected date.
+It uses  Web.config "DatepickerDateFormat" to decide which date format
+to use.  
 
-* "JustDateFormat" is now used for formatting the output of all
-custom date fields.
+If you are having problems related to dates, please check your 
+Web.config settings "DateTimeFormat", "DateTimeFormat", and 
+"JustDateFormat" and the comments about them in the Web.config in this
+zip.  I think things are working better, but historically, I've made
+many mistakes with date formats and internationalization, so be
+suspicious.
 
 * Fixed bug where the display of the popup was truncated if the window
 was scrolled down from the top.
@@ -68,9 +74,9 @@ is also duplicated at the top of the form.
 
 * Fixed cosmetic bug with form border in IE.
 
-* relationships in print?
-* change history in print?
-* images in print?
+* Completed the logic that warns you if you are are leaving the edit bug
+page with unsaved changes.  Now it's working with the menu and comment
+links too.
 
 -----------------------------------------------------------------------
 Version 2.9.8   10/25/2008 

@@ -65,10 +65,7 @@ delete dashboard_items where ds_user = $us";
 		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 			+ "delete user";
 
-		sql = @"
-declare @cnt int
---set @cnt = 0
-
+		sql = @"declare @cnt int
 select @cnt = count(1) from bugs where bg_reported_user = $us or bg_assigned_to_user = $us
 if @cnt = 0
 begin
