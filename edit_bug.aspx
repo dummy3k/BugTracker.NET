@@ -2329,7 +2329,7 @@ $(document).ready(do_doc_ready);
 
 function do_doc_ready()
 {
-	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat",btnet.Util.get_culture_info().DateTimeFormat.ShortDatePattern)); %>'
+	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat","yy-mm-dd")); %>'
 	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
 	$(".date").change(mark_dirty)
 	$(".warn").click(warn_if_dirty) 
