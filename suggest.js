@@ -1,32 +1,24 @@
-
-
-var suggest_ajax_url="ajax2.aspx?q="
-
-function stateChanged2()
+function handle_suggestion(data, status)
 {
-	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+	if (data != "")
 	{
-
-		if (xmlHttp.responseText != "")
-		{
-			var mypopup = document.getElementById("suggest_popup");
-			mypopup.innerHTML = xmlHttp.responseText
-			var sel = document.getElementById("suggest_select")
+		var mypopup = document.getElementById("suggest_popup");
+		mypopup.innerHTML = data
+		var sel = document.getElementById("suggest_select")
 
 
-			// position and show the popup
-			var mylike = document.getElementById("like")
-			sel.style.width = mylike.offsetWidth
-			pos = find_position(mylike)
-			mypopup.style.left = pos[0]
-			mypopup.style.top = pos[1] + (mylike.offsetHeight-3)
+		// position and show the popup
+		var mylike = document.getElementById("like")
+		sel.style.width = mylike.offsetWidth
+		pos = find_position(mylike)
+		mypopup.style.left = pos[0]
+		mypopup.style.top = pos[1] + (mylike.offsetHeight-3)
 
-			mypopup.style.display = "block";
-		}
-		else
-		{
-			hide_suggest();
-		}
+		mypopup.style.display = "block";
+	}
+	else
+	{
+		hide_suggest();
 	}
 }
 
@@ -41,17 +33,9 @@ function get_suggestion()
 	{
 		if (s != prev_desc)
 		{
-			xmlHttp=GetXmlHttpObject()
-			if (xmlHttp==null)
-			{
-				return
-			}
-
 			prev_desc = s
-			var url = suggest_ajax_url + s
-			xmlHttp.onreadystatechange=stateChanged2
-			xmlHttp.open("GET",url,true)
-			xmlHttp.send(null)
+			var url = "ajax2.aspx?q=" + s
+			$.get(url, "", handle_suggestion)
 		}
 	}
 	else
@@ -59,7 +43,6 @@ function get_suggestion()
 		hide_suggest()
 	}
 }
-
 
 var suppress_suggest = false
 
@@ -76,8 +59,6 @@ function select_suggestion(el)
 	// workaround for strange behavior
 	suppress_suggest = true
 	mylike.focus()
-
-
 }
 
 
@@ -147,7 +128,6 @@ function search_criteria_onkeydown(el, ev)
 	{
 		hide_suggest()
 	}
-
 }
 
 function search_criteria_onkeyup(el, ev)
@@ -166,5 +146,3 @@ function search_criteria_onkeyup(el, ev)
 		suppress_suggest = false
 	}
 }
-
-

@@ -644,7 +644,7 @@ function on_submit_search()
                 else
                 {
                     string date_time_format = "";
-                    if (dt.Hour == 0 && dt.Minute == 0 && dt.Second == 0)
+                    if ((dt.Hour == 0 || dt.Hour == 12) && dt.Minute == 0 && dt.Second == 0)
                     {
                         date_time_format = get_setting("JustDateFormat", "g");
                     }

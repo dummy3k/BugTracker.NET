@@ -69,98 +69,32 @@ function send_email(id)
 }
 
 
-var xmlHttp
-
-function GetXmlHttpObject()
+function handle_rewrite_posts(data, status)
 {
-	var objXMLHttp=null
-	if (window.XMLHttpRequest)
-	{
-		objXMLHttp=new XMLHttpRequest()
-	}
-	else if (window.ActiveXObject)
-	{
-		objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
-	}
-	return objXMLHttp
+	$("#posts").html(data)
+	$(".warn").click(warn_if_dirty)
+	$("#snapshot_timestamp").load("get_db_datetime.aspx")
+	start_animation()
 }
 
-function handle_rewrite_posts()
-{
-	
-	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
-	{
-		if (xmlHttp.responseText != "")
-		{
-			var el = get_el("posts")
-			el.innerHTML = xmlHttp.responseText;
-			$(".warn").click(warn_if_dirty)
-			get_db_datetime()
-			start_animation()
-		}
-	}
-}
 
 function rewrite_posts(bugid)
 {
 	var images_inline = get_cookie("images_inline")
 	var history_inline = get_cookie("history_inline")
 
-	xmlHttp=GetXmlHttpObject()
-	if (xmlHttp==null)
-	{
-		return
-	}
-	
 	var url = "write_posts.aspx?images_inline=" + images_inline
 		+ "&history_inline=" + history_inline
 		+ "&id=" + bugid
 	
-	xmlHttp.onreadystatechange=handle_rewrite_posts
-	xmlHttp.open("GET",url,true)
-	xmlHttp.send(null)
+	$.get(url, "", handle_rewrite_posts)
 }
-
-function handle_get_bug_date()
-{
-	if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
-	{
-		if (xmlHttp.responseText != "")
-		{
-			var el = get_el("snapshot_timestamp")
-			el.value = xmlHttp.responseText;
-		}
-	}
-}
-
-function get_db_datetime()
-{
-	xmlHttp=GetXmlHttpObject()
-	if (xmlHttp==null)
-	{
-		return
-	}
-
-	var url = "get_db_datetime.aspx"
-
-	xmlHttp.onreadystatechange=handle_get_bug_date
-	xmlHttp.open("GET",url,true)
-	xmlHttp.send(null)
-}
-
 
 function toggle_notifications(bugid)
 {
 	var el = get_el("get_stop_notifications");
 	var text = get_text(el)
 	
-	xmlHttp=GetXmlHttpObject()
-	if (xmlHttp==null)
-	{
-		return
-	}
-
-	// build url
 	var url = "subscribe.aspx?ses="
 		+ get_cookie("se_id")
 		+ "&id=" 
@@ -172,8 +106,7 @@ function toggle_notifications(bugid)
 	else
 		url += "0"
 
-	xmlHttp.open("GET",url,true)
-	xmlHttp.send(null)
+	$.get(url)
 
 	// modify text in web page	
 	if (text == "get notifications")

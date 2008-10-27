@@ -51,28 +51,34 @@ Version 2.9.98   11/XX/2008
 
 * IMPORTANT FOR OUTSIDE THE US: 
 
-* Now using jQuery. Changed the calendar popup to the jQuery datepicker.
-It uses  Web.config "DatepickerDateFormat" to decide which date format
-to use.  
+* Now using the jQuery javascript library.  Changed the calendar popup 
+to the jQuery datepicker. It uses  Web.config "DatepickerDateFormat" to
+decide which date format the picker puts into the input field.
 
-If you are having problems related to dates, please check your 
-Web.config settings "DateTimeFormat", "DateTimeFormat", and 
-"JustDateFormat" and the comments about them in the Web.config in this
-zip.  I think things are working better, but historically, I've made
-many mistakes with date formats and internationalization, so be
-suspicious.
+Please read the comments in this new Web.config related to the settings
+"DatepickerDateFormat", "DateTimeFormat", and "JustDateFormat".  
+and the comments about them in the Web.config in this zip.
+
+Historically, I've tended to make mistakes with non-US date formats, so
+be suspicious.
+
+The logic now tries to guess when to display just the date and when to
+display both the date and time.
 
 * Fixed bug where the display of the popup was truncated if the window
 was scrolled down from the top.
 
 * Catching exception "Request is not available in this context" when
 Application_Start references the Request object on IIS7 in "Integrated"
-mode.  Google the message for more info.
+mode.  Google the error message for more info.
+
+* Fixed bug 1239351 "SQL saved from search can have incorrect date
+format"
 
 * If "DisplayAnotherButtonInEditBugPage" is set to 1, the error message
-is also duplicated at the top of the form.
+is also duplicated at the top of the form along with the button.
 
-* Fixed cosmetic bug with form border in IE.
+* Fixed cosmetic bug, missing form border in IE.
 
 * Completed the logic that warns you if you are are leaving the edit bug
 page with unsaved changes.  Now it's working with the menu and comment

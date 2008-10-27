@@ -12,7 +12,6 @@ function on_sort(col) {
 	frm.submit();
 }
 
-
 function on_filter() {
 
 	var filter_condition = "66 = 66 "; // a dummy condition, just so I can start all the following with "and"
@@ -57,10 +56,6 @@ function on_filter() {
 	frm.submit();
 }
 
-// ajax stuff
-
-var xmlHttp
-var ajax_url="ajax.aspx?bugid="
 var current_element
 var current_bug
 
@@ -83,28 +78,17 @@ function find_position(obj)
 
 function get_bug_comment(bugid)
 {
-	xmlHttp=GetXmlHttpObject()
-	if (xmlHttp==null)
-	{
-		return
-	}
-
-	var url = ajax_url + bugid
-	xmlHttp.onreadystatechange=stateChanged
-	xmlHttp.open("GET",url,true)
-	xmlHttp.send(null)
+	var url = "ajax.aspx?bugid=" + bugid
+	$.get(url, "", handle_popup)
 }
 
-function stateChanged()
+function handle_popup(data, status)
 {
 	if (current_element != null)
 	{
-		if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+		if (data != "")
 		{
-			if (xmlHttp.responseText != "")
-			{
-				display_popup(xmlHttp.responseText)
-			}
+			display_popup(data)
 		}
 	}
 }
@@ -155,20 +139,6 @@ function display_popup(s)
 	}
 }
 
-
-function GetXmlHttpObject()
-{
-	var objXMLHttp=null
-	if (window.XMLHttpRequest)
-	{
-		objXMLHttp=new XMLHttpRequest()
-	}
-	else if (window.ActiveXObject)
-	{
-		objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
-	}
-	return objXMLHttp
-}
 
 function maybe_get_bug_comment(bug)
 {
@@ -237,9 +207,7 @@ function flag(el, bugid)
 	el.setAttribute(cls,which)
 	
 	var url = "flag.aspx?ses=" + get_cookie("se_id") +  "&bugid=" + bugid + "&flag=" + which_int
-	xmlHttp = GetXmlHttpObject();
-	xmlHttp.open("GET",url,true)
-	xmlHttp.send(null)
+	$.get(url)
 
 }
 
@@ -262,10 +230,7 @@ function seen(el, bugid)
 	el.setAttribute(cls,which)
 	
 	var url = "seen.aspx?ses=" + get_cookie("se_id") +  "&bugid=" + bugid + "&seen=" + which_int
-	xmlHttp = GetXmlHttpObject();
-	xmlHttp.open("GET",url,true)
-	xmlHttp.send(null)
-
+	$.get(url)
 }
 
 
