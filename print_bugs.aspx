@@ -94,8 +94,11 @@ void print_as_excel()
 	first_column = true;
 	for (col = 1; col < dv.Table.Columns.Count; col++)
 	{
-		if (dv.Table.Columns[col].ColumnName == "$FLAG") continue;
-
+		if (dv.Table.Columns[col].ColumnName == "$FLAG") 
+			continue;
+		if (dv.Table.Columns[col].ColumnName == "$SEEN") 
+			continue;
+			
 		if (!first_column)
 		{
 			Response.Write ("\t");
@@ -112,7 +115,10 @@ void print_as_excel()
 		first_column = true;
 		for (col = 1; col < dv.Table.Columns.Count; col++)
 		{
-			if (dv.Table.Columns[col].ColumnName == "$FLAG") continue;
+			if (dv.Table.Columns[col].ColumnName == "$FLAG") 
+				continue;
+			if (dv.Table.Columns[col].ColumnName == "$SEEN") 
+				continue;
 
 			if (!first_column)
 			{
@@ -145,6 +151,10 @@ void print_as_html()
 		{
 			Response.Write("flag");
 		}
+		else if (dv.Table.Columns[col].ColumnName == "$SEEN")
+		{
+			Response.Write("new");
+		}
 		else
 		{
 			Response.Write (dv.Table.Columns[col].ColumnName);
@@ -164,7 +174,22 @@ void print_as_html()
 				if (flag == 1) cls = "red";
 				else if (flag == 2) cls = "grn";
 
-				Response.Write("<td class=datad><span class=" + cls + ">");
+				Response.Write("<td class=datad><span class=" + cls + ">&nbsp;</span>");
+
+			}
+			else if (dv.Table.Columns[col].ColumnName == "$SEEN")
+			{
+				int seen = (int) drv[col];
+				string cls = "old";
+				if (seen == 0)
+				{
+					cls = "new";
+				}
+				else
+				{
+					cls = "old";
+				}
+				Response.Write("<td class=datad><span class=" + cls + ">&nbsp;</span>");
 
 			}
 			else
