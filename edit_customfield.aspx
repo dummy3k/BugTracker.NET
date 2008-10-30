@@ -214,6 +214,7 @@ void on_update (Object sender, EventArgs e)
 	<textarea runat="server" class=txt id="vals" rows=6 cols=60></textarea>
 	<br>
 	<span runat="server" class=err id="vals_err">&nbsp;</span>
+	</td>
 	</tr>
 
 
@@ -245,8 +246,8 @@ void on_update (Object sender, EventArgs e)
 	<tr>
 	<td colspan=2 align=center>
 	<input runat="server" class=btn type=submit id="sub" value="Update" OnServerClick="on_update">
-	<td>&nbsp</td>
 	</td>
+	<td>&nbsp;</td>
 	</tr>
 
 	</table>
