@@ -2375,8 +2375,6 @@ function disable_second_button()
 <body onload='on_body_load()' onunload='on_body_unload()'>
 <% security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs")); %>
 
-<div id="overDiv" style="position:absolute;visibility:hidden; z-index:1000;"></div>
-
 <div class=align>
 
 <% if (!security.user.adds_not_allowed) { %>
@@ -2617,7 +2615,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 				if (dropdown_type != "" || dropdown_vals != "")
 				{
-					string selected_value = Convert.ToString(hash_custom_cols[(string)drcc["name"]]);
+					string selected_value = Convert.ToString(hash_custom_cols[(string)drcc["name"]]).Trim();
 
 					Response.Write ("<select ");
 

@@ -718,6 +718,7 @@ void load_project_custom_dropdown(ListBox dropdown, string vals_string, Dictiona
 	}
 }
 
+///////////////////////////////////////////////////////////////////////
 void handle_project_custom_dropdowns()
 {
 
@@ -1018,6 +1019,7 @@ void load_drop_downs()
 
 }
 
+///////////////////////////////////////////////////////////////////////
 void write_custom_date_control(string name)
 {
 
@@ -1030,7 +1032,7 @@ void write_custom_date_control(string name)
 	Response.Write (" maxlength=" + size_string);
 
 	Response.Write (" name=\"" + name + "\"");
-	Response.Write (" id=\"" + name + "\"");
+	Response.Write (" id=\"" + name.Replace(" ","") + "\"");
 
 	Response.Write (" value=\"");
 	if (Request[name]!="")
@@ -1306,7 +1308,15 @@ function format_date_for_db(s)
 {
 	// convert the date for sql
 	// Uses date.js, 
-	return Date.parse(s).toString("yyyyMMdd HH:mm:ss")
+	try
+	{
+		return Date.parse(s).toString("yyyyMMdd HH:mm:ss")
+	}
+	catch(err)
+	{
+		return ""
+	}
+	
 }
 
 
@@ -1431,7 +1441,7 @@ function on_change()
 		string datatype = (string) drcc["datatype"];
 
 		Response.Write ("var " + clause + " = \"\";\n");
-		Response.Write ("el = document.getElementById('" +  custom_col + "')\n");
+		Response.Write ("el = $('" +  custom_col + "')\n");
 
 		if ((datatype == "varchar" || datatype == "nvarchar")
 		&& (string) drcc["dropdown type"] == "")
@@ -1451,7 +1461,7 @@ function on_change()
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
-			Response.Write ("el = document.getElementById('to__" +  custom_col + "')\n");
+			Response.Write ("el = $('to__" +  custom_col + "')\n");
 
 
 			Response.Write ("if (el.value != \"\")\n");
@@ -1730,7 +1740,6 @@ function do_doc_ready()
 <body onload="on_change()">
 <% security.write_menu(Response, "search"); %>
 
-<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
 <div id="suggest_popup" style="position:absolute; display:none; z-index:1000;"></div>
 
 <div class=align>
@@ -1899,8 +1908,10 @@ function do_doc_ready()
 		string datatype = drcc["datatype"].ToString();
 		string dropdown_type = Convert.ToString(drcc["dropdown type"]);
 
+		string field_id = Convert.ToString(drcc["name"]).Replace(" ","");
+		
 		Response.Write ("<tr>");
-		Response.Write ("<td><span class=lbl id=\"" +  Convert.ToString(drcc["name"]) + "_label\">");
+		Response.Write ("<td><span class=lbl id=\"" +  field_id + "_label\">");
 		Response.Write (drcc["name"]);
 
 		if ((datatype == "nvarchar" || datatype == "varchar")
@@ -1923,7 +1934,7 @@ function do_doc_ready()
 
 			Response.Write ("<select multiple=multiple size=3 onchange='on_change()' ");
 
-			Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
+			Response.Write (" id=\"" + field_id + "\"");
 			Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
 			Response.Write (">");
 
@@ -1994,7 +2005,7 @@ function do_doc_ready()
 			if (datatype == "datetime")
 			{
 
-				write_custom_date_controls(drcc["name"].ToString());
+				write_custom_date_controls(Convert.ToString(drcc["name"]));
 			}
 			else
 			{
@@ -2031,7 +2042,7 @@ function do_doc_ready()
 				Response.Write (" maxlength=" + size_string);
 
 				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
-				Response.Write (" id=\"" + drcc["name"].ToString() + "\"");
+				Response.Write (" id=\"" + field_id + "\"");
 
 				Response.Write (" value=\"");
 				if (Request[(string)drcc["name"]]!="")
