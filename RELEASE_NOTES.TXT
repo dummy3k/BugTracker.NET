@@ -46,7 +46,7 @@ blog about lucene.net
 
 
 -----------------------------------------------------------------------
-Version 2.9.9   10/31/2008 
+Version 2.9.9   11/01/2008 
 -----------------------------------------------------------------------
 
 * IMPORTANT: Check you Web.config settings related to date formats
@@ -84,14 +84,14 @@ results:
 * Fixed bug with custom dropdowns based on char datatypes not working 
 because of the values from the db being padded with spaces. 
 
-* If "DisplayAnotherButtonInEditBugPage" is set to 1, the error message
-is also duplicated at the top of the form along with the button.
-
 * Fixed cosmetic bug, missing form border in IE.
 
 * Fixed problem with ids in search.aspx where custom field has spaces
 in its name.  That made them impossible to select using a custom 
 css file.
+
+* If "DisplayAnotherButtonInEditBugPage" is set to 1, the error message
+is also duplicated at the top of the form along with the button.
 
 * Completed the logic that warns you if you are are leaving the edit bug
 page with unsaved changes.  Now it's working with the menu and comment
