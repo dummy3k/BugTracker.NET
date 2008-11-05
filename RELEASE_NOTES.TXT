@@ -26,23 +26,27 @@ Corey's TO DO list:
 * time tracking
 * syscolumns, column order scheme - make less fragile
 * edit_bug.aspx and css - support for multiple columns
-* send, don't send private comments? search, don't search?
 * set fields to required?  By org.
-* Use date range for search, custom fields
 * 1949210 Deleting a user doesn't delete Self Register info
-* Table prefixes - Use one database for multiple instances (for hosting)
 
 * Documentation improvements:
 workflow.cs
 ldap
-$ALTER_HERE, queries
-more spellchecking...
-search and full text search.
 blog about lucene.net
 
 * relationships in print?
 * change history in print?
 * images in print?
+
+how to pick a bug tracker
+
+
+-----------------------------------------------------------------------
+Version 3.0.0   11/XX/2008 
+-----------------------------------------------------------------------
+
+
+[ 2219380 ] Lucene: SQL SERVER - Cannot resolve collation conflict UNION
 
 
 -----------------------------------------------------------------------

@@ -219,7 +219,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		// org dropdown
 		if (security.user.is_admin
-		|| security.user.other_orgs_permission_level != Security.PERMISSION_NONE)
+		|| security.user.other_orgs_permission_level == Security.PERMISSION_ALL)
 		{
 			org.DataSource = ds.Tables[2].DefaultView;
 			org.DataTextField = "og_name";

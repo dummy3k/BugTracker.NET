@@ -23,7 +23,8 @@ namespace btnet
 
         // convert URL's to hyperlinks
         static Regex reHyperlinks = new Regex(
-                @"(?<Protocol>\w+):\/\/(?<Domain>[\w.]+\/?)\S*",
+                //@"(?<Protocol>\w+):\/\/(?<Domain>[\w.]+\/?)\S*",
+                @"https?://[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]",
                 RegexOptions.IgnoreCase
                 | RegexOptions.CultureInvariant
                 | RegexOptions.IgnorePatternWhitespace

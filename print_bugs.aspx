@@ -138,7 +138,7 @@ void print_as_excel()
 void print_as_html()
 {
 
-	Response.Write ("<head><link rel='StyleSheet' href='btnet.css' type='text/css'></head>");
+	Response.Write ("<html><head><link rel='StyleSheet' href='btnet.css' type='text/css'></head><body>");
 
 	Response.Write ("<table class=bugt border=1>");
 	int col;
@@ -220,7 +220,7 @@ void print_as_html()
 		Response.Write ("</tr>");
 	}
 
-	Response.Write ("</table>");
+	Response.Write ("</table></body></html>");
 }
 
 

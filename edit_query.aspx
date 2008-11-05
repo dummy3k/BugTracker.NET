@@ -356,12 +356,13 @@ void on_update (Object sender, EventArgs e)
 	<tr>
 	<td id="explanation" colspan=3 class=cmt runat="server">
 		In order to work with the bugs.aspx page, your SQL must be structured in a particular way.
-		<br><br>
-		The first column must be either a color starting with "#" or a CSS style class. If it does not start with "#" it will be interpreted as a CSS style class.
+		The first column must be either a color starting with "#" or a CSS style class.  
+		If it starts with "#", it will be interpreted as the background color of the row.
+		Otherwise, it will be interpreted as the name of a CSS style class in your CSS file.
 		<br>
 		<br>
-		View <a target="_blank" href="edit_styles.aspx">example</a> on how to use priority and/or status
-		to determine the CSS style.
+		View this <a target="_blank" href="edit_styles.aspx">example</a> of one way to change the color of your rows.  
+		The example uses a combination of priority and status to determine the CSS style, but feel free to come up with your own scheme.
 		<br>
 		<br>
 		The second column must be "bg_id".

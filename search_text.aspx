@@ -123,7 +123,7 @@ where $ALTER_HERE
 
 union
 
-select '#ffffff', bg_id, bg_short_desc,
+select '#ffffff', bg_id, bg_short_desc COLLATE DATABASE_DEFAULT,
 bp_type + ',' + convert(varchar,bp_id),
 temp_text, bp_date, isnull(st_name,''), temp_score
 from bugs inner join #$GUID t on t.temp_bg_id = bg_id

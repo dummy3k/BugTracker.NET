@@ -74,34 +74,34 @@ namespace btnet
 				string se_id = cookie.Value.Replace("'", "''");
 
 				// check for existing session for active user
-				string sql = @"/* check session */
-					declare @project_admin int
-					select @project_admin = count(1)
-						from sessions
-						inner join project_user_xref on pu_user = se_user
-						and pu_admin = 1
-						where se_id = '$se';
+				string sql = @"
+/* check session */
+declare @project_admin int
+select @project_admin = count(1)
+	from sessions
+	inner join project_user_xref on pu_user = se_user
+	and pu_admin = 1
+	where se_id = '$se';
 
-					select us_id, us_admin,
-					us_username, us_firstname, us_lastname,
-					isnull(us_email,'') us_email,
-					isnull(us_bugs_per_page,10) us_bugs_per_page,
-					isnull(us_forced_project,0) us_forced_project,
-					us_use_fckeditor,
-					us_enable_bug_list_popups,
-					og.*,
-					isnull(us_forced_project, 0 ) us_forced_project,
-					isnull(pu_permission_level, $dpl) pu_permission_level,
-					@project_admin [project_admin]
-					from sessions
-					inner join users on se_user = us_id
-					inner join orgs og on us_org = og_id
-					left outer join project_user_xref
-						on pu_project = us_forced_project
-						and pu_user = us_id
-					where se_id = '$se'
-					and us_active = 1";
-
+select us_id, us_admin,
+us_username, us_firstname, us_lastname,
+isnull(us_email,'') us_email,
+isnull(us_bugs_per_page,10) us_bugs_per_page,
+isnull(us_forced_project,0) us_forced_project,
+us_use_fckeditor,
+us_enable_bug_list_popups,
+og.*,
+isnull(us_forced_project, 0 ) us_forced_project,
+isnull(pu_permission_level, $dpl) pu_permission_level,
+@project_admin [project_admin]
+from sessions
+inner join users on se_user = us_id
+inner join orgs og on us_org = og_id
+left outer join project_user_xref
+	on pu_project = us_forced_project
+	and pu_user = us_id
+where se_id = '$se'
+and us_active = 1";
 
 				sql = sql.Replace("$se", se_id);
 				sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
@@ -115,25 +115,26 @@ namespace btnet
 				{
 					// allow users in, even without logging on.
 					// The user will have the permissions of the "guest" user.
-					string sql = @"/* get guest  */
-					select us_id, us_admin,
-					us_username, us_firstname, us_lastname,
-					isnull(us_email,'') us_email,
-					isnull(us_bugs_per_page,10) us_bugs_per_page,
-					isnull(us_forced_project,0) us_forced_project,
-					us_use_fckeditor,
-					us_enable_bug_list_popups,
-					og.*,
-					isnull(us_forced_project, 0 ) us_forced_project,
-					isnull(pu_permission_level, $dpl) pu_permission_level,
-					0 [project_admin]
-					from users
-					inner join orgs og on us_org = og_id
-					left outer join project_user_xref
-						on pu_project = us_forced_project
-						and pu_user = us_id
-					where us_username = 'guest'
-					and us_active = 1";
+					string sql = @"
+/* get guest  */
+select us_id, us_admin,
+us_username, us_firstname, us_lastname,
+isnull(us_email,'') us_email,
+isnull(us_bugs_per_page,10) us_bugs_per_page,
+isnull(us_forced_project,0) us_forced_project,
+us_use_fckeditor,
+us_enable_bug_list_popups,
+og.*,
+isnull(us_forced_project, 0 ) us_forced_project,
+isnull(pu_permission_level, $dpl) pu_permission_level,
+0 [project_admin]
+from users
+inner join orgs og on us_org = og_id
+left outer join project_user_xref
+	on pu_project = us_forced_project
+	and pu_user = us_id
+where us_username = 'guest'
+and us_active = 1";
 
 					sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 					dr = dbutil.get_datarow(sql);
@@ -1373,13 +1374,13 @@ drop table #temp2";
 			websvn_url = Util.get_setting("WebSvnUrl","");
 
 			string sql = @"
-			select isnull(pj_subversion_repository_url,'') [pj_subversion_repository_url],
-			isnull(pj_subversion_username,'') [pj_subversion_username],
-			isnull(pj_subversion_password,'') [pj_subversion_password],
-			isnull(pj_websvn_url,'') [pj_websvn_url]
-			from projects
-			inner join bugs on pj_id = bg_project
-			where bg_id = $bg";
+select isnull(pj_subversion_repository_url,'') [pj_subversion_repository_url],
+isnull(pj_subversion_username,'') [pj_subversion_username],
+isnull(pj_subversion_password,'') [pj_subversion_password],
+isnull(pj_websvn_url,'') [pj_websvn_url]
+from projects
+inner join bugs on pj_id = bg_project
+where bg_id = $bg";
 
 			sql = sql.Replace("$bg",Convert.ToString(bugid));
 			DataRow dr = dbutil.get_datarow(sql);
