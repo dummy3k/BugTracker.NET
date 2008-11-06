@@ -437,7 +437,7 @@ Boolean validate()
 		confirm_pw_err.InnerText = "";
 	}
 
-	if (org.SelectedIndex < 1)
+	if (org.SelectedItem.Text == "[select org]")
 	{
 		good = false;
 		org_err.InnerText = "You must select a org";
