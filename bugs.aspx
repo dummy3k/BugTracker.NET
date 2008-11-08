@@ -267,8 +267,6 @@ void load_query_dropdown()
 
 }
 
-
-
 </script>
 
 <!-- #include file = "inc_bugs.inc" -->
@@ -281,6 +279,11 @@ void load_query_dropdown()
 <script type="text/javascript" language="JavaScript" src="bug_list.js"></script>
 
 <script>
+
+$(document).ready(function() {
+	$('.filter').click(on_invert_filter)
+	$('.filter_selected').click(on_invert_filter)
+})
 
 function get_or_post()
 {
@@ -295,10 +298,6 @@ function on_query_changed()
 	frm.actn.value = "query";
 	frm.submit();
 }
-
-
-
-
 
 </script>
 
@@ -330,8 +329,7 @@ function on_query_changed()
 	<td  nowrap align=right width=100%>
 	<a target=_blank href=screen_capture.html>screen capture</a>
 </table>
-
-<p>
+<br>
 <%
 if (dv != null)
 {

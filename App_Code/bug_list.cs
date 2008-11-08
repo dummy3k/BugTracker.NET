@@ -276,6 +276,20 @@ namespace btnet
 
         }
 
+		///////////////////////////////////////////////////////////////////////
+		static string maybe_not(string op, string text)
+		{
+			if (op == "<>")
+			{
+				return "NOT " + text;
+			}
+			else
+			{
+				return text;
+			}
+		
+		}
+
         ///////////////////////////////////////////////////////////////////////
         static void display_buglist_filter_select(
             HttpResponse Response,
@@ -365,10 +379,9 @@ namespace btnet
                 string[] options = Util.split_dropdown_vals(dropdown_vals);
                 for (int i = 0; i < options.Length; i++)
                 {
-
                     if (selected_value == options[i])
                     {
-                        Response.Write("<option selected>" + options[i] + "</option>");
+                        Response.Write("<option selected>" + maybe_not(op, options[i]) + "</option>");
                         something_selected = true;
                     }
                     else
@@ -383,7 +396,7 @@ namespace btnet
                 {
                     if (selected_value == Convert.ToString(dr[col]))
                     {
-                        Response.Write("<option selected>" + Convert.ToString(dr[col]) + "</option>");
+                        Response.Write("<option selected>" + maybe_not(op, Convert.ToString(dr[col])) + "</option>");
                         something_selected = true;
                     }
                     else
@@ -482,8 +495,10 @@ namespace btnet
 
             string bug_count_string = get_buglist_bug_count_string(dv);
 
+            Response.Write("<table border=0 cellpadding=0 cellspacing=0 width=100%><tr><td align=left valign=top>");
             Response.Write(paging_string);
-            Response.Write("<table class=bugt border=1 ><tr>\n");
+            Response.Write("<td align=right valign=top><span class=smallnote>clicking while holding Ctrl key toggles \"NOT\" in a filter: \"NOT project 1\"</span></table>");
+            Response.Write("\n<table class=bugt border=1 ><tr>\n");
 
             ///////////////////////////////////////////////////////////////////
             // headings
@@ -700,7 +715,7 @@ namespace btnet
 
                 DataRow dr = drv.Row;
 
-                Response.Write("<tr>");
+                Response.Write("\n<tr>");
 
                 if (show_checkbox)
                 {

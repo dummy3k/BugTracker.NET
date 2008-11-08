@@ -1,18 +1,60 @@
-function on_page(page) {
+function on_page(page)
+{
 	var frm =  document.getElementById(asp_form_id);
 	frm.actn.value = "page";
 	frm.new_page.value = page
 	frm.submit();
 }
 
-function on_sort(col) {
+function on_sort(col)
+{
 	var frm = document.getElementById(asp_form_id);
 	frm.actn.value = "sort";
 	frm.sort.value = col;
 	frm.submit();
 }
 
-function on_filter() {
+function get_selected_text(sel)
+{
+	return sel.options[sel.selectedIndex].text
+}
+
+function get_selected_val(sel)
+{
+	return sel.options[sel.selectedIndex].value
+}
+
+function set_selected_text(sel, text)
+{
+	sel.options[sel.selectedIndex].text = text
+}
+
+
+function on_invert_filter(event)
+{
+	sel = event.target;
+
+	if (event.ctrlKey)
+	{
+		text = get_selected_text(sel)
+		
+		if (text.indexOf("[") != 0)
+		{
+			if (text.indexOf("NOT ") == 0)
+			{
+				set_selected_text(sel, text.substring(4))
+			}
+			else
+			{
+				set_selected_text(sel, "NOT " + text)
+			}
+			on_filter()
+		}
+	}
+}
+
+function on_filter()
+{
 
 	var filter_condition = "66 = 66 "; // a dummy condition, just so I can start all the following with "and"
 
@@ -24,26 +66,37 @@ function on_filter() {
 		
 		if (sel.id.indexOf("sel_[") == 0)
 		{
-			if (sel.options[sel.selectedIndex].text != "[no filter]")
+			text = get_selected_text(sel)
+			
+			if (text != "[no filter]")
 			{
-				if (sel.options[sel.selectedIndex].text == "[none]")
+				val = get_selected_val(sel)
+				
+				if (text == "[none]")
 				{
-					filter_condition += " and " + sel.id.substr(4) + " =$$$";
-					filter_condition += sel.options[sel.selectedIndex].value; // value, not text
-					filter_condition += "$$$";
+					filter_condition += " and " + sel.id.substr(4) + " =$$$"
+					filter_condition += val // value, not text
 				}
-				else if (sel.options[sel.selectedIndex].text == "[any]")
+				else if (text == "[any]")
 				{
-					filter_condition += " and " + sel.id.substr(4) + "<>$$$";  // not equal
-					filter_condition += sel.options[sel.selectedIndex].value; // value, not text
-					filter_condition += "$$$";
+					filter_condition += " and " + sel.id.substr(4) + "<>$$$"  // not equal
+					filter_condition += val // value, not text
 				}
 				else
 				{
-					filter_condition += " and " + sel.id.substr(4) + " =$$$";
-					filter_condition += sel.options[sel.selectedIndex].text;
-					filter_condition += "$$$";
+					if (text.indexOf("NOT ") == 0)
+					{
+						filter_condition += " and " + sel.id.substr(4) + "<>$$$"
+						filter_condition += text.substring(4)
+					}
+					else
+					{
+						filter_condition += " and " + sel.id.substr(4) + " =$$$"
+						filter_condition += text
+					}
+					
 				}
+				filter_condition += "$$$"
 			}
 
 		}

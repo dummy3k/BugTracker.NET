@@ -1731,6 +1731,8 @@ function do_doc_ready()
 	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat","yy-mm-dd")); %>'
 	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
 	$(".date").change(on_change)
+	$('.filter').click(on_invert_filter)
+	$('.filter_selected').click(on_invert_filter)
 }
 
 
