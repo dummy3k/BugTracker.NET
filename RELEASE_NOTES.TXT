@@ -28,6 +28,7 @@ Corey's TO DO list:
 * edit_bug.aspx and css - support for multiple columns
 * set fields to required?  By org.
 * 1949210 Deleting a user doesn't delete Self Register info
+* configurable start page, like start on dashboard
 
 * Documentation improvements:
 workflow.cs
@@ -42,11 +43,15 @@ how to pick a bug tracker
 
 
 -----------------------------------------------------------------------
-Version 3.0.0   11/XX/2008 
+Version 3.0.0   11/08/2008 
 -----------------------------------------------------------------------
 
+* Fixed bug 2219380 - Lucene: SQL SERVER - Cannot resolve collation 
+conflict UNION
 
-[ 2219380 ] Lucene: SQL SERVER - Cannot resolve collation conflict UNION
+* Fixed bug with non-admin users who have permission to add users.
+
+* Fixed bug with logic (regular expression) that turns URLs into links.
 
 
 -----------------------------------------------------------------------
