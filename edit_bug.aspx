@@ -2319,7 +2319,7 @@ void append_custom_field_msg(string s)
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
 <link rel="StyleSheet" href="custom/btnet_edit_bug.css" type="text/css">
 <script type="text/javascript" language="JavaScript" src="jquery/jquery-1.2.6.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.5.2.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.6rc2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
 
 <script>

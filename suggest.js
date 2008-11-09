@@ -10,10 +10,8 @@ function handle_suggestion(data, status)
 		// position and show the popup
 		var mylike = document.getElementById("like")
 		sel.style.width = mylike.offsetWidth
-		pos = find_position(mylike)
-		mypopup.style.left = pos[0]
-		mypopup.style.top = pos[1] + (mylike.offsetHeight-3)
-
+		mypopup.style.left = $(mylike).offset().left
+		mypopup.style.top = $(mylike).offset().top + (mylike.offsetHeight-3)
 		mypopup.style.display = "block";
 	}
 	else

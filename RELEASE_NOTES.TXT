@@ -43,8 +43,16 @@ how to pick a bug tracker
 
 
 -----------------------------------------------------------------------
-Version 3.0.0   11/08/2008 
+Version 3.0.0   11/09/2008 
 -----------------------------------------------------------------------
+
+* Fixed the "suggest" feature in search.aspx, when you are searching by
+"description contains".  I broke it in version 2.9.9.
+
+* Fixed searching by date range.  I broke it in version 2.9.9.
+
+* Fixed bug searching by date range with a custom field of type date.
+It was searching *up to* the "to" date, not *through* the "to" date.
 
 * Fixed bug 2219380 - Lucene: SQL SERVER - Cannot resolve collation 
 conflict UNION
@@ -52,6 +60,10 @@ conflict UNION
 * Fixed bug with non-admin users who have permission to add users.
 
 * Fixed bug with logic (regular expression) that turns URLs into links.
+It was including the final period as part of the URL.
+
+* Upgraded jQuery Datepicker to 1.6rc2 to pick up some of their bug
+fixes.
 
 * Added ability to toggle column filters from "something" to
 "NOT something".  When you have a filter set to some value, hold down

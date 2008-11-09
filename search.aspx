@@ -352,7 +352,7 @@ void do_query()
 	string to_clause = "";
 	if (to_date.Value != "")
 	{
-		to_clause = " bg_reported_date <= '" + Util.format_local_date_into_db_format(to_date.Value).Replace(" 00:00:00","") + " 23:59:59'\n";
+		to_clause = " bg_reported_date <= '" + Util.format_local_date_into_db_format(to_date.Value).Replace(" 12:00:00","") + " 23:59:59'\n";
 	}
 
 	string lu_from_clause = "";
@@ -364,7 +364,7 @@ void do_query()
 	string lu_to_clause = "";
 	if (lu_to_date.Value != "")
 	{
-		lu_to_clause = " bg_last_updated_date <= '" + Util.format_local_date_into_db_format(lu_to_date.Value).Replace(" 00:00:00","") + " 23:59:59'\n";
+		lu_to_clause = " bg_last_updated_date <= '" + Util.format_local_date_into_db_format(lu_to_date.Value).Replace(" 12:00:00","") + " 23:59:59'\n";
 	}
 
 
@@ -424,7 +424,7 @@ void do_query()
 					values = Request["to__" + variable];
 					if (values != "")
 					{
-						custom_clause = " [" + variable + "] <= '" + values + "'\n";
+						custom_clause = " [" + variable + "] <= '" + values + " 23:59:59'\n";
 						where = build_where(where, custom_clause);
 					}
 				}
@@ -1067,7 +1067,7 @@ void write_custom_date_controls(string name)
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
 <link rel="StyleSheet" href="custom/btnet_search.css" type="text/css">
 <script type="text/javascript" language="JavaScript" src="jquery/jquery-1.2.6.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.5.2.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.6rc2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="bug_list.js"></script>
 <script type="text/javascript" language="JavaScript" src="suggest.js"></script>
 <script type="text/javascript" language="JavaScript" src="datejs/date.js"></script>
@@ -1729,8 +1729,8 @@ function show_calendar(el)
 function do_doc_ready()
 {
 	date_format = '<% Response.Write(btnet.Util.get_setting("DatepickerDateFormat","yy-mm-dd")); %>'
-	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
-	$(".date").change(on_change)
+	$('.date').datepicker({dateFormat: date_format, duration: 'fast'})
+	$('.date').change(on_change)
 	$('.filter').click(on_invert_filter)
 	$('.filter_selected').click(on_invert_filter)
 }
