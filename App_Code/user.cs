@@ -5,6 +5,7 @@ Distributed under the terms of the GNU General Public License
 
 using System;
 using System.Data;
+using System.Collections.Generic;
 
 namespace btnet
 {
@@ -47,8 +48,10 @@ namespace btnet
         public int project_field_permission_level = Security.PERMISSION_ALL;
         public int org_field_permission_level = Security.PERMISSION_ALL;
         public int udf_field_permission_level = Security.PERMISSION_ALL;
+        
+        public Dictionary<string,int> dict_custom_field_permission_level = new Dictionary<string, int>();
 
-        public void set_from_db(DataRow dr)
+        public void set_from_db(DbUtil dbutil, DataRow dr)
         {
             this.usid = Convert.ToInt32(dr["us_id"]);
             this.username = (string)dr["us_username"];
@@ -95,6 +98,29 @@ namespace btnet
             this.project_field_permission_level = (int)dr["og_project_field_permission_level"];
             this.org_field_permission_level = (int)dr["og_org_field_permission_level"];
             this.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
+
+			DataSet ds_custom = Util.get_custom_columns(dbutil);
+			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+			{
+				string bg_name = (string)dr_custom["name"];
+				string og_name = "og_" 
+					+ (string)dr_custom["name"]
+					+ "_field_permission_level";
+				
+				try
+				{
+					dict_custom_field_permission_level[bg_name] = (int) dr_custom[og_name];
+				}
+				catch(Exception)
+				{
+					// add it if it's missing
+					dbutil.execute_nonquery("alter table orgs add [" 
+						+ og_name
+						+ "] int null default(2)");
+					dict_custom_field_permission_level[bg_name] = Security.PERMISSION_ALL;
+				}
+				
+			}
 
             if (((string)dr["us_firstname"]).Trim().Length == 0)
             {

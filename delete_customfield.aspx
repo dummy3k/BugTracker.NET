@@ -49,7 +49,10 @@ void Page_Load(Object sender, EventArgs e)
 
 
 		// delete column itself
-		sql = @"alter table bugs drop column [$nm]";
+		sql = @"
+--alter table orgs drop column [og_$nm_field_level_permision]
+alter table bugs drop column [$nm]";
+		
 		sql = sql.Replace("$nm", (string) dr["column_name"]);
 		dbutil.execute_nonquery(sql);
 
@@ -58,6 +61,8 @@ void Page_Load(Object sender, EventArgs e)
 		sql = @"delete from custom_col_metadata
 		where ccm_colorder = $num";
 		sql = sql.Replace("$num", row_id.Value);
+		
+		Application["custom_columns_dataset"]  = null;
 		dbutil.execute_nonquery(sql);
 
 		Response.Redirect("customfields.aspx");

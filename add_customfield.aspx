@@ -197,7 +197,10 @@ void on_update (Object sender, EventArgs e)
 
 	if (good)
 	{
-		sql = "alter table bugs add [$nm] $dt $ln $null $df";
+		sql = @"
+alter table orgs add [og_$nm_field_level_permision] int null default(2)
+alter table bugs add [$nm] $dt $ln $null $df";
+
 		sql = sql.Replace("$nm", name.Value);
 		sql = sql.Replace("$dt", datatype.SelectedItem.Value);
 
@@ -276,6 +279,7 @@ void on_update (Object sender, EventArgs e)
 			sql = sql.Replace("$dt", dropdown_type.SelectedItem.Value.Replace("'", "''"));
 
 			dbutil.execute_nonquery(sql);
+			Application["custom_columns_dataset"]  = null;
 			Server.Transfer ("customfields.aspx");
 		}
 

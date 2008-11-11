@@ -146,6 +146,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$ss", sort_seq.Value);
 
 		dbutil.execute_nonquery(sql);
+		Application["custom_columns_dataset"]  = null;
 		Server.Transfer ("customfields.aspx");
 	}
 	else

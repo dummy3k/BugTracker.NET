@@ -148,7 +148,7 @@ and us_active = 1";
 			}
 			else
 			{
-				user.set_from_db(dr);
+				user.set_from_db(dbutil, dr);
 			}
 
 
@@ -1250,43 +1250,56 @@ drop table #temp2";
 
 		}
 
+        
         ///////////////////////////////////////////////////////////////////////
         public static DataSet get_custom_columns(DbUtil dbutil)
         {
 
-            return dbutil.get_dataset(
-                @"/* custom columns */ select sc.name, st.[name] [datatype], sc.length, sc.xprec, sc.xscale, sc.isnullable,
-				mm.text [default value],
-				isnull(ccm_dropdown_type,'') [dropdown type],
-				isnull(ccm_dropdown_vals,'') [vals],
-				isnull(ccm_sort_seq, sc.colorder) [column order],
-				sc.colorder
-				from syscolumns sc
-				inner join systypes st on st.xusertype = sc.xusertype
-				inner join sysobjects so on sc.id = so.id
-				left outer join syscomments mm on sc.cdefault = mm.id
-				left outer join custom_col_metadata on ccm_colorder = sc.colorder
-				where so.name = 'bugs'
-				and st.[name] <> 'sysname'
-				and sc.name not in ('rowguid',
-				'bg_id',
-				'bg_short_desc',
-				'bg_reported_user',
-				'bg_reported_date',
-				'bg_project',
-				'bg_org',
-				'bg_category',
-				'bg_priority',
-				'bg_status',
-				'bg_assigned_to_user',
-				'bg_last_updated_user',
-				'bg_last_updated_date',
-				'bg_user_defined_attribute',
-				'bg_project_custom_dropdown_value1',
-				'bg_project_custom_dropdown_value2',
-				'bg_project_custom_dropdown_value3',
-				'bg_tags')
-				order by sc.id, isnull(ccm_sort_seq,sc.colorder)");
+			DataSet ds = (DataSet) context.Application["custom_columns_dataset"];
+            
+            if (ds != null)
+            {
+            	return ds;	
+            }
+            else
+            {
+            	ds = dbutil.get_dataset(@"
+/* custom columns */ select sc.name, st.[name] [datatype], sc.length, sc.xprec, sc.xscale, sc.isnullable,
+mm.text [default value],
+isnull(ccm_dropdown_type,'') [dropdown type],
+isnull(ccm_dropdown_vals,'') [vals],
+isnull(ccm_sort_seq, sc.colorder) [column order],
+sc.colorder
+from syscolumns sc
+inner join systypes st on st.xusertype = sc.xusertype
+inner join sysobjects so on sc.id = so.id
+left outer join syscomments mm on sc.cdefault = mm.id
+left outer join custom_col_metadata on ccm_colorder = sc.colorder
+where so.name = 'bugs'
+and st.[name] <> 'sysname'
+and sc.name not in ('rowguid',
+'bg_id',
+'bg_short_desc',
+'bg_reported_user',
+'bg_reported_date',
+'bg_project',
+'bg_org',
+'bg_category',
+'bg_priority',
+'bg_status',
+'bg_assigned_to_user',
+'bg_last_updated_user',
+'bg_last_updated_date',
+'bg_user_defined_attribute',
+'bg_project_custom_dropdown_value1',
+'bg_project_custom_dropdown_value2',
+'bg_project_custom_dropdown_value3',
+'bg_tags')
+order by sc.id, isnull(ccm_sort_seq,sc.colorder)");
+				
+				context.Application["custom_columns_dataset"]  = ds;
+				return ds;
+			}
 
         }
 
