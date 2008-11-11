@@ -1043,13 +1043,12 @@ void write_custom_date_control(string name)
 	Response.Write (">");
 
 	Response.Write ("<a style='font-size: 8pt;'  href=\"javascript:show_calendar('");
-	Response.Write(name);
+	Response.Write(name.Replace(" ",""));
 	Response.Write("')\">&nbsp;[select]</a>");
 }
 
 void write_custom_date_controls(string name)
 {
-	// Someday, expand this logic to handle a range
 	Response.Write("from:&nbsp;&nbsp;");
 	write_custom_date_control(name);
 	Response.Write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to:&nbsp;&nbsp;");
@@ -1304,13 +1303,13 @@ function in_not_in_vals(el)
 	return vals;
 }
 
-function format_date_for_db(s)
+function format_to_date_for_db(s)
 {
 	// convert the date for sql
 	// Uses date.js, 
 	try
 	{
-		return Date.parse(s).toString("yyyyMMdd HH:mm:ss")
+		return Date.parse(s).toString("yyyyMMdd 23:59:59")
 	}
 	catch(err)
 	{
@@ -1319,6 +1318,21 @@ function format_date_for_db(s)
 	
 }
 
+
+function format_from_date_for_db(s)
+{
+	// convert the date for sql
+	// Uses date.js, 
+	try
+	{
+		return Date.parse(s).toString("yyyyMMdd")
+	}
+	catch(err)
+	{
+		return ""
+	}
+	
+}
 
 function on_change()
 {
@@ -1437,11 +1451,12 @@ function on_change()
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
 		string clause = "custom_clause_" + Convert.ToString(custom_count++);
-		string custom_col = drcc["name"].ToString();
+		string custom_col_name = drcc["name"].ToString();
+		string custom_col_id = custom_col_name.Replace(" ","");
 		string datatype = (string) drcc["datatype"];
 
 		Response.Write ("var " + clause + " = \"\";\n");
-		Response.Write ("el = $('" +  custom_col + "')\n");
+		Response.Write ("el = document.getElementById('" +  custom_col_id + "')\n");
 
 		if ((datatype == "varchar" || datatype == "nvarchar")
 		&& (string) drcc["dropdown type"] == "")
@@ -1449,7 +1464,7 @@ function on_change()
 			// my_text_field like '%val%'
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col + "] like '%\" + el.value + \"%'\\n\"\n");
+			Response.Write (clause + " = \" [" + custom_col_name + "] like '%\" + el.value + \"%'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 		}
@@ -1457,16 +1472,16 @@ function on_change()
 		{
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col + "] >=  '\" + format_date_for_db(el.value) + \"'\\n\"\n");
+			Response.Write (clause + " = \" [" + custom_col_name + "] >=  '\" + format_from_date_for_db(el.value) + \"'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
-			Response.Write ("el = $('to__" +  custom_col + "')\n");
+			Response.Write ("el = document.getElementById('to__" +  custom_col_id + "')\n");
 
 
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col + "] <=  '\" + format_date_for_db(el.value) + \"'\\n\"\n");
+			Response.Write (clause + " = \" [" + custom_col_name + "] <=  '\" + format_to_date_for_db(el.value) + \"'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
@@ -1477,11 +1492,10 @@ function on_change()
 			Response.Write ("vals = in_not_in_vals(el)\n");
 			Response.Write ("if (vals != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col + "] in \" + vals\n");
+			Response.Write (clause + " = \" [" + custom_col_name + "] in \" + vals\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 		}
-
 	}
 %>
 

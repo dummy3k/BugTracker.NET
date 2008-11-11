@@ -43,6 +43,14 @@ how to pick a bug tracker
 
 
 -----------------------------------------------------------------------
+Version 3.0.1   11/xx/2008 
+-----------------------------------------------------------------------
+
+* Fixed bugs in search.aspx.  Saved SQL was incorrect when there are
+custom fields, and especially if there are spaces in the names of the
+custom fields.
+
+-----------------------------------------------------------------------
 Version 3.0.0   11/09/2008 
 -----------------------------------------------------------------------
 
