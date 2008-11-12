@@ -403,7 +403,7 @@ void do_query()
 
 			string datatype = (string) drcc["datatype"];
 
-			if ((datatype == "varchar" || datatype== "nvarchar")
+			if ((datatype == "varchar" || datatype== "nvarchar" || datatype== "char" || datatype== "nchar")
 			&& (string) drcc["dropdown type"] == ""	)
 			{
 				if (values != "")
@@ -1458,7 +1458,7 @@ function on_change()
 		Response.Write ("var " + clause + " = \"\";\n");
 		Response.Write ("el = document.getElementById('" +  custom_col_id + "')\n");
 
-		if ((datatype == "varchar" || datatype == "nvarchar")
+		if ((datatype == "varchar" || datatype == "nvarchar" || datatype == "char" || datatype == "nchar")
 		&& (string) drcc["dropdown type"] == "")
 		{
 			// my_text_field like '%val%'
@@ -1930,7 +1930,7 @@ function do_doc_ready()
 		Response.Write ("<td><span class=lbl id=\"" +  field_id + "_label\">");
 		Response.Write (drcc["name"]);
 
-		if ((datatype == "nvarchar" || datatype == "varchar")
+		if ((datatype == "nvarchar" || datatype == "varchar" || datatype == "char" || datatype == "nchar")
 		&& dropdown_type == "")
 		{
 			Response.Write (" contains");
@@ -2033,7 +2033,7 @@ function do_doc_ready()
 
 				int size = 0;
 
-				if (datatype == "nvarchar")
+				if (datatype == "nvarchar" || datatype == "nchar")
 				{
 					size = Convert.ToInt32(drcc["length"]) / 2;
 				}
@@ -2069,7 +2069,7 @@ function do_doc_ready()
 				Response.Write (">");
 
 
-				if ((datatype == "nvarchar" || datatype == "varchar")
+				if ((datatype == "nvarchar" || datatype == "varchar" || datatype == "char" || datatype == "nchar")
 				&& dropdown_type == "")
 				{
 					//

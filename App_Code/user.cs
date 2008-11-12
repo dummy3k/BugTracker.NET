@@ -98,7 +98,7 @@ namespace btnet
             this.project_field_permission_level = (int)dr["og_project_field_permission_level"];
             this.org_field_permission_level = (int)dr["og_org_field_permission_level"];
             this.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
-
+/*
 			DataSet ds_custom = Util.get_custom_columns(dbutil);
 			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
 			{
@@ -107,21 +107,21 @@ namespace btnet
 					+ (string)dr_custom["name"]
 					+ "_field_permission_level";
 				
-				try
+				//try
 				{
 					dict_custom_field_permission_level[bg_name] = (int) dr_custom[og_name];
 				}
-				catch(Exception)
-				{
-					// add it if it's missing
-					dbutil.execute_nonquery("alter table orgs add [" 
-						+ og_name
-						+ "] int null default(2)");
-					dict_custom_field_permission_level[bg_name] = Security.PERMISSION_ALL;
-				}
+				//catch(Exception)
+				//{
+				//	// add it if it's missing
+				//	dbutil.execute_nonquery("alter table orgs add [" 
+				//		+ og_name
+				//		+ "] int null default(2)");
+				//	dict_custom_field_permission_level[bg_name] = Security.PERMISSION_ALL;
+				//}
 				
 			}
-
+*/
             if (((string)dr["us_firstname"]).Trim().Length == 0)
             {
                 this.fullname = (string)dr["us_lastname"];
