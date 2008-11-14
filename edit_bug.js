@@ -68,15 +68,19 @@ function send_email(id)
 	}
 }
 
-
 function handle_rewrite_posts(data, status)
 {
 	$("#posts").html(data)
 	$(".warn").click(warn_if_dirty)
-	$("#snapshot_timestamp").load("get_db_datetime.aspx")
+	$.get("get_db_datetime.aspx","",handle_get_bug_date)
 	start_animation()
 }
 
+function handle_get_bug_date(data, status)
+{
+	var el = document.getElementById("snapshot_timestamp")
+	el.value = data
+}
 
 function rewrite_posts(bugid)
 {

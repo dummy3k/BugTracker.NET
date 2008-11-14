@@ -393,6 +393,22 @@ void on_update (Object sender, EventArgs e)
 				<asp:ListItem text="edit"      value="2" ID="tags2" runat="server"/>
 			</asp:RadioButtonList>
 
+<%
+			DataSet ds_custom = Util.get_custom_columns(dbutil);
+			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+			{
+				string bg_name = (string)dr_custom["name"];
+				string og_name = "og_" 
+					+ (string)dr_custom["name"]
+					+ "_field_permission_level";
+
+                Response.Write("<tr><td>");
+                Response.Write(bg_name);
+                Response.Write("<td colspn=2>");
+                				
+			}
+%>
+
 	</table>
 	<table border=0>
 

@@ -198,7 +198,7 @@ void on_update (Object sender, EventArgs e)
 	if (good)
 	{
 		sql = @"
-alter table orgs add [og_$nm_field_level_permision] int null default(2)
+alter table orgs add [og_$nm_field_permission_level] int null
 alter table bugs add [$nm] $dt $ln $null $df";
 
 		sql = sql.Replace("$nm", name.Value);

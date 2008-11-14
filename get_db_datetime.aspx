@@ -12,6 +12,7 @@ void Page_Load(Object sender, EventArgs e)
 	DateTime dt = (DateTime) dbutil.execute_scalar("select getdate()");
 
 	Response.Write(dt.ToString("yyyyMMdd HH\\:mm\\:ss\\:fff"));
+
 }
 
 </script>
