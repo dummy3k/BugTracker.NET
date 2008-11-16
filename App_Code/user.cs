@@ -99,7 +99,7 @@ namespace btnet
             this.org_field_permission_level = (int)dr["og_org_field_permission_level"];
             this.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
 
-
+			// field permission for custom fields
 			DataSet ds_custom = Util.get_custom_columns(dbutil);
 			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
 			{
@@ -117,12 +117,14 @@ namespace btnet
 					}
 					else
 					{
-						dict_custom_field_permission_level[bg_name] = (int) dr_custom[og_name];
+						dict_custom_field_permission_level[bg_name] = (int) dr[og_name];
 					}
 				}
 				
-				catch(Exception)
+				catch(Exception ex)
 				{
+					btnet.Util.write_to_log("exception looking for " + og_name + ":" + ex.Message);
+					
 					// automatically add it if it's missing
 					dbutil.execute_nonquery("alter table orgs add [" 
 						+ og_name

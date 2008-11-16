@@ -12,8 +12,30 @@ String sql;
 
 DbUtil dbutil;
 Security security;
+Dictionary<string,int> dict_custom_field_permission_level = new Dictionary<string, int>();
+DataSet ds_custom;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
+
+string radio_template = @"
+<tr>
+	<td>""$name$"" field permission
+	<td colspan=2>
+		<table id='$name$_field' border='0'>
+		<tr>
+		<td>
+			<span ID='$name$0'><input id='$name$_field_0' type='radio' name='$name$' value='0' $checked0$/><label for='$name$_field_0'>none</label></span>
+		</td>
+
+		<td>
+			<span ID='$name$1'><input id='$name$_field_1' type='radio' name='$name$' value='1' $checked1$/><label for='$name$_field_1'>view only</label></span>
+		</td>
+		<td>
+			<span ID='$name$2'><input id='$name$_field_2' type='radio' name='$name$' value='2' $checked2$ /><label for='$name$_field_2'>edit</label></span>
+		</td>
+		</tr>
+		</table>
+<tr>";
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -40,6 +62,8 @@ void Page_Load(Object sender, EventArgs e)
 		id = Convert.ToInt32(var);
 	}
 
+	ds_custom = Util.get_custom_columns(dbutil);
+
 	if (!IsPostBack)
 	{
 
@@ -59,6 +83,14 @@ void Page_Load(Object sender, EventArgs e)
 			status_field.SelectedValue = "2";
 			assigned_to_field.SelectedValue = "2";
 			udf_field.SelectedValue = "2";
+			
+			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+			{
+				string bg_name = (string)dr_custom["name"];
+				dict_custom_field_permission_level[bg_name] = 2;
+			}
+
+			
 		}
 		else
 		{
@@ -93,6 +125,22 @@ void Page_Load(Object sender, EventArgs e)
 			status_field.SelectedValue = Convert.ToString((int)dr["og_status_field_permission_level"]);
 			assigned_to_field.SelectedValue = Convert.ToString((int)dr["og_assigned_to_field_permission_level"]);
 			udf_field.SelectedValue = Convert.ToString((int)dr["og_udf_field_permission_level"]);
+			
+			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+			{
+				string bg_name = (string)dr_custom["name"];
+				object obj = dr["og_" + bg_name + "_field_permission_level"];
+				int permission;
+				if (Convert.IsDBNull(obj))
+				{
+					permission = Security.PERMISSION_ALL;
+				}
+				else
+				{
+					permission = (int) obj;
+				}
+				dict_custom_field_permission_level[bg_name] = permission;
+			}			
 
 		}
 	}
@@ -129,65 +177,72 @@ void on_update (Object sender, EventArgs e)
 	{
 		if (id == 0)  // insert new
 		{
-			sql = @"insert into orgs
-			(og_name,
-			og_non_admins_can_use,
-			og_external_user,
-			og_can_edit_sql,
-			og_can_delete_bug,
-			og_can_edit_and_delete_posts,
-			og_can_merge_bugs,
-			og_can_mass_edit_bugs,
-			og_can_use_reports,
-			og_can_edit_reports,
-			og_can_be_assigned_to,
-			og_other_orgs_permission_level,
-			og_project_field_permission_level,
-			og_org_field_permission_level,
-			og_category_field_permission_level,
-			og_tags_field_permission_level,
-			og_priority_field_permission_level,
-			og_status_field_permission_level,
-			og_assigned_to_field_permission_level,
-			og_udf_field_permission_level)
-			values (N'$nam', $non,
-			$ext, $ces, $cdb,
-			$cep, $cmb, $cme,
-			$cur, $cer, $cba, $other_orgs,
-			$flp_project,
-			$flp_org,
-			$flp_category,
-			$flp_tags,
-			$flp_priority,
-			$flp_status,
-			$flp_assigned_to,
-			$flp_udf)";
+			sql = @"
+insert into orgs
+	(og_name,
+	og_non_admins_can_use,
+	og_external_user,
+	og_can_edit_sql,
+	og_can_delete_bug,
+	og_can_edit_and_delete_posts,
+	og_can_merge_bugs,
+	og_can_mass_edit_bugs,
+	og_can_use_reports,
+	og_can_edit_reports,
+	og_can_be_assigned_to,
+	og_other_orgs_permission_level,
+	og_project_field_permission_level,
+	og_org_field_permission_level,
+	og_category_field_permission_level,
+	og_tags_field_permission_level,
+	og_priority_field_permission_level,
+	og_status_field_permission_level,
+	og_assigned_to_field_permission_level,
+	og_udf_field_permission_level
+	$custom1$
+	)
+	values (N'$nam', $non,
+	$ext, $ces, $cdb,
+	$cep, $cmb, $cme,
+	$cur, $cer, $cba, $other_orgs,
+	$flp_project,
+	$flp_org,
+	$flp_category,
+	$flp_tags,
+	$flp_priority,
+	$flp_status,
+	$flp_assigned_to,
+	$flp_udf
+	$custom2$
+)";
 		}
 		else // edit existing
 		{
 
-			sql = @"update orgs set
-			og_name = N'$nam',
-			og_non_admins_can_use = $non,
-			og_external_user = $ext,
-			og_can_edit_sql = $ces,
-			og_can_delete_bug = $cdb,
-			og_can_edit_and_delete_posts = $cep,
-			og_can_merge_bugs = $cmb,
-			og_can_mass_edit_bugs = $cme,
-			og_can_use_reports = $cur,
-			og_can_edit_reports = $cer,
-			og_can_be_assigned_to = $cba,
-			og_other_orgs_permission_level = $other_orgs,
-			og_project_field_permission_level = $flp_project,
-			og_org_field_permission_level = $flp_org,
-			og_category_field_permission_level = $flp_category,
-			og_tags_field_permission_level = $flp_tags,
-			og_priority_field_permission_level = $flp_priority,
-			og_status_field_permission_level = $flp_status,
-			og_assigned_to_field_permission_level = $flp_assigned_to,
-			og_udf_field_permission_level = $flp_udf
-			where og_id = $og_id";
+			sql = @"
+update orgs set
+	og_name = N'$nam',
+	og_non_admins_can_use = $non,
+	og_external_user = $ext,
+	og_can_edit_sql = $ces,
+	og_can_delete_bug = $cdb,
+	og_can_edit_and_delete_posts = $cep,
+	og_can_merge_bugs = $cmb,
+	og_can_mass_edit_bugs = $cme,
+	og_can_use_reports = $cur,
+	og_can_edit_reports = $cer,
+	og_can_be_assigned_to = $cba,
+	og_other_orgs_permission_level = $other_orgs,
+	og_project_field_permission_level = $flp_project,
+	og_org_field_permission_level = $flp_org,
+	og_category_field_permission_level = $flp_category,
+	og_tags_field_permission_level = $flp_tags,
+	og_priority_field_permission_level = $flp_priority,
+	og_status_field_permission_level = $flp_status,
+	og_assigned_to_field_permission_level = $flp_assigned_to,
+	og_udf_field_permission_level = $flp_udf
+	$custom3$
+	where og_id = $og_id";
 
 			sql = sql.Replace("$og_id", Convert.ToString(id));
 
@@ -214,6 +269,39 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$flp_assigned_to", assigned_to_field.SelectedValue);
 		sql = sql.Replace("$flp_udf", udf_field.SelectedValue);
 
+		if (id == 0)  // insert new
+		{
+			string custom1 = "";
+			string custom2 = "";
+			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+			{
+				string bg_name = (string)dr_custom["name"];
+				string og_name = "og_" 
+					+ bg_name
+					+ "_field_permission_level";
+					
+				custom1 += ",[" + og_name + "]";
+				custom2 += "," + btnet.Util.sanitize_integer(Request[bg_name]);
+
+			}
+			sql = sql.Replace("$custom1$",custom1);
+			sql = sql.Replace("$custom2$",custom2);
+		}
+		else
+		{
+			string custom3 = "";
+			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+			{
+				string bg_name = (string)dr_custom["name"];
+				string og_name = "og_" 
+					+ bg_name
+					+ "_field_permission_level";
+
+				custom3 += ",[" + og_name + "]=" + btnet.Util.sanitize_integer(Request[bg_name]);
+
+			}
+			sql = sql.Replace("$custom3$",custom3);
+		}
 
 		dbutil.execute_nonquery(sql);
 		Server.Transfer ("orgs.aspx");
@@ -394,17 +482,21 @@ void on_update (Object sender, EventArgs e)
 			</asp:RadioButtonList>
 
 <%
-			DataSet ds_custom = Util.get_custom_columns(dbutil);
 			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
 			{
 				string bg_name = (string)dr_custom["name"];
 				string og_name = "og_" 
-					+ (string)dr_custom["name"]
+					+ bg_name
 					+ "_field_permission_level";
 
-                Response.Write("<tr><td>");
-                Response.Write(bg_name);
-                Response.Write("<td colspn=2>");
+
+                string radio = radio_template;
+                int selected_val = dict_custom_field_permission_level[bg_name];
+                radio = radio.Replace("$name$", bg_name);
+                radio = radio.Replace("$checked0$", selected_val == 0 ? "checked=true" : "");
+                radio = radio.Replace("$checked1$", selected_val == 1 ? "checked=true" : "");
+                radio = radio.Replace("$checked2$", selected_val == 2 ? "checked=true" : "");
+				Response.Write(radio);
                 				
 			}
 %>

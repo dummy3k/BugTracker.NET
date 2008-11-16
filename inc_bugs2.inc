@@ -12,6 +12,3 @@
 </script>
 
 <div id="popup" class="buglist_popup"></div>
-
-
-

@@ -42,5 +42,4 @@ void call_sort_and_filter_buglist_dataview()
 
 }
 
-
 </script>
