@@ -137,8 +137,15 @@ namespace btnet
 
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
+                string column_name = (string) drcc["name"];
+
+                if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+                {
+                    continue;
+                }
+
                 Response.Write("\n<tr><td>");
-				Response.Write (drcc["name"]);
+				Response.Write (column_name);
 				Response.Write ("<td>");
 
 				if ((string)drcc["datatype"] == "datetime")
@@ -312,37 +319,54 @@ namespace btnet
 
 					string comment = (string) dr["bp_comment"];
 
-					if (user.tags_field_permission_level == 0
+					if (user.tags_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed tags from"))
 						continue;
 
-					if (user.project_field_permission_level == 0
+					if (user.project_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed project from"))
 						continue;
 
-					if (user.org_field_permission_level == 0
+					if (user.org_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed organization from"))
 						continue;
 
-					if (user.category_field_permission_level == 0
+					if (user.category_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed category from"))
 						continue;
 
-					if (user.priority_field_permission_level == 0
+					if (user.priority_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed priority from"))
 						continue;
 
-					if (user.assigned_to_field_permission_level == 0
+					if (user.assigned_to_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed assigned_to from"))
 						continue;
 
-					if (user.status_field_permission_level == 0
+					if (user.status_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed status from"))
 						continue;
 
-					if (user.udf_field_permission_level == 0
+					if (user.udf_field_permission_level == Security.PERMISSION_NONE
 					&& comment.StartsWith("changed " + Util.get_setting("UserDefinedBugAttributeName","YOUR ATTRIBUTE") + " from"))
 						continue;
+
+                    bool bSkip = false;
+                    foreach (string key in user.dict_custom_field_permission_level.Keys)
+                    { 
+                        int field_permission_level = user.dict_custom_field_permission_level[key];
+                        if (field_permission_level == Security.PERMISSION_NONE)
+                        {
+                            if (comment.StartsWith("changed " + key + " from"))
+                            {
+                                bSkip = true;
+                            }
+                        }
+                    }
+                    if (bSkip)
+                    {
+                        continue;
+                    }
 
 				}
 
