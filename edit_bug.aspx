@@ -18,8 +18,8 @@ DataTable dt_users = null;
 
 DbUtil dbutil;
 Security security;
-System.Collections.Hashtable hash_custom_cols;
-System.Collections.Hashtable hash_prev_custom_cols;
+SortedDictionary<string, string> hash_custom_cols = new SortedDictionary<string, string>();
+SortedDictionary<string, string> hash_prev_custom_cols = new SortedDictionary<string, string>();
 
 int permission_level;
 
@@ -40,9 +40,6 @@ void Page_Load(Object sender, EventArgs e)
 	dbutil = new DbUtil();
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
-
-	hash_custom_cols = new System.Collections.Hashtable();
-	hash_prev_custom_cols = new System.Collections.Hashtable();
 
 	fckeComment.BasePath = @"fckeditor/";
 	fckeComment.ToolbarSet = "BugTracker";
@@ -273,16 +270,16 @@ void Page_Load(Object sender, EventArgs e)
 				}
 			}
 
-
-
-
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
-				string defaultval = get_custom_col_default_value(drcc["default value"]);
-				hash_custom_cols.Add((string)drcc["name"], defaultval);
-				hash_prev_custom_cols.Add((string)drcc["name"], "");
+                string column_name = (string)drcc["name"];
+                if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
+                {
+                    string defaultval = get_custom_col_default_value(drcc["default value"]);
+                    hash_custom_cols.Add(column_name, defaultval);
+                    hash_prev_custom_cols.Add(column_name, "");
+                }
 			}
-
 
 			set_controls_field_permission(Security.PERMISSION_ALL);
 
@@ -328,8 +325,13 @@ void Page_Load(Object sender, EventArgs e)
 
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
-				hash_custom_cols.Add((string)drcc["name"], dr[(string)drcc["name"]]);
-				hash_prev_custom_cols.Add((string)drcc["name"], dr[(string)drcc["name"]]);
+				string column_name = (string)drcc["name"];
+                if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
+                {
+                    string val = btnet.Util.format_db_value(dr[column_name]);
+                    hash_custom_cols.Add(column_name, val);
+                    hash_prev_custom_cols.Add(column_name, val);
+                }
 			}
 
 			bugid.InnerText = Convert.ToString((int) dr["id"]);
@@ -600,20 +602,24 @@ void Page_Load(Object sender, EventArgs e)
 
 		}
 
-		// Fetch the values of the custom columns from the Request
-		// and stash them in a hash table.
+		// Fetch the values of the custom columns from the Request and stash them in a hash table.
 
 		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 		{
-			if (permission_level == Security.PERMISSION_ALL || id == 0)
-			{
-				hash_custom_cols.Add(drcc["name"].ToString(), Request[(string)drcc["name"]]);
-			}
-			else
-			{
-				hash_custom_cols.Add(drcc["name"].ToString(), Request["prev_" + (string)drcc["name"]]);
-			}
-			hash_prev_custom_cols.Add(drcc["name"].ToString(), Request["prev_" + (string)drcc["name"]]);
+            string column_name = (string)drcc["name"];
+            
+            if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
+            {
+                if (permission_level == Security.PERMISSION_ALL || id == 0)
+			    {
+				    hash_custom_cols.Add(column_name, Request[column_name]);
+			    }
+			    else
+			    {
+				    hash_custom_cols.Add(column_name, Request["prev_" + column_name]);
+			    }
+			    hash_prev_custom_cols.Add(column_name, Request["prev_" + column_name]);
+            }
 		}
 
 
@@ -1462,11 +1468,10 @@ bool did_something_change()
 
 	if (!something_changed)
 	{
-		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
+        foreach (string column_name in hash_custom_cols.Keys)
 		{
-			string var = (string)drcc["name"];
-			string before = hash_prev_custom_cols[var].ToString();
-			string after = Convert.ToString(hash_custom_cols[var]);
+            string before = hash_prev_custom_cols[column_name];
+            string after = hash_custom_cols[column_name];
 
 			if (before != after)
 			{
@@ -1662,13 +1667,18 @@ bool record_changes()
 	}
 
 
-	// Handle custom columns
+	// Record changes in custom columns
 
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
-		string var = (string)drcc["name"];
-		string before = Convert.ToString(hash_prev_custom_cols[var]);
-		string after = Convert.ToString(hash_custom_cols[var]);
+		string column_name = (string)drcc["name"];
+
+        if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
+        {
+            continue;
+        }
+        string before = hash_prev_custom_cols[column_name];
+        string after = hash_custom_cols[column_name];
 
 		if (before == "0" || before == "")
 		{
@@ -1711,9 +1721,9 @@ bool record_changes()
 			do_update = true;
 			sql += base_sql.Replace(
 				"$3",
-				"changed " + var + " from \"" + before.Replace("'","''") + "\" to \"" + after.Replace("'","''")  + "\"");
+                "changed " + column_name + " from \"" + before.Replace("'", "''") + "\" to \"" + after.Replace("'", "''") + "\"");
 
-			hash_prev_custom_cols[(string)drcc["name"]]	= hash_custom_cols[(string)drcc["name"]];
+            hash_prev_custom_cols[column_name] = hash_custom_cols[column_name];
 		}
 	}
 
@@ -1838,10 +1848,17 @@ Boolean validate()
 	}
 
 
+    // validate custom columns
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
 
-		string name = drcc["name"].ToString();
+		string name = (string) drcc["name"];
+
+        if (security.user.dict_custom_field_permission_level[name] != Security.PERMISSION_ALL)
+        {
+            continue;
+        }
+        
 		string val = Request[name];
 
 		if (val == null) continue;
@@ -2039,9 +2056,7 @@ void on_update (Object sender, EventArgs e)
 		}
 		else // edit existing
 		{
-
 			{
-
 				string new_project;
 				if (project.SelectedItem.Value != prev_project.Value)
 				{
@@ -2057,7 +2072,6 @@ void on_update (Object sender, EventArgs e)
 				{
 					new_project = prev_project.Value;
 				}
-
 
 				sql = @"declare @now datetime
 					declare @last_updated datetime
@@ -2091,7 +2105,6 @@ void on_update (Object sender, EventArgs e)
 						where bg_id = $id
 					end
 					select @now";
-
 
 				sql = sql.Replace("$sd", short_desc.Value.Replace("'","''"));
                 sql = sql.Replace("$tags", tags.Value.Replace("'", "''"));
@@ -2127,8 +2140,6 @@ void on_update (Object sender, EventArgs e)
 				sql = sql.Replace("$pcd2", pcd2.Replace("'","''"));
 				sql = sql.Replace("$pcd3", pcd3.Replace("'","''"));
 
-
-
 				if (ds_custom_cols.Tables[0].Rows.Count == 0 || permission_level != Security.PERMISSION_ALL)
 				{
 					sql = sql.Replace("$custom_cols_placeholder","");
@@ -2139,12 +2150,21 @@ void on_update (Object sender, EventArgs e)
 
 					foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 					{
-						custom_cols_sql += ",[" + drcc["name"].ToString() + "]";
+						
+                        string column_name = drcc["name"].ToString();
+
+                        // skip if no permission to update
+                        if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
+                        {
+                            continue;
+                        }
+                        
+                        custom_cols_sql += ",[" + column_name + "]";
 						custom_cols_sql += " = ";
 						
 						string datatype = drcc["datatype"].ToString( );
 						
-						string val = Request[drcc["name"].ToString()];
+						string val = Request[column_name];
 						
 						if (val == null)
 						{
@@ -2187,13 +2207,9 @@ void on_update (Object sender, EventArgs e)
 								custom_cols_sql += "null";
 							}
 						}
-						
-
 					}
 					sql = sql.Replace("$custom_cols_placeholder", custom_cols_sql);
-
 				}
-
 
 				DateTime last_update_date = (DateTime) dbutil.execute_scalar(sql);
 
@@ -2219,10 +2235,7 @@ void on_update (Object sender, EventArgs e)
 						+ ">[here]</a> to refresh the page and discard your changes.<br>");
 					return;
 				}
-
-
 			} // permission_level = 3 or not
-
 
             bugpost_fields_have_changed = (btnet.Bug.insert_comment(
                 id,
@@ -2274,8 +2287,6 @@ void on_update (Object sender, EventArgs e)
 			set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was not updated.");
 		}
 	}
-
-
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -2307,7 +2318,6 @@ void append_custom_field_msg(string s)
 		custom_field_msg2.InnerHtml += s;
 	}
 }
-
 
 </script>
 
@@ -2543,11 +2553,19 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	// Create the custom column INPUT elements
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
-		string field_id = Convert.ToString(drcc["name"]).Replace(" ","");
+        string column_name = (string) drcc["name"];
 
+        int field_permission_level = security.user.dict_custom_field_permission_level[column_name];
+        if (field_permission_level == Security.PERMISSION_NONE)
+        {
+            continue;
+        }
+        
+        string field_id = column_name.Replace(" ", "");
+        
 		Response.Write ("\n<tr id=\"" + field_id + "_row\">");
 		Response.Write ("<td nowrap><span id=\"" + field_id +  "_label\">");
-		Response.Write (drcc["name"]);
+        Response.Write(column_name);
 
 		int permission_on_original = permission_level;
 
@@ -2556,7 +2574,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		{
 			permission_on_original = fetch_permission_level(prev_project.Value);
 		}
-
 
 		if (permission_on_original == Security.PERMISSION_READONLY
 		|| permission_on_original == Security.PERMISSION_REPORTER)
@@ -2572,9 +2589,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		int fieldLength = int.Parse(drcc["length"].ToString());
 
 		if (permission_on_original == Security.PERMISSION_READONLY
-		|| permission_on_original == Security.PERMISSION_REPORTER)
+        || field_permission_level == Security.PERMISSION_READONLY)
 		{
-			string text = btnet.Util.format_db_value(hash_custom_cols[(string)drcc["name"]]);
+            string text = hash_custom_cols[column_name];
 			if ( fieldLength > minTextAreaSize && !string.IsNullOrEmpty(text))
 			{
 				// more readable if there is a lot of text
@@ -2588,10 +2605,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				Response.Write (text);
 				Response.Write ("</span>");
 			}
-		}
+		}  
 		else
 		{
-
 			string dropdown_type = Convert.ToString(drcc["dropdown type"]);
 
 			if ( fieldLength > minTextAreaSize
@@ -2602,25 +2618,23 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				Response.Write (" onkeydown=\"return count_chars('" + field_id + "'," + fieldLength + ")\" ");
 				Response.Write ("   onkeyup=\"return count_chars('" + field_id + "'," + fieldLength + ")\" ");
 				Response.Write (" cols=\"" + minTextAreaSize + "\" rows=\"" + (((fieldLength/minTextAreaSize)>maxTextAreaRows) ? maxTextAreaRows : (fieldLength/minTextAreaSize)) + "\" " );
-				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
+                Response.Write(" name=\"" + column_name + "\"");
 				Response.Write (" id=\"" + field_id + "\" >");
-				Response.Write (HttpUtility.HtmlEncode(Convert.ToString(hash_custom_cols[(string)drcc["name"]])));
+                Response.Write(HttpUtility.HtmlEncode(hash_custom_cols[column_name]));
 				Response.Write ("</textarea><div class=smallnote id=\"" + field_id + "_cnt\">&nbsp;</div>");
 			}
 			else
 			{
-
 				string dropdown_vals = Convert.ToString(drcc["vals"]);
-
 
 				if (dropdown_type != "" || dropdown_vals != "")
 				{
-					string selected_value = Convert.ToString(hash_custom_cols[(string)drcc["name"]]).Trim();
+                    string selected_value = hash_custom_cols[column_name].Trim();
 
 					Response.Write ("<select ");
 
 					Response.Write (" id=\"" + field_id + "\"");
-					Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
+                    Response.Write(" name=\"" + column_name + "\"");
 					Response.Write (">");
 
 					if (dropdown_type != "users")
@@ -2660,12 +2674,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 							Response.Write (">");
 							Response.Write (user_name);
 							Response.Write ("</option>");
-
 						}
 					}
-
 					Response.Write ("</select>");
-
 				}
 				else
 				{
@@ -2688,43 +2699,33 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 						}
 					}
 
-					Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
+                    Response.Write(" name=\"" + column_name + "\"");
 					Response.Write (" id=\"" + field_id + "\"");
-
-
-					// output a date field according to the specified format
 					Response.Write (" value=\"");
-					//modified by CJU on jan 9 2008
-					Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
-					//end modified by CJU on jan 9 2008
+                    Response.Write(hash_custom_cols[column_name]);
 
 					if (datatype == "datetime")
 					{
-						Response.Write ("\" class='txt date'  >");
+                        Response.Write("\" class='txt date'  >");
 						Response.Write("<a style=\"font-size: 8pt;\"href=\"javascript:show_calendar('"
 							+ field_id
 							+ "');\">[select]</a>");
 					}
 					else
 					{
-						Response.Write ("\" class='txt' >");
-					}
-					
+                        Response.Write("\" class='txt' >");
+    				}
 				}
 			}
-		}
-
+		} // end if readonly or editable
 		Response.Write ("</td></tr>");
-
-	}
-
+	} // end loop through custom fields
 
 	// create project custom dropdowns
 	if (project.SelectedItem != null
 	&& project.SelectedItem.Value != null
 	&& project.SelectedItem.Value != "0")
 	{
-
 		sql = @"select
 			isnull(pj_enable_custom_dropdown1,0) [pj_enable_custom_dropdown1],
 			isnull(pj_enable_custom_dropdown2,0) [pj_enable_custom_dropdown2],
@@ -2838,8 +2839,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		} // if result set not null
 	}
 
-
-
 	%>
 
 	</table>
@@ -2908,16 +2907,16 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	// create the "Prev" fields for the custom columns so that we
 	// can create an audit trail of their changes.
 
-	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
+	foreach (string column_name in hash_custom_cols.Keys)
 	{
 		Response.Write ("<input type=hidden name=\"prev_");
-		Response.Write (drcc["name"]);
+        Response.Write(column_name);
 		Response.Write ("\"");
 
 		// output a date field according to the specified format
-			Response.Write (" value=\"");
+	    Response.Write (" value=\"");
 		//modified by CJU on jan 9 2008
-		Response.Write( btnet.Util.format_db_value( hash_custom_cols[(string)drcc["name"]] ) );
+        Response.Write(hash_custom_cols[column_name]);
 		//modified by CJU on jan 9 2008
 		Response.Write ("\">\n");
 	}

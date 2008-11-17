@@ -1030,7 +1030,7 @@ and a.bp_parent is null";
 				sql += "\n and a.bp_hidden_from_external_users = 0";
 			}
 			
-			sql += "\n order by a.bp_date desc";
+			sql += "\n order by a.bp_id desc";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             DbUtil dbutil = new DbUtil();

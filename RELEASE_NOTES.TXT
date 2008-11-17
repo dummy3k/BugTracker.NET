@@ -48,6 +48,8 @@ Version 3.0.2   11/14/2008
 
 filters for project specific custom fields?
 
+field level permissions in emails and history too
+
 -----------------------------------------------------------------------
 Version 3.0.1   11/14/2008 
 -----------------------------------------------------------------------

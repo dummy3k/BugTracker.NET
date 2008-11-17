@@ -656,7 +656,6 @@ function on_submit_search()
                     }
 	                return dt.ToString(date_time_format,get_culture_info());
                 }
-
 			}
 		}
 

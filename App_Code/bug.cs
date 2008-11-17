@@ -9,6 +9,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 
 // disable System.Net.Mail warnings
 #pragma warning disable 618
@@ -420,6 +421,7 @@ insert into bug_posts
             }
         }
 
+        ///////////////////////////////////////////////////////////////////////
         public class BugPostAttachment
         {
             public BugPostAttachment(string file, Stream content, int content_length, string content_type)
@@ -704,11 +706,6 @@ where bg_id = $id";
             int pl = (int)dr[0];
             int bg_org = (int)dr[1];
 
-            // reduce permissions for guest
-//            if (security.user.is_guest && pl == Security.PERMISSION_ALL)
-//            {
-//                pl = Security.PERMISSION_REPORTER;
-//            }
 
             // maybe reduce permissions
             if (bg_org != security.user.org)
@@ -727,6 +724,7 @@ where bg_id = $id";
         }
 
 
+        ///////////////////////////////////////////////////////////////////////
         public class NewIds
         {
             public NewIds(int b, int p)
@@ -759,7 +757,7 @@ where bg_id = $id";
             string cc,
             string content_type,
             bool internal_only,
-            System.Collections.Hashtable hash_custom_cols,
+            SortedDictionary<string,string> hash_custom_cols,
             bool send_notifications)
         {
 
@@ -1220,6 +1218,7 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
         }
 
 
+        ///////////////////////////////////////////////////////////////////////
 		// Send the emails in the queue
 		private static void threadproc_notifications()
 		{
@@ -1279,9 +1278,5 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 			// exit the worker thread
 
 		} // end of notification thread proc
-
     }
-
 }
-
-
