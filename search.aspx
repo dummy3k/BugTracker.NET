@@ -393,8 +393,13 @@ void do_query()
 
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
-		string variable = (string)drcc["name"];
-		string values = Request[variable];
+		string column_name = (string) drcc["name"];
+		if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+		{
+			continue;
+		}
+		
+		string values = Request[column_name];
 
 		if (values != null)
 		{
@@ -408,7 +413,7 @@ void do_query()
 			{
 				if (values != "")
 				{
-					custom_clause = " [" + variable + "] like '%" + values + "%'\n";
+					custom_clause = " [" + column_name + "] like '%" + values + "%'\n";
 					where = build_where(where, custom_clause);
 				}
 			}
@@ -416,15 +421,15 @@ void do_query()
 			{
 				if (values != "")
 				{
-					custom_clause = " [" + variable + "] >= '" + values + "'\n";
+					custom_clause = " [" + column_name + "] >= '" + values + "'\n";
 					where = build_where(where, custom_clause);
 
 					// reset, and do the to date
 					custom_clause = "";
-					values = Request["to__" + variable];
+					values = Request["to__" + column_name];
 					if (values != "")
 					{
-						custom_clause = " [" + variable + "] <= '" + values + " 23:59:59'\n";
+						custom_clause = " [" + column_name + "] <= '" + values + " 23:59:59'\n";
 						where = build_where(where, custom_clause);
 					}
 				}
@@ -438,7 +443,7 @@ void do_query()
 				else
 				{
 					string in_not_in = format_in_not_in(values);
-					custom_clause = " [" + variable + "] in " + in_not_in + "\n";
+					custom_clause = " [" + column_name + "] in " + in_not_in + "\n";
 					where = build_where(where, custom_clause);
 				}
 			}
@@ -490,32 +495,32 @@ order by bg_id desc
 			select += "\n,isnull(rpt.us_username,'') [reported by]";
 		}
 
-		if (security.user.tags_field_permission_level > 0)
+		if (security.user.tags_field_permission_level != Security.PERMISSION_NONE)
 		{
 			select += ",\nisnull(bg_tags,'') [tags]";
 		}
 
-		if (security.user.project_field_permission_level > 0)
+		if (security.user.project_field_permission_level != Security.PERMISSION_NONE)
 		{
 			select += ",\nisnull(pj_name,'') [project]";
 		}
 
-		if (security.user.org_field_permission_level > 0)
+		if (security.user.org_field_permission_level != Security.PERMISSION_NONE)
 		{
 			select += ",\nisnull(og_name,'') [organization]";
 		}
 
-		if (security.user.category_field_permission_level > 0)
+		if (security.user.category_field_permission_level != Security.PERMISSION_NONE)
 		{
 			select += ",\nisnull(ct_name,'') [category]";
 		}
 
-		if (security.user.priority_field_permission_level > 0)
+		if (security.user.priority_field_permission_level != Security.PERMISSION_NONE)
 		{
 			select += ",\nisnull(pr_name,'') [priority]";
 		}
 
-		if (security.user.assigned_to_field_permission_level > 0)
+		if (security.user.assigned_to_field_permission_level != Security.PERMISSION_NONE)
 		{
 			if (use_full_names)
 			{
@@ -527,12 +532,12 @@ order by bg_id desc
 			}
 		}
 
-		if (security.user.status_field_permission_level > 0)
+		if (security.user.status_field_permission_level != Security.PERMISSION_NONE)
 		{
 			select += ",\nisnull(st_name,'') [status]";
 		}
 
-		if (security.user.udf_field_permission_level > 0)
+		if (security.user.udf_field_permission_level != Security.PERMISSION_NONE)
 		{
 			if (show_udf)
 			{
@@ -546,29 +551,35 @@ order by bg_id desc
 		int user_type_cnt = 1;
 		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 		{
+			string column_name = (string) drcc["name"];
+			if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+			{
+				continue;
+			}
+			
 			if (Convert.ToString(drcc["dropdown type"]) == "users")
 			{
 				custom_cols_sql += ",\nisnull(users"
 					+ Convert.ToString(user_type_cnt++)
 					+ ".us_username,'') "
 					+ "["
-					+ drcc["name"].ToString() + "]";
+					+ column_name + "]";
 			}
 			else
 			{
 				if (Convert.ToString(drcc["datatype"]) == "decimal")
 				{
 					custom_cols_sql += ",\nisnull(["
-						+ drcc["name"].ToString()
+						+ column_name
 						+ "],0)["
-						+ drcc["name"].ToString() + "]";
+						+ column_name + "]";
 				}
 				else
 				{
 					custom_cols_sql += ",\nisnull(["
-						+ drcc["name"].ToString()
+						+ column_name
 						+ "],'')["
-						+ drcc["name"].ToString() + "]";
+						+ column_name + "]";
 				}
 			}
 		}
@@ -667,6 +678,13 @@ order by bg_id desc
 		user_type_cnt = 1;
 		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 		{
+			
+			string column_name = (string) drcc["name"];
+			if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+			{
+				continue;
+			}			
+			
 			if (Convert.ToString(drcc["dropdown type"]) == "users")
 			{
 				select += "left outer join users users"
@@ -674,7 +692,7 @@ order by bg_id desc
 					+ " on users"
 					+ Convert.ToString(user_type_cnt)
 					+ ".us_id = bugs."
-					+ "[" + drcc["name"].ToString() + "]\n";
+					+ "[" + column_name + "]\n";
 
 				user_type_cnt++;
 
@@ -981,37 +999,37 @@ void load_drop_downs()
 		udf.Items.Insert(0, new ListItem("[none]", "0"));
 	}
 
-	if (security.user.project_field_permission_level == 0)
+	if (security.user.project_field_permission_level == Security.PERMISSION_NONE)
 	{
 		project_label.Style["display"] = "none";
 		project.Style["display"] = "none";
 	}
-	if (security.user.org_field_permission_level == 0)
+	if (security.user.org_field_permission_level == Security.PERMISSION_NONE)
 	{
 		org_label.Style["display"] = "none";
 		org.Style["display"] = "none";
 	}
-	if (security.user.category_field_permission_level == 0)
+	if (security.user.category_field_permission_level == Security.PERMISSION_NONE)
 	{
 		category_label.Style["display"] = "none";
 		category.Style["display"] = "none";
 	}
-	if (security.user.priority_field_permission_level == 0)
+	if (security.user.priority_field_permission_level == Security.PERMISSION_NONE)
 	{
 		priority_label.Style["display"] = "none";
 		priority.Style["display"] = "none";
 	}
-	if (security.user.status_field_permission_level == 0)
+	if (security.user.status_field_permission_level == Security.PERMISSION_NONE)
 	{
 		status_label.Style["display"] = "none";
 		status.Style["display"] = "none";
 	}
-	if (security.user.assigned_to_field_permission_level == 0)
+	if (security.user.assigned_to_field_permission_level == Security.PERMISSION_NONE)
 	{
 		assigned_to_label.Style["display"] = "none";
 		assigned_to.Style["display"] = "none";
 	}
-	if (security.user.udf_field_permission_level == 0)
+	if (security.user.udf_field_permission_level == Security.PERMISSION_NONE)
 	{
 		udf_label.Style["display"] = "none";
 		udf.Style["display"] = "none";
@@ -1450,9 +1468,14 @@ function on_change()
 	int custom_count = 1;
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
+		string column_name = (string) drcc["name"];
+		if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+		{
+			continue;
+		}			
+
 		string clause = "custom_clause_" + Convert.ToString(custom_count++);
-		string custom_col_name = drcc["name"].ToString();
-		string custom_col_id = custom_col_name.Replace(" ","");
+		string custom_col_id = column_name.Replace(" ","");
 		string datatype = (string) drcc["datatype"];
 
 		Response.Write ("var " + clause + " = \"\";\n");
@@ -1464,7 +1487,7 @@ function on_change()
 			// my_text_field like '%val%'
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col_name + "] like '%\" + el.value + \"%'\\n\"\n");
+			Response.Write (clause + " = \" [" + column_name + "] like '%\" + el.value + \"%'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 		}
@@ -1472,7 +1495,7 @@ function on_change()
 		{
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col_name + "] >=  '\" + format_from_date_for_db(el.value) + \"'\\n\"\n");
+			Response.Write (clause + " = \" [" + column_name + "] >=  '\" + format_from_date_for_db(el.value) + \"'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
@@ -1481,7 +1504,7 @@ function on_change()
 
 			Response.Write ("if (el.value != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col_name + "] <=  '\" + format_to_date_for_db(el.value) + \"'\\n\"\n");
+			Response.Write (clause + " = \" [" + column_name + "] <=  '\" + format_to_date_for_db(el.value) + \"'\\n\"\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 
@@ -1492,7 +1515,7 @@ function on_change()
 			Response.Write ("vals = in_not_in_vals(el)\n");
 			Response.Write ("if (vals != \"\")\n");
 			Response.Write ("{\n\t");
-			Response.Write (clause + " = \" [" + custom_col_name + "] in \" + vals\n");
+			Response.Write (clause + " = \" [" + column_name + "] in \" + vals\n");
 			Response.Write ("\twhere = build_where(where, " + clause + ");\n");
 			Response.Write ("}\n\n");
 		}
@@ -1543,7 +1566,7 @@ function on_change()
 <%
 		}
 
-		if (security.user.tags_field_permission_level > 0)
+		if (security.user.tags_field_permission_level != Security.PERMISSION_NONE)
 		{
 %>
 			select += ",\nisnull(bg_tags,'') [tags]";
@@ -1551,35 +1574,35 @@ function on_change()
 		}
 
 
-		if (security.user.project_field_permission_level > 0)
+		if (security.user.project_field_permission_level != Security.PERMISSION_NONE)
 		{
 %>
 			select += ",\nisnull(pj_name,'') [project]"
 <%
 		}
 
-		if (security.user.org_field_permission_level > 0)
+		if (security.user.org_field_permission_level != Security.PERMISSION_NONE)
 		{
 %>
 			select += ",\nisnull(og_name,'') [organization]"
 <%
 		}
 
-		if (security.user.category_field_permission_level > 0)
+		if (security.user.category_field_permission_level != Security.PERMISSION_NONE)
 		{
 %>
 			select += ",\nisnull(ct_name,'') [category]";
 <%
 		}
 
-		if (security.user.priority_field_permission_level > 0)
+		if (security.user.priority_field_permission_level != Security.PERMISSION_NONE)
 		{
 %>
 			select += ",\nisnull(pr_name,'') [priority]"
 <%
 		}
 
-		if (security.user.assigned_to_field_permission_level > 0)
+		if (security.user.assigned_to_field_permission_level != Security.PERMISSION_NONE)
 		{
 			if (use_full_names)
 			{
@@ -1595,14 +1618,14 @@ function on_change()
 			}
 		}
 
-		if (security.user.status_field_permission_level > 0)
+		if (security.user.status_field_permission_level != Security.PERMISSION_NONE)
 		{
 %>
 			select += ",\nisnull(st_name,'') [status]";
 <%
 		}
 
-		if (security.user.udf_field_permission_level > 0)
+		if (security.user.udf_field_permission_level != Security.PERMISSION_NONE)
 		{
 			if (show_udf)
 			{
@@ -1616,12 +1639,18 @@ function on_change()
 		int user_dropdown_cnt = 1;
 		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 		{
+			string column_name = (string) drcc["name"];
+			if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+			{
+				continue;
+			}
+
 			if (Convert.ToString(drcc["dropdown type"]) == "users")
 			{
 				Response.Write ("\nselect += \", \\nisnull(users"
 				+ Convert.ToString(user_dropdown_cnt)
 				+ ".us_username,'') ["
-				+ Convert.ToString(drcc["name"])
+				+ column_name
 				+ "]\"");
 				user_dropdown_cnt++;
 			}
@@ -1630,17 +1659,17 @@ function on_change()
 				if (Convert.ToString(drcc["datatype"]) == "decimal")
 				{
 					Response.Write ("\nselect += \", \\nisnull(["
-					+ Convert.ToString(drcc["name"])
+					+ column_name
 					+ "],0) ["
-					+ Convert.ToString(drcc["name"])
+					+ column_name
 					+ "]\"");
 				}
 				else
 				{
 					Response.Write ("\nselect += \", \\nisnull(["
-					+ Convert.ToString(drcc["name"])
+					+ column_name
 					+ "],'') ["
-					+ Convert.ToString(drcc["name"])
+					+ column_name
 					+ "]\"");
 				}
 			}
@@ -1663,6 +1692,12 @@ function on_change()
 		user_dropdown_cnt = 1;
 		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 		{
+			string column_name = (string) drcc["name"];
+			if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+			{
+				continue;
+			}
+
 			if (Convert.ToString(drcc["dropdown type"]) == "users")
 			{
 				Response.Write ("select += \"left outer join users users");
@@ -1671,7 +1706,7 @@ function on_change()
 				Response.Write (Convert.ToString(user_dropdown_cnt));
 				Response.Write (".us_id = bugs.");
 				Response.Write ("[");
-				Response.Write (drcc["name"]);
+				Response.Write (column_name);
 				Response.Write ("]\\n\"\n");
 				user_dropdown_cnt++;
 			}
@@ -1920,15 +1955,19 @@ function do_doc_ready()
 	// Create the custom column INPUT elements
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
+		string column_name = (string) drcc["name"];
+		if (security.user.dict_custom_field_permission_level[column_name] == Security.PERMISSION_NONE)
+		{
+			continue;
+		}
 
+		string field_id = column_name.Replace(" ","");
 		string datatype = drcc["datatype"].ToString();
 		string dropdown_type = Convert.ToString(drcc["dropdown type"]);
-
-		string field_id = Convert.ToString(drcc["name"]).Replace(" ","");
 		
 		Response.Write ("<tr>");
 		Response.Write ("<td><span class=lbl id=\"" +  field_id + "_label\">");
-		Response.Write (drcc["name"]);
+		Response.Write (column_name);
 
 		if ((datatype == "nvarchar" || datatype == "varchar" || datatype == "char" || datatype == "nchar")
 		&& dropdown_type == "")
@@ -1951,10 +1990,10 @@ function do_doc_ready()
 			Response.Write ("<select multiple=multiple size=3 onchange='on_change()' ");
 
 			Response.Write (" id=\"" + field_id + "\"");
-			Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
+			Response.Write (" name=\"" + column_name + "\"");
 			Response.Write (">");
 
-			string selected_vals = Request[Convert.ToString(drcc["name"])];
+			string selected_vals = Request[column_name];
 			if (selected_vals == null)
 			{
 				selected_vals = "$Q6Q6Q6$"; // the point here is, don't select anything in the dropdowns
@@ -2021,7 +2060,7 @@ function do_doc_ready()
 			if (datatype == "datetime")
 			{
 
-				write_custom_date_controls(Convert.ToString(drcc["name"]));
+				write_custom_date_controls(column_name);
 			}
 			else
 			{
@@ -2057,13 +2096,13 @@ function do_doc_ready()
 				Response.Write (" size=" + size_string);
 				Response.Write (" maxlength=" + size_string);
 
-				Response.Write (" name=\"" + drcc["name"].ToString() + "\"");
+				Response.Write (" name=\"" + column_name + "\"");
 				Response.Write (" id=\"" + field_id + "\"");
 
 				Response.Write (" value=\"");
-				if (Request[(string)drcc["name"]]!="")
+				if (Request[column_name]!="")
 				{
-					Response.Write (HttpUtility.HtmlEncode(Request[(string)drcc["name"]]));
+					Response.Write (HttpUtility.HtmlEncode(Request[column_name]));
 				}
 				Response.Write ("\"");
 				Response.Write (">");

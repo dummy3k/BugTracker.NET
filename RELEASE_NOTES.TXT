@@ -46,9 +46,9 @@ how to pick a bug tracker
 Version 3.0.2   11/14/2008 
 -----------------------------------------------------------------------
 
-filters for project specific custom fields?
+****  CONTINUE with search, search for drcc["name
 
-field level permissions in emails and history too
+filters for project specific custom fields?
 
 -----------------------------------------------------------------------
 Version 3.0.1   11/14/2008 
