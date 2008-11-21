@@ -753,33 +753,35 @@ void load_project_and_user_dropdowns(DataTable project_default)
 
 	// Load the user dropdown, which changes per project
 	// Only users explicitly allowed will be listed
-	if (btnet.Util.get_setting("DefaultPermissionLevel","2") == "0")
-	{
-		sql = @"/* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
-			from users
-			inner join orgs on us_org = og_id
-			where us_active = 1
-			and og_can_be_assigned_to = 1
-			and us_id in
-				(select pu_user from project_user_xref
-				where pu_project = $pj
-				and pu_permission_level <> 0)
-			order by us_username; ";
-	}
-	// Only users explictly DISallowed will be omitted
-	else
-	{
-		sql = @"/* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
-			from users
-			inner join orgs on us_org = og_id
-			where us_active = 1
-			and og_can_be_assigned_to = 1
-			and us_id not in
-				(select pu_user from project_user_xref
-				where pu_project = $pj
-				and pu_permission_level = 0)
-			order by us_username; ";
-	}
+//	if (btnet.Util.get_setting("DefaultPermissionLevel","2") == "0")
+//	{
+//		sql = @"/* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
+//			from users
+//			inner join orgs on us_org = og_id
+//			where us_active = 1
+//			and og_can_be_assigned_to = 1
+//			and us_id in
+//				(select pu_user from project_user_xref
+//				where pu_project = $pj
+//				and pu_permission_level <> 0)
+//			order by us_username; ";
+//	}
+//	// Only users explictly DISallowed will be omitted
+//	else
+//	{
+//		sql = @"/* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
+//			from users
+//			inner join orgs on us_org = og_id
+//			where us_active = 1
+//			and og_can_be_assigned_to = 1
+//			and us_id not in
+//				(select pu_user from project_user_xref
+//				where pu_project = $pj
+//				and pu_permission_level = 0)
+//			order by us_username; ";
+//	}
+	
+	sql = btnet.Util.get_related_assignable_users_sql(security, dbutil);
 
 	if (btnet.Util.get_setting("UseFullNames","0") == "0")
 	{

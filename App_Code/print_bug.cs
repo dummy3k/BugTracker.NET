@@ -742,7 +742,7 @@ namespace btnet
 				if (images_inline)
 				{
 					string file = Convert.ToString(dr["bp_file"]);
-					write_file_inline (Response, file, string_post_id, string_bug_id);
+					write_file_inline (Response, file, string_post_id, string_bug_id, (string) dr["bp_content_type"]);
 				}
 			}
 
@@ -783,7 +783,7 @@ namespace btnet
 			if (images_inline)
 			{
 				string file = Convert.ToString(dr["ba_file"]);  // intentially "ba"
-				write_file_inline (Response, file, string_post_id, string_bug_id);
+				write_file_inline (Response, file, string_post_id, string_bug_id, (string) dr["ba_content_type"]);
 
 			}
 
@@ -797,14 +797,20 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		static void write_file_inline (HttpResponse Response, string file, string string_post_id, string string_bug_id)
+		static void write_file_inline (
+			HttpResponse Response, 
+			string filename, 
+			string string_post_id, 
+			string string_bug_id,
+			string content_type)
 		{
 
-			if (file.ToLower().EndsWith(".gif")
-			|| file.ToLower().EndsWith(".jpg")
-			|| file.ToLower().EndsWith(".jpeg")
-			|| file.ToLower().EndsWith(".bmp")
-			|| file.ToLower().EndsWith(".png"))
+			if (content_type =="image/gif"
+			|| content_type == "image/jpg"
+			|| content_type == "image/jpeg"
+			|| content_type == "image/png"
+			|| content_type == "image/bmp"
+			|| content_type == "image/tiff")
 			{
 				Response.Write ("<p>"
 					+ "<a href=javascript:resize_image('im" + string_post_id + "',1.5)>" + "[+]</a>&nbsp;"
@@ -814,11 +820,11 @@ namespace btnet
 					+ string_post_id + "&bug_id=" + string_bug_id
 					+ ">");
 			}
-			else if (file.ToLower().EndsWith(".html")
-			|| file.ToLower().EndsWith(".htm")
-			|| file.ToLower().EndsWith(".ini")
-			|| file.ToLower().EndsWith(".xml")
-			|| file.ToLower().EndsWith(".txt"))
+			else if (content_type == "text/plain"
+			|| content_type == "text/html"
+			|| content_type == "text/xml"
+			|| content_type == "text/css"
+			|| content_type == "text/js")
 			{
 				Response.Write ("<p>"
 					+ "<a href=javascript:resize_iframe('if" + string_post_id + "',200)>" + "[+]</a>&nbsp;"

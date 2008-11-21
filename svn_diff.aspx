@@ -220,7 +220,7 @@ void visual_diff(string file_path, int revision, int old_revision)
 	{
 		// get the old revision number
 		line = diff_lines[2];
-		int old_rev_pos1 = line.IndexOf("(revision ");  // 10 chars long
+		int old_rev_pos1 = line.ToLower().IndexOf("(revision ");  // 10 chars long
 		int old_rev_pos_start_of_int = old_rev_pos1 + 10;
 		int old_rev_after_int = line.IndexOf(")",old_rev_pos_start_of_int);
 		string old_revision_string = line.Substring(old_rev_pos_start_of_int,

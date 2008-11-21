@@ -50,6 +50,27 @@ Version 3.0.2   11/14/2008
 
 filters for project specific custom fields?
 
+sending email as guest
+
+
+  using (MailMessage mail = new MailMessage())
+      {
+        mail.From = new MailAddress("webmaster@yourdomainnamehere.com", txtName.Text);
+        mail.To.Add(BlogSettings.Instance.Email);
+        mail.Subject = "Weblog e-mail - " + txtSubject.Text;
+        mail.Body = txtMessage.Text;
+        mail.IsBodyHtml = false;
+        mail.ReplyTo = new MailAddress(txtEmail.Text, txtName.Text);
+The server rejected the sender address. The server response was: 553 sorry, your mail was administratively denied. (#5.7.1) 
+
+
+file extension to mime type, when adding, when viewing?
+
+
+* Fix to svn_diff.asxp to work with newer versions of Subversion,
+thanks to Christian Hoffmann.
+
+
 -----------------------------------------------------------------------
 Version 3.0.1   11/14/2008 
 -----------------------------------------------------------------------

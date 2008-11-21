@@ -103,33 +103,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			if (string.IsNullOrEmpty(content_type))
 			{
-
-				string ext = System.IO.Path.GetExtension(filename).ToLower();
-
-				if (ext == ".txt")
-				{
-					Response.ContentType = "text/plain";
-				}
-				else if (ext == ".gif")
-				{
-					Response.ContentType = "image/GIF";
-				}
-				else if (ext == ".jpeg" || ext == ".jpg")
-				{
-					Response.ContentType = "image/JPEG";
-				}
-				else if (ext == ".doc")
-				{
-					Response.ContentType = "application/x-msword";
-				}
-				else if (ext == ".xls")
-				{
-					Response.ContentType = "application/x-msexcel";
-				}
-				else if (ext == ".zip")
-				{
-					Response.ContentType = "application/zip";
-				}
+				Response.ContentType = btnet.Util.filename_to_content_type(filename);
 			}
 			else
 			{

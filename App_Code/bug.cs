@@ -317,7 +317,6 @@ insert into bug_posts
                 sql = sql.Replace("$de", comment.Replace("'", "''"));
                 sql = sql.Replace("$si", Convert.ToString(effective_content_length));
                 sql = sql.Replace("$us", Convert.ToString(security.user.usid));
-                sql = sql.Replace("$ct", effective_content_type.Replace("'", "''"));
 
 				// Sometimes, somehow, content type is null.  Not sure how.
 				sql = sql.Replace("$ct",

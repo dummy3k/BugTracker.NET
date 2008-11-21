@@ -576,7 +576,17 @@ int[] handle_attachments(int comment_id)
 			return null;
 		}
 
-        int bp_id = Bug.insert_post_attachment(security, Convert.ToInt32(bg_id.Value), attached_file.PostedFile.InputStream, content_length, filename, "email attachment", file_extension_to_content_type(Path.GetExtension(filename)), comment_id, false, false);
+        int bp_id = Bug.insert_post_attachment(
+            security, 
+            Convert.ToInt32(bg_id.Value), 
+            attached_file.PostedFile.InputStream, 
+            content_length, 
+            filename, 
+            "email attachment", 
+            attached_file.PostedFile.ContentType,
+            comment_id, 
+            false, false);
+        
         attachments.Add(bp_id);
 	}
 
@@ -596,72 +606,8 @@ int[] handle_attachments(int comment_id)
     return (int[])attachments.ToArray(typeof(int));
 }
 
-///////////////////////////////////////////////////////////////////////
-string file_extension_to_content_type(string ext)
-{
-	if (ext == ".jpg"
-	|| ext == ".jpeg")
-	{
-		return "image/jpg";
-	}
-	else if (ext == ".gif")
-	{
-		return "image/gif";
-	}
-	else if (ext == ".bmp")
-	{
-		return "image/bmp";
-	}
-	else if (ext == ".txt")
-	{
-		return "text/plain";
-	}
-	else if (ext == ".doc")
-	{
-		return "application/msword";
-	}
-	else if (ext == ".xls")
-	{
-		return "application/excel";
-	}
-	else if (ext == ".zip")
-	{
-		return "application/zip";
-	}
-	else if (ext == ".htm"
-	|| ext == ".html"
-	|| ext == ".asp"
-	|| ext == ".aspx"
-	|| ext == ".php")
-	{
-		return "text/html";
-	}
-	else
-	{
-		return "";
-	}
-}
 
 ///////////////////////////////////////////////////////////////////////
-int save_attachment(int comment_id, string filename, int content_length, string ext)
-{
-	sql = @"insert into bug_posts
-			(bp_type, bp_bug, bp_file, bp_comment, bp_size, bp_date, bp_user, bp_parent, bp_content_type)
-			values ('file', $1, N'$2', N'$3', $4, getdate(), $5, $6, '$7')
-			select scope_identity()";
-
-	sql = sql.Replace("$1", bg_id.Value);
-	sql = sql.Replace("$2", filename.Replace("'","''"));
-	sql = sql.Replace("$3", "email attachment");
-	sql = sql.Replace("$4", Convert.ToString(content_length));
-	sql = sql.Replace("$5", Convert.ToString(security.user.usid));
-	sql = sql.Replace("$6", Convert.ToString(comment_id));
-	sql = sql.Replace("$7", file_extension_to_content_type(ext));
-
-	// save the attachment's identity
-	return Convert.ToInt32(dbutil.execute_scalar(sql));
-}
-
 
 </script>
 

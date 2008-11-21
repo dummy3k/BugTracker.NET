@@ -1115,7 +1115,7 @@ where us_id in
 if $og_external_user = 1 -- external
 and $og_other_orgs_permission_level = 0 -- other orgs
 begin
-	delete from #temp where us_org <> $user.org and us_id <> $user.usid
+	delete from #temp where og_external_user = 1 and us_org <> $user.org 
 end
 
 $limit_users
@@ -1221,6 +1221,129 @@ drop table #temp2";
 			sql = sql.Replace("$og_other_orgs_permission_level",Convert.ToString(security.user.other_orgs_permission_level));
 
 			return dbutil.get_dataset(sql).Tables[0];
+
+		}
+
+
+		///////////////////////////////////////////////////////////////////////
+		// only used by search?
+		public static string get_related_assignable_users_sql(Security security, DbUtil dbutil)
+		{
+			string sql = "";
+
+			if (Util.get_setting("DefaultPermissionLevel","2") == "0")
+			{
+				// only show users who have explicit permission
+				// for projects that this user has permissions for
+
+				sql = @"
+/* get related users 1 */
+
+select us_id,
+case when $fullnames then
+	case rtrim(us_firstname)
+		when null then isnull(us_lastname, '')
+		when '' then isnull(us_lastname, '')
+		else isnull(us_lastname + ', ' + us_firstname,'')
+	end
+else us_username end us_username,
+us_org,
+og_external_user
+into #temp
+from users
+inner join orgs on us_org = og_id
+where og_can_be_assigned_to = 1
+and us_id in
+	(select pu1.pu_user from project_user_xref pu1
+	where pu1.pu_project in
+		(select pu2.pu_project from project_user_xref pu2
+		where pu2.pu_user = $user.usid
+		and pu2.pu_permission_level <> 0
+		)
+	and pu1.pu_permission_level <> 0
+	)
+
+if $og_external_user = 1 -- external
+and $og_other_orgs_permission_level = 0 -- other orgs
+begin
+	delete from #temp where og_external_user = 1 and us_org <> $user.org 
+end
+
+select us_id, us_username from #temp order by us_username
+
+drop table #temp";
+
+
+
+			}
+			else
+			{
+				// show users UNLESS they have been explicitly excluded
+				// from all the projects the viewer is able to view
+
+				// the cartesian join in the first select is intentional
+
+				sql=@"
+/* get related users 2 */
+select  pj_id, us_id,
+case when $fullnames then
+	case rtrim(us_firstname)
+		when null then isnull(us_lastname, '')
+		when '' then isnull(us_lastname, '')
+		else isnull(us_lastname + ', ' + us_firstname,'')
+	end
+else us_username end us_username
+into #temp
+from projects, users
+where pj_id not in
+(
+	select pu_project from project_user_xref
+	where pu_permission_level = 0 and pu_user = $user.usid
+)
+
+
+if $og_external_user = 1 -- external
+and $og_other_orgs_permission_level = 0 -- other orgs
+begin
+	select distinct a.us_id, a.us_username
+	from #temp a
+	inner join users b on a.us_id = b.us_id
+	inner join orgs on b.us_id = og_id
+	where og_can_be_assigned_to = 1	and (og_external_user = 0 or b.us_org = $user.org)
+	order by a.us_username
+end
+else
+begin
+
+	select distinct us_id, us_username
+		from #temp
+		left outer join project_user_xref on pj_id = pu_project
+		and us_id = pu_user
+		where isnull(pu_permission_level,2) <> 0
+		order by us_username
+end
+
+drop table #temp";
+
+			}
+
+			if (Util.get_setting("UseFullNames","0") == "0")
+			{
+				// false condition
+				sql = sql.Replace("$fullnames","0 = 1");
+			}
+			else
+			{
+				// true condition
+				sql = sql.Replace("$fullnames","1 = 1");
+			}
+
+			sql = sql.Replace("$user.usid",Convert.ToString(security.user.usid));
+			sql = sql.Replace("$user.org",Convert.ToString(security.user.org));
+			sql = sql.Replace("$og_external_user",Convert.ToString(security.user.external_user ? 1 : 0));
+			sql = sql.Replace("$og_other_orgs_permission_level",Convert.ToString(security.user.other_orgs_permission_level));
+
+			return sql;
 
 		}
 
@@ -1460,6 +1583,63 @@ where bg_id = $bg";
 
 			return true;
 		}
+
+   		///////////////////////////////////////////////////////////////////////
+        public static string filename_to_content_type(string filename)
+        {
+            string ext = System.IO.Path.GetExtension(filename).ToLower();
+
+            if (ext == ".jpg"
+	        || ext == ".jpeg")
+	        {
+		        return "image/jpeg";
+	        }
+	        else if (ext == ".gif")
+	        {
+		        return "image/gif";
+	        }
+	        else if (ext == ".bmp")
+	        {
+		        return "image/bmp";
+	        }
+            else if (ext == ".tiff")
+            {
+                return "image/tiff";
+            }
+            else if (ext == ".txt" || ext == ".ini" || ext == ".bat" || ext == ".js")
+	        {
+		        return "text/plain";
+	        }
+	        else if (ext == ".doc" || ext == ".docx")
+	        {
+		        return "application/msword";
+	        }
+	        else if (ext == ".xls")
+	        {
+		        return "application/excel";
+	        }
+	        else if (ext == ".zip")
+	        {
+		        return "application/zip";
+	        }
+	        else if (ext == ".htm"
+	        || ext == ".html"
+	        || ext == ".asp"
+	        || ext == ".aspx"
+	        || ext == ".php")
+	        {
+		        return "text/html";
+	        }
+            else if (ext == ".xml")
+            {
+                return "text/xml";
+            }
+            else
+	        {
+		        return "";
+	        }
+        
+        }
 
     } // end Util
 }
