@@ -35,106 +35,106 @@ namespace btnet
             // subscribe per-project auto_subscribers
             // subscribe per auto_subscribe_own_bugs
             string sql = @"
-    declare @pj int
-    select @pj = bg_project from bugs where bg_id = $id
+declare @pj int
+select @pj = bg_project from bugs where bg_id = $id
 
-    delete from bug_subscriptions
-    where bs_bug = $id
-    and bs_user in
-    (select x.pu_user
-    from projects
-    left outer join project_user_xref x on pu_project = pj_id
-    where pu_project = @pj
-    and isnull(pu_permission_level,$dpl) = 0)
+delete from bug_subscriptions
+where bs_bug = $id
+and bs_user in
+(select x.pu_user
+from projects
+left outer join project_user_xref x on pu_project = pj_id
+where pu_project = @pj
+and isnull(pu_permission_level,$dpl) = 0)
 
-    delete from bug_subscriptions
-    where bs_bug = $id
-    and bs_user in
-    (select us_id from users
-     inner join orgs on us_org = og_id
-     inner join bugs on bg_id = $id
-     where og_other_orgs_permission_level = 0
-     and bg_org <> og_id)
+delete from bug_subscriptions
+where bs_bug = $id
+and bs_user in
+(select us_id from users
+ inner join orgs on us_org = og_id
+ inner join bugs on bg_id = $id
+ where og_other_orgs_permission_level = 0
+ and bg_org <> og_id)
 
-    insert into bug_subscriptions (bs_bug, bs_user)
-    select $id, us_id
-    from users
-    inner join orgs on us_org = og_id
-    inner join bugs on bg_id = $id
-    left outer join project_user_xref on pu_project = @pj and pu_user = us_id
-    where us_auto_subscribe = 1
-    and
-    case
-	    when
-		    us_org <> bg_org
-		    and og_other_orgs_permission_level < 2
-		    and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-			    then og_other_orgs_permission_level
-	    else
-		    isnull(pu_permission_level,$dpl)
-    end <> 0
-    and us_active = 1
-    and us_id not in
-    (select bs_user from bug_subscriptions
-    where bs_bug = $id)
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, us_id
+from users
+inner join orgs on us_org = og_id
+inner join bugs on bg_id = $id
+left outer join project_user_xref on pu_project = @pj and pu_user = us_id
+where us_auto_subscribe = 1
+and
+case
+    when
+	    us_org <> bg_org
+	    and og_other_orgs_permission_level < 2
+	    and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+		    then og_other_orgs_permission_level
+    else
+	    isnull(pu_permission_level,$dpl)
+end <> 0
+and us_active = 1
+and us_id not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)
 
-    insert into bug_subscriptions (bs_bug, bs_user)
-    select $id, pj_default_user
-    from projects
-    inner join users on pj_default_user = us_id
-    where pj_id = @pj
-    and pj_default_user <> 0
-    and pj_auto_subscribe_default_user = 1
-    and us_active = 1
-    and pj_default_user not in
-    (select bs_user from bug_subscriptions
-    where bs_bug = $id)
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, pj_default_user
+from projects
+inner join users on pj_default_user = us_id
+where pj_id = @pj
+and pj_default_user <> 0
+and pj_auto_subscribe_default_user = 1
+and us_active = 1
+and pj_default_user not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)
 
-    insert into bug_subscriptions (bs_bug, bs_user)
-    select $id, pu_user from project_user_xref
-    inner join users on pu_user = us_id
-    inner join orgs on us_org = og_id
-    inner join bugs on bg_id = $id
-    where pu_auto_subscribe = 1
-    and
-    case
-	    when
-		    us_org <> bg_org
-		    and og_other_orgs_permission_level < 2
-		    and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-			    then og_other_orgs_permission_level
-	    else
-		    isnull(pu_permission_level,$dpl)
-    end <> 0
-    and us_active = 1
-    and pu_project = @pj
-    and pu_user not in
-    (select bs_user from bug_subscriptions
-    where bs_bug = $id)
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, pu_user from project_user_xref
+inner join users on pu_user = us_id
+inner join orgs on us_org = og_id
+inner join bugs on bg_id = $id
+where pu_auto_subscribe = 1
+and
+case
+    when
+	    us_org <> bg_org
+	    and og_other_orgs_permission_level < 2
+	    and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+		    then og_other_orgs_permission_level
+    else
+	    isnull(pu_permission_level,$dpl)
+end <> 0
+and us_active = 1
+and pu_project = @pj
+and pu_user not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)
 
-    insert into bug_subscriptions (bs_bug, bs_user)
-    select $id, us_id
-    from users
-    inner join bugs on bg_id = $id
-    inner join orgs on us_org = og_id
-    left outer join project_user_xref on pu_project = @pj and pu_user = us_id
-    where ((us_auto_subscribe_own_bugs = 1 and bg_assigned_to_user = us_id)
-    or
-    (us_auto_subscribe_reported_bugs = 1 and bg_reported_user = us_id))
-    and
-    case
-	    when
-		    us_org <> bg_org
-		    and og_other_orgs_permission_level < 2
-		    and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-			    then og_other_orgs_permission_level
-	    else
-		    isnull(pu_permission_level,$dpl)
-    end <> 0
-    and us_active = 1
-    and us_id not in
-    (select bs_user from bug_subscriptions
-    where bs_bug = $id)";
+insert into bug_subscriptions (bs_bug, bs_user)
+select $id, us_id
+from users
+inner join bugs on bg_id = $id
+inner join orgs on us_org = og_id
+left outer join project_user_xref on pu_project = @pj and pu_user = us_id
+where ((us_auto_subscribe_own_bugs = 1 and bg_assigned_to_user = us_id)
+or
+(us_auto_subscribe_reported_bugs = 1 and bg_reported_user = us_id))
+and
+case
+    when
+	    us_org <> bg_org
+	    and og_other_orgs_permission_level < 2
+	    and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+		    then og_other_orgs_permission_level
+    else
+	    isnull(pu_permission_level,$dpl)
+end <> 0
+and us_active = 1
+and us_id not in
+(select bs_user from bug_subscriptions
+where bs_bug = $id)";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
@@ -1174,6 +1174,16 @@ where bg_id = $id";
 						sec2.user.project_field_permission_level = (int)dr["og_project_field_permission_level"];
 						sec2.user.org_field_permission_level = (int)dr["og_org_field_permission_level"];
 						sec2.user.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
+
+                        DataSet ds_custom = Util.get_custom_columns(dbutil);
+                        foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+                        {
+                            string bg_name = (string)dr_custom["name"];
+                            string og_name = "og_"
+                                + (string)dr_custom["name"]
+                                + "_field_permission_level";
+                            sec2.user.dict_custom_field_permission_level[bg_name] = (int)dr[og_name];
+                        }
 
 						PrintBug.print_bug(
 							my_response,

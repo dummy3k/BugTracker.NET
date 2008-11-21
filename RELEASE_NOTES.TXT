@@ -46,30 +46,22 @@ how to pick a bug tracker
 Version 3.0.2   11/14/2008 
 -----------------------------------------------------------------------
 
-****  CONTINUE with search, search for drcc["name
-
-filters for project specific custom fields?
-
 sending email as guest
 
+project custom dropdown?
 
-  using (MailMessage mail = new MailMessage())
-      {
-        mail.From = new MailAddress("webmaster@yourdomainnamehere.com", txtName.Text);
-        mail.To.Add(BlogSettings.Instance.Email);
-        mail.Subject = "Weblog e-mail - " + txtSubject.Text;
-        mail.Body = txtMessage.Text;
-        mail.IsBodyHtml = false;
-        mail.ReplyTo = new MailAddress(txtEmail.Text, txtName.Text);
-The server rejected the sender address. The server response was: 553 sorry, your mail was administratively denied. (#5.7.1) 
+* New feature: Field level permissions for custom fields. You can 
+control which organizations can view/edit which custom fields.
 
-
-file extension to mime type, when adding, when viewing?
-
-
-* Fix to svn_diff.asxp to work with newer versions of Subversion,
+* Fixed to svn_diff.asxp to work with newer versions of Subversion,
 thanks to Christian Hoffmann.
 
+* Fixed bug related to showing images inline. When the attachment was 
+an .ini file, the user was wrongly being prompted to download the file.
+
+* Fixed bug with the list of users shown in edit_bug.aspx dropdowns
+when the viewer had no permissions to for other organizations.  Users
+from other organizations were being shown.
 
 -----------------------------------------------------------------------
 Version 3.0.1   11/14/2008 
