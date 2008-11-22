@@ -331,6 +331,16 @@ function clone()
 
 	el = get_el("sub")
 	el.value = "Create"
+	
+	try
+	{
+		el = get_el("sub2")
+		el.value = "Create"
+	}
+	catch (e)
+	{
+	
+	}
 
 	el = get_el("posts")
 	el.innerHTML = ""

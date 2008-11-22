@@ -302,12 +302,6 @@ void Page_Load(Object sender, EventArgs e)
 			// look at permission level and react accordingly
 			permission_level = (int)dr["pu_permission_level"];
 
-			// reduce permissions for guest
-//			if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
-//			{
-//				permission_level = Security.PERMISSION_REPORTER;
-//			}
-
 			if (permission_level == Security.PERMISSION_NONE)
 			{
 				Response.Write ("<link rel=StyleSheet href=btnet.css type=text/css>");
@@ -785,8 +779,6 @@ and us_id not in
 order by us_username; ";
     }
 	
-//	sql = btnet.Util.get_related_assignable_users_sql(security, dbutil);
-
 	if (btnet.Util.get_setting("UseFullNames","0") == "0")
 	{
 		// false condition
@@ -2865,8 +2857,18 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		</span>
 		&nbsp;
 		<span id="comment_label" runat="server">Comment:</span>
+		
 		<span class="smallnote" style="margin-left: 170px">
-		Entering "<% Response.Write(btnet.Util.get_setting("BugLinkMarker","bugid#")); %>999" in comment creates link to id 999</span>
+		<% 
+		if (permission_level != Security.PERMISSION_READONLY)
+		{		
+
+			Response.Write ("Entering \"" 
+				+ btnet.Util.get_setting("BugLinkMarker","bugid#") 
+				+"999\" in comment creates link to id 999");
+		} 
+		%>		
+		</span>
 		<br>
 		<textarea  id="comment" rows=5 cols=100 runat="server" class=txt onkeydown="mark_dirty()" onkeyup="mark_dirty()"></textarea>
 		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>

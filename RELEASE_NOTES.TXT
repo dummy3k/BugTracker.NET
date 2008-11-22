@@ -41,17 +41,22 @@ blog about lucene.net
 
 how to pick a bug tracker
 
-
------------------------------------------------------------------------
-Version 3.0.2   11/14/2008 
------------------------------------------------------------------------
-
 sending email as guest
 
 project custom dropdown?
 
+-----------------------------------------------------------------------
+Version 3.0.2   11/21/2008 
+-----------------------------------------------------------------------
+
 * New feature: Field level permissions for custom fields. You can 
 control which organizations can view/edit which custom fields.
+
+Minor bug fixes:
+
+* Fixed bug with the list of users shown in edit_bug.aspx dropdowns
+when the viewer had no permissions to for other organizations.  Users
+from other organizations were being shown.
 
 * Fixed to svn_diff.asxp to work with newer versions of Subversion,
 thanks to Christian Hoffmann.
@@ -59,9 +64,7 @@ thanks to Christian Hoffmann.
 * Fixed bug related to showing images inline. When the attachment was 
 an .ini file, the user was wrongly being prompted to download the file.
 
-* Fixed bug with the list of users shown in edit_bug.aspx dropdowns
-when the viewer had no permissions to for other organizations.  Users
-from other organizations were being shown.
+* Fixed bug 2323190 "Top button doesn't change on copy bug"
 
 -----------------------------------------------------------------------
 Version 3.0.1   11/14/2008 
