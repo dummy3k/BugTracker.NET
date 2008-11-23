@@ -1517,6 +1517,37 @@ where bg_id = $bg";
 	        }
         
         }
+        
+        public static string request_to_string_for_sql(string val, string datatype)
+        {
+
+			if (val == null || val.Length == 0)
+			{
+				if (datatype == "varchar"
+				|| datatype == "nvarchar"
+				|| datatype == "char"
+				|| datatype == "nchar")
+				{
+					return "N''";
+				}
+				else
+				{
+					return "null";
+				}
+			}
+
+			val = val.Replace("'","''");
+
+			if (datatype == "datetime")
+				return "'" + btnet.Util.format_local_date_into_db_format(val) + "'";
+			else if (datatype == "decimal")
+				return btnet.Util.format_local_decimal_into_db_format( val );
+			else if (datatype == "int")
+				return val;
+			else 
+				return "N'" + val + "'";
+       
+        }
 
     } // end Util
 }

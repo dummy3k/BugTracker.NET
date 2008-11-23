@@ -2152,7 +2152,7 @@ void on_update (Object sender, EventArgs e)
 					foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 					{
 						
-                        string column_name = drcc["name"].ToString();
+                        string column_name = (string) drcc["name"];
 
                         // skip if no permission to update
                         if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
@@ -2163,51 +2163,13 @@ void on_update (Object sender, EventArgs e)
                         custom_cols_sql += ",[" + column_name + "]";
 						custom_cols_sql += " = ";
 						
-						string datatype = drcc["datatype"].ToString( );
+						string datatype = (string) drcc["datatype"];
 						
-						string val = Request[column_name];
+						string custom_col_val = btnet.Util.request_to_string_for_sql(
+							Request[column_name], 
+							datatype);
 						
-						if (val == null)
-						{
-							val = "";
-						}
-						else
-						{
-							val = val.Replace("'","''");
-						}
-
-						//modified by CJU on jan 9 2008 : added handling of the decimal datatype case
-						if( val.Length > 0 )
-						{
-							
-							switch(datatype)
-							{
-								// if a date was entered, convert to db format
-								case "datetime":
-									val = btnet.Util.format_local_date_into_db_format(val);
-									break;
-								case "decimal":
-									val = btnet.Util.format_local_decimal_into_db_format( val );
-									break;
-							}
-							
-							custom_cols_sql += "N'" + val + "'";
-						}
-						//end modified by CJU on jan 9 2008
-						else
-						{
-							if (datatype == "varchar"
-							|| datatype == "nvarchar"
-							|| datatype == "char"
-							|| datatype == "nchar")
-							{
-								custom_cols_sql += "N''";
-							}
-							else
-							{
-								custom_cols_sql += "null";
-							}
-						}
+						custom_cols_sql += custom_col_val;
 					}
 					sql = sql.Replace("$custom_cols_placeholder", custom_cols_sql);
 				}
