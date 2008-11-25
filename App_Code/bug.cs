@@ -182,12 +182,13 @@ where bs_bug = $id)";
 
 			// delete the database entries
 
-			sql = @"delete bug_post_attachments from bug_post_attachments inner join bug_posts on bug_post_attachments.bpa_post = bug_posts.bp_id where bug_posts.bp_bug = $bg
-				delete from bug_posts where bp_bug = $bg
-				delete from bug_subscriptions where bs_bug = $bg
-				delete from bug_relationships where re_bug1 = $bg
-				delete from bug_relationships where re_bug2 = $bg
-				delete from bugs where bg_id = $bg";
+			sql = @"
+delete bug_post_attachments from bug_post_attachments inner join bug_posts on bug_post_attachments.bpa_post = bug_posts.bp_id where bug_posts.bp_bug = $bg
+delete from bug_posts where bp_bug = $bg
+delete from bug_subscriptions where bs_bug = $bg
+delete from bug_relationships where re_bug1 = $bg
+delete from bug_relationships where re_bug2 = $bg
+delete from bugs where bg_id = $bg";
 
 			sql = sql.Replace("$bg", id);
 			dbutil.execute_nonquery(sql);
@@ -458,6 +459,7 @@ insert into bug_posts
 				sql = @"select bp_bug, bp_file, bp_size, bp_content_type
 						from bug_posts
 						where bp_id = $bp";
+						
 				sql = sql.Replace("$bp", Convert.ToString(bp_id));
 				using (SqlDataReader reader = dbutil.execute_reader(sql, CommandBehavior.CloseConnection))
 				{
@@ -477,6 +479,7 @@ insert into bug_posts
 				sql = @"select bpa_content
 							from bug_post_attachments
 							where bpa_post = $bp";
+							
 				sql = sql.Replace("$bp", Convert.ToString(bp_id));
 
 				object content_object;
@@ -686,15 +689,15 @@ where bg_id = $id";
 
 			// fetch the revised permission level
 			string sql = @"
-	declare @bg_org int
+declare @bg_org int
 
-	select isnull(pu_permission_level,$dpl),
-	bg_org
-	from bugs
-	left outer join project_user_xref
-	on pu_project = bg_project
-	and pu_user = $us
-	where bg_id = $bg";
+select isnull(pu_permission_level,$dpl),
+bg_org
+from bugs
+left outer join project_user_xref
+on pu_project = bg_project
+and pu_user = $us
+where bg_id = $bg";
 			;
 
 			sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
@@ -886,24 +889,24 @@ where bg_id = $id";
 			if (comment_formated != "")
 			{
 				string sql = @"
-	declare @now datetime
-	set @now = getdate()
+declare @now datetime
+set @now = getdate()
 
-	insert into bug_posts
-	(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_email_cc, bp_type, bp_content_type,
-	bp_hidden_from_external_users)
-	values(
-	$id,
-	$us,
-	@now,
-	N'$comment_formatted',
-	N'$comment_search',
-	N'$from',
-	N'$cc',
-	N'$type',
-	N'$content_type',
-	$internal)
-	select scope_identity();";
+insert into bug_posts
+(bp_bug, bp_user, bp_date, bp_comment, bp_comment_search, bp_email_from, bp_email_cc, bp_type, bp_content_type,
+bp_hidden_from_external_users)
+values(
+$id,
+$us,
+@now,
+N'$comment_formatted',
+N'$comment_search',
+N'$from',
+N'$cc',
+N'$type',
+N'$content_type',
+$internal)
+select scope_identity();";
 
 				if (from != null)
 				{
@@ -1015,30 +1018,30 @@ where bg_id = $id";
 				if (just_to_this_userid > 0)
 				{
 					sql = @"
-	/* get notification email for just one user  */
-	select us_email, us_id, us_admin, og.*
-	from bug_subscriptions
-	inner join users on bs_user = us_id
-	inner join orgs og on us_org = og_id
-	inner join bugs on bg_id = bs_bug
-	left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
-	where us_email is not null
-	and us_enable_notifications = 1
-	-- $status_change
-	and us_active = 1
-	and us_email <> ''
-	and
-	case
-		when
-			us_org <> bg_org
-			and og_other_orgs_permission_level < 2
-			and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-				then og_other_orgs_permission_level
-		else
-			isnull(pu_permission_level,$dpl)
-	end <> 0
-	and bs_bug = $id
-	and us_id = $just_this_usid";
+/* get notification email for just one user  */
+select us_email, us_id, us_admin, og.*
+from bug_subscriptions
+inner join users on bs_user = us_id
+inner join orgs og on us_org = og_id
+inner join bugs on bg_id = bs_bug
+left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
+where us_email is not null
+and us_enable_notifications = 1
+-- $status_change
+and us_active = 1
+and us_email <> ''
+and
+case
+	when
+		us_org <> bg_org
+		and og_other_orgs_permission_level < 2
+		and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+			then og_other_orgs_permission_level
+	else
+		isnull(pu_permission_level,$dpl)
+end <> 0
+and bs_bug = $id
+and us_id = $just_this_usid";
 
 					sql = sql.Replace("$just_this_usid", Convert.ToString(just_to_this_userid));
 				}
@@ -1047,34 +1050,34 @@ where bg_id = $id";
 
 					// MAW -- 2006/01/27 -- Added different notifications if reported or assigned-to
 					sql = @"
-	/* get notification emails for all subscribers */
-	select us_email, us_id, us_admin, og.*
-	from bug_subscriptions
-	inner join users on bs_user = us_id
-	inner join orgs og on us_org = og_id
-	inner join bugs on bg_id = bs_bug
-	left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
-	where us_email is not null
-	and us_enable_notifications = 1
-	-- $status_change
-	and us_active = 1
-	and us_email <> ''
-	and (   ($cl <= us_reported_notifications and bg_reported_user = bs_user)
-	or ($cl <= us_assigned_notifications and bg_assigned_to_user = bs_user)
-	or ($cl <= us_assigned_notifications and $pau = bs_user)
-	or ($cl <= us_subscribed_notifications))
-	and
-	case
-	when
-		us_org <> bg_org
-		and og_other_orgs_permission_level < 2
-		and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-			then og_other_orgs_permission_level
-	else
-		isnull(pu_permission_level,$dpl)
-	end <> 0
-	and bs_bug = $id
-	and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
+/* get notification emails for all subscribers */
+select us_email, us_id, us_admin, og.*
+from bug_subscriptions
+inner join users on bs_user = us_id
+inner join orgs og on us_org = og_id
+inner join bugs on bg_id = bs_bug
+left outer join project_user_xref on pu_user = us_id and pu_project = bg_project
+where us_email is not null
+and us_enable_notifications = 1
+-- $status_change
+and us_active = 1
+and us_email <> ''
+and (   ($cl <= us_reported_notifications and bg_reported_user = bs_user)
+or ($cl <= us_assigned_notifications and bg_assigned_to_user = bs_user)
+or ($cl <= us_assigned_notifications and $pau = bs_user)
+or ($cl <= us_subscribed_notifications))
+and
+case
+when
+	us_org <> bg_org
+	and og_other_orgs_permission_level < 2
+	and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+		then og_other_orgs_permission_level
+else
+	isnull(pu_permission_level,$dpl)
+end <> 0
+and bs_bug = $id
+and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
 				}
 
 				sql = sql.Replace("$cl", changeLevel.ToString());
@@ -1165,7 +1168,17 @@ where bg_id = $id";
 							string og_name = "og_"
 								+ (string)dr_custom["name"]
 								+ "_field_permission_level";
-							sec2.user.dict_custom_field_permission_level[bg_name] = (int)dr[og_name];
+
+							object obj = dr[og_name];
+							if (Convert.IsDBNull(obj))
+							{
+								sec2.user.dict_custom_field_permission_level[bg_name] = Security.PERMISSION_ALL;
+							}
+							else
+							{
+								sec2.user.dict_custom_field_permission_level[bg_name] = (int) dr[og_name];
+							}
+
 						}
 
 						PrintBug.print_bug(

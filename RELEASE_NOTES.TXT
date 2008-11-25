@@ -46,6 +46,16 @@ sending email as guest
 project custom dropdown?
 
 -----------------------------------------------------------------------
+Version 3.0.3   11/24/2008 
+-----------------------------------------------------------------------
+
+Everybody who downloaded 3.0.2 should replace it with this release.
+
+* Fixed bug in bug.cs, line 1168, when sending a notification email.
+
+
+
+-----------------------------------------------------------------------
 Version 3.0.2   11/21/2008 
 -----------------------------------------------------------------------
 
