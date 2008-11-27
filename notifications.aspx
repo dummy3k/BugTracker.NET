@@ -7,7 +7,6 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-
 DataSet ds;
 DbUtil dbutil;
 Security security;
@@ -55,7 +54,7 @@ class=smallnote>
 Email notifications are put into a table into the database and then the system attempts to send them.
 If the system fails to send the notification, it records the reason for the failure with the row.
 <br><br>
-The system makes three attempts to send the notification.  After the third attempt,
+The system makes 3 attempts to send the notification.  After the 3rd attempt,
 you can either give up and delete the unsent notifications
 or you can reset the retry count and let the system continue trying.
 
@@ -69,6 +68,10 @@ or you can reset the retry count and let the system continue trying.
 <a href=edit_queued_notifications.aspx?actn=reset&ses=<% Response.Write(ses); %> >Reset retry count to zero</a>
 <br>
 <br>
+<a href=edit_queued_notifications.aspx?actn=resend&ses=<% Response.Write(ses); %> >Try to resend</a>
+<br>
+<br>
+
 <%
 
 if (ds.Tables[0].Rows.Count > 0)

@@ -29,13 +29,21 @@ void Page_Load(Object sender, EventArgs e)
 	if (Request.QueryString["actn"] == "delete")
 	{
 		sql = @"delete from queued_notifications where qn_status = N'not sent'";
+		dbutil.execute_nonquery(sql);
 	}
 	else if (Request.QueryString["actn"] == "reset")
 	{
 		sql = @"update queued_notifications set qn_retries = 0 where qn_status = N'not sent'";
+		dbutil.execute_nonquery(sql);
+	}
+	else if (Request.QueryString["actn"] == "resend")
+	{
+		// spawn a worker thread to send the emails
+		System.Threading.ThreadStart worker = new System.Threading.ThreadStart(btnet.Bug.threadproc_notifications);
+		System.Threading.Thread thread = new System.Threading.Thread(worker);
+		thread.Start();
 	}
 
-	dbutil.execute_nonquery(sql);
 
 	Response.Redirect("notifications.aspx");
 }

@@ -13,6 +13,7 @@ DataSet ds;
 DbUtil dbutil;
 Security security;
 int permission_level;
+string ses;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
 
@@ -24,6 +25,11 @@ void Page_Load(Object sender, EventArgs e)
 	dbutil = new DbUtil();
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	
+	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "relationships";
+	
+	
 	string sql;
 	add_err.InnerText = "";
 
@@ -48,15 +54,17 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
+	ses = (string) Session["session_cookie"];		
 	string action = Request["actn"];
 
-	if (action == null)
+	if (!string.IsNullOrEmpty(action))
 	{
-		action = "";
-	}
-
-	if (action != "")
-	{
+		if (Request["ses"] != ses)
+		{
+			Response.Write ("session in Request doesn't match session cookie");
+			Response.End();		
+		}
+		
 		if (permission_level == Security.PERMISSION_READONLY)
 		{
 			Response.Write("You are not allowed to edit this item");
@@ -67,36 +75,22 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			if (security.user.is_guest)
 			{
-				Response.Write("You are not allowed to delete a releationship");
+				Response.Write("You are not allowed to delete a relationship");
 				Response.End();
 			}
 
-			if (Request.QueryString["ses"] != (string) Session["session_cookie"])
-			{
-				Response.Write ("session in URL doesn't match session cookie");
-				Response.End();
-			}
+			bugid2 = Convert.ToInt32(Util.sanitize_integer(Request["bugid2"]));
 
-
-			if (Request["bugid2"] != null)
-			{
-				if (Util.is_int(Request["bugid2"]))
-				{
-					bugid2 = Convert.ToInt32((Request["bugid2"]));
-
-					sql = @"
-						delete from bug_relationships where re_bug2 = $bg2 and re_bug1 = $bg;
-						delete from bug_relationships where re_bug1 = $bg2 and re_bug2 = $bg;
-						insert into bug_posts
-								(bp_bug, bp_user, bp_date, bp_comment, bp_type)
-								values($bg, $us, getdate(), N'deleted relationship to $bg2', 'update')";
-					sql = sql.Replace("$bg2",Convert.ToString(bugid2));
-					sql = sql.Replace("$bg",Convert.ToString(bugid));
-					sql = sql.Replace("$us",Convert.ToString(security.user.usid));
-					dbutil.execute_nonquery(sql);
-				}
-			}
-
+			sql = @"
+				delete from bug_relationships where re_bug2 = $bg2 and re_bug1 = $bg;
+				delete from bug_relationships where re_bug1 = $bg2 and re_bug2 = $bg;
+				insert into bug_posts
+						(bp_bug, bp_user, bp_date, bp_comment, bp_type)
+						values($bg, $us, getdate(), N'deleted relationship to $bg2', 'update')";
+			sql = sql.Replace("$bg2",Convert.ToString(bugid2));
+			sql = sql.Replace("$bg",Convert.ToString(bugid));
+			sql = sql.Replace("$us",Convert.ToString(security.user.usid));
+			dbutil.execute_nonquery(sql);
 		}
 		else
 		{
@@ -193,43 +187,42 @@ insert into bug_posts
 			}
 		}
 
-		//.Transfer ("relationships.aspx?id=" + Convert.ToString(bugid));
 	}
 
-	sql = @"select bg_id [id],
-		bg_short_desc [desc],
-		re_type [comment],
-        st_name [status],
-		case
-			when re_direction = 0 then ''
-			when re_direction = 2 then 'child of $bg'
-			else                       'parent of $bg' 
-		end as [parent or child],
-		'<a target=_blank href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view]";
+	sql = @"
+select bg_id [id],
+	bg_short_desc [desc],
+	re_type [comment],
+	st_name [status],
+	case
+		when re_direction = 0 then ''
+		when re_direction = 2 then 'child of $bg'
+		else                       'parent of $bg' 
+	end as [parent or child],
+	'<a target=_blank href=edit_bug.aspx?id=' + convert(varchar,bg_id) + '>view</a>' [view]";
 
 		if (!security.user.is_guest && permission_level == Security.PERMISSION_ALL)
 		{
 
-			sql += @",'<a href=relationships.aspx?actn=remove&ses=$ses&id=$bg&bugid2='
-		+ convert(varchar,re_bug2)
-		+ '>detach</a>' [detach]";
-
+			sql += @"
+,'<a href=''javascript:remove(' + convert(varchar,re_bug2) + ')''>detach</a>' [detach]"; 
 		}
 
+		sql += @"
+from bugs
+inner join bug_relationships on bg_id = re_bug2
+left outer join statuses on st_id = bg_status
+where re_bug1 = $bg
+order by bg_id desc";
 
-		sql += @"from bugs
-		inner join bug_relationships on bg_id = re_bug2
-        left outer join statuses on st_id = bg_status
-		where re_bug1 = $bg
-		order by bg_id desc";
 
-	string ses = (string) Session["session_cookie"];
-	sql = sql.Replace("$ses", ses.Replace("'","''"));
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
 	sql = Util.alter_sql_per_project_permissions(sql, security);
 
 	ds = dbutil.get_dataset(sql);
-
+	
+	id.Value = Convert.ToString(bugid);
+	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -306,11 +299,22 @@ void display_hierarchy()
 
 <html>
 <head>
-<title id="titl" runat="server">btnet related <% Response.Write(Util.get_setting("PluralBugLabel","bugs"));%></title>
+<title id="titl" runat="server">btnet related bugs</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
 
 <script>
+
+var asp_form_id = '<% Response.Write(Util.get_form_name()); %>';
+
+function remove(bugid2_arg)
+{
+    var frm =  document.getElementById(asp_form_id)
+    var actn = document.getElementById("actn")
+    actn.value = "remove"
+    bugid2.value = bugid2_arg
+    frm.submit()
+}
 
 function body_on_load()
 {
@@ -330,7 +334,13 @@ function body_on_load()
 <body onload="body_on_load()">
 
 <div class=align>
-Relationships for <% Response.Write(Convert.ToString(bugid)); %>
+Relationships for 
+<% 
+	Response.Write(btnet.Util.get_setting("SingularBugLabel","bug") 
+	+ " " 
+	+ Convert.ToString(bugid)); 
+%>
+
 <p>
 <table border=0><tr><td>
 
@@ -341,8 +351,8 @@ if (permission_level != Security.PERMISSION_READONLY)
 <p>
 <form class=frm runat="server" action="relationships.aspx">
 <table>
-<tr><td>Related ID:<td><input type=text class=txt size=8 name=bugid2>
-<tr><td>Comment:<td><input  type=text class=txt name=type size=90 maxlength=500>
+<tr><td>Related ID:<td><input type="text" class="txt" id="bugid2" name="bugid2" size=8>
+<tr><td>Comment:<td><input type="text" class="txt" id="type" name="type" size=90 maxlength=500>
 
 <tr><td colspan=2>
 Related ID is sibling<asp:RadioButton runat="server" checked="true" GroupName="direction" value="0" id="siblings"/>
@@ -351,12 +361,13 @@ Related ID is child<asp:RadioButton runat="server" GroupName="direction" value="
 &nbsp;&nbsp;&nbsp;
 Related ID is parent<asp:RadioButton runat="server" GroupName="direction" value="2" id="parent_to_child"/>
 &nbsp;&nbsp;&nbsp;
-<tr><td colspan=2><input class=btn type=submit value="Add">
+<tr><td colspan=2><input class="btn" type="submit" value="Add">
 <tr><td colspan=2>&nbsp;
-<tr><td colspan=2>&nbsp;<span runat="server" class='err' id="add_err"></span>
+<tr><td colspan=2>&nbsp;<span runat="server" class="err" id="add_err"></span>
 </table>
-<input type=hidden name="id" value=<% Response.Write(Convert.ToString(bugid));%>>
-<input type=hidden name="actn" value="add">
+<input runat="server" id="id" type=hidden name="id" value="">
+<input id="actn" type=hidden name="actn" value="add">
+<input id="ses" type=hidden name="ses" value="<% Response.Write(ses); %>">
 
 </form>
 <% } %>

@@ -308,6 +308,30 @@ bp_email_cc nvarchar(800) null
 
 create index bp_index_1 on bug_posts (bp_bug)
 
+
+/* BUG POSTS  - comments, attachments, change history */
+
+create table bug_tasks
+(
+tsk_id int identity primary key not null,
+tsk_bug int not null,
+tsk_entered_by_user int not null,
+tsk_entered_by_date datetime not null,
+tsk_assigned_to_user int null,
+tsk_planned_start_date datetime null,
+tsk_actual_start_date datetime null,
+tsk_planned_end_date datetime null,
+tsk_actual_end_date datetime null,
+tsk_planned_duration_in_minutes int null,
+tsk_actual_duration_in_minutes int null,
+tsk_percent_complete int null,
+tsk_status int null,
+tsk_sort_sequence int null,
+tsk_description nvarchar(400) null,
+)
+
+create index tsk_index_1 on bug_tasks (tsk_bug)
+
 /* BUG POST ATTACHMENTS -- database storage of attachments */
 
 create table bug_post_attachments
@@ -317,9 +341,10 @@ bpa_post int not null,
 bpa_content image not null
 )
 
+
 create unique index bpa_index on bug_post_attachments (bpa_post)
 
-/* BUG SUBSCRIPTIONS */
+/* BUG USER SUBSCRIPTIONS */
 
 create table bug_subscriptions
 (
@@ -449,7 +474,7 @@ insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) val
 insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) values ('low', 3, '#ffffff', 'pr3_')
 
 
-/* CUSTOM DROPDOWN VALS */
+/* CUSTOM COL METADATA */
 
 create table custom_col_metadata
 (

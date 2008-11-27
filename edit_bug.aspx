@@ -523,6 +523,24 @@ void Page_Load(Object sender, EventArgs e)
 			}
 
 
+			if (btnet.Util.get_setting("EnableTasks","0") == "1")
+			{
+				int task_cnt = 0;
+				if (id != 0)
+				{
+					//task_cnt = (int) dr["task_cnt"];
+				}
+				string tasks_link = "<a target=_blank href=tasks.aspx?bugid="
+					+ Convert.ToString(id)
+				+ " title='View sub-tasks/time-tracking entries related to this item'><img src=foobar.png border=0 align=top>&nbsp;tasks(<span id=task_cnt>" + task_cnt + "</span>)</a>";
+				tasks.InnerHtml = tasks_link;
+			}
+			else
+			{
+				tasks.InnerHtml = "";
+			}
+
+
 			format_subcribe_cancel_link();
 
 
@@ -2373,6 +2391,7 @@ function disable_second_button()
 			<li id="subscribers" runat="server" />
 			<li id="subscriptions" runat="server" />
 			<li id="relationships" runat="server" />
+			<li id="tasks" runat="server" />
 			<li id="send_email" runat="server" />
 			<li id="attachment" runat="server" />
 			<li id="custom" runat="server" />

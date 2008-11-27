@@ -1225,11 +1225,12 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 
 		///////////////////////////////////////////////////////////////////////
 		// Send the emails in the queue
-		private static void threadproc_notifications()
+		public static void threadproc_notifications()
 		{
 			// just to be safe, make the worker threads wait for each other
 			lock (dummy)
 			{
+				
 				string sql = @"select * from queued_notifications where qn_status = N'not sent' and qn_retries < 3";
  				DbUtil dbutil = new DbUtil(); // create a new one, just in case there would be multithreading issues...
 
