@@ -70,6 +70,10 @@ drop table [queued_notifications]
 if exists (select * from dbo.sysobjects where id = object_id(N'[dashboard_items]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dashboard_items]
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[bug_tasks]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [bug_tasks]
+
+
 
 /* org */
 
@@ -315,15 +319,19 @@ create table bug_tasks
 (
 tsk_id int identity primary key not null,
 tsk_bug int not null,
-tsk_entered_by_user int not null,
-tsk_entered_by_date datetime not null,
+tsk_created_user int not null,
+tsk_created_date datetime not null,
+tsk_last_updated_user int not null,
+tsk_last_updated_date datetime not null,
+
 tsk_assigned_to_user int null,
 tsk_planned_start_date datetime null,
 tsk_actual_start_date datetime null,
 tsk_planned_end_date datetime null,
 tsk_actual_end_date datetime null,
-tsk_planned_duration_in_minutes int null,
-tsk_actual_duration_in_minutes int null,
+tsk_planned_duration decimal(6,2) null,
+tsk_actual_duration decimal(6,2) null,
+tsk_duration_units nvarchar(20) null,
 tsk_percent_complete int null,
 tsk_status int null,
 tsk_sort_sequence int null,

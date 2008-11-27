@@ -38,7 +38,34 @@ void Page_Load(Object sender, EventArgs e)
 
 	ses = (string) Session["session_cookie"];
 	
-	string sql = "select * from bug_tasks where tsk_bug = $bugid order by tsk_sort_sequence, tsk_id";
+	string sql = @"
+select 
+
+tsk_id [id],
+tsk_description [description],
+-- tsk_bug [bug],
+-- tsk_created_user [created by], 
+-- tsk_created_date [created date],
+-- tsk_last_updated_user [last updated by],
+-- tsk_last_updated datetime [],
+
+-- tsk_assigned_to_user
+tsk_planned_start_date [planned start],
+tsk_actual_start_date [actual start],
+tsk_planned_end_date [planned end],
+tsk_actual_end_date [actual end],
+tsk_planned_duration [planned duration],
+tsk_actual_duration  [actual duration],
+tsk_duration_units [duration units],
+tsk_percent_complete [percent complete],
+st_name  [status],
+tsk_id
+-- tsk_sort_sequence 
+from bug_tasks 
+left outer join statuses on tsk_status = st_id
+where tsk_bug = $bugid 
+order by tsk_sort_sequence, tsk_id";
+
 	sql = sql.Replace("$bugid", Convert.ToString(bugid));
 	
 	ds = dbutil.get_dataset(sql);
@@ -50,16 +77,29 @@ void Page_Load(Object sender, EventArgs e)
 <html>
 <head>
 <title id="titl" runat="server">btnet tasks</title>
+
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<link rel="StyleSheet" href="jquery/ui.datepicker.css" type="text/css">
+
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
+
 </head>
 <body>
 
-<div class=align>
-<a href=edit_task.aspx?id=0&bugid=<% Response.Write(Convert.ToString(bugid)); %>>add new task</a>
-</p>
-<%
 
+<div class=align>
+
+Tasks for 
+<% 
+	Response.Write(btnet.Util.get_setting("SingularBugLabel","bug") 
+	+ " " 
+	+ Convert.ToString(bugid)); 
+%>
+<p>
+<a href=edit_task.aspx?id=0&bugid=<% Response.Write(Convert.ToString(bugid)); %>>add new task</a>
+<p>
+
+<%
 if (ds.Tables[0].Rows.Count > 0)
 {
 	SortableHtmlTable.create_from_dataset(

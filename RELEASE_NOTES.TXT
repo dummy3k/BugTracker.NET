@@ -49,6 +49,10 @@ project custom dropdown?
 Version 3.0.4   11/xx/2008 
 -----------------------------------------------------------------------
 
+see what the guy did with the orgs query
+
+
+
 * Added ability for admin to try to resend unsent emails.  The system
 tries to resend automatically anyway whenever there is a new 
 notification, but the new feature lets an admin do it explicitly.
