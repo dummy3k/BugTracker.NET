@@ -49,7 +49,7 @@ tsk_description [description],
 -- tsk_last_updated_user [last updated by],
 -- tsk_last_updated datetime [],
 
--- tsk_assigned_to_user
+us_username [assigned to],
 tsk_planned_start_date [planned start],
 tsk_actual_start_date [actual start],
 tsk_planned_end_date [planned end],
@@ -63,6 +63,7 @@ tsk_id
 -- tsk_sort_sequence 
 from bug_tasks 
 left outer join statuses on tsk_status = st_id
+left outer join users on tsk_assigned_to_user = us_id
 where tsk_bug = $bugid 
 order by tsk_sort_sequence, tsk_id";
 
@@ -104,8 +105,8 @@ if (ds.Tables[0].Rows.Count > 0)
 {
 	SortableHtmlTable.create_from_dataset(
 		Response, ds, 
-		"edit_task.aspx?ses=" +  ses + "&id=",
-		"delete_task.aspx?ses=" +  ses + "&id=");
+		"edit_task.aspx?ses="   +  ses + "&bugid=" + Convert.ToString(bugid) + "&id=",
+		"delete_task.aspx?ses=" +  ses + "&bugid=" + Convert.ToString(bugid) + "&id=");
 }
 else
 {

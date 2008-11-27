@@ -57,6 +57,10 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}		
 
+	string string_tsk_id = btnet.Util.sanitize_integer(Request["id"]);
+	tsk_id_static.InnerHtml = string_tsk_id;
+	tsk_id = Convert.ToInt32(string_tsk_id);
+
 	if (!IsPostBack)
 	{
 
@@ -67,31 +71,90 @@ void Page_Load(Object sender, EventArgs e)
 		if (tsk_id == 0)
 		{
 
+			tsk_id_tr.Visible = false;
 			sub.Value = "Create";
 			
 		}
 		else
 		{
-			string string_tsk_id = btnet.Util.sanitize_integer(Request["id"]);
-			tsk_id = Convert.ToInt32(string_tsk_id);
-			
-			sub.Value = "Update";
-
 
 			// Get this entry's data from the db and fill in the form
 
-			sql = @"select * from tasks where tsk_id = $tsk_id";
+			sql = @"select * from bug_tasks where tsk_id = $tsk_id and tsk_bug = $bugid";
 			sql = sql.Replace("$tsk_id", Convert.ToString(tsk_id));
-			dr = dbutil.get_datarow(sql);
+			sql = sql.Replace("$bugid", Convert.ToString(bugid));
+			DataRow dr = dbutil.get_datarow(sql);
+           
+            assigned_to.ClearSelection();
+            assigned_to.Items.FindByValue(Convert.ToString(dr["tsk_assigned_to_user"])).Selected = true;
 
-			
+            duration_units.ClearSelection();
+            duration_units.Items.FindByText(Convert.ToString(dr["tsk_duration_units"])).Selected = true;
+
+            status.ClearSelection();
+            status.Items.FindByValue(Convert.ToString(dr["tsk_status"])).Selected = true;
+            
+            planned_duration.Value = Convert.ToString(dr["tsk_planned_duration"]);
+			actual_duration.Value = Convert.ToString(dr["tsk_actual_duration"]);
+			percent_complete.Value = Convert.ToString(dr["tsk_percent_complete"]);
+			sort_sequence.Value = Convert.ToString(dr["tsk_sort_sequence"]);
+			desc.Value = Convert.ToString(dr["tsk_description"]);
+
+            load_date_hour_min(
+                planned_start_date,
+                planned_start_hour,
+                planned_start_min,
+                dr["tsk_planned_start_date"]);                
+
+            load_date_hour_min(
+                actual_start_date,
+                actual_start_hour,
+                actual_start_min,
+                dr["tsk_actual_start_date"]);
+
+            load_date_hour_min(
+                planned_end_date,
+                planned_end_hour,
+                planned_end_min,
+                dr["tsk_planned_end_date"]);
+
+            load_date_hour_min(
+                actual_end_date,
+                actual_end_hour,
+                actual_end_min,
+                dr["tsk_actual_end_date"]);
+                                                
+			sub.Value = "Update";
 
 		}
 	}
-
 }
 
+///////////////////////////////////////////////////////////////////////
+void load_date_hour_min(
+    HtmlInputText date_control,
+    DropDownList hour_control, 
+    DropDownList min_control, 
+    object date)
+{
+    hour_control.ClearSelection();
+    min_control.ClearSelection();
 
+    if (Convert.IsDBNull(date))
+    {
+        date_control.Value = "";
+    }
+    else
+    {
+        DateTime dt = Convert.ToDateTime(date);
+        string temp_date = dt.Year.ToString("0000") + "-" + dt.Month.ToString("00") + "-" + dt.Day.ToString("00");
+        date_control.Value = btnet.Util.format_db_date_and_time(Convert.ToDateTime(temp_date));
+        hour_control.Items.FindByValue(dt.Hour.ToString("00")).Selected = true;
+        min_control.Items.FindByValue(dt.Minute.ToString("00")).Selected = true;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////
 void load_users_dropdowns(int bugid)
 {
 	// What's selected now?   Save it before we refresh the dropdown.
@@ -260,8 +323,37 @@ $tsk_sort_sequence,
 N'$tsk_description'
 )";
 
-		sql = sql.Replace("$tsk_bug", Convert.ToString(bugid));
-		sql = sql.Replace("$tsk_created_user", Convert.ToString(security.user.usid));
+			sql = sql.Replace("$tsk_bug", Convert.ToString(bugid));
+			sql = sql.Replace("$tsk_created_user", Convert.ToString(security.user.usid));
+		
+
+		}
+		else // edit existing
+		{
+
+			sql = @"
+update bug_tasks set
+tsk_last_updated_user = $tsk_last_updated_user,
+tsk_last_updated_date = getdate(),
+tsk_assigned_to_user = $tsk_assigned_to_user,
+tsk_planned_start_date = '$tsk_planned_start_date',
+tsk_actual_start_date = '$tsk_actual_start_date',
+tsk_planned_end_date = '$tsk_planned_end_date',
+tsk_actual_end_date = '$tsk_actual_end_date',
+tsk_planned_duration = $tsk_planned_duration,
+tsk_actual_duration = $tsk_actual_duration,
+tsk_duration_units = N'$tsk_duration_units',
+tsk_percent_complete = $tsk_percent_complete,
+tsk_status = $tsk_status,
+tsk_sort_sequence = $tsk_sort_sequence,
+tsk_description = N'$tsk_description'
+where tsk_id = $tsk_id";
+
+
+			sql = sql.Replace("$tsk_id", Convert.ToString(tsk_id));
+
+		}
+
 		sql = sql.Replace("$tsk_last_updated_user", Convert.ToString(security.user.usid));
 		
 		sql = sql.Replace("$tsk_planned_start_date", format_date_hour_min(
@@ -292,23 +384,10 @@ N'$tsk_description'
 		sql = sql.Replace("$tsk_assigned_to_user", assigned_to.SelectedItem.Value);
 		sql = sql.Replace("$tsk_description", desc.Value.Replace("'","''"));
 		sql = sql.Replace("$tsk_duration_units", duration_units.SelectedItem.Value.Replace("'","''"));
-		
-		
 
-		}
-		else // edit existing
-		{
-
-			sql = @"update tasks set";
-
-			sql = sql.Replace("$id", Convert.ToString(tsk_id));
-
-		}
-//		sql = sql.Replace("$na", name.Value.Replace("'","''"));
-//		sql = sql.Replace("$ss", sort_seq.Value);
-//		sql = sql.Replace("$df", Util.bool_to_string(default_selection.Checked));
 		dbutil.execute_nonquery(sql);
 		Response.Redirect ("tasks.aspx?bugid=" + Convert.ToString(bugid));
+
 
 	}
 	else
@@ -364,6 +443,11 @@ function show_calendar(el)
 <p>
 <form class=frm runat="server">
 	<table border=0>
+
+	<tr runat="server" id="tsk_id_tr">
+	<td class="lbl" id="tsk_id_label">Id:</td>
+	<td class="lbl" id="tsk_id_static"></td>
+	</tr>
 
 	<tr runat="server" id="desc_tr">
 	<td class="lbl" id="desc_label">Description:</td>
