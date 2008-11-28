@@ -533,6 +533,37 @@ function on_submit_search()
 		}
 
 		///////////////////////////////////////////////////////////////////////
+		public static string is_valid_decimal(string name, string val, int left_of_decimal, int right_of_decimal)
+		{
+			System.Globalization.CultureInfo ci = btnet.Util.get_culture_info();
+			decimal x;
+			if (!Decimal.TryParse(val, System.Globalization.NumberStyles.Float, ci, out x))
+			{
+				return name + " is not in a valid decimal format";
+			}
+
+			string[] vals = val.Split(new string[] { ci.NumberFormat.NumberDecimalSeparator }, StringSplitOptions.None);
+
+			if (vals.Length == 1)
+			{
+				if (vals[0].Length > left_of_decimal)
+				{
+					return name  +  " has too many digits to the left of the decimal point";
+				}
+			}
+			else if (vals.Length > 1)
+			{
+				if (vals[1].Length > right_of_decimal)
+				{
+					return name + " has too many digits to the right of the decimal point";
+				}
+			}
+
+			return "";
+
+		}
+
+		///////////////////////////////////////////////////////////////////////
 		public static bool is_datetime(string maybe_datetime)
 		{
 			DateTime d;
@@ -914,8 +945,6 @@ function on_submit_search()
 			{
 				return false;
 			}
-
-
 		}
 
 		///////////////////////////////////////////////////////////////////////

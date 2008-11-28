@@ -74,22 +74,22 @@ void Page_Load(Object sender, EventArgs e)
 
 	if (btnet.Util.get_setting("ShowTaskPlannedDuration","1") == "1")
 	{
-		sql += ", tsk_planned_duration [planned duration]";
+		sql += ", tsk_planned_duration [planned<br>duration]";
 	}
 	if (btnet.Util.get_setting("ShowTaskActualDuration","1") == "1")
 	{
-		sql += ", tsk_actual_duration  [actual duration]";
+		sql += ", tsk_actual_duration  [actual<br>duration]";
 	}
 
 
 	if (btnet.Util.get_setting("ShowTaskDurationUnits","1") == "1")
 	{
-		sql += ", tsk_duration_units [duration units]";
+		sql += ", tsk_duration_units [duration<br>units]";
 	}
 
 	if (btnet.Util.get_setting("ShowTaskPercentComplete","1") == "1")
 	{
-		sql += ", tsk_percent_complete [percent complete]";
+		sql += ", tsk_percent_complete [percent<br>complete]";
 	}
 
 	if (btnet.Util.get_setting("ShowTaskStatus","1") == "1")
@@ -97,6 +97,10 @@ void Page_Load(Object sender, EventArgs e)
 		sql += ", st_name  [status]";
 	}		
 
+	if (btnet.Util.get_setting("ShowTaskSortSequence","1") == "1")
+	{
+		sql += ", tsk_sort_sequence  [seq]";
+	}	
 
 	sql += @"
 from bug_tasks 

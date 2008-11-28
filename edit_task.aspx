@@ -1,4 +1,5 @@
 <%@ Page language="C#"%>
+<%@ Import Namespace="System.Text.RegularExpressions" %>
 <!--
 Copyright 2002-2008 Corey Trager
 Distributed under the terms of the GNU General Public License
@@ -6,17 +7,6 @@ Distributed under the terms of the GNU General Public License
 <!-- #include file = "inc.aspx" -->
 
 <script language="C#" runat="server">
-
-/*
-
-validate integers, decimals
-
-add settings to Web.config
-
-adjust select statement
-
-
-*/
 
 int tsk_id;
 int bugid;
@@ -26,7 +16,6 @@ DbUtil dbutil;
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
-
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -123,7 +112,6 @@ void Page_Load(Object sender, EventArgs e)
 		// add or edit?
 		if (tsk_id == 0)
 		{
-
 			tsk_id_tr.Visible = false;
 			sub.Value = "Create";
 
@@ -138,7 +126,6 @@ void Page_Load(Object sender, EventArgs e)
 
 			string default_status = btnet.Util.get_setting("TaskDefaultStatus","[no status]");
             status.Items.FindByText(default_status).Selected = true;
-			
 		}
 		else
 		{
@@ -187,7 +174,6 @@ void Page_Load(Object sender, EventArgs e)
                 dr["tsk_actual_end_date"]);
                                                 
 			sub.Value = "Update";
-
 		}
 	}
 }
@@ -265,7 +251,6 @@ and us_id not in
 order by us_username; ";
     }
 
-
 	sql += "\nselect st_id, st_name from statuses order by st_sort_seq, st_name";
 
 	sql += "\nselect isnull(@assigned_to,0) ";
@@ -284,7 +269,6 @@ order by us_username; ";
 		// true condition
 		sql = sql.Replace("$fullnames","1 = 1");
 	}
-
     
 	assigned_to.DataSource = new DataView((DataTable)dbutil.get_dataset(sql).Tables[0]);	
 	assigned_to.DataTextField = "us_username";
@@ -298,20 +282,106 @@ order by us_username; ";
 	status.DataBind();
 	status.Items.Insert(0, new ListItem("[no status]", "0"));
 
-
-	int default_assigned_to_user = (int) dbutil.get_dataset(sql).Tables[2].Rows[0][0];
-	
-	assigned_to.Items.FindByValue(Convert.ToString(default_assigned_to_user)).Selected = true;
-	
+	// by default, assign the entry to the same user to whom the bug is assigned to?
+	// or should it be assigned to the logged in user?
+	if (tsk_id == 0)
+	{
+		int default_assigned_to_user = (int) dbutil.get_dataset(sql).Tables[2].Rows[0][0];
+		assigned_to.Items.FindByValue(Convert.ToString(default_assigned_to_user)).Selected = true;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
 Boolean validate()
 {
 	Boolean good = true;
+
+	if (sort_sequence.Value != "")
+	{
+		if (!Util.is_int(sort_sequence.Value))
+		{
+			good = false;
+			sort_sequence_err.InnerText = "Sort Sequence must be an integer.";
+		}
+		else
+		{
+			sort_sequence_err.InnerText = "";
+		}
+	}
+	else
+	{
+		sort_sequence_err.InnerText = "";
+	}
+	
+	if (percent_complete.Value != "")
+	{
+		if (!Util.is_int(percent_complete.Value))
+		{
+			good = false;
+			percent_complete_err.InnerText = "Percent Complete must be from 0 to 100.";
+		}
+		else
+		{
+			int percent_complete_int = Convert.ToInt32(percent_complete.Value);
+			if (percent_complete_int >= 0 && percent_complete_int <= 100)
+			{
+				// good
+				percent_complete_err.InnerText = "";
+			}
+			else
+			{
+				good = false;
+				percent_complete_err.InnerText = "Percent Complete must be from 0 to 100.";
+			}
+			
+		}
+	}
+	else
+	{
+		percent_complete_err.InnerText = "";
+	}
+
+
+	if (planned_duration.Value != "")
+	{
+		string err = btnet.Util.is_valid_decimal("Planned Duration", planned_duration.Value, 4, 2);
+		
+		if (err != "")
+		{
+			good = false;
+			planned_duration_err.InnerText = err;
+		}
+		else
+		{
+			planned_duration_err.InnerText = "";
+		}
+	}
+	else
+	{
+		planned_duration_err.InnerText = "";
+	}
+
+	if (actual_duration.Value != "")
+	{
+		string err = btnet.Util.is_valid_decimal("Actual Duration", actual_duration.Value, 4, 2);
+		
+		if (err != "")
+		{
+			good = false;
+			actual_duration_err.InnerText = err;
+		}
+		else
+		{
+			actual_duration_err.InnerText = "";
+		}
+	}
+	else
+	{
+		actual_duration_err.InnerText = "";
+	}	
+	
 	return good;
 }
-
 
 ///////////////////////////////////////////////////////////////////////
 string format_date_hour_min(string date, string hour, string min)
@@ -455,7 +525,6 @@ where tsk_id = $tsk_id";
 		dbutil.execute_nonquery(sql);
 		Response.Redirect ("tasks.aspx?bugid=" + Convert.ToString(bugid));
 
-
 	}
 	else
 	{
@@ -467,9 +536,7 @@ where tsk_id = $tsk_id";
 		{
 			msg.InnerText = "Task was not updated.";
 		}
-
 	}
-
 }
 
 </script>
@@ -499,7 +566,6 @@ function show_calendar(el)
 	$("#" + el).datepicker("show")
 }
 
-
 </script>
 
 </head>
@@ -514,21 +580,25 @@ function show_calendar(el)
 	<tr runat="server" id="bugid_tr">
 	<td class="lbl" id="bugid_label"></td>
 	<td class="lbl" id="bugid_static"></td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="tsk_id_tr">
 	<td class="lbl" id="tsk_id_label">Task ID:</td>
 	<td class="lbl" id="tsk_id_static"></td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="desc_tr">
 	<td class="lbl" id="desc_label">Description:</td>
 	<td><input runat="server" type="text" class="txt" id="desc" maxlength=200 size=100></td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="assigned_to_tr">
 	<td class="	lbl" id="assigned_to_label">Assigned to:</td>
 	<td><asp:DropDownList id="assigned_to" runat="server"></asp:DropDownList></td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="planned_start_date_tr">
@@ -573,6 +643,7 @@ function show_calendar(el)
 		<asp:ListItem Text="45" Value="45" Selected="False" />
 	</asp:DropDownList>
 	</td>
+	<td>&nbsp</td>
 	</tr>
 
 
@@ -618,6 +689,7 @@ function show_calendar(el)
 		<asp:ListItem Text="45" Value="45" Selected="False" />
 	</asp:DropDownList>
 	</td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="planned_end_date_tr">
@@ -663,6 +735,7 @@ function show_calendar(el)
 		<asp:ListItem Text="45" Value="45" Selected="False" />
 	</asp:DropDownList>
 	</td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="actual_end_date_tr">
@@ -707,16 +780,19 @@ function show_calendar(el)
 		<asp:ListItem Text="45" Value="45" Selected="False" />
 	</asp:DropDownList>
 	</td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="planned_duration_tr">
 	<td class="lbl" id="planned_duration_lbl">Planned duration:</td>
 	<td><input runat="server" type=text class="txt" id="planned_duration" maxlength=7 size=7></td>
+	<td runat="server" class="err" id="planned_duration_err">&nbsp;</td>
 	</tr>
 
 	<tr runat="server" id="actual_duration_tr">
 	<td class="lbl" id="actual_duration_lbl">Actual duration:</td>
 	<td><input runat="server" type=text class="txt" id="actual_duration" maxlength=7 size=7></td>
+	<td runat="server" class="err" id="actual_duration_err">&nbsp;</td>
 	</tr>
 
 	<tr runat="server" id="duration_units_tr">
@@ -728,22 +804,26 @@ function show_calendar(el)
 		<asp:ListItem Text="days" Value="days" Selected="False" />
 	</asp:DropDownList>		
 	</td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr runat="server" id="percent_complete_tr">
 	<td class="lbl" id="percent_complete_lbl">Percent complete:</td>
 	<td><input runat="server" type=text class="txt" id="percent_complete" maxlength=6 size=6></td>
+	<td runat="server" class="err" id="percent_complete_err">&nbsp;</td>
 	</tr>
 
 	<tr runat="server" id="status_tr">
 	<td class="lbl" id="status_lbl">Status:</td>
 	<td><asp:DropDownList id="status" runat="server"></asp:DropDownList></td>
+	<td>&nbsp</td>
 	</tr>
 
 
 	<tr runat="server" id="sort_sequence_tr">
 	<td class="lbl" id="sort_sequence_lbl">Sort Sequence:</td>
 	<td><input runat="server" type=text class="txt" id="sort_sequence" maxlength=3 size=3></td>
+	<td runat="server" class="err" id="sort_sequence_err">&nbsp;</td>
 	</tr>
 
 	<tr>
@@ -761,5 +841,3 @@ function show_calendar(el)
 </form>
 </td></tr></table></div>
 </html>
-
-
