@@ -39,28 +39,61 @@ void Page_Load(Object sender, EventArgs e)
 	ses = (string) Session["session_cookie"];
 	
 	string sql = @"
-select 
+select tsk_id [id],
+'<a href=edit_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id) + '>edit</a>' [$no_sort_edit],
+'<a href=delete_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id)  + '>delete</a>'  [$no_sort_delete],
+tsk_description [description]";
 
-tsk_id [id],
-tsk_description [description],
--- tsk_bug [bug],
--- tsk_created_user [created by], 
--- tsk_created_date [created date],
--- tsk_last_updated_user [last updated by],
--- tsk_last_updated datetime [],
+		if (btnet.Util.get_setting("ShowTaskAssignedTo","1") == "1")
+		{
+			sql += ",us_username [assigned to]";
+		}
+		
+		if (btnet.Util.get_setting("ShowTaskPlannedStartDate","1") == "1")
+		{
+			sql += ", tsk_planned_start_date [planned start]";
+		}
+		if (btnet.Util.get_setting("ShowTaskActualStartDate","1") == "1")
+		{
+			sql += ", tsk_actual_start_date [actual start]";
+		}
+		
+		if (btnet.Util.get_setting("ShowTaskPlannedEndDate","1") == "1")
+		{
+			sql += ", tsk_planned_end_date [planned end]";
+		}
+		if (btnet.Util.get_setting("ShowTaskActualEndDate","1") == "1")
+		{
+			sql += ", tsk_actual_end_date [actual end]";
+		}
+		
+		if (btnet.Util.get_setting("ShowTaskPlannedDuration","1") == "1")
+		{
+			sql += ", tsk_planned_duration [planned duration]";
+		}
+		if (btnet.Util.get_setting("ShowTaskActualDuration","1") == "1")
+		{
+			sql += ", tsk_actual_duration  [actual duration]";
+		}
+		
 
-us_username [assigned to],
-tsk_planned_start_date [planned start],
-tsk_actual_start_date [actual start],
-tsk_planned_end_date [planned end],
-tsk_actual_end_date [actual end],
-tsk_planned_duration [planned duration],
-tsk_actual_duration  [actual duration],
-tsk_duration_units [duration units],
-tsk_percent_complete [percent complete],
-st_name  [status],
-tsk_id
--- tsk_sort_sequence 
+		if (btnet.Util.get_setting("ShowTaskDurationUnits","1") == "1")
+		{
+			sql += ", tsk_duration_units [duration units]";
+		}
+
+		if (btnet.Util.get_setting("ShowTaskPercentComplete","1") == "1")
+		{
+			sql += ", tsk_percent_complete [percent complete]";
+		}
+		
+		if (btnet.Util.get_setting("ShowTaskStatus","1") == "1")
+		{
+			sql += ", st_name  [status]";
+		}		
+
+
+		sql += @"
 from bug_tasks 
 left outer join statuses on tsk_status = st_id
 left outer join users on tsk_assigned_to_user = us_id
@@ -68,6 +101,7 @@ where tsk_bug = $bugid
 order by tsk_sort_sequence, tsk_id";
 
 	sql = sql.Replace("$bugid", Convert.ToString(bugid));
+	sql = sql.Replace("$ses", ses);
 	
 	ds = dbutil.get_dataset(sql);
 
@@ -104,9 +138,7 @@ Tasks for
 if (ds.Tables[0].Rows.Count > 0)
 {
 	SortableHtmlTable.create_from_dataset(
-		Response, ds, 
-		"edit_task.aspx?ses="   +  ses + "&bugid=" + Convert.ToString(bugid) + "&id=",
-		"delete_task.aspx?ses=" +  ses + "&bugid=" + Convert.ToString(bugid) + "&id=");
+		Response, ds, "", "", false); 
 }
 else
 {

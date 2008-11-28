@@ -528,11 +528,11 @@ void Page_Load(Object sender, EventArgs e)
 				int task_cnt = 0;
 				if (id != 0)
 				{
-					//task_cnt = (int) dr["task_cnt"];
+					task_cnt = (int) dr["task_cnt"];
 				}
 				string tasks_link = "<a target=_blank href=tasks.aspx?bugid="
 					+ Convert.ToString(id)
-				+ " title='View sub-tasks/time-tracking entries related to this item'><img src=foobar.png border=0 align=top>&nbsp;tasks(<span id=task_cnt>" + task_cnt + "</span>)</a>";
+				+ " title='View sub-tasks/time-tracking entries related to this item'><img src=clock.png border=0 align=top>&nbsp;tasks/time(<span id=task_cnt>" + task_cnt + "</span>)</a>";
 				tasks.InnerHtml = tasks_link;
 			}
 			else

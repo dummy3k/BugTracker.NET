@@ -9,15 +9,11 @@ Distributed under the terms of the GNU General Public License
 
 /*
 
-more config settings
+validate integers, decimals
 
-Web.config, or db
+add settings to Web.config
 
-default units
-default work hours per day
-holidays
-weekends
-user's vacation days
+adjust select statement
 
 
 */
@@ -41,9 +37,6 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
 
-	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
-		+ "edit task";
-
 	msg.InnerText = "";
 	
 	string string_bugid = btnet.Util.sanitize_integer(Request["bugid"]);
@@ -56,6 +49,7 @@ void Page_Load(Object sender, EventArgs e)
 		Response.Write("You are not allowed to edit this item");
 		Response.End();
 	}		
+	
 
 	string string_tsk_id = btnet.Util.sanitize_integer(Request["id"]);
 	tsk_id_static.InnerHtml = string_tsk_id;
@@ -64,15 +58,86 @@ void Page_Load(Object sender, EventArgs e)
 	if (!IsPostBack)
 	{
 
-		load_users_dropdowns(bugid);			
+		titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - "
+			+ "edit task";
 
+		bugid_label.InnerHtml = btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " ID:";
+		bugid_static.InnerHtml = Convert.ToString(bugid);
+
+		load_users_dropdowns(bugid);
+
+		if (btnet.Util.get_setting("ShowTaskAssignedTo","1") == "0")
+		{
+			assigned_to_tr.Visible = false;
+		}
 		
+		if (btnet.Util.get_setting("ShowTaskPlannedStartDate","1") == "0")
+		{
+			planned_start_date_tr.Visible = false;
+		}
+		if (btnet.Util.get_setting("ShowTaskActualStartDate","1") == "0")
+		{
+			actual_start_date_tr.Visible = false;
+		}
+		
+		if (btnet.Util.get_setting("ShowTaskPlannedEndDate","1") == "0")
+		{
+			planned_end_date_tr.Visible = false;
+		}
+		if (btnet.Util.get_setting("ShowTaskActualEndDate","1") == "0")
+		{
+			actual_end_date_tr.Visible = false;
+		}
+		
+		if (btnet.Util.get_setting("ShowTaskPlannedDuration","1") == "0")
+		{
+			planned_duration_tr.Visible = false;
+		}
+		if (btnet.Util.get_setting("ShowTaskActualDuration","1") == "0")
+		{
+			actual_duration_tr.Visible = false;
+		}
+		
+
+		if (btnet.Util.get_setting("ShowTaskDurationUnits","1") == "0")
+		{
+			duration_units_tr.Visible = false;
+		}
+
+		if (btnet.Util.get_setting("ShowTaskPercentComplete","1") == "0")
+		{
+			percent_complete_tr.Visible = false;
+		}
+		
+		if (btnet.Util.get_setting("ShowTaskStatus","1") == "0")
+		{
+			status_tr.Visible = false;
+		}		
+
+		if (btnet.Util.get_setting("ShowTaskSortSequence","1") == "0")
+		{
+			sort_sequence_tr.Visible = false;
+		}		
+
+
 		// add or edit?
 		if (tsk_id == 0)
 		{
 
 			tsk_id_tr.Visible = false;
 			sub.Value = "Create";
+
+            string default_duration_units = btnet.Util.get_setting("TaskDefaultDurationUnits","hours");
+           	duration_units.Items.FindByText(default_duration_units).Selected = true;
+
+            string default_hour = btnet.Util.get_setting("TaskDefaultHour","09");
+           	planned_start_hour.Items.FindByText(default_hour).Selected = true;
+           	actual_start_hour.Items.FindByText(default_hour).Selected = true;
+           	planned_end_hour.Items.FindByText(default_hour).Selected = true;
+           	actual_end_hour.Items.FindByText(default_hour).Selected = true;
+
+			string default_status = btnet.Util.get_setting("TaskDefaultStatus","[no status]");
+            status.Items.FindByText(default_status).Selected = true;
 			
 		}
 		else
@@ -85,13 +150,10 @@ void Page_Load(Object sender, EventArgs e)
 			sql = sql.Replace("$bugid", Convert.ToString(bugid));
 			DataRow dr = dbutil.get_datarow(sql);
            
-            assigned_to.ClearSelection();
             assigned_to.Items.FindByValue(Convert.ToString(dr["tsk_assigned_to_user"])).Selected = true;
 
-            duration_units.ClearSelection();
             duration_units.Items.FindByText(Convert.ToString(dr["tsk_duration_units"])).Selected = true;
 
-            status.ClearSelection();
             status.Items.FindByValue(Convert.ToString(dr["tsk_status"])).Selected = true;
             
             planned_duration.Value = Convert.ToString(dr["tsk_planned_duration"]);
@@ -137,8 +199,6 @@ void load_date_hour_min(
     DropDownList min_control, 
     object date)
 {
-    hour_control.ClearSelection();
-    min_control.ClearSelection();
 
     if (Convert.IsDBNull(date))
     {
@@ -233,7 +293,7 @@ order by us_username; ";
 	status.DataTextField = "st_name";
 	status.DataValueField = "st_id";
 	status.DataBind();
-	status.Items.Insert(0, new ListItem("[not status]", "0"));
+	status.Items.Insert(0, new ListItem("[no status]", "0"));
 
 
 }
@@ -444,8 +504,13 @@ function show_calendar(el)
 <form class=frm runat="server">
 	<table border=0>
 
+	<tr runat="server" id="bugid_tr">
+	<td class="lbl" id="bugid_label"></td>
+	<td class="lbl" id="bugid_static"></td>
+	</tr>
+
 	<tr runat="server" id="tsk_id_tr">
-	<td class="lbl" id="tsk_id_label">Id:</td>
+	<td class="lbl" id="tsk_id_label">Task ID:</td>
 	<td class="lbl" id="tsk_id_static"></td>
 	</tr>
 
@@ -477,7 +542,7 @@ function show_calendar(el)
 		<asp:ListItem Text="06" Value="06" Selected="False" />
 		<asp:ListItem Text="07" Value="07" Selected="False" />
 		<asp:ListItem Text="08" Value="08" Selected="False" />
-		<asp:ListItem Text="09" Value="09" Selected="True" />
+		<asp:ListItem Text="09" Value="09" Selected="False" />
 		<asp:ListItem Text="10" Value="10" Selected="False" />
 		<asp:ListItem Text="11" Value="11" Selected="False" />
 		<asp:ListItem Text="12" Value="12" Selected="False" />
@@ -495,7 +560,7 @@ function show_calendar(el)
 	</asp:DropDownList>
 	<span id="planned_start_min_label">&nbsp;min:</span>
 	<asp:DropDownList id="planned_start_min" runat="server">
-		<asp:ListItem Text="00" Value="00" Selected="True" />
+		<asp:ListItem Text="00" Value="00" Selected="False" />
 		<asp:ListItem Text="15" Value="15" Selected="False" />
 		<asp:ListItem Text="30" Value="30" Selected="False" />
 		<asp:ListItem Text="45" Value="45" Selected="False" />
@@ -522,7 +587,7 @@ function show_calendar(el)
 		<asp:ListItem Text="06" Value="06" Selected="False" />
 		<asp:ListItem Text="07" Value="07" Selected="False" />
 		<asp:ListItem Text="08" Value="08" Selected="False" />
-		<asp:ListItem Text="09" Value="09" Selected="True" />
+		<asp:ListItem Text="09" Value="09" Selected="False" />
 		<asp:ListItem Text="10" Value="10" Selected="False" />
 		<asp:ListItem Text="11" Value="11" Selected="False" />
 		<asp:ListItem Text="12" Value="12" Selected="False" />
@@ -540,7 +605,7 @@ function show_calendar(el)
 	</asp:DropDownList>
 	<span id="actual_start_min_label">&nbsp;min:</span>
 	<asp:DropDownList id="actual_start_min" runat="server">
-		<asp:ListItem Text="00" Value="00" Selected="True" />
+		<asp:ListItem Text="00" Value="00" Selected="False" />
 		<asp:ListItem Text="15" Value="15" Selected="False" />
 		<asp:ListItem Text="30" Value="30" Selected="False" />
 		<asp:ListItem Text="45" Value="45" Selected="False" />
@@ -566,7 +631,7 @@ function show_calendar(el)
 		<asp:ListItem Text="06" Value="06" Selected="False" />
 		<asp:ListItem Text="07" Value="07" Selected="False" />
 		<asp:ListItem Text="08" Value="08" Selected="False" />
-		<asp:ListItem Text="09" Value="09" Selected="True" />
+		<asp:ListItem Text="09" Value="09" Selected="False" />
 		<asp:ListItem Text="10" Value="10" Selected="False" />
 		<asp:ListItem Text="11" Value="11" Selected="False" />
 		<asp:ListItem Text="12" Value="12" Selected="False" />
@@ -585,7 +650,7 @@ function show_calendar(el)
 	</asp:DropDownList>
 	<span id="planned_end_min_label">&nbsp;min:</span>
 	<asp:DropDownList id="planned_end_min" runat="server">
-		<asp:ListItem Text="00" Value="00" Selected="True" />
+		<asp:ListItem Text="00" Value="00" Selected="False" />
 		<asp:ListItem Text="15" Value="15" Selected="False" />
 		<asp:ListItem Text="30" Value="30" Selected="False" />
 		<asp:ListItem Text="45" Value="45" Selected="False" />
@@ -611,7 +676,7 @@ function show_calendar(el)
 		<asp:ListItem Text="06" Value="06" Selected="False" />
 		<asp:ListItem Text="07" Value="07" Selected="False" />
 		<asp:ListItem Text="08" Value="08" Selected="False" />
-		<asp:ListItem Text="09" Value="09" Selected="True" />
+		<asp:ListItem Text="09" Value="09" Selected="False" />
 		<asp:ListItem Text="10" Value="10" Selected="False" />
 		<asp:ListItem Text="11" Value="11" Selected="False" />
 		<asp:ListItem Text="12" Value="12" Selected="False" />
@@ -629,7 +694,7 @@ function show_calendar(el)
 	</asp:DropDownList>
 	<span id="actual_end_min_label">&nbsp;min:</span>
 	<asp:DropDownList id="actual_end_min" runat="server">
-		<asp:ListItem Text="00" Value="00" Selected="True" />
+		<asp:ListItem Text="00" Value="00" Selected="False" />
 		<asp:ListItem Text="15" Value="15" Selected="False" />
 		<asp:ListItem Text="30" Value="30" Selected="False" />
 		<asp:ListItem Text="45" Value="45" Selected="False" />

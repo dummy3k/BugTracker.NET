@@ -548,16 +548,26 @@ where not exists (select * from bug_user_seen where sn_user = $this_usid and sn_
 			}
 
 			sql += @"
-declare @revision int
-set @revision = 0";
+declare @revisions int
+declare @tasks int
+set @revisions = 0
+set @tasks = 0";
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration", "0") == "1")
 			{
 				sql += @"
-select @revision = count(1)
+select @revisions = count(1)
 from svn_affected_paths
 inner join svn_revisions on svnap_svnrev_id = svnrev_id
 where svnrev_bug = $id;";
+			}
+
+			if (btnet.Util.get_setting("EnableTasks", "0") == "1")
+			{
+				sql += @"
+select @tasks = count(1)
+from bug_tasks
+where tsk_bug = $id;";
 			}
 
 			sql += @"
@@ -629,7 +639,8 @@ isnull(bg_project_custom_dropdown_value1,'') [bg_project_custom_dropdown_value1]
 isnull(bg_project_custom_dropdown_value2,'') [bg_project_custom_dropdown_value2],
 isnull(bg_project_custom_dropdown_value3,'') [bg_project_custom_dropdown_value3],
 @related [relationship_cnt],
-@revision [revision_cnt],
+@revisions [revision_cnt],
+@tasks [task_cnt],
 getdate() [snapshot_timestamp]
 $custom_cols_placeholder
 from bugs
