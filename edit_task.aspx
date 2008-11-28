@@ -35,7 +35,7 @@ void Page_Load(Object sender, EventArgs e)
 	Util.do_not_cache(Response);
 	dbutil = new DbUtil();
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
 
 	msg.InnerText = "";
 	
@@ -227,7 +227,8 @@ void load_users_dropdowns(int bugid)
 
 	sql = @"
 declare @project int
-select @project = bg_project from bugs where bg_id = $bg_id";
+declare @assigned_to int
+select @project = bg_project, @assigned_to = bg_assigned_to_user from bugs where bg_id = $bg_id";
 
 	// Load the user dropdown, which changes per project
 	// Only users explicitly allowed will be listed
@@ -267,6 +268,8 @@ order by us_username; ";
 
 	sql += "\nselect st_id, st_name from statuses order by st_sort_seq, st_name";
 
+	sql += "\nselect isnull(@assigned_to,0) ";
+	
 	sql = sql.Replace("$og_id",Convert.ToString(security.user.org));
 	sql = sql.Replace("$og_other_orgs_permission_level", Convert.ToString(security.user.other_orgs_permission_level));
 	sql = sql.Replace("$bg_id",Convert.ToString(bugid));
@@ -296,6 +299,10 @@ order by us_username; ";
 	status.Items.Insert(0, new ListItem("[no status]", "0"));
 
 
+	int default_assigned_to_user = (int) dbutil.get_dataset(sql).Tables[2].Rows[0][0];
+	
+	assigned_to.Items.FindByValue(Convert.ToString(default_assigned_to_user)).Selected = true;
+	
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -717,7 +724,7 @@ function show_calendar(el)
 	<td>
 	<asp:DropDownList id="duration_units" runat="server">
 		<asp:ListItem Text="minutes" Value="minutes" Selected="False" />
-		<asp:ListItem Text="hours" Value="hours" Selected="True" />
+		<asp:ListItem Text="hours" Value="hours" Selected="False" />
 		<asp:ListItem Text="days" Value="days" Selected="False" />
 	</asp:DropDownList>		
 	</td>

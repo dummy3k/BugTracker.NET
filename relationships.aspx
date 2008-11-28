@@ -33,9 +33,9 @@ void Page_Load(Object sender, EventArgs e)
 	string sql;
 	add_err.InnerText = "";
 
-	bugid = Convert.ToInt32(Util.sanitize_integer(Request["id"]));
+	bugid = Convert.ToInt32(Util.sanitize_integer(Request["bgid"]));
 	
-	if (string.IsNullOrEmpty(Request["id"]))
+	if (string.IsNullOrEmpty(Request["bugid"]))
 	{
 		previd = 0;
 	}
@@ -221,7 +221,7 @@ order by bg_id desc";
 
 	ds = dbutil.get_dataset(sql);
 	
-	id.Value = Convert.ToString(bugid);
+	bgid.Value = Convert.ToString(bugid);
 	
 }
 
@@ -235,7 +235,7 @@ string get_bug_html(DataRow dr)
 <div
 style='background: #dddddd; border: 1px solid blue; padding 15px;  width: 140px; height: 50px; overflow: hidden;'
 ><a 
-href='relationships.aspx?id=$id&prev=$prev'>$id&nbsp;&nbsp;&nbsp;&nbsp;$title</a></div>";
+href='relationships.aspx?bgid=$id&prev=$prev'>$id&nbsp;&nbsp;&nbsp;&nbsp;$title</a></div>";
 
 	
 	if (previd == (int) dr["id"])
@@ -365,7 +365,7 @@ Related ID is parent<asp:RadioButton runat="server" GroupName="direction" value=
 <tr><td colspan=2>&nbsp;
 <tr><td colspan=2>&nbsp;<span runat="server" class="err" id="add_err"></span>
 </table>
-<input runat="server" id="id" type=hidden name="id" value="">
+<input runat="server" id="bgid" type=hidden name="bgid" value="">
 <input id="actn" type=hidden name="actn" value="add">
 <input id="ses" type=hidden name="ses" value="<% Response.Write(ses); %>">
 

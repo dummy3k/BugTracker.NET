@@ -500,7 +500,7 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				relationship_cnt = (int) dr["relationship_cnt"];
 			}
-			string relationships_link = "<a target=_blank href=relationships.aspx?id="
+			string relationships_link = "<a target=_blank href=relationships.aspx?bgid="
 				+ Convert.ToString(id)
 				+ " title='Create a relationship between this item and another item'><img src=database_link.png border=0 align=top>&nbsp;relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
 			relationships.InnerHtml = relationships_link;

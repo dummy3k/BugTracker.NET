@@ -313,7 +313,7 @@ bp_email_cc nvarchar(800) null
 create index bp_index_1 on bug_posts (bp_bug)
 
 
-/* BUG POSTS  - comments, attachments, change history */
+/* BUG TASKS - subtasks and time tracking */
 
 create table bug_tasks
 (

@@ -30,70 +30,75 @@ void Page_Load(Object sender, EventArgs e)
 	bugid = Convert.ToInt32(Util.sanitize_integer(Request["bugid"]));
 
 	permission_level = Bug.get_bug_permission_level(bugid, security);
-	if (permission_level != Security.PERMISSION_ALL)
+	if (permission_level == Security.PERMISSION_NONE)
 	{
-		Response.Write("You are not allowed to edit tasks");
+		Response.Write("You are not allowed to view this item");
 		Response.End();
 	}
 
 	ses = (string) Session["session_cookie"];
 	
-	string sql = @"
-select tsk_id [id],
-'<a href=edit_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id) + '>edit</a>' [$no_sort_edit],
-'<a href=delete_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id)  + '>delete</a>'  [$no_sort_delete],
-tsk_description [description]";
+	string sql = "select tsk_id [id],";
 
-		if (btnet.Util.get_setting("ShowTaskAssignedTo","1") == "1")
-		{
-			sql += ",us_username [assigned to]";
-		}
-		
-		if (btnet.Util.get_setting("ShowTaskPlannedStartDate","1") == "1")
-		{
-			sql += ", tsk_planned_start_date [planned start]";
-		}
-		if (btnet.Util.get_setting("ShowTaskActualStartDate","1") == "1")
-		{
-			sql += ", tsk_actual_start_date [actual start]";
-		}
-		
-		if (btnet.Util.get_setting("ShowTaskPlannedEndDate","1") == "1")
-		{
-			sql += ", tsk_planned_end_date [planned end]";
-		}
-		if (btnet.Util.get_setting("ShowTaskActualEndDate","1") == "1")
-		{
-			sql += ", tsk_actual_end_date [actual end]";
-		}
-		
-		if (btnet.Util.get_setting("ShowTaskPlannedDuration","1") == "1")
-		{
-			sql += ", tsk_planned_duration [planned duration]";
-		}
-		if (btnet.Util.get_setting("ShowTaskActualDuration","1") == "1")
-		{
-			sql += ", tsk_actual_duration  [actual duration]";
-		}
-		
-
-		if (btnet.Util.get_setting("ShowTaskDurationUnits","1") == "1")
-		{
-			sql += ", tsk_duration_units [duration units]";
-		}
-
-		if (btnet.Util.get_setting("ShowTaskPercentComplete","1") == "1")
-		{
-			sql += ", tsk_percent_complete [percent complete]";
-		}
-		
-		if (btnet.Util.get_setting("ShowTaskStatus","1") == "1")
-		{
-			sql += ", st_name  [status]";
-		}		
-
-
+	if (permission_level == Security.PERMISSION_ALL)
+	{
 		sql += @"
+'<a href=edit_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id) + '>edit</a>' [$no_sort_edit],
+'<a href=delete_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id)  + '>delete</a>'  [$no_sort_delete],";
+	}
+
+	sql += "tsk_description [description]";
+
+	if (btnet.Util.get_setting("ShowTaskAssignedTo","1") == "1")
+	{
+		sql += ",us_username [assigned to]";
+	}
+
+	if (btnet.Util.get_setting("ShowTaskPlannedStartDate","1") == "1")
+	{
+		sql += ", tsk_planned_start_date [planned start]";
+	}
+	if (btnet.Util.get_setting("ShowTaskActualStartDate","1") == "1")
+	{
+		sql += ", tsk_actual_start_date [actual start]";
+	}
+
+	if (btnet.Util.get_setting("ShowTaskPlannedEndDate","1") == "1")
+	{
+		sql += ", tsk_planned_end_date [planned end]";
+	}
+	if (btnet.Util.get_setting("ShowTaskActualEndDate","1") == "1")
+	{
+		sql += ", tsk_actual_end_date [actual end]";
+	}
+
+	if (btnet.Util.get_setting("ShowTaskPlannedDuration","1") == "1")
+	{
+		sql += ", tsk_planned_duration [planned duration]";
+	}
+	if (btnet.Util.get_setting("ShowTaskActualDuration","1") == "1")
+	{
+		sql += ", tsk_actual_duration  [actual duration]";
+	}
+
+
+	if (btnet.Util.get_setting("ShowTaskDurationUnits","1") == "1")
+	{
+		sql += ", tsk_duration_units [duration units]";
+	}
+
+	if (btnet.Util.get_setting("ShowTaskPercentComplete","1") == "1")
+	{
+		sql += ", tsk_percent_complete [percent complete]";
+	}
+
+	if (btnet.Util.get_setting("ShowTaskStatus","1") == "1")
+	{
+		sql += ", st_name  [status]";
+	}		
+
+
+	sql += @"
 from bug_tasks 
 left outer join statuses on tsk_status = st_id
 left outer join users on tsk_assigned_to_user = us_id
@@ -131,8 +136,11 @@ Tasks for
 	+ Convert.ToString(bugid)); 
 %>
 <p>
+
+<% if (permission_level == Security.PERMISSION_ALL) { %>
 <a href=edit_task.aspx?id=0&bugid=<% Response.Write(Convert.ToString(bugid)); %>>add new task</a>
 <p>
+<% } %>
 
 <%
 if (ds.Tables[0].Rows.Count > 0)

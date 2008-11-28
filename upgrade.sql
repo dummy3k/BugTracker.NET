@@ -696,7 +696,6 @@ alter table queued_notifications alter column qn_subject nvarchar(400) not null
 alter table bugs add bg_tags nvarchar(200) null
 alter table orgs add og_tags_field_permission_level int not null default(2)
 
-
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
@@ -704,7 +703,6 @@ alter table orgs add og_tags_field_permission_level int not null default(2)
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
-
 
 create table bug_user_seen
 (
@@ -715,7 +713,6 @@ sn_seen int not null
 
 create unique index sn_index_1 on bug_user_seen (sn_bug, sn_user)
 
-
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
@@ -725,3 +722,36 @@ create unique index sn_index_1 on bug_user_seen (sn_bug, sn_user)
 -----------------------------------------------------------------------
 
 alter table bug_posts add bp_email_cc nvarchar(800) null
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 3.0.3 to 3.0.4
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+create table bug_tasks
+(
+tsk_id int identity primary key not null,
+tsk_bug int not null,
+tsk_created_user int not null,
+tsk_created_date datetime not null,
+tsk_last_updated_user int not null,
+tsk_last_updated_date datetime not null,
+
+tsk_assigned_to_user int null,
+tsk_planned_start_date datetime null,
+tsk_actual_start_date datetime null,
+tsk_planned_end_date datetime null,
+tsk_actual_end_date datetime null,
+tsk_planned_duration decimal(6,2) null,
+tsk_actual_duration decimal(6,2) null,
+tsk_duration_units nvarchar(20) null,
+tsk_percent_complete int null,
+tsk_status int null,
+tsk_sort_sequence int null,
+tsk_description nvarchar(400) null,
+)
+
+create index tsk_index_1 on bug_tasks (tsk_bug)
