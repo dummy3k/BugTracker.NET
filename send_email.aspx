@@ -416,7 +416,7 @@ string get_bug_text(int bugid)
 		// write the html to that response
 		System.IO.StringWriter writer = new System.IO.StringWriter();
 		HttpResponse my_response = new HttpResponse(writer);
-		PrintBug.print_bug(my_response, bug_dr, security, true /*include style*/);
+		PrintBug.print_bug(my_response, bug_dr, security, true /*include style*/, false, false);
 		return writer.ToString();
 }
 

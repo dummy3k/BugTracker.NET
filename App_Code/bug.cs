@@ -1196,7 +1196,9 @@ and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
 							my_response,
 							bug_dr,
 							sec2,
-							true /* include style */);
+							true, /* include style */
+                            false, /* images_inline */
+                            false /* history_inline */);
 
 						// at this point "writer" has the bug html
 

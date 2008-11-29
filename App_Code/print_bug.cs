@@ -32,7 +32,10 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		public static void print_bug (HttpResponse Response, DataRow dr, Security security, bool include_style)
+		public static void print_bug (HttpResponse Response, DataRow dr, Security security, 
+            bool include_style, 
+            bool images_inline, 
+            bool history_inline)
 		{
 
 			int bugid = Convert.ToInt32(dr["id"]);
@@ -273,9 +276,11 @@ namespace btnet
 
 			// End of relationship logic
 
-			// don't write links, don't show images, do show update history
-			write_posts (Response, bugid, 0, false, false, true,
-				security.user);
+			write_posts (Response, bugid, 0, 
+                false, /* don't write links */
+                images_inline, 
+                history_inline, 
+                security.user);
 
 			Response.Write ("</body>");
 

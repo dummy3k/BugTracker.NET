@@ -46,7 +46,7 @@ sending email as guest
 project custom dropdown?
 
 -----------------------------------------------------------------------
-Version 3.0.4   11/xx/2008 
+Version 3.0.4   11/28/2008 
 -----------------------------------------------------------------------
 
 * New feature: Time tracking and/or Sub-tasks.  See the "EnableTasks"
@@ -66,6 +66,10 @@ notification, but the new feature lets an admin do it explicitly.
 
 * Fixed bug in relationships page when trying to add a relationship
 after deleting one.
+
+* Printing of bug detail now includes images if show/hide images inline
+is toggled to show, and it includes change history if show/hide change 
+history is toggled to show.
 
 -----------------------------------------------------------------------
 Version 3.0.3   11/24/2008 

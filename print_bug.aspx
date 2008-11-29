@@ -9,8 +9,10 @@ Distributed under the terms of the GNU General Public License
 
 DbUtil dbutil;
 Security security;
-
 DataRow dr;
+bool images_inline;
+bool history_inline;
+        
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -59,6 +61,26 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
+    HttpCookie cookie = Request.Cookies["images_inline"];
+    if (cookie == null || cookie.Value == "0")
+    {
+        images_inline = false;
+    }
+    else
+    {
+        images_inline = true;
+    }
+
+    cookie = Request.Cookies["history_inline"];
+    if (cookie == null || cookie.Value == "0")
+    {
+        history_inline = false;
+    }
+    else
+    {
+        history_inline = true;
+    }
+    
 
 }
 
@@ -77,7 +99,7 @@ a:hover {text-decoration: underline; }
 
 </head>
 
-<% PrintBug.print_bug(Response, dr, security, false /* include style */); %>
+<% PrintBug.print_bug(Response, dr, security, false /* include style */, images_inline, history_inline); %>
 
 </html>
 
