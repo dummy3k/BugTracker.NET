@@ -530,7 +530,7 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					task_cnt = (int) dr["task_cnt"];
 				}
-				string tasks_link = "<a target=_blank href=tasks.aspx?bugid="
+				string tasks_link = "<a target=_blank href=tasks_frame.aspx?bugid="
 					+ Convert.ToString(id)
 				+ " title='View sub-tasks/time-tracking entries related to this item'><img src=clock.png border=0 align=top>&nbsp;tasks/time(<span id=task_cnt>" + task_cnt + "</span>)</a>";
 				tasks.InnerHtml = tasks_link;
@@ -773,7 +773,7 @@ from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or og_external_user = 0)
 and us_id in
     (select pu_user from project_user_xref
         where pu_project = $pj
@@ -789,7 +789,7 @@ from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or og_external_user = 0)
 and us_id not in
     (select pu_user from project_user_xref
 	    where pu_project = $pj

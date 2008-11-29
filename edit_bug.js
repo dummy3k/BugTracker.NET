@@ -1,6 +1,6 @@
 function on_body_unload()
 {
-	// don't leave stray child windows because it's too confusing which parent/opener they are talking back to
+	// don't leave stray child windows
 	if (popup_window != null)
 	{
 		popup_window.close();
@@ -9,12 +9,22 @@ function on_body_unload()
 
 function set_relationship_cnt(bugid, cnt)
 {
-	if (bugid == this_bugid) // don't really need this check now that we're closing child windows at unload time
+	if (bugid == this_bugid) 
 	{
 		el = get_el("relationship_cnt");
 		set_text(el,cnt)
 	}
 }
+
+function set_task_cnt(bugid, cnt)
+{
+	if (bugid == this_bugid) 
+	{
+		el = get_el("task_cnt");
+		set_text(el,cnt)
+	}
+}
+
 
 var popup_window = null
 function open_popup_window(url, title, bugid, width, height)

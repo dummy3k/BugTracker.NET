@@ -49,9 +49,16 @@ project custom dropdown?
 Version 3.0.4   11/xx/2008 
 -----------------------------------------------------------------------
 
-see what the guy did with the orgs query
+* New feature: Time tracking and/or Sub-tasks.  See the "EnableTasks"
+setting in Web.config for more info.  The goal of this feature is to 
+give you a way of entering tasks related to a bug and/or time that you
+spent working on a bug and/or scheduling info related to the bug. The 
+page where you enter the info is very configurable. You can hide the 
+fields you aren't using via Web.config. 
 
-
+* Tweaked the logic for determining which user to display in the
+"assigned to" dropdown.  See this thread:
+http://sourceforge.net/forum/forum.php?forum_id=226938
 
 * Added ability for admin to try to resend unsent emails.  The system
 tries to resend automatically anyway whenever there is a new 

@@ -24,7 +24,7 @@ void Page_Load(Object sender, EventArgs e)
 	Util.do_not_cache(Response);
 	dbutil = new DbUtil();
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	msg.InnerText = "";
 	
@@ -227,7 +227,7 @@ from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or og_external_user = 0)
 and us_id in
     (select pu_user from project_user_xref
         where pu_project = @project
@@ -243,7 +243,7 @@ from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or og_external_user = 0)
 and us_id not in
     (select pu_user from project_user_xref
 	    where pu_project = @project

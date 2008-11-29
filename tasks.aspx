@@ -40,11 +40,14 @@ void Page_Load(Object sender, EventArgs e)
 	
 	string sql = "select tsk_id [id],";
 
-	if (permission_level == Security.PERMISSION_ALL)
+	if (permission_level == Security.PERMISSION_ALL && !security.user.is_guest)
 	{
 		sql += @"
-'<a href=edit_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id) + '>edit</a>' [$no_sort_edit],
-'<a href=delete_task.aspx?ses=''$ses''&bugid=$bugid&id=' + convert(varchar,tsk_id)  + '>delete</a>'  [$no_sort_delete],";
+'<a   href=edit_task.aspx?bugid=$bugid&id=' + convert(varchar,tsk_id) + '>edit</a>'   [$no_sort_edit],
+'<a href=delete_task.aspx?ses=$ses&bugid=$bugid&id=' + convert(varchar,tsk_id) + '>delete</a>' [$no_sort_delete],";
+//		sql += @"
+//'<a href=javascript:edit_task($bugid,'   + convert(varchar,tsk_id) + ')>edit</a>' [$no_sort_edit],
+//'<a href=javascript:delete_task($bugid,' + convert(varchar,tsk_id) + ')>delete</a>'  [$no_sort_delete],";
 	}
 
 	sql += "tsk_description [description]";
@@ -127,8 +130,18 @@ order by tsk_sort_sequence, tsk_id";
 
 <script type="text/javascript" language="JavaScript" src="sortable.js"></script>
 
+
+<script>
+
+function body_on_load()
+{
+	parent.set_task_cnt(<% Response.Write(Convert.ToString(ds.Tables[0].Rows.Count)); %>)
+}
+
+</script>
+
 </head>
-<body>
+<body onload="body_on_load()">
 
 
 <div class=align>
