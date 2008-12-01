@@ -10,31 +10,10 @@ using System.Text;
 
 namespace btnet
 {
-
-    ///////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////
-    // DbUtil
-    ///////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////
     public class DbUtil
     {
-
-        //public SqlConnection sqlconn;
-        public string connection_string;
-
         ///////////////////////////////////////////////////////////////////////
-        public DataSet command_to_dataset(SqlCommand cmd)
-        {
-
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
-            return ds;
-
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        public object execute_scalar(string sql)
+        public static object execute_scalar(string sql)
         {
             if (Util.get_setting("LogSqlEnabled", "1") == "1")
             {
@@ -43,53 +22,25 @@ namespace btnet
 
             using (SqlConnection conn = get_sqlconnection())
             {
-                object returnValue;
-                conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                returnValue = cmd.ExecuteScalar();
-                conn.Close();
-                return returnValue;
+                return cmd.ExecuteScalar();
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public object execute_scalar(SqlCommand cmd)
+        public static void execute_nonquery_without_logging(string sql)
         {
-            log_command(cmd);
-
             using (SqlConnection conn = get_sqlconnection())
             {
-                try
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
-                    cmd.Connection = conn;
-                    object returnValue;
-                    conn.Open();
-                    returnValue = cmd.ExecuteScalar();
-                    conn.Close();
-                    return returnValue;
-                }
-                finally
-                {
-                    cmd.Connection = null;
+                	cmd.ExecuteNonQuery();
                 }
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public void execute_nonquery_without_logging(string sql)
-        {
-
-            using (SqlConnection conn = get_sqlconnection())
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.ExecuteNonQuery();
-                conn.Close();
-            }
-        }
-
-        ///////////////////////////////////////////////////////////////////////
-        public void execute_nonquery(string sql)
+        public static void execute_nonquery(string sql)
         {
 
             if (Util.get_setting("LogSqlEnabled", "1") == "1")
@@ -99,15 +50,15 @@ namespace btnet
 
             using (SqlConnection conn = get_sqlconnection())
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.ExecuteNonQuery();
-                conn.Close();
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                	cmd.ExecuteNonQuery();
+                }
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public void execute_nonquery(SqlCommand cmd)
+        public static void execute_nonquery(SqlCommand cmd)
         {
             log_command(cmd);
 
@@ -116,9 +67,7 @@ namespace btnet
                 try
                 {
                     cmd.Connection = conn;
-                    conn.Open();
                     cmd.ExecuteNonQuery();
-                    conn.Close();
                 }
                 finally
                 {
@@ -128,7 +77,7 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public SqlDataReader execute_reader(string sql, CommandBehavior behavior)
+        public static SqlDataReader execute_reader(string sql, CommandBehavior behavior)
         {
             if (Util.get_setting("LogSqlEnabled", "1") == "1")
             {
@@ -152,7 +101,7 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public SqlDataReader execute_reader(SqlCommand cmd, CommandBehavior behavior)
+        public static SqlDataReader execute_reader(SqlCommand cmd, CommandBehavior behavior)
         {
             log_command(cmd);
 
@@ -160,7 +109,6 @@ namespace btnet
             try
             {
                 cmd.Connection = conn;
-                conn.Open();
                 return cmd.ExecuteReader(behavior | CommandBehavior.CloseConnection);
             }
             catch
@@ -175,7 +123,7 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public DataSet get_dataset(string sql)
+        public static DataSet get_dataset(string sql)
         {
 
             if (Util.get_setting("LogSqlEnabled", "1") == "1")
@@ -186,26 +134,30 @@ namespace btnet
             DataSet ds = new DataSet();
             using (SqlConnection conn = get_sqlconnection())
             {
-                SqlDataAdapter da = new SqlDataAdapter(sql, conn);
-//btnet.Util.write_to_memory_log(sql.Replace("\r\n"," | "));
-                da.Fill(ds);
-//btnet.Util.write_to_memory_log("");
-                return ds;
+                using (SqlDataAdapter da = new SqlDataAdapter(sql, conn))
+               	{
+                    System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+                    stopwatch.Start();
+                    da.Fill(ds);
+                    stopwatch.Stop();
+                    log_stopwatch_time(stopwatch);
+                	return ds;
+                }
             }
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public SqlConnection get_sqlconnection()
+        public static void log_stopwatch_time(System.Diagnostics.Stopwatch stopwatch)
         {
-
-            connection_string = Util.get_setting("ConnectionString", "MISSING CONNECTION STRING");
-            SqlConnection sqlconn = new SqlConnection(connection_string);
-            return sqlconn;
-
+            if (Util.get_setting("LogSqlEnabled", "1") == "1")
+            {
+                Util.write_to_log("elapsed millseconds:" + stopwatch.ElapsedMilliseconds.ToString("0000"));
+            }
         }
 
+
         ///////////////////////////////////////////////////////////////////////
-        public DataView get_dataview(string sql)
+        public static DataView get_dataview(string sql)
         {
             DataSet ds = get_dataset(sql);
             return new DataView(ds.Tables[0]);
@@ -213,7 +165,7 @@ namespace btnet
 
 
         ///////////////////////////////////////////////////////////////////////
-        public DataRow get_datarow(string sql)
+        public static DataRow get_datarow(string sql)
         {
             DataSet ds = get_dataset(sql);
             if (ds.Tables[0].Rows.Count != 1)
@@ -227,7 +179,17 @@ namespace btnet
         }
 
         ///////////////////////////////////////////////////////////////////////
-        public void log_command(SqlCommand cmd)
+        public static SqlConnection get_sqlconnection()
+        {
+
+            string connection_string = Util.get_setting("ConnectionString", "MISSING CONNECTION STRING");
+            SqlConnection conn = new SqlConnection(connection_string);
+            conn.Open();
+            return conn;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        private static void log_command(SqlCommand cmd)
         {
             if (Util.get_setting("LogSqlEnabled", "1") == "1")
             {

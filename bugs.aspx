@@ -7,7 +7,7 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+
 Security security;
 string qu_id_string = null;
 string sql_error = "";
@@ -17,9 +17,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ Util.get_setting("PluralBugLabel","bugs");
@@ -140,7 +140,7 @@ void do_query()
 		// This is the normal path from the queries page.
 		sql = @"select qu_sql from queries where qu_id = $quid";
 		sql = sql.Replace("$quid", qu_id_string);
-		bug_sql = (string)dbutil.execute_scalar(sql);
+		bug_sql = (string)btnet.DbUtil.execute_scalar(sql);
 	}
 
 	if (bug_sql == null)
@@ -150,7 +150,7 @@ void do_query()
 		sql = @"select qu_id, qu_sql from queries where qu_id in
 			(select us_default_query from users where us_id = $us)";
 		sql = sql.Replace("$us", Convert.ToString(security.user.usid));
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 		if (dr != null)
 		{
 			qu_id_string = Convert.ToString(dr["qu_id"]);
@@ -162,7 +162,7 @@ void do_query()
 	if (bug_sql == null)
 	{
 		sql = @"select top 1 qu_id, qu_sql from queries order by case when qu_default = 1 then 1 else 0 end desc";
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 		bug_sql = (string) dr["qu_sql"];
 		if (dr != null)
 		{
@@ -215,7 +215,7 @@ void do_query()
 	DataSet ds = null;
 	try
 	{
-		ds = dbutil.get_dataset (bug_sql);
+		ds = btnet.DbUtil.get_dataset (bug_sql);
 		dv = new DataView(ds.Tables[0]);
 	}
 	catch(System.Data.SqlClient.SqlException e)
@@ -259,7 +259,7 @@ void load_query_dropdown()
 
 	sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 
-	query.DataSource = dbutil.get_dataview(sql);
+	query.DataSource = btnet.DbUtil.get_dataview(sql);
 
 	query.DataTextField = "qu_desc";
 	query.DataValueField = "qu_id";

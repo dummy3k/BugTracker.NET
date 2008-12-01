@@ -11,7 +11,7 @@ int id;
 int bugid;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -22,10 +22,10 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	if (security.user.is_admin || security.user.can_edit_and_delete_posts)
 	{
@@ -70,7 +70,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		sql = @"select bp_comment, bp_file, bp_hidden_from_external_users from bug_posts where bp_id = $1";
 		sql = sql.Replace("$1", Convert.ToString(id));
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		// Fill in this form
 		desc.Value = (string) dr["bp_comment"];
@@ -109,7 +109,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$1", desc.Value.Replace("'", "''"));
 		sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only.Checked));
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 		if (!internal_only.Checked)
 		{

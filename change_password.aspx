@@ -7,7 +7,7 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 		else
 		{
-			dbutil = new DbUtil();
+			
 
 			string guid = Request["id"];
 
@@ -67,7 +67,7 @@ delete from emailed_links
 			sql = sql.Replace("$minutes",Util.get_setting("RegistrationExpiration","20"));
 			sql = sql.Replace("$guid",guid.Replace("'","''"));
 
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 			if (dr == null)
 			{
@@ -79,7 +79,7 @@ delete from emailed_links
 			}
 			else
 			{
-				Util.update_user_password(dbutil, (int) dr["el_user_id"], password.Value);
+				Util.update_user_password((int) dr["el_user_id"], password.Value);
 				msg.InnerHtml = "Your password has been changed.";
 			}
 

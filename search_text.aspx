@@ -7,16 +7,16 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+
 Security security;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
 
-    dbutil = new DbUtil();
+    
     security = new Security();
-    security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+    security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
     Lucene.Net.Search.Query query = null;
 
@@ -141,7 +141,7 @@ drop table #$GUID
     sql =  btnet.Util.alter_sql_per_project_permissions(sql, security);
 
 
-    DataSet ds = dbutil.get_dataset (sql);
+    DataSet ds = btnet.DbUtil.get_dataset (sql);
     Session["bugs_unfiltered"] = ds.Tables[0];
     Session["bugs"] = new DataView(ds.Tables[0]);
 

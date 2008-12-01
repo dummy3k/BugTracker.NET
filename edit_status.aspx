@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -21,9 +21,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit status";
@@ -56,7 +56,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			sql = @"select st_name, st_sort_seq, isnull(st_style,'') [st_style], st_default from statuses where st_id = $1";
 			sql = sql.Replace("$1", Convert.ToString(id));
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 			// Fill in this form
 			name.Value = (string) dr["st_name"];
@@ -137,7 +137,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$ss", sort_seq.Value);
 		sql = sql.Replace("$st", style.Value.Replace("'","''"));
 		sql = sql.Replace("$df", Util.bool_to_string(default_selection.Checked));
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("statuses.aspx");
 
 	}

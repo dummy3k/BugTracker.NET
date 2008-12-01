@@ -12,7 +12,7 @@ int tsk_id;
 int bugid;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -22,9 +22,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	msg.InnerText = "";
 	
@@ -135,7 +135,7 @@ void Page_Load(Object sender, EventArgs e)
 			sql = @"select * from bug_tasks where tsk_id = $tsk_id and tsk_bug = $bugid";
 			sql = sql.Replace("$tsk_id", Convert.ToString(tsk_id));
 			sql = sql.Replace("$bugid", Convert.ToString(bugid));
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
            
             assigned_to.Items.FindByValue(Convert.ToString(dr["tsk_assigned_to_user"])).Selected = true;
 
@@ -270,13 +270,13 @@ order by us_username; ";
 		sql = sql.Replace("$fullnames","1 = 1");
 	}
     
-	assigned_to.DataSource = new DataView((DataTable)dbutil.get_dataset(sql).Tables[0]);	
+	assigned_to.DataSource = new DataView((DataTable)btnet.DbUtil.get_dataset(sql).Tables[0]);	
 	assigned_to.DataTextField = "us_username";
 	assigned_to.DataValueField = "us_id";
 	assigned_to.DataBind();
 	assigned_to.Items.Insert(0, new ListItem("[not assigned]", "0"));
 
-	status.DataSource = new DataView((DataTable)dbutil.get_dataset(sql).Tables[1]);	
+	status.DataSource = new DataView((DataTable)btnet.DbUtil.get_dataset(sql).Tables[1]);	
 	status.DataTextField = "st_name";
 	status.DataValueField = "st_id";
 	status.DataBind();
@@ -286,7 +286,7 @@ order by us_username; ";
 	// or should it be assigned to the logged in user?
 	if (tsk_id == 0)
 	{
-		int default_assigned_to_user = (int) dbutil.get_dataset(sql).Tables[2].Rows[0][0];
+		int default_assigned_to_user = (int) btnet.DbUtil.get_dataset(sql).Tables[2].Rows[0][0];
 		assigned_to.Items.FindByValue(Convert.ToString(default_assigned_to_user)).Selected = true;
 	}
 }
@@ -522,7 +522,7 @@ where tsk_id = $tsk_id";
 		sql = sql.Replace("$tsk_description", desc.Value.Replace("'","''"));
 		sql = sql.Replace("$tsk_duration_units", duration_units.SelectedItem.Value.Replace("'","''"));
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Response.Redirect ("tasks.aspx?bugid=" + Convert.ToString(bugid));
 
 	}

@@ -2,7 +2,7 @@
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+
 Security security;
 
 ///////////////////////////////////////////////////////////////////////
@@ -10,9 +10,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	if (security.user.is_admin || security.user.can_use_reports)
 	{
@@ -111,7 +111,7 @@ and ds_id = $ds_id
 
 	if (action != "")
 	{
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Response.Redirect ("edit_dashboard.aspx");
 	}
 	else

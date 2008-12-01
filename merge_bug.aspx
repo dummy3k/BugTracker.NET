@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 DataRow dr;
 
@@ -17,11 +17,11 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 
 	security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	if (security.user.is_admin || security.user.can_merge_bugs)
 	{
@@ -118,7 +118,7 @@ bool validate()
 	sql = sql.Replace("$from", from_bug.Value);
 	sql = sql.Replace("$into", into_bug.Value);
 
-	dr = dbutil.get_datarow(sql);
+	dr = btnet.DbUtil.get_datarow(sql);
 
 	if ((int) dr[2] == -1)
 	{
@@ -178,7 +178,7 @@ void on_update(object Source, EventArgs e)
 			where bp_type = 'file' and bp_bug = $from";
 
 		sql = sql.Replace("$from", prev_from_bug.Value);
-		DataSet ds = dbutil.get_dataset(sql);
+		DataSet ds = btnet.DbUtil.get_dataset(sql);
 
 		foreach (DataRow dr in ds.Tables[0].Rows)
 		{
@@ -224,7 +224,7 @@ void on_update(object Source, EventArgs e)
 		sql = sql.Replace("$from",prev_from_bug.Value);
 		sql = sql.Replace("$into",prev_into_bug.Value);
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 		// record the merge itself
 
@@ -237,7 +237,7 @@ void on_update(object Source, EventArgs e)
 		sql = sql.Replace("$into",prev_into_bug.Value);
 		sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 
-		int comment_id = Convert.ToInt32(dbutil.execute_scalar(sql));
+		int comment_id = Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
 
 		// update bug comments with info from old bug
 		sql = @"update bug_posts
@@ -247,7 +247,7 @@ void on_update(object Source, EventArgs e)
 
 		sql = sql.Replace("$from",prev_from_bug.Value);
 		sql = sql.Replace("$bc",Convert.ToString(comment_id));
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 
 		// delete the from bug

@@ -5,7 +5,7 @@
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 int scale = 1;
 
@@ -14,9 +14,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	if (security.user.is_admin || security.user.can_use_reports)
 	{
@@ -49,7 +49,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	sql = sql.Replace("$id", string_id);
 
-	DataRow dr = dbutil.get_datarow (sql);
+	DataRow dr = btnet.DbUtil.get_datarow (sql);
 
 	string rp_sql = (string)dr["rp_sql"];
     string chart_type = (string)dr["rp_chart_type"];
@@ -58,7 +58,7 @@ void Page_Load(Object sender, EventArgs e)
 	// replace the magic pseudo variable
 	rp_sql = rp_sql.Replace("$ME", Convert.ToString(security.user.usid));
 
-	DataSet ds = dbutil.get_dataset (rp_sql);
+	DataSet ds = btnet.DbUtil.get_dataset (rp_sql);
 
 	if (ds.Tables[0].Rows.Count > 0)
 	{

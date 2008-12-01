@@ -46,6 +46,20 @@ sending email as guest
 project custom dropdown?
 
 -----------------------------------------------------------------------
+Version 3.0.5   11/xx/2008 
+-----------------------------------------------------------------------
+
+* guest sees add task link
+
+* permissions for tasks
+
+edit_attachment.aspx(28): security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+edit_comment.aspx(31): security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+
+send email?
+
+
+-----------------------------------------------------------------------
 Version 3.0.4   11/28/2008 
 -----------------------------------------------------------------------
 

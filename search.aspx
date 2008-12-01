@@ -7,7 +7,7 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+
 Security security;
 bool show_udf;
 bool use_full_names = false;
@@ -35,9 +35,9 @@ Dictionary<int, BtnetProject> map_projects = new Dictionary<int, BtnetProject>()
 void Page_Load(Object sender, EventArgs e)
 {
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "search";
@@ -45,9 +45,9 @@ void Page_Load(Object sender, EventArgs e)
 	show_udf = (Util.get_setting("ShowUserDefinedBugAttribute","1") == "1");
 	use_full_names = (Util.get_setting("UseFullNames","0") == "1");
 
-	ds_custom_cols = Util.get_custom_columns(dbutil);
+	ds_custom_cols = Util.get_custom_columns();
 
-	dt_users = Util.get_related_users(security, dbutil);
+	dt_users = Util.get_related_users(security);
 
 	if (!IsPostBack)
 	{
@@ -70,7 +70,7 @@ where isnull(pj_enable_custom_dropdown1,0) = 1
 or isnull(pj_enable_custom_dropdown2,0) = 1
 or isnull(pj_enable_custom_dropdown3,0) = 1";
 
-		int projects_with_custom_dropdowns = (int) dbutil.execute_scalar(sql);
+		int projects_with_custom_dropdowns = (int) btnet.DbUtil.execute_scalar(sql);
 
 		if (projects_with_custom_dropdowns == 0)
 		{
@@ -100,7 +100,7 @@ where isnull(pj_enable_custom_dropdown1,0) = 1
 or isnull(pj_enable_custom_dropdown2,0) = 1
 or isnull(pj_enable_custom_dropdown3,0) = 1";
 
-		DataSet ds_projects = dbutil.get_dataset(sql);
+		DataSet ds_projects = btnet.DbUtil.get_dataset(sql);
 
 		foreach (DataRow dr in ds_projects.Tables[0].Rows)
 		{
@@ -716,7 +716,7 @@ order by bg_id desc
 
 	sql = Util.alter_sql_per_project_permissions(sql, security);
 
-	DataSet ds = dbutil.get_dataset(sql);
+	DataSet ds = btnet.DbUtil.get_dataset(sql);
 	dv = new DataView (ds.Tables[0]);
 	Session["bugs"] = dv;
 	Session["bugs_unfiltered"] = ds.Tables[0];
@@ -952,7 +952,7 @@ void load_drop_downs()
 	select st_id, st_name from statuses order by st_sort_seq, st_name;
 	select udf_id, udf_name from user_defined_attribute order by udf_sort_seq, udf_name";
 
-	DataSet ds_dropdowns = dbutil.get_dataset(sql);
+	DataSet ds_dropdowns = btnet.DbUtil.get_dataset(sql);
 
 	project.DataSource = ds_dropdowns.Tables[0];
 	project.DataTextField = "pj_name";

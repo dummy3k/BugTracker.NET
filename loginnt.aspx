@@ -10,15 +10,15 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 
-DbUtil dbutil;
+
 string sql;
 
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
-	dbutil = new DbUtil();
-	dbutil.get_sqlconnection();
+	
+	btnet.DbUtil.get_sqlconnection();
 
 	Util.do_not_cache(Response);
 
@@ -57,7 +57,7 @@ void Page_Load(Object sender, EventArgs e)
 			and us_active = 1";
 		sql = sql.Replace("$us", windows_username.Replace("'","''"));
 
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 		if (dr != null)
 		{
 			// The user was found, so bake a cookie and redirect
@@ -235,7 +235,7 @@ END";
             string guid = Guid.NewGuid().ToString();
             sql = sql.Replace("$password", guid);
 
-            dr = dbutil.get_datarow(sql);
+            dr = btnet.DbUtil.get_datarow(sql);
             if (dr != null) // automatically created the user
             {
                 // The user was created, so bake a cookie and redirect
@@ -254,7 +254,7 @@ END";
 			where us_username = 'guest'
 			and us_active = 1";
 
-		dr = dbutil.get_datarow(sql);
+		dr = btnet.DbUtil.get_datarow(sql);
 		if (dr != null)
 		{
 			// The Guest user was found, so bake a cookie and redirect

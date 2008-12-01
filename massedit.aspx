@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -18,10 +18,10 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	if (security.user.is_admin || security.user.can_mass_edit_bugs)
 	{
@@ -148,7 +148,7 @@ void Page_Load(Object sender, EventArgs e)
 			if (upload_folder != null)
 			{
 				string sql2 = @"select bp_bug, bp_id, bp_file from bug_posts where bp_type = 'file' and bp_bug in (" + bug_list.Value + ")";
-				DataSet ds = dbutil.get_dataset(sql2);
+				DataSet ds = btnet.DbUtil.get_dataset(sql2);
 				foreach (DataRow dr in ds.Tables[0].Rows)
 				{
 					// create path
@@ -168,7 +168,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 
-		dbutil.execute_nonquery(sql_text.InnerText);
+		btnet.DbUtil.execute_nonquery(sql_text.InnerText);
 		Response.Redirect ("search.aspx");
 
 	}

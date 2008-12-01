@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 int id;
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -17,10 +17,10 @@ void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionI
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e) {
     Util.do_not_cache(Response);
-    dbutil = new DbUtil();
+    
     security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	if (security.user.is_admin || security.user.can_edit_reports)
 	{
@@ -58,7 +58,7 @@ void Page_Load(Object sender, EventArgs e) {
                 rp_desc, rp_sql, rp_chart_type
                 from reports where rp_id = $1";
             sql = sql.Replace("$1", Convert.ToString(id));
-            DataRow dr = dbutil.get_datarow(sql);
+            DataRow dr = btnet.DbUtil.get_datarow(sql);
 
             // Fill in this form
             desc.Value = (string) dr["rp_desc"];
@@ -140,7 +140,7 @@ void on_update (Object sender, EventArgs e) {
 
         sql = sql.Replace("$ct", ct);
 
-        dbutil.execute_nonquery(sql);
+        btnet.DbUtil.execute_nonquery(sql);
         Server.Transfer("reports.aspx");
     }
     else

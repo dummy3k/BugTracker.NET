@@ -8,21 +8,21 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "projects";
 
-	ds = dbutil.get_dataset(
+	ds = btnet.DbUtil.get_dataset(
 		@"select
 		pj_id [id],
 		'<a href=edit_project.aspx?&id=' + convert(varchar,pj_id) + '>edit</a>' [$no_sort_edit],

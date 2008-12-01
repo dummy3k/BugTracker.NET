@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 
 string exception_message;
@@ -18,14 +18,14 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 
 	// If there is a users table, then authenticate this page
 	try
 	{
-		dbutil.execute_nonquery("select count(1) from users");
+		btnet.DbUtil.execute_nonquery("select count(1) from users");
 		security = new Security();
-		security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+		security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 	}
 	catch (Exception)
 	{
@@ -41,7 +41,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			try
 			{
-				ds = dbutil.get_dataset(Server.HtmlDecode(query.Value));
+				ds = btnet.DbUtil.get_dataset(Server.HtmlDecode(query.Value));
 			}
 			catch (Exception e2)
 			{

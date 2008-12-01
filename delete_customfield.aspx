@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -18,9 +18,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "delete custom field";
@@ -37,14 +37,14 @@ void Page_Load(Object sender, EventArgs e)
 			and sc.colorder = $id";
 
 		sql = sql.Replace("$id",row_id.Value);
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		// if there is a default, delete it
 		if (dr["default_constraint_name"].ToString() != "")
 		{
 			sql = @"alter table bugs drop constraint [$df]";
 			sql = sql.Replace("$df", (string) dr["default_constraint_name"]);
-			dbutil.execute_nonquery(sql);
+			btnet.DbUtil.execute_nonquery(sql);
 		}
 
 
@@ -54,7 +54,7 @@ void Page_Load(Object sender, EventArgs e)
 alter table bugs drop column [$nm]";
 		
 		sql = sql.Replace("$nm", (string) dr["column_name"]);
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 
 		//delete row from custom column table
@@ -63,7 +63,7 @@ alter table bugs drop column [$nm]";
 		sql = sql.Replace("$num", row_id.Value);
 		
 		Application["custom_columns_dataset"]  = null;
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 		Response.Redirect("customfields.aspx");
 
@@ -81,7 +81,7 @@ alter table bugs drop column [$nm]";
 			and sc.colorder = $id";
 
 		sql = sql.Replace("$id",id);
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		confirm_href.InnerText = "confirm delete of \""
 			+ Convert.ToString(dr["name"])

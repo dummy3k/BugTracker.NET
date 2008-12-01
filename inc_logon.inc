@@ -15,7 +15,7 @@
 		sql = sql.Replace("$gu", guid);
 		sql = sql.Replace("$us", Convert.ToString(userid));
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 		string sAppPath = Request.Url.AbsolutePath;
 		sAppPath = sAppPath.Substring(0, sAppPath.LastIndexOf('/'));

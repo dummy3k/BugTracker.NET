@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -18,15 +18,15 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	if (IsPostBack)
 	{
 		sql = @"delete categories where ct_id = $1";
 		sql = sql.Replace("$1", row_id.Value);
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("categories.aspx");
 	}
 	else
@@ -41,7 +41,7 @@ void Page_Load(Object sender, EventArgs e)
 			select ct_name, @cnt [cnt] from categories where ct_id = $1";
 		sql = sql.Replace("$1", id);
 
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		if ((int) dr["cnt"] > 0)
 		{

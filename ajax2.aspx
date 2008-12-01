@@ -3,7 +3,7 @@
 
 <script runat="server">
 
-DbUtil dbutil;
+
 Security security;
 
 ///////////////////////////////////////////////////////////////////////
@@ -11,9 +11,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	// will this be too slow?
 
@@ -31,7 +31,7 @@ void Page_Load(Object sender, EventArgs e)
 		string text = Request["q"];
 		sql = sql.Replace("$str",text.Replace("'","''"));
 
-		DataSet ds = dbutil.get_dataset(sql);
+		DataSet ds = btnet.DbUtil.get_dataset(sql);
 
 
 		if (ds.Tables[0].Rows.Count > 0)

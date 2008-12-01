@@ -14,7 +14,7 @@ Distributed under the terms of the GNU General Public License
 #warning System.Web.Mail is deprecated, but it doesn't work yet with "explicit" SSL, so keeping it for now - corey
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 int project = -1;
 
@@ -24,9 +24,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	btnet.Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 
 	titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - "
@@ -91,7 +91,7 @@ void Page_Load(Object sender, EventArgs e)
 			sql = sql.Replace("$id", string_bp_id);
 			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 
-            DataView dv = dbutil.get_dataview(sql);
+            DataView dv = btnet.DbUtil.get_dataview(sql);
             dr = null;
             if (dv.Count > 0)
             {
@@ -294,7 +294,7 @@ void Page_Load(Object sender, EventArgs e)
 			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 			sql = sql.Replace("$bg", string_bg_id);
 
-			dr = dbutil.get_datarow(sql);
+			dr = btnet.DbUtil.get_datarow(sql);
 
 			// format from dropdown
 			if (request_from != null)
@@ -471,7 +471,7 @@ update bugs set
 	sql = sql.Replace("$to", to.Value.Replace("'","''"));
 	sql = sql.Replace("$cc", cc.Value.Replace("'","''"));
 
-	int comment_id = Convert.ToInt32(dbutil.execute_scalar(sql));
+	int comment_id = Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
 
 	int[] attachments = handle_attachments(comment_id);
 
@@ -842,7 +842,7 @@ function findPosY(obj)
 		}
 
 		sql = sql.Replace("$pr", Convert.ToString(project));
-		DataSet ds_emails = dbutil.get_dataset(sql);
+		DataSet ds_emails = btnet.DbUtil.get_dataset(sql);
 		foreach (DataRow dr_email in ds_emails.Tables[0].Rows)
 		{
 			Response.Write("<option>");

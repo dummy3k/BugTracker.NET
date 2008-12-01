@@ -11,7 +11,7 @@ Distributed under the terms of the GNU General Public License
 
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -21,11 +21,11 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
-	ds = dbutil.get_dataset(
+	ds = btnet.DbUtil.get_dataset(
 		@"select
 			'<a target=_blank href=edit_priority.aspx?id=' + convert(varchar,pr_id) + '>' + pr_name + '</a>' [priority],
 			'<a target=_blank href=edit_status.aspx?id=' + convert(varchar,st_id) + '>' + st_name + '</a>' [status],

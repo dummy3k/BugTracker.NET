@@ -9,18 +9,18 @@ Distributed under the terms of the GNU General Public License
 
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
-	ds = dbutil.get_dataset(
+	ds = btnet.DbUtil.get_dataset(
 		@"select og_id [id],
 		'<a href=edit_org.aspx?id=' + convert(varchar,og_id) + '>edit</a>' [$no_sort_edit],
 		'<a href=delete_org.aspx?id=' + convert(varchar,og_id) + '>delete</a>' [$no_sort_delete],

@@ -7,7 +7,7 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@ void Page_Load(Object sender, EventArgs e)
 	Util.set_context(HttpContext.Current);
 	Util.do_not_cache(Response);
 
-	dbutil = new DbUtil();
+	
 
 	string guid = Request["id"];
 
@@ -36,7 +36,7 @@ delete from emailed_links
 	sql = sql.Replace("$minutes",Util.get_setting("RegistrationExpiration","20"));
 	sql = sql.Replace("$guid",guid.Replace("'","''"));
 
-	DataRow dr = dbutil.get_datarow(sql);
+	DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 	if (dr == null)
 	{
@@ -113,7 +113,7 @@ delete from emailed_links where el_id = '$guid'";
 		sql = sql.Replace("$guid",guid.Replace("'","''"));
 		sql = sql.Replace("$template", Util.get_setting("SelfRegisteredUserTemplate","[NO SelfRegisteredUserTemplate!]"));
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		msg.InnerHtml = "Your registration is complete.";
 	}
 

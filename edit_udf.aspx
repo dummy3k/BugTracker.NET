@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -21,9 +21,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit user defined attribute value";
@@ -56,7 +56,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			sql = @"select udf_name, udf_sort_seq, udf_default from user_defined_attribute where udf_id = $1";
 			sql = sql.Replace("$1", Convert.ToString(id));
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 			// Fill in this form
 			name.Value = (string) dr[0];
@@ -134,7 +134,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$na", name.Value.Replace("'","''"));
 		sql = sql.Replace("$ss", sort_seq.Value);
 		sql = sql.Replace("$df", Util.bool_to_string(default_selection.Checked));
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("udfs.aspx");
 
 	}

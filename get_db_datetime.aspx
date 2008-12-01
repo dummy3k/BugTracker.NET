@@ -7,9 +7,9 @@
 void Page_Load(Object sender, EventArgs e)
 {
 	Util.do_not_cache(Response);
-    DbUtil dbutil = new DbUtil();
+    
 
-	DateTime dt = (DateTime) dbutil.execute_scalar("select getdate()");
+	DateTime dt = (DateTime) btnet.DbUtil.execute_scalar("select getdate()");
 
 	Response.Write(dt.ToString("yyyyMMdd HH\\:mm\\:ss\\:fff"));
 

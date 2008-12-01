@@ -51,7 +51,7 @@ namespace btnet
         
         public Dictionary<string,int> dict_custom_field_permission_level = new Dictionary<string, int>();
 
-        public void set_from_db(DbUtil dbutil, DataRow dr)
+        public void set_from_db(DataRow dr)
         {
             this.usid = Convert.ToInt32(dr["us_id"]);
             this.username = (string)dr["us_username"];
@@ -100,7 +100,7 @@ namespace btnet
             this.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
 
 			// field permission for custom fields
-			DataSet ds_custom = Util.get_custom_columns(dbutil);
+			DataSet ds_custom = Util.get_custom_columns();
 			foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
 			{
 				string bg_name = (string)dr_custom["name"];
@@ -126,7 +126,7 @@ namespace btnet
 					btnet.Util.write_to_log("exception looking for " + og_name + ":" + ex.Message);
 					
 					// automatically add it if it's missing
-					dbutil.execute_nonquery("alter table orgs add [" 
+					btnet.DbUtil.execute_nonquery("alter table orgs add [" 
 						+ og_name
 						+ "] int null");
 					dict_custom_field_permission_level[bg_name] = Security.PERMISSION_ALL;

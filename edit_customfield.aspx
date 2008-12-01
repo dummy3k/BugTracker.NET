@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -21,9 +21,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit custom column metadata";
@@ -49,7 +49,7 @@ where so.name = 'bugs'
 and sc.colorder = $co";
 
 		sql = sql.Replace("$co", Convert.ToString(id));
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		name.InnerText = (string) dr["name"];
 		dropdown_type.Value = Convert.ToString(dr["dropdown_type"]);
@@ -145,7 +145,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$v", vals.Value.Replace("'", "''"));
 		sql = sql.Replace("$ss", sort_seq.Value);
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Application["custom_columns_dataset"]  = null;
 		Server.Transfer ("customfields.aspx");
 	}

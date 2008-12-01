@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 ///////////////////////////////////////////////////////////////////////
@@ -16,9 +16,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	int bugid = Convert.ToInt32(Request["id"]);
 	int permission_level = Bug.get_bug_permission_level(bugid, security);
@@ -46,7 +46,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	sql = sql.Replace("$bg", Util.sanitize_integer(Request["id"]));
 	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
-	dbutil.execute_nonquery(sql);
+	btnet.DbUtil.execute_nonquery(sql);
 
 }
 

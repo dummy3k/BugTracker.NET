@@ -7,7 +7,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 int bugid;
 
@@ -15,9 +15,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
     bugid = Convert.ToInt32(Util.sanitize_integer(Request["id"]));
 
@@ -26,7 +26,7 @@ void Page_Load(Object sender, EventArgs e)
     string svn_password = "";
     string websvn_url = "";
 
-    btnet.Util.get_subversion_connection_info(dbutil, bugid,
+    btnet.Util.get_subversion_connection_info(bugid,
     	ref repository_url,
     	ref svn_username,
     	ref svn_password,
@@ -87,7 +87,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
 
-	ds = dbutil.get_dataset(sql);
+	ds = btnet.DbUtil.get_dataset(sql);
 }
 
 

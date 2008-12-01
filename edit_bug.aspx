@@ -16,7 +16,7 @@ DataSet ds_custom_cols;
 DataRow dr;
 DataTable dt_users = null;
 
-DbUtil dbutil;
+
 Security security;
 SortedDictionary<string, string> hash_custom_cols = new SortedDictionary<string, string>();
 SortedDictionary<string, string> hash_prev_custom_cols = new SortedDictionary<string, string>();
@@ -37,9 +37,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	btnet.Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	fckeComment.BasePath = @"fckeditor/";
 	fckeComment.ToolbarSet = "BugTracker";
@@ -113,7 +113,7 @@ void Page_Load(Object sender, EventArgs e)
 
 
 	// get list of custom fields
-	ds_custom_cols = btnet.Util.get_custom_columns(dbutil);
+	ds_custom_cols = btnet.Util.get_custom_columns();
 
 	if (security.user.external_user || btnet.Util.get_setting("EnableInternalOnlyPosts","0") == "0")
 	{
@@ -161,7 +161,7 @@ void Page_Load(Object sender, EventArgs e)
 			sql += "\nselect top 1 st_id from statuses where st_default = 1 order by st_name;"; // 3
 			sql += "\nselect top 1 udf_id from user_defined_attribute where udf_default = 1 order by udf_name;"; // 4
 
-			DataSet ds_defaults = dbutil.get_dataset(sql);
+			DataSet ds_defaults = btnet.DbUtil.get_dataset(sql);
 
 			string default_value;
 
@@ -821,7 +821,7 @@ order by us_username; ";
     sql = sql.Replace("$og_id", Convert.ToString(security.user.org));
     sql = sql.Replace("$og_other_orgs_permission_level", Convert.ToString(security.user.other_orgs_permission_level));
     
-	dt_users = dbutil.get_dataset(sql).Tables[0];
+	dt_users = btnet.DbUtil.get_dataset(sql).Tables[0];
 
 	assigned_to.DataSource = new DataView((DataTable)dt_users);
 	assigned_to.DataTextField = "us_username";
@@ -923,7 +923,7 @@ string get_custom_col_default_value(object o)
 		&& defaultval[defaultval.Length-1] == ')')
 		{
 			string defaultval_sql = "select " + defaultval.Substring(1,defaultval.Length-2);
-			defaultval = Convert.ToString(dbutil.execute_scalar(defaultval_sql));
+			defaultval = Convert.ToString(btnet.DbUtil.execute_scalar(defaultval_sql));
 		}
 	}
 
@@ -966,7 +966,7 @@ void format_subcribe_cancel_link()
 			sql = "select count(1) from bug_subscriptions where bs_bug = $bg and bs_user = $us";
 			sql = sql.Replace("$bg",Convert.ToString(id));
 			sql = sql.Replace("$us",Convert.ToString(security.user.usid));
-			subscribed = (int) dbutil.execute_scalar(sql);
+			subscribed = (int) btnet.DbUtil.execute_scalar(sql);
 		}
 
 		if (security.user.is_guest) // wouldn't make sense to share an email address
@@ -1395,7 +1395,7 @@ void load_dropdowns(DataRow dr, User user)
 	sql += "\nselect udf_id, udf_name from user_defined_attribute order by udf_sort_seq, udf_name;";
 
 	// do a batch of sql statements
-	DataSet ds_dropdowns = dbutil.get_dataset(sql);
+	DataSet ds_dropdowns = btnet.DbUtil.get_dataset(sql);
 
 	project.DataSource = ds_dropdowns.Tables[0];
 	project.DataTextField = "pj_name";
@@ -1722,7 +1722,7 @@ bool record_changes()
 				else
 				{
 					sql_get_username = "select us_username from users where us_id = $1";
-					before = (string) dbutil.execute_scalar(sql_get_username.Replace("$1", before));
+					before = (string) btnet.DbUtil.execute_scalar(sql_get_username.Replace("$1", before));
 				}
 
 
@@ -1733,7 +1733,7 @@ bool record_changes()
 				else
 				{
 					sql_get_username = "select us_username from users where us_id = $1";
-					after = (string) dbutil.execute_scalar(sql_get_username.Replace("$1", after));
+					after = (string) btnet.DbUtil.execute_scalar(sql_get_username.Replace("$1", after));
 				}
 			}
 
@@ -1789,7 +1789,7 @@ bool record_changes()
 	if (do_update
 	&& btnet.Util.get_setting("TrackBugHistory","1") == "1") // you might not want the debris to grow
 	{
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 	}
 
 
@@ -1825,7 +1825,7 @@ int fetch_permission_level(string projectToCheck)
 	sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel","2"));
 	sql = sql.Replace("$pj", projectToCheck);
 	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
-	int pl = (int) dbutil.execute_scalar(sql);
+	int pl = (int) btnet.DbUtil.execute_scalar(sql);
 
 	// reduce permissions for guest
 	//if (security.user.is_guest && permission_level == Security.PERMISSION_ALL)
@@ -2192,7 +2192,7 @@ void on_update (Object sender, EventArgs e)
 					sql = sql.Replace("$custom_cols_placeholder", custom_cols_sql);
 				}
 
-				DateTime last_update_date = (DateTime) dbutil.execute_scalar(sql);
+				DateTime last_update_date = (DateTime) btnet.DbUtil.execute_scalar(sql);
 
 				btnet.WhatsNew.add_news(id, short_desc.Value, "updated", security);
 
@@ -2722,7 +2722,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 		sql = sql.Replace("$pj", project.SelectedItem.Value);
 
-		DataRow project_dr = dbutil.get_datarow(sql);
+		DataRow project_dr = btnet.DbUtil.get_datarow(sql);
 
 
 		if (project_dr != null)

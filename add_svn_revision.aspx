@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 
-DbUtil dbutil;
+
 Security security;
 
 string repos_url = "";
@@ -27,9 +27,9 @@ void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionI
 void Page_Load(Object sender, EventArgs e)
 {
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
     msg.InnerText = "";
 
@@ -90,7 +90,7 @@ string svn_log(int revision, bool xml)
 {
 
 
-	btnet.Util.get_subversion_connection_info(dbutil, bugid,
+	btnet.Util.get_subversion_connection_info(bugid,
 		ref repository_url,
 		ref svn_username,
 		ref svn_password,
@@ -152,7 +152,7 @@ insert into svn_revisions
     sql = sql.Replace("$svndate", date.Replace("'","''"));
     sql = sql.Replace("$svnmsg", comment.Replace("'","''"));
 
-    int parent = Convert.ToInt32(dbutil.execute_scalar(sql));
+    int parent = Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
 
     // second pass, insert affected paths
     foreach (XmlNode node in logentry.ChildNodes)
@@ -185,7 +185,7 @@ insert into svn_affected_paths
                 sql = sql.Replace("$svnact", action.Replace("'", "''"));
                 sql = sql.Replace("$svnpath", path.Replace("'", "''"));
 
-                dbutil.execute_nonquery(sql);
+                btnet.DbUtil.execute_nonquery(sql);
 
             }
         }

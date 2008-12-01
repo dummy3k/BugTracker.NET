@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -19,9 +19,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit project per-user permissions";
@@ -52,7 +52,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("$pj", Util.sanitize_integer(Request["id"]));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 
-        DataSet ds = dbutil.get_dataset(sql);
+        DataSet ds = btnet.DbUtil.get_dataset(sql);
 
         MyDataGrid.DataSource=ds.Tables[0].DefaultView;
         MyDataGrid.DataBind();
@@ -122,7 +122,7 @@ void on_update (Object sender, EventArgs e)
 
 	}
 
-	dbutil.execute_nonquery(sql_batch);
+	btnet.DbUtil.execute_nonquery(sql_batch);
 	msg.InnerText = "Permissions have been updated.";
 
 }

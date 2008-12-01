@@ -7,7 +7,7 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-DbUtil dbutil;
+
 Security security;
 string sql;
 int bugid;
@@ -17,9 +17,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "view subscribers";
@@ -56,7 +56,7 @@ void Page_Load(Object sender, EventArgs e)
 				insert into bug_subscriptions (bs_bug, bs_user) values($bg, $us)";					;
 				sql = sql.Replace("$bg",Convert.ToString(bugid));
 				sql = sql.Replace("$us",Request["userid"]);
-				dbutil.execute_nonquery(sql);
+				btnet.DbUtil.execute_nonquery(sql);
 
 				// send a notification to this user only
                 btnet.Bug.send_notifications(btnet.Bug.UPDATE, bugid, security, 1);
@@ -107,7 +107,7 @@ order by 1";
 	}
 
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
-	ds = dbutil.get_dataset(sql);
+	ds = btnet.DbUtil.get_dataset(sql);
 
 	// Get list of users who could be subscribed to this bug.
 
@@ -182,7 +182,7 @@ select @project = bg_project, @org = bg_org from bugs where bg_id = $bg;";
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
 
 	//DataSet ds_users =
-	userid.DataSource = dbutil.get_dataview(sql);
+	userid.DataSource = btnet.DbUtil.get_dataview(sql);
 	userid.DataTextField = "us_username";
 	userid.DataValueField = "us_id";
 	userid.DataBind();

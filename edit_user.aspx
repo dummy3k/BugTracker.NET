@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 bool copy = false;
 
@@ -22,9 +22,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN_OR_PROJECT_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN_OR_PROJECT_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit user";
@@ -37,7 +37,7 @@ void Page_Load(Object sender, EventArgs e)
 			where pu_user = $us
 			and pu_admin = 1";
 		sql = sql.Replace("$us", Convert.ToString(security.user.usid));
-		DataSet ds_projects = dbutil.get_dataset(sql);
+		DataSet ds_projects = btnet.DbUtil.get_dataset(sql);
 
 		if (ds_projects.Tables[0].Rows.Count == 0)
 		{
@@ -202,7 +202,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("$us",Convert.ToString(id));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 
-		DataSet ds = dbutil.get_dataset(sql);
+		DataSet ds = btnet.DbUtil.get_dataset(sql);
 
 		// query dropdown
 		query.DataSource = ds.Tables[1].DefaultView;
@@ -534,7 +534,7 @@ void on_update (Object sender, EventArgs e)
 			// See if the user already exists?
 			sql = "select count(1) from users where us_username = N'$1'";
 			sql = sql.Replace("$1", username.Value.Replace("'","''"));
-			int user_count = (int) dbutil.execute_scalar(sql);
+			int user_count = (int) btnet.DbUtil.execute_scalar(sql);
 
 			if (user_count == 0)
 			{
@@ -592,10 +592,10 @@ select scope_identity()";
                 sql = sql.Replace("$pw", Convert.ToString(new Random().Next()));
 
                 // insert the user
-                id = Convert.ToInt32(dbutil.execute_scalar(sql));
+                id = Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
 
                 // now encrypt the password and update the db
-                btnet.Util.update_user_password(dbutil, id, pw.Value);
+                btnet.Util.update_user_password(id, pw.Value);
 
                 update_project_user_xref();
 
@@ -617,7 +617,7 @@ select scope_identity()";
 				from users where us_username = N'$1' and us_id <> $2" ;
 			sql = sql.Replace("$1", username.Value.Replace("'","''"));
 			sql = sql.Replace("$2", Convert.ToString(id));
-			int user_count = (int) dbutil.execute_scalar(sql);
+			int user_count = (int) btnet.DbUtil.execute_scalar(sql);
 
 			if (user_count == 0)
 			{
@@ -650,12 +650,12 @@ where us_id = $id";
 
 				sql = replace_vars_in_sql_statement(sql);
 
-				dbutil.execute_nonquery(sql);
+				btnet.DbUtil.execute_nonquery(sql);
 
                 // update the password
                 if (pw.Value != "")
                 {
-                    btnet.Util.update_user_password(dbutil, id, pw.Value);
+                    btnet.Util.update_user_password(id, pw.Value);
                 }
 
 				update_project_user_xref();
@@ -1003,7 +1003,7 @@ void update_project_user_xref()
 
 	sql = sql.Replace("$us", Convert.ToString(id));
 	sql = sql.Replace("$dpl", Convert.ToString(default_permission_level));
-	dbutil.execute_nonquery(sql);
+	btnet.DbUtil.execute_nonquery(sql);
 
 }
 

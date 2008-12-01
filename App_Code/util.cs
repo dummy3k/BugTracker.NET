@@ -40,7 +40,7 @@ namespace btnet
 </td>";
 
 		///////////////////////////////////////////////////////////////////////
-		public void check_security(DbUtil dbutil, HttpContext asp_net_context, int level)
+		public void check_security(HttpContext asp_net_context, int level)
 		{
 			Util.set_context(asp_net_context);
 			this.context = asp_net_context;
@@ -105,7 +105,7 @@ and us_active = 1";
 
 				sql = sql.Replace("$se", se_id);
 				sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
-				dr = dbutil.get_datarow(sql);
+				dr = btnet.DbUtil.get_datarow(sql);
 
 			}
 
@@ -137,7 +137,7 @@ where us_username = 'guest'
 and us_active = 1";
 
 					sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
-					dr = dbutil.get_datarow(sql);
+					dr = btnet.DbUtil.get_datarow(sql);
 				}
 			}
 
@@ -148,7 +148,7 @@ and us_active = 1";
 			}
 			else
 			{
-				user.set_from_db(dbutil, dr);
+				user.set_from_db(dr);
 			}
 
 
@@ -439,9 +439,9 @@ function on_submit_search()
 
 
 				string url = "";
-				if (Util.Request != null)
+				if (HttpContext.Current != null)
 				{
-					url = Util.Request.Url.ToString();
+                    url = HttpContext.Current.Request.Url.ToString();
 				}
 
 				w.WriteLine(DateTime.Now.ToString("yyy-MM-dd HH:mm:ss")
@@ -469,9 +469,9 @@ function on_submit_search()
 			}
 
 			string url = "";
-			if (Util.Request != null)
+			if (HttpContext.Current != null)
 			{
-				url = Util.Request.Url.ToString();
+				url = HttpContext.Current.Request.Url.ToString();
 			}
 
 			string line = DateTime.Now.ToString("yyy-MM-dd HH:mm:ss:fff")
@@ -812,8 +812,6 @@ function on_submit_search()
                 if (order_pos < where_pos)
                     order_pos = -1; // ignore an order by that occurs in a subquery, for example
 
-                Util.write_to_log(Convert.ToString(sql.Length) + " " + Convert.ToString(where_pos) + " " + Convert.ToString(order_pos));
-
                 if (where_pos != -1 && order_pos != -1)
                 {
                     // both WHERE and ORDER BY clauses
@@ -877,7 +875,7 @@ function on_submit_search()
 		}
 
         ///////////////////////////////////////////////////////////////////////
-        public static void update_user_password(DbUtil dbutil, int us_id, string unencypted)
+        public static void update_user_password(int us_id, string unencypted)
         {
             Random random = new Random();
             int salt = random.Next(10000, 99999);
@@ -890,7 +888,7 @@ function on_submit_search()
             sql = sql.Replace("$salt", Convert.ToString(salt));
             sql = sql.Replace("$id", Convert.ToString(us_id));
 
-            dbutil.execute_nonquery(sql);
+            btnet.DbUtil.execute_nonquery(sql);
         }
 
 		///////////////////////////////////////////////////////////////////////
@@ -1106,7 +1104,7 @@ function on_submit_search()
 
 		///////////////////////////////////////////////////////////////////////
 		// only used by search?
-		public static DataTable get_related_users(Security security, DbUtil dbutil)
+		public static DataTable get_related_users(Security security)
 		{
 			string sql = "";
 
@@ -1249,7 +1247,7 @@ drop table #temp2";
 			sql = sql.Replace("$og_external_user",Convert.ToString(security.user.external_user ? 1 : 0));
 			sql = sql.Replace("$og_other_orgs_permission_level",Convert.ToString(security.user.other_orgs_permission_level));
 
-			return dbutil.get_dataset(sql).Tables[0];
+			return btnet.DbUtil.get_dataset(sql).Tables[0];
 
 		}
 
@@ -1265,8 +1263,7 @@ drop table #temp2";
 					where pj_id = $pj";
 
 			sql = sql.Replace("$pj", Convert.ToString(projectid));
-			DbUtil dbutil = new DbUtil();
-			object obj = dbutil.execute_scalar(sql);
+			object obj = btnet.DbUtil.execute_scalar(sql);
 
 			if (obj != null)
 			{
@@ -1281,7 +1278,7 @@ drop table #temp2";
 
         
         ///////////////////////////////////////////////////////////////////////
-        public static DataSet get_custom_columns(DbUtil dbutil)
+        public static DataSet get_custom_columns()
         {
 
 			DataSet ds = (DataSet) context.Application["custom_columns_dataset"];
@@ -1292,7 +1289,7 @@ drop table #temp2";
             }
             else
             {
-            	ds = dbutil.get_dataset(@"
+            	ds = btnet.DbUtil.get_dataset(@"
 /* custom columns */ select sc.name, st.[name] [datatype], sc.length, sc.xprec, sc.xscale, sc.isnullable,
 mm.text [default value],
 isnull(ccm_dropdown_type,'') [dropdown type],
@@ -1403,7 +1400,6 @@ order by sc.id, isnull(ccm_sort_seq,sc.colorder)");
 
         ///////////////////////////////////////////////////////////////////////
         public static void get_subversion_connection_info(
-			DbUtil dbutil,
 			int bugid,
     		ref string repository_url,
     		ref string svn_username,
@@ -1425,7 +1421,7 @@ inner join bugs on pj_id = bg_project
 where bg_id = $bg";
 
 			sql = sql.Replace("$bg",Convert.ToString(bugid));
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 			if (dr == null)
 			{

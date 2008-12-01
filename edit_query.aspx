@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -21,10 +21,10 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit query";
@@ -54,7 +54,7 @@ void Page_Load(Object sender, EventArgs e)
 				from orgs
 				order by og_name;";
 
-			DataSet ds_orgs = dbutil.get_dataset(sql);
+			DataSet ds_orgs = btnet.DbUtil.get_dataset(sql);
 
 			// forced project dropdown
 			org.DataSource = ds_orgs.Tables[0].DefaultView;
@@ -105,7 +105,7 @@ void Page_Load(Object sender, EventArgs e)
 
 
 			sql = sql.Replace("$1", Convert.ToString(id));
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 			if ((int) dr["qu_user"] != security.user.usid)
 			{
@@ -201,7 +201,7 @@ Boolean validate()
 		// See if name is already used?
 		sql = "select count(1) from queries where qu_desc = N'$de'";
 		sql = sql.Replace("$de", desc.Value.Replace("'","''"));
-		int query_count = (int) dbutil.execute_scalar(sql);
+		int query_count = (int) btnet.DbUtil.execute_scalar(sql);
 
 		if (query_count == 1)
 		{
@@ -216,7 +216,7 @@ Boolean validate()
 		sql = "select count(1) from queries where qu_desc = N'$de' and qu_id <> $id";
 		sql = sql.Replace("$de", desc.Value.Replace("'","''"));
 		sql = sql.Replace("$id", Convert.ToString(id));
-		int query_count = (int) dbutil.execute_scalar(sql);
+		int query_count = (int) btnet.DbUtil.execute_scalar(sql);
 
 		if (query_count == 1)
 		{
@@ -282,7 +282,7 @@ void on_update (Object sender, EventArgs e)
 			sql = sql.Replace("$us", "0");
 		}
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("queries.aspx");
 
 	}

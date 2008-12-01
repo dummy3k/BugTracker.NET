@@ -16,7 +16,7 @@ namespace btnet
         public static bool check_password(string username, string password)
         {
 
-            DbUtil dbutil = new DbUtil();
+            
 
             string sql = @"
 select us_username, us_id, us_password, isnull(us_salt,0) us_salt, us_active
@@ -25,7 +25,7 @@ where us_username = N'$username'";
 
             sql = sql.Replace("$username", username.Replace("'", "''"));
 
-            DataRow dr = dbutil.get_datarow(sql);
+            DataRow dr = btnet.DbUtil.get_datarow(sql);
 
             if (dr == null)
             {
@@ -48,14 +48,14 @@ where us_username = N'$username'";
 			}
 			else
 			{
-				authenticated = check_password_with_db(username, password, dbutil, dr);
+				authenticated = check_password_with_db(username, password, dr);
 			}
 
             if (authenticated)
             {
                 sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us";
                 sql = sql.Replace("$us", Convert.ToString((int)dr["us_id"]));
-                dbutil.execute_nonquery(sql);
+                btnet.DbUtil.execute_nonquery(sql);
                 return true;
             }
             else
@@ -104,7 +104,7 @@ where us_username = N'$username'";
 			}
 		}
 
-        public static bool check_password_with_db(string username, string password, DbUtil dbutil, DataRow dr)
+        public static bool check_password_with_db(string username, string password, DataRow dr)
         {
 
             int us_salt = (int) dr["us_salt"];
@@ -134,7 +134,7 @@ where us_username = N'$username'";
                 // update it so that it is encrypted WITH salt.
                 if (us_salt == 0 || us_password.Length < 32)
                 {
-                    btnet.Util.update_user_password(dbutil, (int) dr["us_id"], password);
+                    btnet.Util.update_user_password((int) dr["us_id"], password);
                 }
                 return true;
             }

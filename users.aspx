@@ -8,16 +8,16 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN_OR_PROJECT_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN_OR_PROJECT_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "users";
@@ -145,7 +145,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	sql = sql.Replace("$us", Convert.ToString(security.user.usid));
-	ds = dbutil.get_dataset(sql);
+	ds = btnet.DbUtil.get_dataset(sql);
 
 	// cookies
 	if (hide_inactive_users.Checked)

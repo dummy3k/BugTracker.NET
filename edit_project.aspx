@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -21,9 +21,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit project";
@@ -44,7 +44,7 @@ void Page_Load(Object sender, EventArgs e)
 	{
 
 		default_user.DataSource =
-			dbutil.get_dataview("select us_id, us_username from users order by us_username");
+			btnet.DbUtil.get_dataview("select us_id, us_username from users order by us_username");
 		default_user.DataTextField = "us_username";
 		default_user.DataValueField = "us_id";
 		default_user.DataBind();
@@ -89,7 +89,7 @@ void Page_Load(Object sender, EventArgs e)
 			from projects
 			where pj_id = $1";
 			sql = sql.Replace("$1", Convert.ToString(id));
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 			// Fill in this form
 			name.Value = (string) dr["pj_name"];
@@ -321,7 +321,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$cdv2", custom_dropdown_values2.Value.Replace("'","''"));
 		sql = sql.Replace("$cdv3", custom_dropdown_values3.Value.Replace("'","''"));
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("projects.aspx");
 
 	}

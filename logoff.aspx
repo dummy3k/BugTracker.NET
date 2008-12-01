@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 
 <script runat="server">
 
-DbUtil dbutil;
+
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -19,8 +19,8 @@ void Page_Load(Object sender, EventArgs e)
 
 	Util.set_context(HttpContext.Current);
 
-	dbutil = new DbUtil();
-	dbutil.get_sqlconnection();
+	
+	btnet.DbUtil.get_sqlconnection();
 
 	// delete the session row
 
@@ -34,7 +34,7 @@ void Page_Load(Object sender, EventArgs e)
 			where se_id = N'$se'
 			or datediff(d, se_date, getdate()) > 2";
 		sql = sql.Replace("$se", se_id);
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 
 		Session["SelectedBugQuery"] = null;

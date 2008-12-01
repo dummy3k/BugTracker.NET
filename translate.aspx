@@ -11,7 +11,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
     String sql;
-    DbUtil dbutil;
+    
     Security security;
 
 
@@ -19,9 +19,9 @@ Distributed under the terms of the GNU General Public License
     void Page_Load(Object sender, EventArgs e)
     {
     	Util.do_not_cache(Response);
-		dbutil = new DbUtil();
+		
 		security = new Security();
-		security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+		security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 		titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 			+ "translate";
@@ -43,7 +43,7 @@ Distributed under the terms of the GNU General Public License
 
 				sql = sql.Replace("$id", string_bp_id);
 
-				DataRow dr = dbutil.get_datarow(sql);
+				DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 				string_bg_id = Convert.ToString((int) dr["bp_bug"]);
 				object obj = dr["bp_comment"];
@@ -62,7 +62,7 @@ Distributed under the terms of the GNU General Public License
 
 				sql = sql.Replace("$id", string_bg_id);
 
-				object obj = dbutil.execute_scalar(sql);
+				object obj = btnet.DbUtil.execute_scalar(sql);
 
 				if (obj != System.DBNull.Value)
 					source.InnerText = obj.ToString();

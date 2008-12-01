@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -18,10 +18,10 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	if (security.user.is_admin || security.user.can_edit_and_delete_posts)
 	{
@@ -49,13 +49,13 @@ void Page_Load(Object sender, EventArgs e)
 		// save the filename before deleting the row
 		sql = @"select bp_file from bug_posts where bp_id = $ba";
 		sql = sql.Replace("$ba", attachment_id_string);
-		string filename = (string) dbutil.execute_scalar(sql);
+		string filename = (string) btnet.DbUtil.execute_scalar(sql);
 
 		// delete the row representing the attachment
 		sql = @"delete bug_post_attachments where bpa_post = $ba
             delete bug_posts where bp_id = $ba";
 		sql = sql.Replace("$ba", attachment_id_string);
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 		// delete the file too
 		string upload_folder = Util.get_upload_folder();
@@ -87,7 +87,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql = @"select bp_file from bug_posts where bp_id = $1";
 		sql = sql.Replace("$1", attachment_id_string);
 
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		string s = Convert.ToString(dr["bp_file"]);
 

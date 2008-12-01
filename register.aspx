@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 #pragma warning disable 618
 #warning System.Web.Mail is deprecated, but it doesn't work yet with "explicit" SSL, so keeping it for now - corey
 
-DbUtil dbutil;
+
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -71,7 +71,7 @@ insert into emailed_links
             sql = sql.Replace("$firstname", firstname.Value.Replace("'","''"));
             sql = sql.Replace("$lastname", lastname.Value.Replace("'","''"));
 
-            dbutil.execute_nonquery(sql);
+            btnet.DbUtil.execute_nonquery(sql);
 
 			string result = btnet.Email.send_email(
 				email.Value,
@@ -160,7 +160,7 @@ bool validate()
 
 	// check for dupes
 
-	dbutil = new DbUtil();
+	
 
 	string sql = @"
 declare @user_cnt int
@@ -175,7 +175,7 @@ select @user_cnt, @email_cnt, @pending_user_cnt, @pending_email_cnt";
 	sql = sql.Replace("$us", username.Value.Replace("'","''"));
 	sql = sql.Replace("$em", email.Value.Replace("'","''"));
 
-	DataRow dr = dbutil.get_datarow(sql);
+	DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 	if ((int) dr[0] > 0)
 	{

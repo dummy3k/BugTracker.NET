@@ -481,7 +481,6 @@ namespace btnet
             string new_page_val,
             bool IsPostBack,
             DataSet ds_custom_cols,
-            DbUtil dbutil,
             string filter_val
             )
         {
@@ -588,7 +587,7 @@ namespace btnet
 
             if (ds_custom_cols == null)
             {
-                ds_custom_cols = Util.get_custom_columns(dbutil);
+                ds_custom_cols = Util.get_custom_columns();
             }
 
             db_column_count = 0;

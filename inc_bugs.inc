@@ -15,9 +15,7 @@ void display_bugs(bool show_checkboxes)
 		new_page.Value,
 		IsPostBack,
 		ds_custom_cols,
-		dbutil,
 		filter.Value);
-
 }
 
 void call_sort_and_filter_buglist_dataview()

@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 DataSet ds = null;
 DataView dv = null;
@@ -22,9 +22,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "print " + Util.get_setting("PluralBugLabel","bugs");
@@ -40,14 +40,14 @@ void Page_Load(Object sender, EventArgs e)
 		int qu_id = Convert.ToInt32(qu_id_string);
 		sql = @"select qu_sql from queries where qu_id = $1";
 		sql = sql.Replace("$1", qu_id_string);
-		string bug_sql = (string)dbutil.execute_scalar(sql);
+		string bug_sql = (string)btnet.DbUtil.execute_scalar(sql);
 
 		// replace magic variables
 		bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.user.usid));
 		bug_sql = Util.alter_sql_per_project_permissions(bug_sql,security);
 
 		// all we really need is the bugid, but let's do the same query as print_bugs.aspx
-		ds = dbutil.get_dataset (bug_sql);
+		ds = btnet.DbUtil.get_dataset (bug_sql);
 	}
 	else
 	{
@@ -111,10 +111,10 @@ if (dv != null)
 			(int)drv[1],
 			security);
 
-		PrintBug.print_bug(Response, dr, security, 
-            false, /* include style */
-            false, 
-            false);
+		PrintBug.print_bug(Response, dr, security,
+            false /* include style */,
+            images_inline,
+            history_inline); ;
 	}
 }
 else

@@ -14,13 +14,13 @@ void Page_Load(Object sender, EventArgs e)
 
 	if (Request["dbname"] != null && Request["dbname"] != "")
 	{
-		DbUtil dbutil = new DbUtil();
-		dbutil.get_sqlconnection();
+		
+		btnet.DbUtil.get_sqlconnection();
 		string sql = @"use master
 			create database [$db]";
 
 		sql = sql.Replace("$db", Request["dbname"]);
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 		Response.Write ("<font color=red><b>Database Created.</b></font>");
 

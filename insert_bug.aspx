@@ -13,7 +13,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 
-DbUtil dbutil;
+
 Security security;
 String sql;
 
@@ -23,7 +23,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	Util.set_context(HttpContext.Current);
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 
 	string username = Request["username"];
 	string password = Request["password"];
@@ -131,7 +131,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	sql = sql.Replace("$us",username.Replace("'","''"));
 
-	DataRow dr = dbutil.get_datarow(sql);
+	DataRow dr = btnet.DbUtil.get_datarow(sql);
 
     // this should never happen
     if (dr == null)
@@ -228,7 +228,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		sql = sql.Replace("$id", Convert.ToString(bugid));
 
-		if (Convert.ToInt32(dbutil.execute_scalar(sql)) == 0)
+		if (Convert.ToInt32(btnet.DbUtil.execute_scalar(sql)) == 0)
 		{
 			bugid = 0;
 		}
@@ -405,7 +405,7 @@ void Page_Load(Object sender, EventArgs e)
 		select @udf = udf_id from user_defined_attribute where udf_default = 1 order by udf_name
 		select @pj pj, @ct ct, @pr pr, @st st, @udf udf";
 
-		DataRow defaults = dbutil.get_datarow(sql);
+		DataRow defaults = btnet.DbUtil.get_datarow(sql);
 
 		if (projectid == 0) {projectid = (int) defaults["pj"];}
 		if (orgid == 0) {orgid = security.user.org;}
@@ -460,7 +460,7 @@ void Page_Load(Object sender, EventArgs e)
 
 					sql = sql.Replace("$pj", Convert.ToString(projectid));
 
-					object project_email = dbutil.execute_scalar(sql);
+					object project_email = btnet.DbUtil.execute_scalar(sql);
 
 					if (project_email != null)
 					{
@@ -539,7 +539,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql += "select bg_short_desc from bugs where bg_id = $bg";
 
 		sql = sql.Replace("$bg", Convert.ToString(bugid));
-		DataRow dr2 = dbutil.get_datarow(sql);
+		DataRow dr2 = btnet.DbUtil.get_datarow(sql);
 
 		if (mime_message != null)
 		{

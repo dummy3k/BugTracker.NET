@@ -76,10 +76,10 @@ namespace btnet
                     btnet.Util.write_to_log("started creating Lucene index using folder " + MyLucene.index_path);
                     Lucene.Net.Index.IndexWriter writer = new Lucene.Net.Index.IndexWriter(index_path, anal, true);
 
-                    DbUtil dbutil = new DbUtil();
+                    
 
                     // index the bugs
-                    DataSet ds = dbutil.get_dataset(@"
+                    DataSet ds = btnet.DbUtil.get_dataset(@"
     select bg_id, 
     case 
         when isnull(bg_tags,'') <> '' then bg_short_desc + ' / ' + bg_tags
@@ -96,7 +96,7 @@ namespace btnet
                     }
 
                     // index the bug posts
-                    ds = dbutil.get_dataset(@"
+                    ds = btnet.DbUtil.get_dataset(@"
     select bp_bug, bp_id, 
     isnull(bp_comment_search,bp_comment) [text] 
     from bug_posts 
@@ -170,10 +170,10 @@ namespace btnet
 
                     modifier.DeleteDocuments(new Lucene.Net.Index.Term("bg_id", Convert.ToString(bug_id)));
 
-                    DbUtil dbutil = new DbUtil();
+                    
 
                     // index the bugs
-                    DataSet ds = dbutil.get_dataset(@"
+                    DataSet ds = btnet.DbUtil.get_dataset(@"
     select bg_id, 
     case 
         when isnull(bg_tags,'') <> '' then bg_short_desc + ' / ' + bg_tags
@@ -190,7 +190,7 @@ namespace btnet
                     }
 
                     // index the bug posts
-                    ds = dbutil.get_dataset(@"
+                    ds = btnet.DbUtil.get_dataset(@"
     select bp_bug, bp_id, 
     isnull(bp_comment_search,bp_comment) [text] 
     from bug_posts 

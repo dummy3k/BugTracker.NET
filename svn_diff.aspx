@@ -48,7 +48,7 @@ the literal text (starting in the first column):
 */
 
 
-DbUtil dbutil;
+
 Security security;
 
 string left = "";
@@ -65,9 +65,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 
 	// get info about revision
@@ -85,7 +85,7 @@ void Page_Load(Object sender, EventArgs e)
 		int svnap_id = Convert.ToInt32(Util.sanitize_integer(Request["id"]));
 		sql = sql.Replace("$id", Convert.ToString(svnap_id));
 
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		// check if user has permission for this bug
 		int permission_level = Bug.get_bug_permission_level((int) dr["svnrev_bug"], security);
@@ -94,7 +94,7 @@ void Page_Load(Object sender, EventArgs e)
 			Response.End();
 		}
 
-		btnet.Util.get_subversion_connection_info(dbutil,
+		btnet.Util.get_subversion_connection_info(
 			(int) dr["svnrev_bug"],
 			ref repository_url,
 			ref svn_username,
@@ -109,7 +109,7 @@ void Page_Load(Object sender, EventArgs e)
 	else
 	{
 
-		btnet.Util.get_subversion_connection_info(dbutil,
+		btnet.Util.get_subversion_connection_info(
 			Convert.ToInt32(Request["hidden_bugid"]),
 			ref repository_url,
 			ref svn_username,

@@ -10,16 +10,16 @@
 int id;
 int bug_id;
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
 
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	id = Convert.ToInt32(Request["id"]);
 	bug_id = Convert.ToInt32(Request["bug_id"]);
@@ -45,7 +45,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	sql = @"select bp_file, isnull(bp_content_type,'') [bp_content_type] from bug_posts where bp_id = $1";
 	sql = sql.Replace("$1", Convert.ToString(id));
-	DataRow dr = dbutil.get_datarow(sql);
+	DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 	string filename = (string) dr["bp_file"];
 	string content_type = (string) dr["bp_content_type"];
@@ -63,7 +63,7 @@ void Page_Load(Object sender, EventArgs e)
 
         // Use an SqlDataReader so that we can write out the blob data in chunks.
 
-        using (SqlDataReader reader = dbutil.execute_reader(cmd, CommandBehavior.CloseConnection | CommandBehavior.SequentialAccess))
+        using (SqlDataReader reader = btnet.DbUtil.execute_reader(cmd, CommandBehavior.CloseConnection | CommandBehavior.SequentialAccess))
         {
             if (reader.Read()) // Did we find the content in the database?
             {

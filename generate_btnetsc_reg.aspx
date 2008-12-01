@@ -6,16 +6,16 @@
 //Distributed under the terms of the GNU General Public License
 // Updated to support new 1.8+ version of btnetsc -WER
 
-DbUtil dbutil;
+
 Security security;
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
 
-dbutil = new DbUtil();
+
 security = new Security();
-security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 Response.ContentType = "text/reg";
 Response.AddHeader ("content-disposition","attachment; filename=\"btnetsc.reg\"");

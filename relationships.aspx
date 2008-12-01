@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int bugid;
 int previd;
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 int permission_level;
 string ses;
@@ -22,9 +22,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 	
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 			+ "relationships";
@@ -90,7 +90,7 @@ void Page_Load(Object sender, EventArgs e)
 			sql = sql.Replace("$bg2",Convert.ToString(bugid2));
 			sql = sql.Replace("$bg",Convert.ToString(bugid));
 			sql = sql.Replace("$us",Convert.ToString(security.user.usid));
-			dbutil.execute_nonquery(sql);
+			btnet.DbUtil.execute_nonquery(sql);
 		}
 		else
 		{
@@ -118,7 +118,7 @@ void Page_Load(Object sender, EventArgs e)
 						// check if bug exists
 						sql = @"select count(1) from bugs where bg_id = $bg2";
 						sql = sql.Replace("$bg2",Convert.ToString(bugid2));
-						rows = (int) dbutil.execute_scalar(sql);
+						rows = (int) btnet.DbUtil.execute_scalar(sql);
 
 						if (rows == 0)
 						{
@@ -130,7 +130,7 @@ void Page_Load(Object sender, EventArgs e)
 							sql = @"select count(1) from bug_relationships where re_bug1 = $bg and re_bug2 = $bg2";
 							sql = sql.Replace("$bg2",Convert.ToString(bugid2));
 							sql = sql.Replace("$bg",Convert.ToString(bugid));
-							rows = (int) dbutil.execute_scalar(sql);
+							rows = (int) btnet.DbUtil.execute_scalar(sql);
 
 							if (rows > 0)
 							{
@@ -177,7 +177,7 @@ insert into bug_posts
 										sql = sql.Replace("$dir1","1");
 									}
 
-									dbutil.execute_nonquery(sql);
+									btnet.DbUtil.execute_nonquery(sql);
 									add_err.InnerText = "Relationship was added.";
 								}
 							}
@@ -219,7 +219,7 @@ order by bg_id desc";
 	sql = sql.Replace("$bg", Convert.ToString(bugid));
 	sql = Util.alter_sql_per_project_permissions(sql, security);
 
-	ds = dbutil.get_dataset(sql);
+	ds = btnet.DbUtil.get_dataset(sql);
 	
 	bgid.Value = Convert.ToString(bugid);
 	

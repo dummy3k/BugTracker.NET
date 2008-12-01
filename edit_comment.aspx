@@ -11,7 +11,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 bool use_fckeditor = false;
@@ -25,10 +25,10 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	btnet.Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
 
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	if (security.user.is_admin || security.user.can_edit_and_delete_posts)
 	{
@@ -64,7 +64,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 
 	sql = sql.Replace("$id", Convert.ToString(id));
-	DataRow dr = dbutil.get_datarow(sql);
+	DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 	bugid = (int) dr["bp_bug"];
 
@@ -183,7 +183,7 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$id", Convert.ToString(id));
 		sql = sql.Replace("$bugid", Convert.ToString(bugid));
 		sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only.Checked));
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		// Don't send notifications for internal only comments.
 		// We aren't putting them the email notifications because it that makes it

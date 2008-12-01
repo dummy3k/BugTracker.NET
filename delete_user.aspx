@@ -9,7 +9,7 @@ Distributed under the terms of the GNU General Public License
 
 
 String sql;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -19,9 +19,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN_OR_PROJECT_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN_OR_PROJECT_ADMIN);
 
 	string id = Util.sanitize_integer(Request["id"]);
 
@@ -29,7 +29,7 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		sql = @"select us_created_user, us_admin from users where us_id = $us";
 		sql = sql.Replace("$us", id);
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		if (security.user.usid != (int) dr["us_created_user"])
 		{
@@ -57,7 +57,7 @@ delete queued_notifications where qn_user = $us
 delete dashboard_items where ds_user = $us";
 
 		sql = sql.Replace("$us", row_id.Value);
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("users.aspx");
 	}
 	else
@@ -76,7 +76,7 @@ select us_username, @cnt [cnt] from users where us_id = $us";
 
 		sql = sql.Replace("$us", id);
 
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		if ((int) dr["cnt"] > 0)
 		{

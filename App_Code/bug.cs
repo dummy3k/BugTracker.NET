@@ -139,8 +139,8 @@ where bs_bug = $id)";
 			sql = sql.Replace("$id", Convert.ToString(bugid));
 			sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
 
-			DbUtil dbutil = new DbUtil();
-			dbutil.execute_nonquery(sql);
+			
+			btnet.DbUtil.execute_nonquery(sql);
 
 
 		}
@@ -157,8 +157,8 @@ where bs_bug = $id)";
 			string sql = @"select bp_id, bp_file from bug_posts where bp_type = 'file' and bp_bug = $bg";
 			sql = sql.Replace("$bg", id);
 
-			DbUtil dbutil = new DbUtil();
-			DataSet ds = dbutil.get_dataset(sql);
+			
+			DataSet ds = btnet.DbUtil.get_dataset(sql);
 			if (upload_folder != null && upload_folder != "")
 			{
 				foreach (DataRow dr in ds.Tables[0].Rows)
@@ -191,7 +191,7 @@ delete from bug_relationships where re_bug2 = $bg
 delete from bugs where bg_id = $bg";
 
 			sql = sql.Replace("$bg", id);
-			dbutil.execute_nonquery(sql);
+			btnet.DbUtil.execute_nonquery(sql);
 
 
 		}
@@ -265,7 +265,7 @@ delete from bugs where bg_id = $bg";
 			// it check that content_length is less than MaxUploadSize.
 			// These are left up to the caller.
 
-			DbUtil dbutil = new DbUtil();
+			
 			string upload_folder = Util.get_upload_folder();
 			string sql;
 			bool store_attachments_in_database = (Util.get_setting("StoreAttachmentsInDatabase", "0") == "1");
@@ -335,7 +335,7 @@ insert into bug_posts
 				}
 				sql = sql.Replace("$internal", btnet.Util.bool_to_string(hidden_from_external_users));
 
-				int bp_id = Convert.ToInt32(dbutil.execute_scalar(sql));
+				int bp_id = Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
 
 				try
 				{
@@ -363,7 +363,7 @@ insert into bug_posts
 						{
 							cmd.Parameters.AddWithValue("@bp", bp_id);
 							cmd.Parameters.Add("@bc", SqlDbType.Image).Value = data;
-							dbutil.execute_nonquery(cmd);
+							btnet.DbUtil.execute_nonquery(cmd);
 						}
 					}
 					else
@@ -400,7 +400,7 @@ insert into bug_posts
 
 					sql = sql.Replace("$bp", Convert.ToString(bp_id));
 
-					dbutil.execute_nonquery(sql);
+					btnet.DbUtil.execute_nonquery(sql);
 
 					throw;
 				}
@@ -444,7 +444,7 @@ insert into bug_posts
 			// Note that this method does not perform any security check.
 			// This is left up to the caller.
 
-			DbUtil dbutil = new DbUtil();
+			
 			string upload_folder = Util.get_upload_folder();
 			string sql;
 			bool store_attachments_in_database = (Util.get_setting("StoreAttachmentsInDatabase", "0") == "1");
@@ -461,7 +461,7 @@ insert into bug_posts
 						where bp_id = $bp";
 						
 				sql = sql.Replace("$bp", Convert.ToString(bp_id));
-				using (SqlDataReader reader = dbutil.execute_reader(sql, CommandBehavior.CloseConnection))
+				using (SqlDataReader reader = btnet.DbUtil.execute_reader(sql, CommandBehavior.CloseConnection))
 				{
 					if (reader.Read())
 					{
@@ -483,7 +483,7 @@ insert into bug_posts
 				sql = sql.Replace("$bp", Convert.ToString(bp_id));
 
 				object content_object;
-				content_object = dbutil.execute_scalar(sql);
+				content_object = btnet.DbUtil.execute_scalar(sql);
 
 				if (content_object != null && !Convert.IsDBNull(content_object))
 				{
@@ -525,8 +525,8 @@ insert into bug_posts
 			Security security)
 		{
 
-			DbUtil dbutil = new DbUtil();
-			DataSet ds_custom_cols = btnet.Util.get_custom_columns(dbutil);
+			
+			DataSet ds_custom_cols = btnet.Util.get_custom_columns();
 			return get_bug_datarow(bugid, security, ds_custom_cols);
 		}
 
@@ -681,8 +681,8 @@ where bg_id = $id";
 			sql = sql.Replace("$this_org", Convert.ToString(security.user.org));
 			sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
 
-			DbUtil dbutil = new DbUtil();
-			return dbutil.get_datarow(sql);
+			
+			return btnet.DbUtil.get_datarow(sql);
 
 
 		}
@@ -714,8 +714,8 @@ where bg_id = $bg";
 			sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel", "2"));
 			sql = sql.Replace("$bg", Convert.ToString(bugid));
 			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
-			DbUtil dbutil = new DbUtil();
-			DataRow dr = dbutil.get_datarow(sql);
+			
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 			int pl = (int)dr[0];
 			int bg_org = (int)dr[1];
 
@@ -774,7 +774,7 @@ where bg_id = $bg";
 			bool send_notifications)
 		{
 
-			DbUtil dbutil = new DbUtil();
+			
 
 			if (assigned_to_userid == 0)
 			{
@@ -829,7 +829,7 @@ where bg_id = $bg";
 				string custom_cols_sql1 = "";
 				string custom_cols_sql2 = "";
 
-				DataSet ds_custom_cols = btnet.Util.get_custom_columns(dbutil);
+				DataSet ds_custom_cols = btnet.Util.get_custom_columns();
 
 				foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 				{
@@ -862,7 +862,7 @@ where bg_id = $bg";
 			sql += "\nselect scope_identity()";
 
 
-			int bugid = Convert.ToInt32(dbutil.execute_scalar(sql));
+			int bugid = Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
 			int postid = btnet.Bug.insert_comment(
 				bugid,
 				security.user.usid,
@@ -952,8 +952,8 @@ select scope_identity();";
 				sql = sql.Replace("$internal", btnet.Util.bool_to_string(internal_only));
 
 
-				DbUtil dbutil = new DbUtil();
-				return Convert.ToInt32(dbutil.execute_scalar(sql));
+				
+				return Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
 
 			}
 			else
@@ -1097,8 +1097,8 @@ and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
 				sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
 				sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 
-				DbUtil dbutil = new DbUtil();
-				DataSet ds_subscribers = dbutil.get_dataset(sql);
+				
+				DataSet ds_subscribers = btnet.DbUtil.get_dataset(sql);
 
 				if (ds_subscribers.Tables[0].Rows.Count > 0)
 				{
@@ -1172,7 +1172,7 @@ and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
 						sec2.user.org_field_permission_level = (int)dr["og_org_field_permission_level"];
 						sec2.user.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
 
-						DataSet ds_custom = Util.get_custom_columns(dbutil);
+						DataSet ds_custom = Util.get_custom_columns();
 						foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
 						{
 							string bg_name = (string)dr_custom["name"];
@@ -1214,7 +1214,7 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 						sql = sql.Replace("$subject", subject.Replace("'","''"));
 						sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
 
-						dbutil.execute_nonquery_without_logging(sql);
+						btnet.DbUtil.execute_nonquery_without_logging(sql);
 
 						added_to_queue = true;
 
@@ -1245,10 +1245,10 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 			{
 				
 				string sql = @"select * from queued_notifications where qn_status = N'not sent' and qn_retries < 3";
- 				DbUtil dbutil = new DbUtil(); // create a new one, just in case there would be multithreading issues...
+ 				 // create a new one, just in case there would be multithreading issues...
 
 				// get the pending notifications
-				DataSet ds = dbutil.get_dataset(sql);
+				DataSet ds = btnet.DbUtil.get_dataset(sql);
 				foreach (DataRow dr in ds.Tables[0].Rows)
 				{
 
@@ -1291,7 +1291,7 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 					sql = sql.Replace("$qn_id", Convert.ToString(dr["qn_id"]));
 
 					// update the row or delete the row
-					dbutil.execute_nonquery(sql);
+					btnet.DbUtil.execute_nonquery(sql);
 				}
 			}
 			// exit the worker thread

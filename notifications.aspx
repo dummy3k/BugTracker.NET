@@ -8,7 +8,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 string ses;
 
@@ -16,11 +16,11 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
-	ds = dbutil.get_dataset(
+	ds = btnet.DbUtil.get_dataset(
 		@"select
 		qn_id [id],
 		qn_date_created [date created],

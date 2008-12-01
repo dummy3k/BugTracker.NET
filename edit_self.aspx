@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 void Page_Init (object sender, EventArgs e) {ViewStateUserKey = Session.SessionID;}
@@ -21,9 +21,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit your settings";
@@ -48,7 +48,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		sql = sql.Replace("$us",Convert.ToString(security.user.usid));
 
-		query.DataSource = dbutil.get_dataview(sql);
+		query.DataSource = btnet.DbUtil.get_dataview(sql);
 		query.DataTextField = "qu_desc";
 		query.DataValueField = "qu_id";
 		query.DataBind();
@@ -63,7 +63,7 @@ void Page_Load(Object sender, EventArgs e)
 		sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 		sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 
-		DataView projects_dv = dbutil.get_dataview(sql);
+		DataView projects_dv = btnet.DbUtil.get_dataview(sql);
 
 		project_auto_subscribe.DataSource = projects_dv;
 		project_auto_subscribe.DataTextField = "pj_name";
@@ -97,7 +97,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		sql = sql.Replace("$id", Convert.ToString(id));
 
-		DataRow dr = dbutil.get_datarow(sql);
+		DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 		// Fill in this form
 		firstname.Value = (string) dr["firstname"];
@@ -258,12 +258,12 @@ void on_update (Object sender, EventArgs e)
 		sql = sql.Replace("$id", Convert.ToString(id));
 
 		// update user
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
         // update the password
         if (pw.Value != "")
         {
-            btnet.Util.update_user_password(dbutil, id, pw.Value);
+            btnet.Util.update_user_password(id, pw.Value);
         }
 
 		// Now update project_user_xref
@@ -272,7 +272,7 @@ void on_update (Object sender, EventArgs e)
 		sql = @"update project_user_xref
 				set pu_auto_subscribe = 0 where pu_user = $id";
 		sql = sql.Replace("$id", Convert.ToString(id));
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 
 		// Second see what to turn back on
 		string projects = "";
@@ -303,7 +303,7 @@ void on_update (Object sender, EventArgs e)
 
 			sql = sql.Replace("$id", Convert.ToString(id));
 			sql = sql.Replace("$projects", projects);
-			dbutil.execute_nonquery(sql);
+			btnet.DbUtil.execute_nonquery(sql);
 		}
 
 
@@ -342,7 +342,7 @@ void on_update (Object sender, EventArgs e)
 
 			sql = sql.Replace("$id", Convert.ToString(id));
 			sql = sql.Replace("$projects", projects);
-			dbutil.execute_nonquery(sql);
+			btnet.DbUtil.execute_nonquery(sql);
 
 		}
 

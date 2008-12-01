@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 <script language="C#" runat="server">
 
 
-DbUtil dbutil;
+
 string sql;
 
 ///////////////////////////////////////////////////////////////////////
@@ -29,12 +29,12 @@ void Page_Load(Object sender, EventArgs e)
 	// see if the connection string works
 	try
 	{
-		dbutil = new DbUtil();
-		dbutil.get_sqlconnection();
+		
+		btnet.DbUtil.get_sqlconnection();
 
 		try
 		{
-			dbutil.execute_nonquery("select count(1) from users");
+			btnet.DbUtil.execute_nonquery("select count(1) from users");
 
 		}
 		catch (SqlException e1)
@@ -136,7 +136,7 @@ void on_logon(Object sender, EventArgs e)
     {
         sql = "select us_id from users where us_username = N'$us'";
     	sql = sql.Replace("$us", user.Value.Replace("'","''"));
-    	DataRow dr = dbutil.get_datarow(sql);
+    	DataRow dr = btnet.DbUtil.get_datarow(sql);
         if (dr != null)
         {
             int us_id = (int)dr["us_id"];

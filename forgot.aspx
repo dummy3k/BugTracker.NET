@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 #pragma warning disable 618
 #warning System.Web.Mail is deprecated, but it doesn't work yet with "explicit" SSL, so keeping it for now - corey
 
-DbUtil dbutil;
+
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -45,10 +45,10 @@ void Page_Load(Object sender, EventArgs e)
 		else
 		{
 
-			dbutil = new DbUtil();
+			
 
 			// check if email exists
-			int user_count = (int) dbutil.execute_scalar(
+			int user_count = (int) btnet.DbUtil.execute_scalar(
 				"select count(1) from users where us_email = N'" + email.Value.Replace("'","''") + "'");
 
 			if (user_count == 1)
@@ -71,7 +71,7 @@ select @username us_username";
 				sql = sql.Replace("$guid",guid);
 				sql = sql.Replace("$email", email.Value.Replace("'","''"));
 
-				DataRow dr = dbutil.get_datarow(sql);
+				DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 				string result = btnet.Email.send_email(
 					email.Value,

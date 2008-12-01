@@ -9,22 +9,22 @@ Distributed under the terms of the GNU General Public License
 
 
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 
 void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "statuses";
 
-	ds = dbutil.get_dataset (
+	ds = btnet.DbUtil.get_dataset (
 		@"select st_id [id],
 		st_name [status],
 		st_sort_seq [sort seq],

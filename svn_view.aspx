@@ -9,7 +9,7 @@ Distributed under the terms of the GNU General Public License
 //Copyright 2002-2008 Corey Trager
 //Distributed under the terms of the GNU General Public License
 
-DbUtil dbutil;
+
 Security security;
 
 string repository_url = "";
@@ -23,11 +23,11 @@ void Page_Load(Object sender, EventArgs e)
 {
 	Util.do_not_cache(Response);
 	Response.ContentType = "text/plain";
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
-	btnet.Util.get_subversion_connection_info(dbutil,
+	btnet.Util.get_subversion_connection_info(
 		Convert.ToInt32(Request["bugid"]),
 		ref repository_url,
 		ref svn_username,

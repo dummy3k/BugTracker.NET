@@ -9,7 +9,7 @@ Distributed under the terms of the GNU General Public License
 
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 
 
@@ -18,9 +18,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	msg.InnerText = "";
 
@@ -249,7 +249,7 @@ alter table bugs add [$nm] $dt $ln $null $df";
 		bool alter_table_worked = false;
 		try
 		{
-			dbutil.execute_nonquery(sql);
+			btnet.DbUtil.execute_nonquery(sql);
 			alter_table_worked = true;
 		}
 		catch (Exception e2)
@@ -278,7 +278,7 @@ alter table bugs add [$nm] $dt $ln $null $df";
 			sql = sql.Replace("$ss", sort_seq.Value);
 			sql = sql.Replace("$dt", dropdown_type.SelectedItem.Value.Replace("'", "''"));
 
-			dbutil.execute_nonquery(sql);
+			btnet.DbUtil.execute_nonquery(sql);
 			Application["custom_columns_dataset"]  = null;
 			Server.Transfer ("customfields.aspx");
 		}

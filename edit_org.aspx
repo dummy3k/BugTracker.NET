@@ -10,7 +10,7 @@ Distributed under the terms of the GNU General Public License
 int id;
 String sql;
 
-DbUtil dbutil;
+
 Security security;
 Dictionary<string,int> dict_custom_field_permission_level = new Dictionary<string, int>();
 DataSet ds_custom;
@@ -43,9 +43,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.MUST_BE_ADMIN);
+	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "edit organization";
@@ -62,7 +62,7 @@ void Page_Load(Object sender, EventArgs e)
 		id = Convert.ToInt32(var);
 	}
 
-	ds_custom = Util.get_custom_columns(dbutil);
+	ds_custom = Util.get_custom_columns();
 
 	if (!IsPostBack)
 	{
@@ -100,7 +100,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			sql = @"select * from orgs where og_id = $og_id";
 			sql = sql.Replace("$og_id", Convert.ToString(id));
-			DataRow dr = dbutil.get_datarow(sql);
+			DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 			// Fill in this form
 			name.Value = (string) dr["og_name"];
@@ -303,7 +303,7 @@ update orgs set
 			sql = sql.Replace("$custom3$",custom3);
 		}
 
-		dbutil.execute_nonquery(sql);
+		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("orgs.aspx");
 
 	}

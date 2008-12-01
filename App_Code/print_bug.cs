@@ -132,8 +132,8 @@ namespace btnet
 			// Get custom column info  (There's an inefficiency here - we just did this
 			// same call in get_bug_datarow...)
 
-			DbUtil dbutil = new DbUtil();
-			DataSet ds_custom_cols = btnet.Util.get_custom_columns(dbutil);
+			
+			DataSet ds_custom_cols = btnet.Util.get_custom_columns();
 
 
 			// Show custom columns
@@ -170,7 +170,7 @@ namespace btnet
 							if (userid != 0)
 							{
 								string sql_get_username = "select us_username from users where us_id = $1";
-								s = (string) dbutil.execute_scalar(sql_get_username.Replace("$1", Convert.ToString(userid)));
+								s = (string) btnet.DbUtil.execute_scalar(sql_get_username.Replace("$1", Convert.ToString(userid)));
 							}
 						}
 					}
@@ -204,7 +204,7 @@ namespace btnet
 
 				sql = sql.Replace("$pj", Convert.ToString((int)dr["project"]));
 
-				DataRow project_dr = dbutil.get_datarow(sql);
+				DataRow project_dr = btnet.DbUtil.get_datarow(sql);
 
 
 				if (project_dr != null)
@@ -242,7 +242,7 @@ namespace btnet
 				order by 1";
 
 			sql2 = sql2.Replace("$bg", Convert.ToString(dr["id"]));
-			DataSet ds_relationships = dbutil.get_dataset(sql2);
+			DataSet ds_relationships = btnet.DbUtil.get_dataset(sql2);
 
 			if (ds_relationships.Tables[0].Rows.Count > 0)
 			{
@@ -1068,8 +1068,8 @@ and a.bp_parent is null";
 			sql += "\n order by a.bp_id desc";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
-            DbUtil dbutil = new DbUtil();
-            return dbutil.get_dataset(sql);
+            
+            return btnet.DbUtil.get_dataset(sql);
 
         }
 

@@ -9,7 +9,7 @@ Distributed under the terms of the GNU General Public License
 
 int bugid;
 DataSet ds;
-DbUtil dbutil;
+
 Security security;
 int permission_level;
 string ses;
@@ -20,9 +20,9 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	dbutil = new DbUtil();
+	
 	security = new Security();
-	security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 	
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 			+ "tasks";
@@ -115,7 +115,7 @@ order by tsk_sort_sequence, tsk_id";
 	sql = sql.Replace("$bugid", Convert.ToString(bugid));
 	sql = sql.Replace("$ses", ses);
 	
-	ds = dbutil.get_dataset(sql);
+	ds = btnet.DbUtil.get_dataset(sql);
 
 }
 

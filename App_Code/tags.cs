@@ -34,8 +34,8 @@ namespace btnet
 			SortedDictionary<string,List<int>> tags = new SortedDictionary<string,List<int>>();
 
 			// update the cache
-			DbUtil dbutil = new DbUtil();
-			DataSet ds = dbutil.get_dataset("select bg_id, bg_tags from bugs where isnull(bg_tags,'') <> ''");
+			
+			DataSet ds = btnet.DbUtil.get_dataset("select bg_id, bg_tags from bugs where isnull(bg_tags,'') <> ''");
 
 			foreach (DataRow dr in ds.Tables[0].Rows)
 			{
