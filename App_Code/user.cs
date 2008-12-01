@@ -34,6 +34,9 @@ namespace btnet
         public bool can_use_reports = false;
         public bool can_edit_reports = false;
         public bool can_be_assigned_to = true;
+        
+        public bool can_view_tasks = true;
+        public bool can_edit_tasks = true;
 
         public int other_orgs_permission_level = Security.PERMISSION_ALL;
         public int org = 0;
@@ -77,6 +80,8 @@ namespace btnet
             this.can_use_reports = Convert.ToBoolean(dr["og_can_use_reports"]);
             this.can_edit_reports = Convert.ToBoolean(dr["og_can_edit_reports"]);
             this.can_be_assigned_to = Convert.ToBoolean(dr["og_can_be_assigned_to"]);
+            this.can_view_tasks = Convert.ToBoolean(dr["og_can_view_tasks"]);
+            this.can_edit_tasks = Convert.ToBoolean(dr["og_can_edit_tasks"]);
             this.other_orgs_permission_level = (int)dr["og_other_orgs_permission_level"];
             this.org = (int)dr["og_id"];
             this.org_name = (string) dr["og_name"];

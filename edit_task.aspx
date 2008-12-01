@@ -33,7 +33,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	int permission_level = Bug.get_bug_permission_level(bugid, security);
 
-	if (permission_level != Security.PERMISSION_ALL)
+	if (permission_level != Security.PERMISSION_ALL || !security.user.can_edit_tasks)
 	{
 		Response.Write("You are not allowed to edit this item");
 		Response.End();

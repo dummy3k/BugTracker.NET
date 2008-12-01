@@ -54,12 +54,29 @@ edit_comment.aspx(31): security.check_security(dbutil, HttpContext.Current, Secu
 
 send email?
 
-EnableRelationships
+EnableRelationships << off by default
 
 delete from emailed_links where el_username in (select us_username from users where us_id = $us)
 
+org permission
+
+you might need to edit your orgs to turn on permissions.
 og_can_view_tasks
 og_can_edit_tasks
+
+upgrade.sql
+
+
+select 
+org_name [customer],
+datepart('year',tsk_creation
+sum(
+case 
+when tsk_durations_units = 'minutes' then actual_duration / 60.0
+when tsk_durations_units = 'days' then actual_duration * 8 
+else actual_duration [hours]),
+
+from bug_tasks
 
 -----------------------------------------------------------------------
 Version 3.0.4   11/28/2008 

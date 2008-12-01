@@ -522,19 +522,21 @@ void Page_Load(Object sender, EventArgs e)
 				revisions.InnerHtml = revisions_link;
 			}
 
-			if (btnet.Util.get_setting("EnableTasks","0") == "1")
+			if (security.user.can_view_tasks)
 			{
-				int task_cnt = 0;
-				if (id != 0)
+				if (btnet.Util.get_setting("EnableTasks","0") == "1")
 				{
-					task_cnt = (int) dr["task_cnt"];
+					int task_cnt = 0;
+					if (id != 0)
+					{
+						task_cnt = (int) dr["task_cnt"];
+					}
+					string tasks_link = "<a target=_blank href=tasks_frame.aspx?bugid="
+						+ Convert.ToString(id)
+					+ " title='View sub-tasks/time-tracking entries related to this item'><img src=clock.png border=0 align=top>&nbsp;tasks/time(<span id=task_cnt>" + task_cnt + "</span>)</a>";
+					tasks.InnerHtml = tasks_link;
 				}
-				string tasks_link = "<a target=_blank href=tasks_frame.aspx?bugid="
-					+ Convert.ToString(id)
-				+ " title='View sub-tasks/time-tracking entries related to this item'><img src=clock.png border=0 align=top>&nbsp;tasks/time(<span id=task_cnt>" + task_cnt + "</span>)</a>";
-				tasks.InnerHtml = tasks_link;
 			}
-
 
 			format_subcribe_cancel_link();
 
