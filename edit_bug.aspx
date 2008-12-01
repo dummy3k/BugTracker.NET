@@ -477,13 +477,15 @@ void Page_Load(Object sender, EventArgs e)
 				attachment.InnerHtml = attachment_link;
 			}
 
-
-			if (permission_level != Security.PERMISSION_READONLY)
+			if (!security.user.is_guest)
 			{
-				string send_email_link = "<a href='javascript:send_email("
-					+ Convert.ToString(id)
-					+ ")' title='Send an email about this item'><img src=email_edit.png border=0 align=top>&nbsp;send email</a>";
-				send_email.InnerHtml = send_email_link;
+				if (permission_level != Security.PERMISSION_READONLY)
+				{
+					string send_email_link = "<a href='javascript:send_email("
+						+ Convert.ToString(id)
+						+ ")' title='Send an email about this item'><img src=email_edit.png border=0 align=top>&nbsp;send email</a>";
+					send_email.InnerHtml = send_email_link;
+				}
 			}
 
 			if (permission_level != Security.PERMISSION_READONLY)
@@ -494,16 +496,18 @@ void Page_Load(Object sender, EventArgs e)
 				subscribers.InnerHtml = subscribers_link;
 			}
 
-
-			int relationship_cnt = 0;
-			if (id != 0)
-			{
-				relationship_cnt = (int) dr["relationship_cnt"];
-			}
-			string relationships_link = "<a target=_blank href=relationships.aspx?bgid="
-				+ Convert.ToString(id)
-				+ " title='Create a relationship between this item and another item'><img src=database_link.png border=0 align=top>&nbsp;relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
-			relationships.InnerHtml = relationships_link;
+            if (btnet.Util.get_setting("EnableRelationships", "0") == "1")
+            {
+                int relationship_cnt = 0;
+                if (id != 0)
+                {
+                    relationship_cnt = (int)dr["relationship_cnt"];
+                }
+                string relationships_link = "<a target=_blank href=relationships.aspx?bgid="
+                    + Convert.ToString(id)
+                    + " title='Create a relationship between this item and another item'><img src=database_link.png border=0 align=top>&nbsp;relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
+                relationships.InnerHtml = relationships_link;
+            }
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")
 			{
@@ -517,11 +521,6 @@ void Page_Load(Object sender, EventArgs e)
 				+ " title='View Subversion revisions related to this item'><img src=accept.png border=0 align=top>&nbsp;svn revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
 				revisions.InnerHtml = revisions_link;
 			}
-			else
-			{
-				revisions.InnerHtml = "";
-			}
-
 
 			if (btnet.Util.get_setting("EnableTasks","0") == "1")
 			{
@@ -534,10 +533,6 @@ void Page_Load(Object sender, EventArgs e)
 					+ Convert.ToString(id)
 				+ " title='View sub-tasks/time-tracking entries related to this item'><img src=clock.png border=0 align=top>&nbsp;tasks/time(<span id=task_cnt>" + task_cnt + "</span>)</a>";
 				tasks.InnerHtml = tasks_link;
-			}
-			else
-			{
-				tasks.InnerHtml = "";
 			}
 
 

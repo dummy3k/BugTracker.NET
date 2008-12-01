@@ -550,8 +550,10 @@ where not exists (select * from bug_user_seen where sn_user = $this_usid and sn_
 			sql += @"
 declare @revisions int
 declare @tasks int
+declare @related int;
 set @revisions = 0
-set @tasks = 0";
+set @tasks = 0
+set @related = 0";
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration", "0") == "1")
 			{
@@ -570,11 +572,15 @@ from bug_tasks
 where tsk_bug = $id;";
 			}
 
-			sql += @"
-declare @related int;
+			if (btnet.Util.get_setting("EnableRelationships", "0") == "1")
+			{
+                sql += @"
 select @related = count(1)
 from bug_relationships
-where re_bug1 = $id;
+where re_bug1 = $id;";
+            }
+    
+            sql += @"
 
 select bg_id [id],
 bg_short_desc [short_desc],

@@ -58,6 +58,7 @@ edit_comment.aspx(31): security.check_security(dbutil, HttpContext.Current, Secu
 
 send email?
 
+EnableRelationships
 
 -----------------------------------------------------------------------
 Version 3.0.4   11/28/2008 

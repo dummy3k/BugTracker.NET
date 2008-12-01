@@ -91,7 +91,7 @@ iframe {
 <% security.write_menu(Response, "reports"); %>
 
 <% if (security.user.is_guest) /* no dashboard */{ %>
-<span style="color:Gray;">edit dashboard not available to "guest" user</span>
+<span class="disabled_link">edit dashboard not available to "guest" user</span>
 <% } else { %>
 <a href=edit_dashboard.aspx>edit dashboard</a>
 <% } %>

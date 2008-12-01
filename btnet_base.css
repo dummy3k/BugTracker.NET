@@ -356,6 +356,12 @@ textarea {
 	border: 1px solid #cccccc;
 }
 
+
+.disabled_link
+{
+	color:gray;
+}
+
 #edit_bug_menu ul
 {
 	list-style: none;
