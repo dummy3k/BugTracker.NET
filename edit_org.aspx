@@ -114,6 +114,8 @@ void Page_Load(Object sender, EventArgs e)
 			can_use_reports.Checked = Convert.ToBoolean((int)dr["og_can_use_reports"]);
 			can_edit_reports.Checked = Convert.ToBoolean((int)dr["og_can_edit_reports"]);
 			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["og_can_be_assigned_to"]);
+			can_view_tasks.Checked = Convert.ToBoolean((int)dr["og_can_view_tasks"]);
+			can_edit_tasks.Checked = Convert.ToBoolean((int)dr["og_can_edit_tasks"]);
 
 			other_orgs.SelectedValue = Convert.ToString((int)dr["og_other_orgs_permission_level"]);
 
@@ -144,7 +146,12 @@ void Page_Load(Object sender, EventArgs e)
 
 		}
 	}
-
+	else
+	foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+	{
+		string bg_name = (string)dr_custom["name"];
+		dict_custom_field_permission_level[bg_name] = Convert.ToInt32(Request[bg_name]);
+	}
 }
 
 
@@ -190,6 +197,8 @@ insert into orgs
 	og_can_use_reports,
 	og_can_edit_reports,
 	og_can_be_assigned_to,
+	og_can_view_tasks,
+	og_can_edit_tasks,
 	og_other_orgs_permission_level,
 	og_project_field_permission_level,
 	og_org_field_permission_level,
@@ -201,10 +210,21 @@ insert into orgs
 	og_udf_field_permission_level
 	$custom1$
 	)
-	values (N'$nam', $non,
-	$ext, $ces, $cdb,
-	$cep, $cmb, $cme,
-	$cur, $cer, $cba, $other_orgs,
+	values (
+	N'$name', 
+	$non_admins_can_use,
+	$external_user,
+	$can_edit_sql,
+	$can_delete_bug,
+	$can_edit_and_delete_posts,
+	$can_merge_bugs,
+	$can_mass_edit_bugs,
+	$can_use_reports,
+	$can_edit_reports,
+	$can_be_assigned_to,
+	$can_view_tasks,
+	$can_edit_tasks,
+	$other_orgs,
 	$flp_project,
 	$flp_org,
 	$flp_category,
@@ -221,17 +241,19 @@ insert into orgs
 
 			sql = @"
 update orgs set
-	og_name = N'$nam',
-	og_non_admins_can_use = $non,
-	og_external_user = $ext,
-	og_can_edit_sql = $ces,
-	og_can_delete_bug = $cdb,
-	og_can_edit_and_delete_posts = $cep,
-	og_can_merge_bugs = $cmb,
-	og_can_mass_edit_bugs = $cme,
-	og_can_use_reports = $cur,
-	og_can_edit_reports = $cer,
-	og_can_be_assigned_to = $cba,
+	og_name = N'$name',
+	og_non_admins_can_use = $non_admins_can_use,
+	og_external_user = $external_user,
+	og_can_edit_sql = $can_edit_sql,
+	og_can_delete_bug = $can_delete_bug,
+	og_can_edit_and_delete_posts = $can_edit_and_delete_posts,
+	og_can_merge_bugs = $can_merge_bugs,
+	og_can_mass_edit_bugs = $can_mass_edit_bugs,
+	og_can_use_reports = $can_use_reports,
+	og_can_edit_reports = $can_edit_reports,
+	og_can_be_assigned_to = $can_be_assigned_to,
+	og_can_view_tasks = $can_view_tasks,
+	og_can_edit_tasks = $can_edit_tasks,
 	og_other_orgs_permission_level = $other_orgs,
 	og_project_field_permission_level = $flp_project,
 	og_org_field_permission_level = $flp_org,
@@ -248,17 +270,19 @@ update orgs set
 
 		}
 
-		sql = sql.Replace("$nam", name.Value.Replace("'","''"));
-		sql = sql.Replace("$non", Util.bool_to_string(non_admins_can_use.Checked));
-		sql = sql.Replace("$ext", Util.bool_to_string(external_user.Checked));
-		sql = sql.Replace("$ces", Util.bool_to_string(can_edit_sql.Checked));
-		sql = sql.Replace("$cdb", Util.bool_to_string(can_delete_bug.Checked));
-		sql = sql.Replace("$cep", Util.bool_to_string(can_edit_and_delete_posts.Checked));
-		sql = sql.Replace("$cmb", Util.bool_to_string(can_merge_bugs.Checked));
-		sql = sql.Replace("$cme", Util.bool_to_string(can_mass_edit_bugs.Checked));
-		sql = sql.Replace("$cur", Util.bool_to_string(can_use_reports.Checked));
-		sql = sql.Replace("$cer", Util.bool_to_string(can_edit_reports.Checked));
-		sql = sql.Replace("$cba", Util.bool_to_string(can_be_assigned_to.Checked));
+		sql = sql.Replace("$name", name.Value.Replace("'","''"));
+		sql = sql.Replace("$non_admins_can_use", Util.bool_to_string(non_admins_can_use.Checked));
+		sql = sql.Replace("$external_user", Util.bool_to_string(external_user.Checked));
+		sql = sql.Replace("$can_edit_sql", Util.bool_to_string(can_edit_sql.Checked));
+		sql = sql.Replace("$can_delete_bug", Util.bool_to_string(can_delete_bug.Checked));
+		sql = sql.Replace("$can_edit_and_delete_posts", Util.bool_to_string(can_edit_and_delete_posts.Checked));
+		sql = sql.Replace("$can_merge_bugs", Util.bool_to_string(can_merge_bugs.Checked));
+		sql = sql.Replace("$can_mass_edit_bugs", Util.bool_to_string(can_mass_edit_bugs.Checked));
+		sql = sql.Replace("$can_use_reports", Util.bool_to_string(can_use_reports.Checked));
+		sql = sql.Replace("$can_edit_reports", Util.bool_to_string(can_edit_reports.Checked));
+		sql = sql.Replace("$can_be_assigned_to", Util.bool_to_string(can_be_assigned_to.Checked));
+		sql = sql.Replace("$can_view_tasks", Util.bool_to_string(can_view_tasks.Checked));
+		sql = sql.Replace("$can_edit_tasks", Util.bool_to_string(can_edit_tasks.Checked));
 		sql = sql.Replace("$other_orgs", other_orgs.SelectedValue);
 		sql = sql.Replace("$flp_project", project_field.SelectedValue);
 		sql = sql.Replace("$flp_org", org_field.SelectedValue);
@@ -556,6 +580,19 @@ update orgs set
 		<td class=lbl>Can create/edit reports</td>
 		<td>&nbsp</td>
 		</tr>
+
+		<tr>
+		<td><asp:checkbox runat="server" class=cb id="can_view_tasks"/></td>
+		<td class=lbl>Can view tasks/time</td>
+		<td>&nbsp</td>
+		</tr>
+		<tr>
+		<td><asp:checkbox runat="server" class=cb id="can_edit_tasks"/></td>
+		<td class=lbl>Can edit tasks/time</td>
+		<td>&nbsp</td>
+		</tr>
+
+		
 	</table>
 
 	<table border=0>

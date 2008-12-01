@@ -226,24 +226,24 @@ Response.Write (Application["custom_logo"]);
 
 <span>
 
-<% if (Util.get_setting("ShowForgotPasswordLink","1") == "1") { %>
-<p>
-<a style="font-size: 8pt;"href="forgot.aspx">Forgot your username or password?</a>
-<p>
-<% } %>
-
 <% if (Util.get_setting("AllowGuestWithoutLogin","0") == "1") { %>
 <p>
 <a style="font-size: 8pt;"href="bugs.aspx">Continue as "guest" without logging in</a>
 <p>
 <% } %>
 
-
 <% if (Util.get_setting("AllowSelfRegistration","0") == "1") { %>
 <p>
 <a style="font-size: 8pt;"href="register.aspx">Register</a>
 <p>
 <% } %>
+
+<% if (Util.get_setting("ShowForgotPasswordLink","1") == "1") { %>
+<p>
+<a style="font-size: 8pt;"href="forgot.aspx">Forgot your username or password?</a>
+<p>
+<% } %>
+
 
 </span>
 

@@ -36,10 +36,6 @@ ldap
 blog about lucene.net
 
 * relationships in print?
-* change history in print?
-* images in print?
-
-how to pick a bug tracker
 
 sending email as guest
 
@@ -59,6 +55,11 @@ edit_comment.aspx(31): security.check_security(dbutil, HttpContext.Current, Secu
 send email?
 
 EnableRelationships
+
+delete from emailed_links where el_username in (select us_username from users where us_id = $us)
+
+og_can_view_tasks
+og_can_edit_tasks
 
 -----------------------------------------------------------------------
 Version 3.0.4   11/28/2008 

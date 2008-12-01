@@ -47,6 +47,7 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		// do delete here
 		sql = @"
+delete from emailed_links where el_username in (select us_username from users where us_id = $us)
 delete users where us_id = $us
 delete project_user_xref where pu_user = $us
 delete bug_subscriptions where bs_user = $us
