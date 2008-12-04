@@ -44,6 +44,48 @@ project custom dropdown?
 -----------------------------------------------------------------------
 Version 3.0.5   11/xx/2008 
 -----------------------------------------------------------------------
+* I get the exact same error when I attempt to login. When I start the project from Visual Studio with the built-in web server, it works fine, but when I debug with IIS I see that HttpContext.Current.Session is always null, even in the Page_Load of default.aspx. I verified that session state was enabled both in IIS settings (globally, for the default web site, and the BTNET virtual directory running under the default site) and in the Web.Config for the site, which I figured should trump all the other settings anyhow. 
+ 
+
+
+* That's a bug.  Sorry.    Around line 183 in bug.cs, add "delete from bug_tasks where tsk_bug = $bg"
+
+* There's a minor bug, if you have Windows Integrated Authentication then the code to update the user's Most Recent Login time (users.us_most_recent_login_datetime) is never called. 
+ 
+*& I recommend inserting five new lines into LoginNT.aspx: 
+ 
+60: DataRow dr = dbutil.get_datarow(sql); 
+61: if (dr != null) 
+62: { 
+63: // The user was found, so bake a cookie and redirect 
+64: int userid = (int) dr["us_id"]; 
+65: create_session ( 
+66: userid, 
+67: (string) dr["us_username"], 
+68: "1"); 
+NEW1: // Also update us_most_recent_login_datetime 
+NEW2: sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us"; 
+NEW3: sql = sql.Replace("$us", Convert.ToString((int)dr["us_id"])); 
+NEW4: dbutil.execute_nonquery(sql); 
+NEW5: // redirect 
+69: redirect(); 
+70: } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 * guest sees add task link
 

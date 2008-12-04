@@ -43,7 +43,6 @@ namespace btnet
 		public void check_security(HttpContext asp_net_context, int level)
 		{
 			Util.set_context(asp_net_context);
-			this.context = asp_net_context;
 			HttpRequest Request = asp_net_context.Request;
 			HttpResponse Response = asp_net_context.Response;
 			HttpCookie cookie = Request.Cookies["se_id"];
