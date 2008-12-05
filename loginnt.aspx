@@ -62,7 +62,9 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			// The user was found, so bake a cookie and redirect
 			int userid = (int) dr["us_id"];
-			create_session (
+			btnet.Security.create_session (
+				Request,
+				Response,
 				userid,
 				(string) dr["us_username"],
 				"1");
@@ -239,7 +241,9 @@ END";
             if (dr != null) // automatically created the user
             {
                 // The user was created, so bake a cookie and redirect
-                create_session(
+                btnet.Security.create_session(
+                	Request,
+                	Response,
                     (int)dr["us_id"],
                     windows_username.Replace("'", "''"),
                     "1");
@@ -259,7 +263,9 @@ END";
 		{
 			// The Guest user was found, so bake a cookie and redirect
 			int userid = (int) dr["us_id"];
-			create_session (
+			btnet.Security.create_session (
+				Request,
+				Response,
 				userid,
 				(string) dr["us_username"],
 				"1");

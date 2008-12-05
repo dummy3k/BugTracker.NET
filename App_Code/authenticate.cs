@@ -53,9 +53,6 @@ where us_username = N'$username'";
 
             if (authenticated)
             {
-                sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us";
-                sql = sql.Replace("$us", Convert.ToString((int)dr["us_id"]));
-                btnet.DbUtil.execute_nonquery(sql);
                 return true;
             }
             else

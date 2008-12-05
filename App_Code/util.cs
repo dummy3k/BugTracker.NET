@@ -143,6 +143,7 @@ and us_active = 1";
 			// no previous session, no guest login allowed
 			if (dr == null)
 			{
+				btnet.Util.write_to_log("no previous session, no guest login allowed");
 				Response.Redirect(target);
 			}
 			else
@@ -157,19 +158,23 @@ and us_active = 1";
 			}
 			else
 			{
+				btnet.Util.write_to_log("blanking cookie");
 				asp_net_context.Session["session_cookie"]  = "";
 			}
 
 			if (level == MUST_BE_ADMIN && !user.is_admin)
 			{
+				btnet.Util.write_to_log("must be admin, redirecting");
 				Response.Redirect("default.aspx");
 			}
 			else if (level == ANY_USER_OK_EXCEPT_GUEST && user.is_guest)
 			{
+				btnet.Util.write_to_log("cant be guest, redirecting");
 				Response.Redirect("default.aspx");
 			}
 			else if (level == MUST_BE_ADMIN_OR_PROJECT_ADMIN && !user.is_admin && !user.is_project_admin)
 			{
+				btnet.Util.write_to_log("must be project admin, redirecting");
 				Response.Redirect("default.aspx");
 			}
 
@@ -181,6 +186,40 @@ and us_active = 1";
 			{
 				auth_method = "plain";
 			}
+		}
+
+		///////////////////////////////////////////////////////////////////////
+		public static void create_session(HttpRequest Request, HttpResponse Response, int userid, string username, string NTLM)
+		{
+
+			// Generate a random session id
+			// Don't use a regularly incrementing identity
+			// column because that can be guessed.
+			string guid = Guid.NewGuid().ToString();
+
+			btnet.Util.write_to_log("guid=" + guid);
+
+			string sql = @"
+insert into sessions (se_id, se_user) values('$gu', $us)
+update users set us_most_recent_login_datetime = getdate() where us_id = $us";
+
+			sql = sql.Replace("$gu", guid);
+			sql = sql.Replace("$us", Convert.ToString(userid));
+
+			btnet.DbUtil.execute_nonquery(sql);
+
+			string sAppPath = Request.Url.AbsolutePath;
+			sAppPath = sAppPath.Substring(0, sAppPath.LastIndexOf('/'));
+			Util.write_to_log("AppPath:" + sAppPath);
+
+			Response.Cookies["se_id"].Value = guid;
+			Response.Cookies["se_id"].Path = sAppPath;
+			Response.Cookies["user"]["name"] = username;
+			Response.Cookies["user"]["NTLM"] = NTLM;
+			Response.Cookies["user"].Path = sAppPath;
+			DateTime dt = DateTime.Now;
+			TimeSpan ts = new TimeSpan(365, 0, 0, 0);
+			Response.Cookies["user"].Expires = dt.Add(ts);
 		}
 
         ///////////////////////////////////////////////////////////////////////
@@ -281,7 +320,7 @@ function on_submit_search()
             // search
             if (Util.get_setting("EnableLucene", "1") == "1")
             {
-                string query = (string) context.Session["query"];
+                string query = (string) HttpContext.Current.Session["query"];
                 if (query == null)
                 {
                     query = "";

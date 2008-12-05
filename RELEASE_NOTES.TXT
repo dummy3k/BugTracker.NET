@@ -44,67 +44,35 @@ project custom dropdown?
 -----------------------------------------------------------------------
 Version 3.0.5   11/xx/2008 
 -----------------------------------------------------------------------
-* I get the exact same error when I attempt to login. When I start the project from Visual Studio with the built-in web server, it works fine, but when I debug with IIS I see that HttpContext.Current.Session is always null, even in the Page_Load of default.aspx. I verified that session state was enabled both in IIS settings (globally, for the default web site, and the BTNET virtual directory running under the default site) and in the Web.Config for the site, which I figured should trump all the other settings anyhow. 
- 
+
+TEST WITH WINDOWS SECURITY
 
 
-* That's a bug.  Sorry.    Around line 183 in bug.cs, add "delete from bug_tasks where tsk_bug = $bg"
+To migrate to this release, run the QL in upgrade.sql.
 
-* There's a minor bug, if you have Windows Integrated Authentication then the code to update the user's Most Recent Login time (users.us_most_recent_login_datetime) is never called. 
- 
-*& I recommend inserting five new lines into LoginNT.aspx: 
- 
-60: DataRow dr = dbutil.get_datarow(sql); 
-61: if (dr != null) 
-62: { 
-63: // The user was found, so bake a cookie and redirect 
-64: int userid = (int) dr["us_id"]; 
-65: create_session ( 
-66: userid, 
-67: (string) dr["us_username"], 
-68: "1"); 
-NEW1: // Also update us_most_recent_login_datetime 
-NEW2: sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us"; 
-NEW3: sql = sql.Replace("$us", Convert.ToString((int)dr["us_id"])); 
-NEW4: dbutil.execute_nonquery(sql); 
-NEW5: // redirect 
-69: redirect(); 
-70: } 
+alter table orgs add og_can_view_tasks int not null default(0)
+alter table orgs add og_can_edit_tasks int not null default(0)
 
 
+* Org permissions now include settings for "view tasks/time" and 
+"edit tasks/time".   They are OFF by default, so you might need to edit
+your org permissions if you have "EnableTasks" set to "1".
 
+* Added new Web.config setting "EnableRelationships" for turning that
+feature on and off.   It is OFF by default, so if you were using it
+you need to add the line to your Web.config, and set it to "1".
 
+* Fixed bug where change history was missing from the emails.  The
+bug was introduced in version 3.0.4.
 
+* Fixed bug where deleting of bugs was leaving behind the related tasks.
+Now deleting them.
 
+* Fixed bug where us_most_recent_login_datetime wasn't being updated
+if Windows authentication was being used.
 
-
-
-
-
-
-
-
-
-
-
-* guest sees add task link
-
-* permissions for tasks
-
-edit_attachment.aspx(28): security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
-edit_comment.aspx(31): security.check_security(dbutil, HttpContext.Current, Security.ANY_USER_OK_EXCEPT_GUEST);
-
-send email?
-
-EnableRelationships << off by default
-
-delete from emailed_links where el_username in (select us_username from users where us_id = $us)
-
-org permission
-
-you might need to edit your orgs to turn on permissions.
-og_can_view_tasks
-og_can_edit_tasks
+* Fixed bug where guest was seeing "add task" link, but wasn't allowed
+to add task.
 
 upgrade.sql
 
@@ -117,7 +85,6 @@ case
 when tsk_durations_units = 'minutes' then actual_duration / 60.0
 when tsk_durations_units = 'days' then actual_duration * 8 
 else actual_duration [hours]),
-
 from bug_tasks
 
 -----------------------------------------------------------------------

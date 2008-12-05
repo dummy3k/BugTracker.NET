@@ -141,7 +141,9 @@ void on_logon(Object sender, EventArgs e)
         {
             int us_id = (int)dr["us_id"];
 
-            create_session(
+            btnet.Security.create_session(
+            	Request,
+            	Response,
                 us_id,
                 user.Value,
                 "0");
