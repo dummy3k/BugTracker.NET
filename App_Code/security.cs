@@ -375,8 +375,6 @@ function on_submit_search()
             Response.Write("<a target=_blank href=http://ifdefined.com/README.html>help</a></td>");
 
             Response.Write("</tr></table><br>");
-
         }
-
 	} // end Security
 }

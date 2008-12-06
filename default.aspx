@@ -5,7 +5,6 @@ Copyright 2002-2008 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
-<!-- #include file = "inc_logon.inc" -->
 
 <script language="C#" runat="server">
 
@@ -69,7 +68,7 @@ void Page_Load(Object sender, EventArgs e)
 		// If windows authentication only, then redirect
 		if (auth_mode == "1")
 		{
-			redirect("loginNT.aspx");
+			btnet.Util.redirect("loginNT.aspx", Request, Response);
 		}
 
 		// If previous login was with windows authentication, then try it again
@@ -77,7 +76,7 @@ void Page_Load(Object sender, EventArgs e)
     	{
 		    Response.Cookies["user"]["name"] = "";
 			Response.Cookies["user"]["NTLM"] = "0";
-			redirect("loginNT.aspx");
+			btnet.Util.redirect("loginNT.aspx", Request, Response);
 		}
 	}
 	else
@@ -126,7 +125,7 @@ void on_logon(Object sender, EventArgs e)
 	string auth_mode = Util.get_setting("WindowsAuthentication","0");
 	if ( auth_mode != "0" ) {
 		if (user.Value.Trim() == "") {
-			redirect("loginNT.aspx");
+			btnet.Util.redirect("loginNT.aspx", Request, Response);
 		}
 	}
 
@@ -148,7 +147,7 @@ void on_logon(Object sender, EventArgs e)
                 user.Value,
                 "0");
 
-            redirect();
+            btnet.Util.redirect(Request, Response);
         }
         else
         {

@@ -5,7 +5,6 @@ Copyright 2002-2008 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
-<!-- #include file = "inc_logon.inc" -->
 
 <script language="C#" runat="server">
 
@@ -30,7 +29,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	if (auth_mode == "0")
 	{
-		redirect("default.aspx");
+		btnet.Util.redirect("default.aspx", Request, Response);
 	}
 
 	// Get the logon user from IIS
@@ -68,7 +67,7 @@ void Page_Load(Object sender, EventArgs e)
 				userid,
 				(string) dr["us_username"],
 				"1");
-			redirect();
+			btnet.Util.redirect(Request, Response);
 		}
 
         // Is self register enabled for users authenticated by windows?
@@ -247,7 +246,7 @@ END";
                     (int)dr["us_id"],
                     windows_username.Replace("'", "''"),
                     "1");
-                redirect();
+                btnet.Util.redirect(Request, Response);
             }
         }
 
@@ -269,7 +268,7 @@ END";
 				userid,
 				(string) dr["us_username"],
 				"1");
-			redirect();
+			btnet.Util.redirect(Request, Response);
 		}
 
 		// If using mixed-mode authentication and we got this far,
@@ -277,7 +276,7 @@ END";
 		// to the manual screen.
 		if (auth_mode != "1")
 		{
-			redirect("default.aspx?msg=user+not+valid");
+			btnet.Util.redirect("default.aspx?msg=user+not+valid", Request, Response);
 		}
 
 		// If we are still here, then toss a 401 error.
