@@ -53,7 +53,6 @@ To migrate to this release, run the QL in upgrade.sql.
 alter table orgs add og_can_view_tasks int not null default(0)
 alter table orgs add og_can_edit_tasks int not null default(0)
 
-
 * Org permissions now include settings for "view tasks/time" and 
 "edit tasks/time".   They are OFF by default, so you might need to edit
 your org permissions if you have "EnableTasks" set to "1".
