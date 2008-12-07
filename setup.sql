@@ -569,6 +569,40 @@ values('Bugs by User',
 'select bg_reported_user, count(1) [r] into #t from bugs group by bg_reported_user; select bg_assigned_to_user, count(1) [a] into #t2 from bugs group by bg_assigned_to_user; select us_username, r [reported], a [assigned] from users left outer join #t on bg_reported_user = us_id left outer join #t2 on bg_assigned_to_user = us_id order by 1', 
 'table')
 
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values ('Hours by Org, Year, Month',
+'select og_name [organization], '
++ char(10) + ' datepart(year,tsk_created_date) [year],  '
++ char(10) + ' datepart(month,tsk_created_date) [month], '
++ char(10) + ' convert(decimal(8,1),sum( '
++ char(10) + ' case when tsk_duration_units = ''minutes'' then tsk_actual_duration / 60.0 '
++ char(10) + ' when tsk_duration_units = ''days'' then tsk_actual_duration * 8.0  '
++ char(10) + ' else tsk_actual_duration * 1.0 end)) [total hours] '
++ char(10) + ' from bug_tasks '
++ char(10) + ' inner join bugs on tsk_bug = bg_id '
++ char(10) + ' inner join orgs on bg_org = og_id '
++ char(10) + ' where isnull(tsk_actual_duration,0) <> 0 '
++ char(10) + ' group by og_name,datepart(year,tsk_created_date), datepart(month,tsk_created_date) ',
+'table')
+
+insert into reports (rp_desc, rp_sql, rp_chart_type)
+values ('Hours Remaining by Project',
+'select pj_name [project], '
++ char(10) + ' convert(decimal(8,1),sum( '
++ char(10) + ' case  '
++ char(10) + ' when tsk_duration_units = ''minutes'' then  '
++ char(10) + ' tsk_planned_duration / 60.0 * .01 * (100 - isnull(tsk_percent_complete,0)) '
++ char(10) + ' when tsk_duration_units = ''days'' then ' 
++ char(10) + ' tsk_planned_duration * 8.0  * .01 * (100 - isnull(tsk_percent_complete,0)) '
++ char(10) + ' else tsk_planned_duration * .01 * (100 - isnull(tsk_percent_complete,0)) '
++ char(10) + ' end)) [total hours] '
++ char(10) + ' from bug_tasks '
++ char(10) + ' inner join bugs on tsk_bug = bg_id '
++ char(10) + ' inner join projects on bg_project = pj_id '
++ char(10) + ' where isnull(tsk_planned_duration,0) <> 0 '
++ char(10) + ' group by pj_name ',
+'table')
+
 
 
 /* QUERIES */
