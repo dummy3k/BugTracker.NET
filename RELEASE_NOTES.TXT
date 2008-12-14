@@ -42,10 +42,10 @@ sending email as guest
 project custom dropdown?
 
 -----------------------------------------------------------------------
-Version 3.0.5   11/xx/2008 
+Version 3.0.5   12/13/2008 
 -----------------------------------------------------------------------
 
-To migrate to this release, run the QL in upgrade.sql.
+To migrate to this release, run the SQL in upgrade.sql.
 
 alter table orgs add og_can_view_tasks int not null default(0)
 alter table orgs add og_can_edit_tasks int not null default(0)
@@ -53,6 +53,10 @@ alter table orgs add og_can_edit_tasks int not null default(0)
 * Org permissions now include settings for "view tasks/time" and 
 "edit tasks/time".   They are OFF by default, so you might need to edit
 your org permissions if you have "EnableTasks" set to "1".
+
+* No longer supporting "CustomWelcomeHtml" in Web.config.  Instead, 
+put your custom HTML for the default.aspx into the custom_welcome.html
+file in the custom folder.
 
 * Added new Web.config setting "EnableRelationships" for turning that
 feature on and off.   It is OFF by default, so if you were using it

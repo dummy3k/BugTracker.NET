@@ -250,7 +250,7 @@ Response.Write (Application["custom_logo"]);
 
 </td></tr></table>
 
-<% Response.Write (Util.get_setting("CustomWelcomeHtml","")); %>
+<% Response.Write (Application["custom_welcome"]); %>
 </div>
 </body>
 </html>
