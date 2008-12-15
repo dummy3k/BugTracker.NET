@@ -176,7 +176,7 @@ namespace btnet
 		{
 
 			NameValueCollection name_values
-                = (NameValueCollection)System.Configuration.ConfigurationManager.GetSection("btnetSettings");
+                = (NameValueCollection)System.Configuration.ConfigurationManager.GetSection("appSettings");
 			if (string.IsNullOrEmpty(name_values[name]))
 			{
 				return default_value;

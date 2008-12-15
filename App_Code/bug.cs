@@ -188,6 +188,7 @@ delete from bug_posts where bp_bug = $bg
 delete from bug_subscriptions where bs_bug = $bg
 delete from bug_relationships where re_bug1 = $bg
 delete from bug_relationships where re_bug2 = $bg
+delete from bug_tasks where tsk_bug = $bg
 delete from bugs where bg_id = $bg";
 
 			sql = sql.Replace("$bg", id);

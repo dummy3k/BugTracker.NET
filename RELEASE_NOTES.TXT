@@ -11,7 +11,7 @@ http://ifdefined.com/readme.html#upgrading
 
 Corey's TO DO list:
 
-
+ 
 
 * add settings for turning off printing of change history.
 
@@ -41,6 +41,22 @@ sending email as guest
 
 project custom dropdown?
 
+
+-----------------------------------------------------------------------
+Version 3.0.6   12/XX/2008 
+-----------------------------------------------------------------------
+
+To upgrade to this release, make the following changes to your
+Web.config file:
+
+1) Delete the line in your web config that begins like this:
+<section name="btnetSettings"....  
+2) Change the word "btnetSettings" to "appSettings" in two places.
+
+* Fixed bug where deleting of bugs was leaving behind the related tasks.
+Now deleting them.  I said I fixed in in version 3.0.5, but, actually,
+I didn't.
+
 -----------------------------------------------------------------------
 Version 3.0.5   12/13/2008 
 -----------------------------------------------------------------------
@@ -65,14 +81,13 @@ you need to add the line to your Web.config, and set it to "1".
 * Fixed bug where change history was missing from the emails.  The
 bug was introduced in version 3.0.4.
 
-* Fixed bug where deleting of bugs was leaving behind the related tasks.
-Now deleting them.
-
 * Fixed bug where us_most_recent_login_datetime wasn't being updated
 if Windows authentication was being used.
 
 * Fixed bug where guest was seeing "add task" link, but wasn't allowed
 to add task.
+
+* Fixed bug 1949210 "Deleting a user doesn't delete Self Register info"
 
 * Added to setup.sql a couple sample reports related to the new
 tasks/time feature.
