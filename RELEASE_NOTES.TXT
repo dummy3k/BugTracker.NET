@@ -52,10 +52,16 @@ Web.config file:
 1) Delete the line in your web config that begins like this:
 <section name="btnetSettings"....  
 2) Change the word "btnetSettings" to "appSettings" in two places.
+This is related to bug 2410699 "IIS7 and btnetSettings, medium trust, 
+Web.config"
 
 * Fixed bug where deleting of bugs was leaving behind the related tasks.
 Now deleting them.  I said I fixed in in version 3.0.5, but, actually,
 I didn't.
+
+* Fixed bug where custom columns weren't being removed from the
+org table, so that if you added, deleted, then re-added a custom col,
+you would get an error.
 
 -----------------------------------------------------------------------
 Version 3.0.5   12/13/2008 

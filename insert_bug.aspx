@@ -284,6 +284,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			if (Request["$ORGANIZATION$"] != null && Request["$ORGANIZATION$"] != "") {orgid = Convert.ToInt32(Request["$ORGANIZATION$"]);}
 			if (Request["$CATEGORY$"] != null && Request["$CATEGORY$"] != "") {categoryid = Convert.ToInt32(Request["$CATEGORY$"]);}
+			if (Request["$PROJECT$"] != null && Request["$PROJECT$"] != "") {projectid = Convert.ToInt32(Request["$PROJECT$"]);}
 			if (Request["$PRIORITY$"] != null && Request["$PRIORITY$"] != "") {priorityid = Convert.ToInt32(Request["$PRIORITY$"]);}
 			if (Request["$ASSIGNEDTO$"] != null && Request["$ASSIGNEDTO$"] != "") {assignedid = Convert.ToInt32(Request["$ASSIGNEDTO$"]);}
 			if (Request["$STATUS$"] != null && Request["$STATUS$"] != "") {statusid = Convert.ToInt32(Request["$STATUS$"]);}

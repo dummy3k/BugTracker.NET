@@ -50,7 +50,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		// delete column itself
 		sql = @"
---alter table orgs drop column [og_$nm_field_permission_level]
+alter table orgs drop column [og_$nm_field_permission_level]
 alter table bugs drop column [$nm]";
 		
 		sql = sql.Replace("$nm", (string) dr["column_name"]);
