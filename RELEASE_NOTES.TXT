@@ -63,6 +63,10 @@ I didn't.
 org table, so that if you added, deleted, then re-added a custom col,
 you would get an error.
 
+* Fixed "Exception: System.InvalidOperationException: The connection was not 
+closed. The connection's current state is open." error when attaching
+a file to an email.
+
 -----------------------------------------------------------------------
 Version 3.0.5   12/13/2008 
 -----------------------------------------------------------------------

@@ -22,8 +22,11 @@ namespace btnet
 
             using (SqlConnection conn = get_sqlconnection())
             {
+                object returnValue;
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                return cmd.ExecuteScalar();
+                returnValue = cmd.ExecuteScalar();
+                conn.Close();
+                return returnValue;
             }
         }
 
@@ -32,11 +35,11 @@ namespace btnet
         {
             using (SqlConnection conn = get_sqlconnection())
             {
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                	cmd.ExecuteNonQuery();
-                }
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+                conn.Close();
             }
+
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -50,10 +53,9 @@ namespace btnet
 
             using (SqlConnection conn = get_sqlconnection())
             {
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                	cmd.ExecuteNonQuery();
-                }
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+                conn.Close();
             }
         }
 
@@ -68,6 +70,7 @@ namespace btnet
                 {
                     cmd.Connection = conn;
                     cmd.ExecuteNonQuery();
+                    conn.Close();
                 }
                 finally
                 {
@@ -89,7 +92,6 @@ namespace btnet
             {
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
-                    conn.Open();
                     return cmd.ExecuteReader(behavior | CommandBehavior.CloseConnection);
                 }
             }
