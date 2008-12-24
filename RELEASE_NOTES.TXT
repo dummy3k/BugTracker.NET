@@ -42,8 +42,24 @@ sending email as guest
 project custom dropdown?
 
 
+https://sourceforge.net/forum/forum.php?thread_id=2741623&forum_id=226938
+
+"Unknown email address.<br>Are you sure you spelled it correctly?" 
+ 
+being sure that the email was correct, i went into sql server and examined the users table rows. there were two users, an admin account and my account sharing my email address. thinking that perhaps this was the culprit, i updated the admin account to use another email and retried the forgot pw link. it then found my email correctly and i was able to reset and login.  
+ 
+i then checked the source and the count is being evaluated to 1, e.g. if count(user) = 1 carry on. 
+ 
+maybe the logic checking the count should be changed to > 1, and in that case a message indicating that more than one user uses this email, or routine should be adjusted to prompt the user to resolve which user you're resetting (perhaps an additional username field)? 
+ 
+ 
+in addition, the label Email: should probably be Password. 
+ 
+ 
+
+
 -----------------------------------------------------------------------
-Version 3.0.6   12/XX/2008 
+Version 3.0.6   12/22/2008 
 -----------------------------------------------------------------------
 
 To upgrade to this release, make the following changes to your
@@ -55,6 +71,10 @@ Web.config file:
 This is related to bug 2410699 "IIS7 and btnetSettings, medium trust, 
 Web.config"
 
+* Fixed "Exception: System.InvalidOperationException: The connection was
+not closed. The connection's current state is open." error when 
+attaching a file to an email.
+
 * Fixed bug where deleting of bugs was leaving behind the related tasks.
 Now deleting them.  I said I fixed in in version 3.0.5, but, actually,
 I didn't.
@@ -62,10 +82,6 @@ I didn't.
 * Fixed bug where custom columns weren't being removed from the
 org table, so that if you added, deleted, then re-added a custom col,
 you would get an error.
-
-* Fixed "Exception: System.InvalidOperationException: The connection was not 
-closed. The connection's current state is open." error when attaching
-a file to an email.
 
 -----------------------------------------------------------------------
 Version 3.0.5   12/13/2008 
