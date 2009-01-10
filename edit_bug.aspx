@@ -522,7 +522,7 @@ void Page_Load(Object sender, EventArgs e)
 				revisions.InnerHtml = revisions_link;
 			}
 
-			if (security.user.can_view_tasks)
+			if (security.user.is_admin || security.user.can_view_tasks)
 			{
 				if (btnet.Util.get_setting("EnableTasks","0") == "1")
 				{

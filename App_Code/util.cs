@@ -111,7 +111,10 @@ namespace btnet
 				string url = "";
 				if (HttpContext.Current != null)
 				{
-                    url = HttpContext.Current.Request.Url.ToString();
+                    if (HttpContext.Current.Request != null)
+                    {
+                    	url = HttpContext.Current.Request.Url.ToString();
+                    }
 				}
 
 				w.WriteLine(DateTime.Now.ToString("yyy-MM-dd HH:mm:ss")
@@ -139,7 +142,7 @@ namespace btnet
 			}
 
 			string url = "";
-			if (HttpContext.Current != null)
+			if (HttpContext.Current.Request != null)
 			{
 				url = HttpContext.Current.Request.Url.ToString();
 			}

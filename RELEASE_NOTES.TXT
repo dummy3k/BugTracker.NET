@@ -11,52 +11,37 @@ http://ifdefined.com/readme.html#upgrading
 
 Corey's TO DO list:
 
- 
-
-* add settings for turning off printing of change history.
 
 * auto subscribe if you modified bug
 * default value for internal comments
 * many to many, queries to organizations
 * excel export for reports
-* field level permissions for custom fields?
 * escalation/reminder, "Due Date"
 * new fckEditor 
 * some sort of contact management?
-* time tracking
 * syscolumns, column order scheme - make less fragile
 * edit_bug.aspx and css - support for multiple columns
 * set fields to required?  By org.
-* 1949210 Deleting a user doesn't delete Self Register info
 * configurable start page, like start on dashboard
-
+* relationships in print?
 * Documentation improvements:
+* forgot.aspx doesn't work if two users have same email address, and 
+system lets two users use same email address.
+
+
 workflow.cs
 ldap
 blog about lucene.net
 
-* relationships in print?
-
-sending email as guest
-
-project custom dropdown?
-
-
-https://sourceforge.net/forum/forum.php?thread_id=2741623&forum_id=226938
-
-"Unknown email address.<br>Are you sure you spelled it correctly?" 
- 
-being sure that the email was correct, i went into sql server and examined the users table rows. there were two users, an admin account and my account sharing my email address. thinking that perhaps this was the culprit, i updated the admin account to use another email and retried the forgot pw link. it then found my email correctly and i was able to reset and login.  
- 
-i then checked the source and the count is being evaluated to 1, e.g. if count(user) = 1 carry on. 
- 
-maybe the logic checking the count should be changed to > 1, and in that case a message indicating that more than one user uses this email, or routine should be adjusted to prompt the user to resolve which user you're resetting (perhaps an additional username field)? 
- 
- 
-in addition, the label Email: should probably be Password. 
  
  
 
+-----------------------------------------------------------------------
+Version 3.0.7   01/xx/2009
+-----------------------------------------------------------------------
+
+ 2477163  	  Cannot view or edit tasks/time even if admin 
+ 
 
 -----------------------------------------------------------------------
 Version 3.0.6   12/22/2008 

@@ -30,17 +30,28 @@ void Page_Load(Object sender, EventArgs e)
 	bugid = Convert.ToInt32(Util.sanitize_integer(Request["bugid"]));
 
 	permission_level = Bug.get_bug_permission_level(bugid, security);
-	if (permission_level == Security.PERMISSION_NONE || !security.user.can_view_tasks)
+	if (permission_level == Security.PERMISSION_NONE)
 	{
-		Response.Write("You are not allowed to view this item");
+		Response.Write("You are not allowed to view tasks for this item");
 		Response.End();
 	}
+	
+	if (security.user.is_admin || security.user.can_view_tasks)
+	{
+		// allowed
+	}
+	else
+	{
+		Response.Write("You are not allowed to view tasks");
+		Response.End();
+	}
+	
 
 	ses = (string) Session["session_cookie"];
 	
 	string sql = "select tsk_id [id],";
 
-	if (permission_level == Security.PERMISSION_ALL && !security.user.is_guest && security.user.can_edit_tasks)
+	if (permission_level == Security.PERMISSION_ALL && !security.user.is_guest && (security.user.is_admin || security.user.can_edit_tasks))
 	{
 		sql += @"
 '<a   href=edit_task.aspx?bugid=$bugid&id=' + convert(varchar,tsk_id) + '>edit</a>'   [$no_sort_edit],
@@ -151,7 +162,7 @@ Tasks for
 %>
 <p>
 
-<% if (permission_level == Security.PERMISSION_ALL && security.user.can_edit_tasks) { %>
+<% if (permission_level == Security.PERMISSION_ALL && (security.user.is_admin || security.user.can_edit_tasks)) { %>
 <a href=edit_task.aspx?id=0&bugid=<% Response.Write(Convert.ToString(bugid)); %>>add new task</a>
 <p>
 <% } %>
