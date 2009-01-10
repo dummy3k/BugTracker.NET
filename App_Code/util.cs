@@ -1,5 +1,5 @@
 /*
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 */
 
@@ -217,7 +217,7 @@ namespace btnet
 
 			string[] vals = val.Split(new string[] { ci.NumberFormat.NumberDecimalSeparator }, StringSplitOptions.None);
 
-			if (vals.Length == 1)
+			if (vals.Length > 0)
 			{
 				if (vals[0].Length > left_of_decimal)
 				{

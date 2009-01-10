@@ -2,7 +2,7 @@
 <%@ Register TagPrefix="FCKeditorV2" Namespace="FredCK.FCKeditorV2" Assembly="FredCK.FCKeditorV2" %>
 
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -1302,8 +1302,11 @@ void format_prev_next_bug()
 		bool this_bug_found = false;
 
 		// read through the list of bugs looking for the one that matches this one
+		int position_in_list = 0;
+		int save_position_in_list = 0;
 		foreach (DataRowView drv in dv_bugs)
 		{
+			position_in_list++;
 			if (this_bug_found)
 			{
 				// step 3 - get the next bug - we're done
@@ -1313,6 +1316,7 @@ void format_prev_next_bug()
 			else if (id == (int) drv[1])
 			{
 				// step 2 - we found this - set switch
+				save_position_in_list = position_in_list;
 				this_bug_found = true;
 			}
 			else
@@ -1350,6 +1354,12 @@ void format_prev_next_bug()
 			{
 				prev_next_link += "&nbsp;&nbsp;&nbsp;&nbsp;<span class=gray_link>next</span>";
 			}
+			
+			prev_next_link += "&nbsp;&nbsp;&nbsp;<span class=smallnote>" 
+				+ Convert.ToString(save_position_in_list) 
+				+ " of "
+				+ Convert.ToString(dv_bugs.Count)
+				+ "</span>";
 
 			prev_next.InnerHtml = prev_next_link;
 		}
@@ -1488,6 +1498,9 @@ bool did_something_change()
 		{
             string before = hash_prev_custom_cols[column_name];
             string after = hash_custom_cols[column_name];
+
+			if (before == null) before = "";
+			if (after == null) after = "";
 
 			if (before != after)
 			{
@@ -1909,48 +1922,15 @@ Boolean validate()
 			}
 			else if (datatype == "decimal")
 			{
-				//modified by CJU on jan 9 2008 : better support for french number styles
-				//check that val string is a valid decimal value
-				System.Globalization.CultureInfo ci = btnet.Util.get_culture_info( );
-				decimal x;
-				if( !Decimal.TryParse( val, System.Globalization.NumberStyles.Float, ci, out x ) )
-				{
-					append_custom_field_msg("\"" + name + "\" not in a valid decimal format.<br>");
-					good = false;
-				}
-
-				// check if there are too many digits overall
 				int xprec = Convert.ToInt32(drcc["xprec"]);
-				string[] vals = val.Split( new string[] { ci.NumberFormat.NumberDecimalSeparator }, StringSplitOptions.None );
-				int prec = (vals.Length == 1 ? vals[0].Length : vals[0].Length + vals[1].Length);
-				if( prec > xprec )
+				int xscale = Convert.ToInt32(drcc["xscale"]);
+				
+				string decimal_error = btnet.Util.is_valid_decimal(name, val, xprec-xscale, xscale);
+				if (decimal_error != "")
 				{
-					append_custom_field_msg("\"" + name + "\" has too many digits.<br>");
+					append_custom_field_msg(decimal_error + "<br>");
 					good = false;
 				}
-
-				// check if there are too many digits to left or right of decimal
-				int xscale = Convert.ToInt32(drcc["xscale"]);
-				if( vals.Length == 1 )
-				{
-					if (vals[0].Length > xprec - xscale)
-					{
-						append_custom_field_msg("\"" + name + "\" has more than "
-							+ Convert.ToString(xprec - xscale) + " digits to the left of the decimal point.<br>");
-						good = false;
-					}
-				}
-
-				if( vals.Length > 1 )
-				{
-					if (vals[1].Length > xscale)
-					{
-						append_custom_field_msg("\"" + name + "\" has more than "
-							+  Convert.ToString(xscale) + " digits to the right of the decimal point.<br>");
-						good = false;
-					}
-				}
-				//end modified by CJU on jan 9 2008
 			}
 		}
 		else

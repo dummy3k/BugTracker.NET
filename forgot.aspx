@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -34,47 +34,86 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		msg.InnerHtml = "";
 
-		if (email.Value == "")
+		if (email.Value == "" && username.Value == "")
 		{
-			msg.InnerHtml = "Enter your email address.";
+			msg.InnerHtml = "Enter either your Username or your Email address.";
 		}
-		else if (!Util.validate_email(email.Value))
+		else if (email.Value != "" && !Util.validate_email(email.Value))
 		{
 			msg.InnerHtml = "Format of email address is invalid.";
 		}
 		else
 		{
 
+			int user_count = 0;
+			int user_id = 0;
 			
+			if (email.Value != "" && username.Value == "")
+			{
 
-			// check if email exists
-			int user_count = (int) btnet.DbUtil.execute_scalar(
-				"select count(1) from users where us_email = N'" + email.Value.Replace("'","''") + "'");
+				// check if email exists
+				user_count = (int) btnet.DbUtil.execute_scalar(
+					"select count(1) from users where us_email = N'" + email.Value.Replace("'","''") + "'");
+					
+				if (user_count == 1)
+				{
+					user_id = (int) btnet.DbUtil.execute_scalar(
+						"select us_id from users where us_email = N'" + email.Value.Replace("'","''") + "'");
+				}
+				
+				
+			}
+			else if (email.Value == "" && username.Value != "")
+			{
+				// check if email exists
+				user_count = (int) btnet.DbUtil.execute_scalar(
+					"select count(1) from users where isnull(us_email,'') != '' and  us_username = N'" + username.Value.Replace("'","''") + "'");
+
+				if (user_count == 1)
+				{
+					user_id = (int) btnet.DbUtil.execute_scalar(
+						"select us_id from users where us_username = N'" + username.Value.Replace("'","''") + "'");
+				}
+			}			
+			else if (email.Value != "" && username.Value != "")
+			{
+				// check if email exists
+				user_count = (int) btnet.DbUtil.execute_scalar(
+					"select count(1) from users where us_username = N'" + username.Value.Replace("'","''") + "' and us_email = N'"
+					+ email.Value.Replace("'","''") + "'");
+
+				if (user_count == 1)
+				{
+					user_id = (int) btnet.DbUtil.execute_scalar(
+						"select us_id from users where us_username = N'" + username.Value.Replace("'","''") + "' and us_email = N'"
+						+ email.Value.Replace("'","''") + "'");
+				}
+			}			
+
 
 			if (user_count == 1)
 			{
 				string guid = Guid.NewGuid().ToString();
 				string sql = @"
-declare @user_id int
 declare @username nvarchar(255)
+declare @email nvarchar(255)
 
-select @user_id = us_id, @username = us_username
-	from users
-	where us_email = N'$email'
+select @username = us_username, @email = us_email
+	from users where us_id = $user_id
 
 insert into emailed_links
 	(el_id, el_date, el_email, el_action, el_user_id)
-	values ('$guid', getdate(), N'$email', N'forgot', @user_id)
+	values ('$guid', getdate(), @email, N'forgot', $user_id)
 
-select @username us_username";
+select @username us_username, @email us_email";
 
 				sql = sql.Replace("$guid",guid);
-				sql = sql.Replace("$email", email.Value.Replace("'","''"));
+				sql = sql.Replace("$user_id",Convert.ToString(user_id));
 
 				DataRow dr = btnet.DbUtil.get_datarow(sql);
 
 				string result = btnet.Email.send_email(
-					email.Value,
+					(string) dr["us_email"],
 					Util.get_setting("NotificationEmailFrom",""),
 					"", // cc
 					"reset password",
@@ -91,8 +130,7 @@ select @username us_username";
 
 				if (result == "")
 				{
-					msg.InnerHtml = "An email has been sent to " + email.Value;
-					msg.InnerHtml += "<br>Please click on the link in the email message.";
+					msg.InnerHtml = "An email with password info has been sent to you.";
 				}
 				else
 				{
@@ -102,7 +140,7 @@ select @username us_username";
 			}
 			else
 			{
-				msg.InnerHtml = "Unknown email address.<br>Are you sure you spelled it correctly?";
+				msg.InnerHtml = "Unknown username or email address.<br>Are you sure you spelled everything correctly?<br>Try just username, just email, or both.";
 			}
 		}
 	}
@@ -129,8 +167,22 @@ Response.Write (Application["custom_logo"]);
 
 <div align="center">
 <table border=0><tr><td>
+
 <form class=frm runat="server">
 	<table border=0>
+
+	<tr>
+	<td colspan=2 class=smallnote>Enter Username or Email or both</td>
+	</tr>
+
+	<tr>
+	<td colspan=2>&nbsp;</td>
+	</tr>
+
+	<tr>
+	<td class=lbl>Username:</td>
+	<td><input runat="server" type=text class=txt id="username" size=40 maxlength=40></td>
+	</tr>
 
 	<tr>
 	<td class=lbl>Email:</td>
@@ -142,7 +194,7 @@ Response.Write (Application["custom_logo"]);
 	</td></tr>
 
 	<tr><td colspan=2 align=center>
-	<input class=btn type=submit value="Send password link to my email" runat="server">
+	<input class=btn type=submit value="Send password info to my email" runat="server">
 	</td></tr>
 
 	</table>

@@ -27,6 +27,7 @@ Corey's TO DO list:
 * Documentation improvements:
 * forgot.aspx doesn't work if two users have same email address, and 
 system lets two users use same email address.
+see https://sourceforge.net/forum/forum.php?thread_id=2741623&forum_id=226938
 
 
 workflow.cs
@@ -40,9 +41,25 @@ blog about lucene.net
 Version 3.0.7   01/xx/2009
 -----------------------------------------------------------------------
 
- 2477163  	  Cannot view or edit tasks/time even if admin 
+ * Fixed bug 2477163 "Cannot view or edit tasks/time even though admin"
  
-
+ * Fixed bug 2494633 "Bug updated even if unchanged if field 
+ permission view only"
+ 
+ * Fixed bug with validation of decimal format custom fields.  The
+ logic was allowing too many digits to the left of the decimal, leading
+ to an overflow error.
+ 
+ * Fixed bug with page for retrieving a forgotten password, when two
+ users have the same email address.
+ 
+ * Made changes that might make BugTracker.NET more compatible with
+ new IIS "Integrated Pipeline", but I'm not sure (because I don't have
+ II7 to test with...)
+ 
+ * Added RFE 2490904 "Display position in list edit_bug.aspx, near 
+ prev/next"
+  
 -----------------------------------------------------------------------
 Version 3.0.6   12/22/2008 
 -----------------------------------------------------------------------
