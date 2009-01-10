@@ -11,7 +11,6 @@ http://ifdefined.com/readme.html#upgrading
 
 Corey's TO DO list:
 
-
 * auto subscribe if you modified bug
 * default value for internal comments
 * many to many, queries to organizations
@@ -25,21 +24,16 @@ Corey's TO DO list:
 * configurable start page, like start on dashboard
 * relationships in print?
 * Documentation improvements:
-* forgot.aspx doesn't work if two users have same email address, and 
-system lets two users use same email address.
-see https://sourceforge.net/forum/forum.php?thread_id=2741623&forum_id=226938
-
 
 workflow.cs
 ldap
 blog about lucene.net
 
- 
- 
+-----------------------------------------------------------------------
+Version 3.0.7   01/10/2009   (svn revision 292)
+-----------------------------------------------------------------------
 
------------------------------------------------------------------------
-Version 3.0.7   01/xx/2009
------------------------------------------------------------------------
+Minor bug fixes.
 
  * Fixed bug 2477163 "Cannot view or edit tasks/time even though admin"
  
