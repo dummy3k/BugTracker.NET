@@ -1,4 +1,5 @@
-<%@ Page language="C#" %>
+<%@ Page Language="C#" %>
+
 <!-- #include file = "inc.aspx" -->
 
 <script language="C#" runat="server">
@@ -23,10 +24,10 @@ void Page_Load(Object sender, EventArgs e)
 		Util.do_not_cache(Response);
 	}
 
-	
+
 	security = new Security();
 
-	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
+	security.check_security(HttpContext.Current, Security.ANY_USER_OK);
 
 
 	// fetch the sql
@@ -47,20 +48,20 @@ void Page_Load(Object sender, EventArgs e)
 		// replace magic variables
 		bug_sql = bug_sql.Replace("$ME", Convert.ToString(security.user.usid));
 
-		bug_sql = Util.alter_sql_per_project_permissions(bug_sql,security);
+		bug_sql = Util.alter_sql_per_project_permissions(bug_sql, security);
 
-		ds = btnet.DbUtil.get_dataset (bug_sql);
+		ds = btnet.DbUtil.get_dataset(bug_sql);
 		dv = new DataView(ds.Tables[0]);
 	}
 	else
 	{
-		dv = (DataView) Session["bugs"];
+		dv = (DataView)Session["bugs"];
 	}
 
 
 	if (dv == null)
 	{
-		Response.Write ("Please recreate the list before trying to print...");
+		Response.Write("Please recreate the list before trying to print...");
 		Response.End();
 	}
 
@@ -82,10 +83,9 @@ void Page_Load(Object sender, EventArgs e)
 ///////////////////////////////////////////////////////////////////////
 void print_as_excel()
 {
-
-	Response.Charset= btnet.Util.get_setting("ExportToExcelCharset","UTF-8");
+	Response.Charset = btnet.Util.get_setting("ExportToExcelCharset", "UTF-8");
 	Response.ContentType = "application/x-msexcel";
-	Response.AddHeader ("content-disposition","attachment; filename=bugs.xls");
+	Response.AddHeader("content-disposition", "attachment; filename=bugs.xls");
 
 	int col;
 	bool first_column;
@@ -94,42 +94,49 @@ void print_as_excel()
 	first_column = true;
 	for (col = 1; col < dv.Table.Columns.Count; col++)
 	{
-		if (dv.Table.Columns[col].ColumnName == "$FLAG") 
+		if (dv.Table.Columns[col].ColumnName == "$FLAG")
 			continue;
-		if (dv.Table.Columns[col].ColumnName == "$SEEN") 
+		if (dv.Table.Columns[col].ColumnName == "$SEEN")
 			continue;
-			
+
 		if (!first_column)
 		{
-			Response.Write ("\t");
+			Response.Write("\t");
 		}
-		Response.Write (dv.Table.Columns[col].ColumnName);
+		Response.Write(dv.Table.Columns[col].ColumnName);
 		first_column = false;
 	}
-	Response.Write ("\n");
+	Response.Write("\r\n");
 
 	// bug rows
 	foreach (DataRowView drv in dv)
 	{
-
 		first_column = true;
 		for (col = 1; col < dv.Table.Columns.Count; col++)
 		{
-			if (dv.Table.Columns[col].ColumnName == "$FLAG") 
+			if (dv.Table.Columns[col].ColumnName == "$FLAG")
 				continue;
-			if (dv.Table.Columns[col].ColumnName == "$SEEN") 
+			if (dv.Table.Columns[col].ColumnName == "$SEEN")
 				continue;
 
 			if (!first_column)
 			{
-				Response.Write ("\t");
+				Response.Write("\t");
 			}
-			Response.Write (drv[col].ToString());
+
+			if (drv[col].ToString().IndexOf("\r\n") >= 0)
+			{
+				Response.Write("\"" + drv[col].ToString().Replace("\"", "\"\"").Replace("\r\n", "\n") + "\"");
+			}
+			else
+			{
+				Response.Write(drv[col].ToString().Replace("\n", ""));
+			}
+
 			first_column = false;
 		}
-		Response.Write ("\n");
+		Response.Write("\r\n");
 	}
-
 }
 
 
@@ -138,15 +145,15 @@ void print_as_excel()
 void print_as_html()
 {
 
-	Response.Write ("<html><head><link rel='StyleSheet' href='btnet.css' type='text/css'></head><body>");
+	Response.Write("<html><head><link rel='StyleSheet' href='btnet.css' type='text/css'></head><body>");
 
-	Response.Write ("<table class=bugt border=1>");
+	Response.Write("<table class=bugt border=1>");
 	int col;
 
 	for (col = 1; col < dv.Table.Columns.Count; col++)
 	{
 
-		Response.Write ("<td class=bugh>\n");
+		Response.Write("<td class=bugh>\n");
 		if (dv.Table.Columns[col].ColumnName == "$FLAG")
 		{
 			Response.Write("flag");
@@ -157,19 +164,19 @@ void print_as_html()
 		}
 		else
 		{
-			Response.Write (dv.Table.Columns[col].ColumnName);
+			Response.Write(dv.Table.Columns[col].ColumnName);
 		}
-		Response.Write ("</td>");
+		Response.Write("</td>");
 	}
 
 	foreach (DataRowView drv in dv)
 	{
-		Response.Write ("<tr>");
+		Response.Write("<tr>");
 		for (col = 1; col < dv.Table.Columns.Count; col++)
 		{
 			if (dv.Table.Columns[col].ColumnName == "$FLAG")
 			{
-				int flag = (int) drv[col];
+				int flag = (int)drv[col];
 				string cls = "wht";
 				if (flag == 1) cls = "red";
 				else if (flag == 2) cls = "grn";
@@ -179,7 +186,7 @@ void print_as_html()
 			}
 			else if (dv.Table.Columns[col].ColumnName == "$SEEN")
 			{
-				int seen = (int) drv[col];
+				int seen = (int)drv[col];
 				string cls = "old";
 				if (seen == 0)
 				{
@@ -198,32 +205,31 @@ void print_as_html()
 
 				if (Util.is_numeric_datatype(datatype))
 				{
-					Response.Write ("<td class=bugd align=right>");
+					Response.Write("<td class=bugd align=right>");
 				}
 				else
 				{
-					Response.Write ("<td class=bugd>");
+					Response.Write("<td class=bugd>");
 				}
 
 				// write the data
 				if (drv[col].ToString() == "")
 				{
-					Response.Write ("&nbsp;");
+					Response.Write("&nbsp;");
 				}
 				else
 				{
-					Response.Write (Server.HtmlEncode(drv[col].ToString()).Replace("\n","<br>"));
+					Response.Write(Server.HtmlEncode(drv[col].ToString()).Replace("\n", "<br>"));
 				}
 			}
-			Response.Write ("</td>");
+			Response.Write("</td>");
 		}
-		Response.Write ("</tr>");
+		Response.Write("</tr>");
 	}
 
-	Response.Write ("</table></body></html>");
+	Response.Write("</table></body></html>");
 }
 
 
 </script>
-
 

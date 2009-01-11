@@ -25,9 +25,6 @@ drop table [queries]
 if exists (select * from dbo.sysobjects where id = object_id(N'[reports]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [reports]
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[sessions]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
-drop table [sessions]
-
 if exists (select * from dbo.sysobjects where id = object_id(N'[statuses]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [statuses]
 
@@ -183,15 +180,6 @@ values ('reporter', 'Report And', 'Comment Only', 'admin', 0, 1, 1)
 insert into users (
 us_username, us_firstname, us_lastname, us_password, us_admin, us_default_query, us_forced_project, us_active)
 values ('guest', 'Special', 'cannot save searches, settings', 'guest', 0, 1, 1, 0)
-
-/* SESSIONS */
-
-create table sessions
-(
-	se_id char(37) not null,
-	se_date datetime not null default(getdate()),
-	se_user int not null
-)
 
 
 /* EMAILED LINKS */

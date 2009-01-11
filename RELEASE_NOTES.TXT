@@ -29,6 +29,20 @@ workflow.cs
 ldap
 blog about lucene.net
 
+
+-----------------------------------------------------------------------
+Version 3.0.8   01/xx/2009   (svn revision ???)
+-----------------------------------------------------------------------
+
+* Exporting a list of bugs to excel now handles line breaks better, 
+thanks to Michael Wilson.
+
+* No longer using the "Sessions" table in the database.  Years ago, I
+wanted BugTracker.NET to avoid using the ASP.NET Session object, to be
+more compatible with web farms, but for a long time now BugTracker.NET
+has been dependent on the Session object, so no point in keeping the
+Sessions table.
+
 -----------------------------------------------------------------------
 Version 3.0.7   01/10/2009   (svn revision 292)
 -----------------------------------------------------------------------
