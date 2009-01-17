@@ -31,7 +31,7 @@ blog about lucene.net
 
 
 -----------------------------------------------------------------------
-Version 3.0.8   01/xx/2009   (svn revision ???)
+Version 3.0.8   01/18/2009   (svn revision ???)
 -----------------------------------------------------------------------
 
 * Fixed bug with send_email.aspx. It was showing email addresses
