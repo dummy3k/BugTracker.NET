@@ -776,7 +776,6 @@ namespace btnet
 
 
 		///////////////////////////////////////////////////////////////////////
-		// only used by search?
 		public static DataTable get_related_users(Security security)
 		{
 			string sql = "";
@@ -797,6 +796,7 @@ case when $fullnames then
 		else isnull(us_lastname + ', ' + us_firstname,'')
 	end
 else us_username end us_username,
+isnull(us_email,'') us_email,
 us_org,
 og_external_user
 into #temp
@@ -820,7 +820,7 @@ end
 
 $limit_users
 
-select us_id, us_username from #temp order by us_username
+select us_id, us_username, us_email from #temp order by us_username
 
 drop table #temp";
 
@@ -843,7 +843,8 @@ case when $fullnames then
 		when '' then isnull(us_lastname, '')
 		else isnull(us_lastname + ', ' + us_firstname,'')
 	end
-else us_username end us_username
+else us_username end us_username,
+isnull(us_email,'') us_email
 into #temp
 from projects, users
 where pj_id not in
@@ -859,7 +860,7 @@ $limit_users
 if $og_external_user = 1 -- external
 and $og_other_orgs_permission_level = 0 -- other orgs
 begin
-	select distinct a.us_id, a.us_username
+	select distinct a.us_id, a.us_username, a.us_email
 	from #temp a
 	inner join users b on a.us_id = b.us_id
 	inner join orgs on b.us_id = og_id
@@ -869,7 +870,7 @@ end
 else
 begin
 
-	select distinct us_id, us_username
+	select distinct us_id, us_username, us_email
 		from #temp
 		left outer join project_user_xref on pj_id = pu_project
 		and us_id = pu_user

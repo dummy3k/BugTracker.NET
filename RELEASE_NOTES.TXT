@@ -34,6 +34,10 @@ blog about lucene.net
 Version 3.0.8   01/xx/2009   (svn revision ???)
 -----------------------------------------------------------------------
 
+* Fixed bug with send_email.aspx. It was showing email addresses
+that a user with limited permissions shouldn't see.  See thread:
+http://sourceforge.net/forum/forum.php?thread_id=2856651&forum_id=226938
+
 * Exporting a list of bugs to excel now handles line breaks better, 
 thanks to Michael Wilson.
 
