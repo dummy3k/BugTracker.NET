@@ -339,32 +339,32 @@ void do_query()
 	string comments_since_clause = "";
 	if (comments_since.Value != "") {
 		comments_since_clause = " bg_id in (select bp_bug from bug_posts where bp_type in ('comment','received','sent') and bp_date > '";
-		comments_since_clause += Util.format_local_date_into_db_format(comments_since.Value).Replace(" 12:00:00","");
+		comments_since_clause += format_to_date(comments_since.Value);
 		comments_since_clause += "')\n";
 	}
 
 	string from_clause = "";
 	if (from_date.Value != "")
 	{
-		from_clause = " bg_reported_date >= '" + Util.format_local_date_into_db_format(from_date.Value).Replace(" 12:00:00","") + "'\n";
+		from_clause = " bg_reported_date >= '" + format_from_date(from_date.Value) + "'\n";
 	}
 
 	string to_clause = "";
 	if (to_date.Value != "")
 	{
-		to_clause = " bg_reported_date <= '" + Util.format_local_date_into_db_format(to_date.Value).Replace(" 12:00:00","") + " 23:59:59'\n";
+		to_clause = " bg_reported_date <= '" + format_to_date(to_date.Value) + "'\n";
 	}
 
 	string lu_from_clause = "";
 	if (lu_from_date.Value != "")
 	{
-		lu_from_clause = " bg_last_updated_date >= '" + Util.format_local_date_into_db_format(lu_from_date.Value).Replace(" 12:00:00","") + "'\n";
+		lu_from_clause = " bg_last_updated_date >= '" + format_from_date(lu_from_date.Value) + "'\n";
 	}
 
 	string lu_to_clause = "";
 	if (lu_to_date.Value != "")
 	{
-		lu_to_clause = " bg_last_updated_date <= '" + Util.format_local_date_into_db_format(lu_to_date.Value).Replace(" 12:00:00","") + " 23:59:59'\n";
+		lu_to_clause = " bg_last_updated_date <= '" + format_to_date(lu_to_date.Value) + "'\n";
 	}
 
 
@@ -421,7 +421,7 @@ void do_query()
 			{
 				if (values != "")
 				{
-					custom_clause = " [" + column_name + "] >= '" + values + "'\n";
+					custom_clause = " [" + column_name + "] >= '" + format_from_date(values) + "'\n";
 					where = build_where(where, custom_clause);
 
 					// reset, and do the to date
@@ -429,7 +429,7 @@ void do_query()
 					values = Request["to__" + column_name];
 					if (values != "")
 					{
-						custom_clause = " [" + column_name + "] <= '" + values + " 23:59:59'\n";
+						custom_clause = " [" + column_name + "] <= '" + format_to_date(values) + "'\n";
 						where = build_where(where, custom_clause);
 					}
 				}
@@ -720,6 +720,17 @@ order by bg_id desc
 	dv = new DataView (ds.Tables[0]);
 	Session["bugs"] = dv;
 	Session["bugs_unfiltered"] = ds.Tables[0];
+}
+
+
+string format_from_date(string dt)
+{
+	return Util.format_local_date_into_db_format(dt).Replace(" 12:00:00","").Replace(" 00:00:00","");
+}
+
+string format_to_date(string dt)
+{
+	return Util.format_local_date_into_db_format(dt).Replace(" 12:00:00"," 23:59:59").Replace(" 00:00:00"," 23:59:59");
 }
 
 ///////////////////////////////////////////////////////////////////////

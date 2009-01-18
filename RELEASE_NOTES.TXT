@@ -31,13 +31,17 @@ blog about lucene.net
 
 
 -----------------------------------------------------------------------
-Version 3.0.8   01/18/2009   (svn revision ???)
+Version 3.0.8   01/18/2009   (svn revision 298)
 -----------------------------------------------------------------------
 
 * Fixed bug with send_email.aspx. It was showing email addresses
 that a user with limited permissions shouldn't see, like one client
 seeing the email addresses of another client.  See thread:
 http://sourceforge.net/forum/forum.php?thread_id=2856651&forum_id=226938
+
+* Fixed bug (I think) where extraneous "00:00:00" appear in date range
+searches.  I couldn't reproduce the bug, but I think the logic in this
+version will prevent it.
 
 * Upgraded fckEditor, the rich text editor, from version 2.4.2 to
 version 2.6.3.  There's no specific reason why I upgraded.  It just
