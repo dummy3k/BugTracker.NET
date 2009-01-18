@@ -35,8 +35,19 @@ Version 3.0.8   01/18/2009   (svn revision ???)
 -----------------------------------------------------------------------
 
 * Fixed bug with send_email.aspx. It was showing email addresses
-that a user with limited permissions shouldn't see.  See thread:
+that a user with limited permissions shouldn't see, like one client
+seeing the email addresses of another client.  See thread:
 http://sourceforge.net/forum/forum.php?thread_id=2856651&forum_id=226938
+
+* Upgraded fckEditor, the rich text editor, from version 2.4.2 to
+version 2.6.3.  There's no specific reason why I upgraded.  It just
+seemed to be about time.  For more info about fckEditor changes, 
+visit http://www.fckeditor.net.  If you are upgrading an existing
+installation, you need to replace both your fckeditor folder and the dll
+in the bin folder.
+
+* Upgraded jQuery from 1.2.6 to 1.3.  There was no specific reason why I
+upgraded.  For more about jQuery, visit http://docs.jquery.com.
 
 * Exporting a list of bugs to excel now handles line breaks better, 
 thanks to Michael Wilson.

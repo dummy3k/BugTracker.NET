@@ -275,7 +275,7 @@ void load_query_dropdown()
 <head>
 <title id="titl" runat="server">btnet bugs</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
-<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.2.6.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.3.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="bug_list.js"></script>
 
 <script>
