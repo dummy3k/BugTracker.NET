@@ -31,6 +31,16 @@ blog about lucene.net
 
 
 -----------------------------------------------------------------------
+Version 3.0.9   01/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+* Fixed a bug with send_email.aspx introduced in version 3.0.8.  Prior
+to version 3.0.8, list of email addresses wasn't taking into account
+the users organization permissions.   I fixed that in 3.0.8 but broke 
+the logic related to project permissions.   With this release, both
+organization and project permissions should be working (I hope).
+
+-----------------------------------------------------------------------
 Version 3.0.8   01/18/2009   (svn revision 298)
 -----------------------------------------------------------------------
 

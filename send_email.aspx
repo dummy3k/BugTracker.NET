@@ -798,6 +798,61 @@ function findPosY(obj)
 	<select id=addrs_select size=6 onchange="select_addrs(this)">
 	<%
 
+	Dictionary<int, int> dict_users_for_this_project = new Dictionary<int,int>();
+	
+	// list of email addresses to use.
+	if (project > -1)
+	{
+		if (project == 0)
+		{
+
+			sql = @"select us_id
+				from users
+				where us_active = 1
+				and len(us_email) > 0
+				order by us_email";
+
+		}
+		else
+		{
+			// Only users explicitly allowed will be listed
+			if (btnet.Util.get_setting("DefaultPermissionLevel","2") == "0")
+			{
+				sql = @"select us_id
+					from users
+					where us_active = 1
+					and len(us_email) > 0
+					and us_id in
+						(select pu_user from project_user_xref
+						where pu_project = $pr
+						and pu_permission_level <> 0)
+					order by us_email";
+			}
+			// Only users explictly DISallowed will be omitted
+			else
+			{
+				sql = @"select us_id
+					from users
+					where us_active = 1
+					and len(us_email) > 0
+					and us_id not in
+						(select pu_user from project_user_xref
+						where pu_project = $pr
+						and pu_permission_level = 0)
+					order by us_email";
+			}
+		}
+
+		sql = sql.Replace("$pr", Convert.ToString(project));
+		DataSet ds_users_for_this_project = btnet.DbUtil.get_dataset(sql);
+		
+		// remember the users for this this project
+		foreach (DataRow dr in ds_users_for_this_project.Tables[0].Rows)
+		{
+			dict_users_for_this_project[(int) dr[0]] = 1;
+		}
+	}
+
 
 	DataTable dt_related_users = btnet.Util.get_related_users(security);
 	// let's sort by email
@@ -808,13 +863,16 @@ function findPosY(obj)
 	{
 		if ((string)drv_email["us_email"] != "")
 		{
-			Response.Write("<option value='");
-			Response.Write(drv_email["us_email"]);
-			Response.Write("'>");
-			Response.Write(drv_email["us_email"]);
-			Response.Write("  (");
-			Response.Write(drv_email["us_username"]);
-			Response.Write(")</option>");
+			if (dict_users_for_this_project.ContainsKey((int)drv_email["us_id"]))
+			{
+				Response.Write("<option value='");
+				Response.Write(drv_email["us_email"]);
+				Response.Write("'>");
+				Response.Write(drv_email["us_email"]);
+				Response.Write("  (");
+				Response.Write(drv_email["us_username"]);
+				Response.Write(")</option>");
+			}
 		}
 	}
 
