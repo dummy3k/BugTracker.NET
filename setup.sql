@@ -1,3 +1,6 @@
+--Copyright 2002-2009 Corey Trager
+--Distributed under the terms of the GNU General Public License
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[bug_posts]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [bug_posts]
 

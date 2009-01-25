@@ -4,7 +4,7 @@
 
 <script language="C#" runat="server">
 
-//Copyright 2002-2008 Corey Trager
+//Copyright 2002-2009 Corey Trager
 //Distributed under the terms of the GNU General Public License
 
 
