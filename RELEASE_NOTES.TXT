@@ -31,6 +31,26 @@ workflow.cs
 ldap
 blog about lucene.net
 
+
+-----------------------------------------------------------------------
+Version 3.1.0   01/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+* Have btnet_service emails use the real incoming email, not the service email.
+
+
+* Changed "FCKConfig.EnterMode" from p to br, so that enter key in rich
+text editor adds just a line break, not a paragraph break.
+
+* Added Web.config setting "AspNetFormId" which you can use to override
+what form id some of the the javascript looks for.  Different versions
+of ASP.NET have generated HTML forms with different ids.
+
+* Updated SharpMimeTools dll to handle commas in quoted printable 
+email subjects.
+
+* Fixed crash in whatsnew.cs
+
 -----------------------------------------------------------------------
 Version 3.0.9   01/25/2009   (svn revision 300)
 -----------------------------------------------------------------------
@@ -205,6 +225,8 @@ group by pj_name
 -----------------------------------------------------------------------
 Version 3.0.4   11/28/2008 
 -----------------------------------------------------------------------
+
+See upgrade.sql for upgrading to this release.
 
 * New feature: Time tracking and/or Sub-tasks.  See the "EnableTasks"
 setting in Web.config for more info.  The goal of this feature is to 

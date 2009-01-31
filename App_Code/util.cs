@@ -55,19 +55,14 @@ namespace btnet
 		}
 
 		///////////////////////////////////////////////////////////////////////
-		public static string get_form_name() {
-			if (Environment.Version.ToString().Substring(0,1) == "1")
-			{
-				return "_ctl0";
-			}
-			else
-			{
-				return "ctl00";
-			}
+		public static string get_form_name()
+		{
+			return get_setting("AspNetFormId","ctl00");
 		}
 
 		///////////////////////////////////////////////////////////////////////
-		public static string get_log_file_path() {
+		public static string get_log_file_path()
+		{
 
 			// determine log file name
 			string log_file_folder = Util.get_log_folder();

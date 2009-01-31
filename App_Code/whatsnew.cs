@@ -1,5 +1,5 @@
 /*
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 */
 
@@ -19,11 +19,11 @@ namespace btnet
 			{
 
 				// create the list if necessary
-				List<BugNews> list = (List<BugNews>) security.context.Application["whatsnew"];
+				List<BugNews> list = (List<BugNews>) HttpContext.Current.Application["whatsnew"];
 				if (list == null)
 				{
 					list = new List<BugNews>();
-					security.context.Application["whatsnew"] = list;
+					HttpContext.Current.Application["whatsnew"] = list;
 				}
 
 				BugNews bn = new BugNews();
