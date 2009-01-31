@@ -1,7 +1,7 @@
 <%@ Page Language="C#" %>
 
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -134,120 +134,27 @@ void Page_Load(Object sender, EventArgs e)
                 }
             }
 
+            
+			int new_user_id = btnet.User.copy_user(
+				windows_username,
+				email,
+				first_name,
+				last_name,
+				0,
+				Guid.NewGuid().ToString(), // random value for password
+				template_user);
 
-            // create the user
-            sql = @"
-IF NOT EXISTS (SELECT us_id FROM users WHERE us_username = '$username')
-BEGIN
-
-	insert into users
-	(
-		us_username,
-		us_salt,
-		us_password,
-		us_firstname,
-		us_lastname,
-		us_email,
-		us_admin,
-		us_default_query,
-		us_enable_notifications,
-		us_auto_subscribe,
-		us_auto_subscribe_own_bugs,
-		us_auto_subscribe_reported_bugs,
-		us_send_notifications_to_self,
-		us_active,
-		us_bugs_per_page,
-		us_forced_project,
-		us_reported_notifications,
-		us_assigned_notifications,
-		us_subscribed_notifications,
-		us_signature,
-		us_use_fckeditor,
-		us_enable_bug_list_popups,
-		us_created_user,
-		us_org,
-		us_most_recent_login_datetime
-	)
-	select
-		N'$username',
-		0,
-		'$password',
-		N'$firstname',
-		N'$lastname',
-		N'$email',
-		us_admin,
-		us_default_query,
-		us_enable_notifications,
-		us_auto_subscribe,
-		us_auto_subscribe_own_bugs,
-		us_auto_subscribe_reported_bugs,
-		us_send_notifications_to_self,
-		1,
-		us_bugs_per_page,
-		us_forced_project,
-		us_reported_notifications,
-		us_assigned_notifications,
-		us_subscribed_notifications,
-		N'$signature',
-		us_use_fckeditor,
-		us_enable_bug_list_popups,
-		us_created_user,
-		us_org,
-		GETDATE()
-		from users
-		where us_username = '$template_user'
-
-		declare @usid int
-
-
-	select @usid = scope_identity()
-
-	insert into project_user_xref
-		(pu_project,
-		pu_user,
-		pu_auto_subscribe,
-		pu_permission_level,
-		pu_admin)
-
-	select
-		pu_project,
-		@usid,
-		pu_auto_subscribe,
-		pu_permission_level,
-		pu_admin
-		from project_user_xref
-		inner join users on us_id = pu_user
-		where us_username = '$template_user'
-
-	select
-		@usid us_id,
-		N'$username' us_username
-
-END";
-
-            sql = sql.Replace("$username", windows_username.Replace("'", "''"));
-            sql = sql.Replace("$firstname", first_name.Replace("'", "''"));
-            sql = sql.Replace("$lastname", last_name.Replace("'", "''"));
-            sql = sql.Replace("$email", email.Replace("'", "''"));
-            sql = sql.Replace("$signature", display_name.Replace("'", "''"));
-            sql = sql.Replace("$template_user", template_user.Replace("'", "''"));
-
-            // Password doesn't matter, but don't let it be something that others can guess
-            string guid = Guid.NewGuid().ToString();
-            sql = sql.Replace("$password", guid);
-
-            dr = btnet.DbUtil.get_datarow(sql);
-            if (dr != null) // automatically created the user
-            {
-                // The user was created, so bake a cookie and redirect
-                btnet.Security.create_session(
-                	Request,
-                	Response,
-                    (int)dr["us_id"],
-                    windows_username.Replace("'", "''"),
-                    "1");
-                btnet.Util.redirect(Request, Response);
-            }
+			if (new_user_id > 0) // automatically created the user
+			{
+				// The user was created, so bake a cookie and redirect
+				btnet.Security.create_session(
+					Request,
+					Response,
+					new_user_id,
+					windows_username.Replace("'", "''"),
+					"1");
+				btnet.Util.redirect(Request, Response);
+			}
         }
 
 

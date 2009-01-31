@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -48,72 +48,20 @@ delete from emailed_links
 	}
 	else
 	{
-		// insert the user now, delete the temp link
-		sql = @"
-
-declare @template_user_id int
-select @template_user_id = us_id from users where us_username = N'$template'
-
-insert into users
-	(us_username, us_email, us_firstname, us_lastname, us_salt, us_password,
-	us_default_query,
-	us_enable_notifications,
-	us_auto_subscribe,
-	us_auto_subscribe_own_bugs,
-	us_auto_subscribe_reported_bugs,
-	us_send_notifications_to_self,
-	us_active,
-	us_bugs_per_page,
-	us_forced_project,
-	us_reported_notifications,
-	us_assigned_notifications,
-	us_subscribed_notifications,
-	us_use_fckeditor,
-	us_enable_bug_list_popups,
-	us_org)
-
-select
-	N'$username', N'$email', N'$firstname', N'$lastname', $salt, N'$password',
-	us_default_query,
-	us_enable_notifications,
-	us_auto_subscribe,
-	us_auto_subscribe_own_bugs,
-	us_auto_subscribe_reported_bugs,
-	us_send_notifications_to_self,
-	1, -- active
-	us_bugs_per_page,
-	us_forced_project,
-	us_reported_notifications,
-	us_assigned_notifications,
-	us_subscribed_notifications,
-	us_use_fckeditor,
-	us_enable_bug_list_popups,
-	us_org
-	from users where us_id = @template_user_id
-
-declare @new_user_id int
-select @new_user_id = scope_identity()
-
-insert into project_user_xref
-	(pu_project, pu_user, pu_auto_subscribe, pu_permission_level, pu_admin)
-
-select pu_project, @new_user_id, pu_auto_subscribe, pu_permission_level, pu_admin
-	from project_user_xref
-	where pu_user = @template_user_id
-
-delete from emailed_links where el_id = '$guid'";
-
-		sql = sql.Replace("$username", ((string) dr["el_username"]).Replace("'","''"));
-		sql = sql.Replace("$email", ((string) dr["el_email"]).Replace("'","''"));
-		sql = sql.Replace("$firstname", ((string) dr["el_firstname"]).Replace("'","''"));
-		sql = sql.Replace("$lastname", ((string) dr["el_lastname"]).Replace("'","''"));
-		sql = sql.Replace("$salt", Convert.ToString((int)dr["el_salt"]));
-		sql = sql.Replace("$password", (string) dr["el_password"]);
-
+		btnet.User.copy_user(
+			(string) dr["el_username"],
+			(string) dr["el_email"],
+			(string) dr["el_firstname"],
+			(string) dr["el_lastname"],
+			(int) dr["el_salt"],
+			(string) dr["el_password"],
+			Util.get_setting("SelfRegisteredUserTemplate","[NO SelfRegisteredUserTemplate!]"));
+		
+		//  Delete the temp link
+		sql = @"delete from emailed_links where el_id = '$guid'";
 		sql = sql.Replace("$guid",guid.Replace("'","''"));
-		sql = sql.Replace("$template", Util.get_setting("SelfRegisteredUserTemplate","[NO SelfRegisteredUserTemplate!]"));
-
 		btnet.DbUtil.execute_nonquery(sql);
+
 		msg.InnerHtml = "Your registration is complete.";
 	}
 

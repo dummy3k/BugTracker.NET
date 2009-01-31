@@ -16,7 +16,6 @@ Corey's TO DO list:
 * many to many, queries to organizations
 * excel export for reports
 * escalation/reminder, "Due Date"
-* new fckEditor 
 * some sort of contact management?
 * syscolumns, column order scheme - make less fragile
 * edit_bug.aspx and css - support for multiple columns
@@ -25,31 +24,34 @@ Corey's TO DO list:
 * relationships in print?
 * Documentation improvements:
 * POP3Main, multiple filters
-* map emails to ids
 
 workflow.cs
 ldap
 blog about lucene.net
 
-
 -----------------------------------------------------------------------
-Version 3.1.0   01/xx/2009   (svn revision xxx)
+Version 3.1.0   01/31/2009   (svn revision 302)
 -----------------------------------------------------------------------
 
-* Have btnet_service emails use the real incoming email, not the service email.
+* You can now have the incoming emails from btnet_service.exe trigger
+the creation of new BugTracker.NET users, with the "from" address being
+the username.  See these new settings in Web.config:
+	CreateUserFromEmailAddressIfThisUsername
+	CreateUsersFromEmailTemplate
 
-
-* Changed "FCKConfig.EnterMode" from p to br, so that enter key in rich
-text editor adds just a line break, not a paragraph break.
+* Fixed bug 2453704 "Null reference when adding bug with news on", in
+whatsnew.cs.
 
 * Added Web.config setting "AspNetFormId" which you can use to override
 what form id some of the the javascript looks for.  Different versions
-of ASP.NET have generated HTML forms with different ids.
+of ASP.NET have generated HTML forms with different ids, and the 
+previous logic was guessing those ids wrong for some configurations.
+
+* Changed "FCKConfig.EnterMode" from <p> to <br>, so that enter key in 
+rich text editor adds just a line break, not a paragraph break.
 
 * Updated SharpMimeTools dll to handle commas in quoted printable 
 email subjects.
-
-* Fixed crash in whatsnew.cs
 
 -----------------------------------------------------------------------
 Version 3.0.9   01/25/2009   (svn revision 300)

@@ -5,7 +5,7 @@
 <%@ Assembly Name="SharpMimeTools" %>
 
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -123,15 +123,44 @@ void Page_Load(Object sender, EventArgs e)
 		Response.Write("ERROR: invalid username or password");
 		Response.End();
     }
+    
+    DataRow dr = null;
 
-    sql = @"select us_id, us_admin, us_org, og_other_orgs_permission_level
+	sql = @"select us_id, us_admin, us_username, us_org, og_other_orgs_permission_level
 		from users
 		inner join orgs on us_org = og_id
 		where us_username = N'$us'";
+	
+	// create a new user from the "from" email address    
+    string btnet_service_username = Util.get_setting("CreateUserFromEmailAddressIfThisUsername","");
+    if (!string.IsNullOrEmpty(from) && username == btnet_service_username)
+    {
+		username = btnet.Util.simplify_email_address(from);
 
-	sql = sql.Replace("$us",username.Replace("'","''"));
+		sql = sql.Replace("$us",username.Replace("'","''"));		
+		dr = btnet.DbUtil.get_datarow(sql);
+		
+		if (dr == null)
+		{
+			btnet.User.copy_user(
+				username,
+				username,
+				"", "",  // first, last
+				0,  // salt
+				Guid.NewGuid().ToString(), // random value for password,
+				Util.get_setting("CreateUsersFromEmailTemplate","[NO CreateUsersFromEmailTemplate!]"));
+		}
 
-	DataRow dr = btnet.DbUtil.get_datarow(sql);
+		dr = btnet.DbUtil.get_datarow(sql);
+		
+    }
+    else
+    {
+
+		sql = sql.Replace("$us",username.Replace("'","''"));
+		dr = btnet.DbUtil.get_datarow(sql);
+	}
+	
 
     // this should never happen
     if (dr == null)
@@ -143,7 +172,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	security = new Security();
 	security.context = HttpContext.Current;
-	security.user.username = from;
+	security.user.username = username;
 	security.user.usid = (int) dr["us_id"];
 	security.user.is_admin = Convert.ToBoolean(dr["us_admin"]);
 	security.user.org = (int) dr["us_org"];

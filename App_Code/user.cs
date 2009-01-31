@@ -1,5 +1,5 @@
 /*
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 */
 
@@ -181,5 +181,90 @@ namespace btnet
                 }
             }
         }
+        
+        public static int copy_user(
+        	string username, 
+        	string email,
+        	string firstname,
+        	string lastname,
+        	int salt,
+        	string password,
+        	string template_username)
+        {
+
+			string sql = @"
+/* copy user */
+declare @template_user_id int
+select @template_user_id = us_id from users where us_username = N'$template'
+
+declare @new_user_id int
+set @new_user_id = -1
+
+IF NOT EXISTS (SELECT us_id FROM users WHERE us_username = '$username')
+BEGIN
+
+insert into users
+	(us_username, us_email, us_firstname, us_lastname, us_salt, us_password,
+	us_default_query,
+	us_enable_notifications,
+	us_auto_subscribe,
+	us_auto_subscribe_own_bugs,
+	us_auto_subscribe_reported_bugs,
+	us_send_notifications_to_self,
+	us_active,
+	us_bugs_per_page,
+	us_forced_project,
+	us_reported_notifications,
+	us_assigned_notifications,
+	us_subscribed_notifications,
+	us_use_fckeditor,
+	us_enable_bug_list_popups,
+	us_org)
+
+select
+	N'$username', N'$email', N'$firstname', N'$lastname', $salt, N'$password',
+	us_default_query,
+	us_enable_notifications,
+	us_auto_subscribe,
+	us_auto_subscribe_own_bugs,
+	us_auto_subscribe_reported_bugs,
+	us_send_notifications_to_self,
+	1, -- active
+	us_bugs_per_page,
+	us_forced_project,
+	us_reported_notifications,
+	us_assigned_notifications,
+	us_subscribed_notifications,
+	us_use_fckeditor,
+	us_enable_bug_list_popups,
+	us_org
+	from users where us_id = @template_user_id
+
+select @new_user_id = scope_identity()
+
+insert into project_user_xref
+	(pu_project, pu_user, pu_auto_subscribe, pu_permission_level, pu_admin)
+
+select pu_project, @new_user_id, pu_auto_subscribe, pu_permission_level, pu_admin
+	from project_user_xref
+	where pu_user = @template_user_id
+
+select @new_user_id
+
+END
+";
+
+			sql = sql.Replace("$username", username.Replace("'","''"));
+			sql = sql.Replace("$email", email.Replace("'","''"));
+			sql = sql.Replace("$firstname", firstname.Replace("'","''"));
+			sql = sql.Replace("$lastname", lastname.Replace("'","''"));
+			sql = sql.Replace("$salt", Convert.ToString(salt));
+			sql = sql.Replace("$password", password);
+			sql = sql.Replace("$template", template_username);
+			
+			return Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
+        
+        }
+        
     }; // end class
 }

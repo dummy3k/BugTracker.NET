@@ -1282,6 +1282,26 @@ where bg_id = $bg";
                 Response.Redirect(url + "?url=" + Request.QueryString["url"] + "&qs=" + Request.QueryString["qs"]);
             }
         }
+        
+        ///////////////////////////////////////////////////////////////////////
+		public static string simplify_email_address(string email)
+		{
+			// convert "Corey Trager <ctrager@yahoo.com>" to just "ctrager@yahoo.com"
+
+
+			int pos1 = email.IndexOf("<");
+			int pos2 = email.IndexOf(">");
+
+			if (pos1 >= 0 && pos2 > pos1)
+			{
+				return email.Substring(pos1+1, pos2 - pos1 - 1);
+			}
+			else
+			{
+				return email;
+			}
+		}
+        
 
     } // end Util
 }
