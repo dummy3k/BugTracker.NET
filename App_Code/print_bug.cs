@@ -1,5 +1,5 @@
 /*
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 */
 
@@ -813,7 +813,9 @@ namespace btnet
 			if (content_type =="image/gif"
 			|| content_type == "image/jpg"
 			|| content_type == "image/jpeg"
+			|| content_type == "image/pjpeg"
 			|| content_type == "image/png"
+			|| content_type == "image/x-png"
 			|| content_type == "image/bmp"
 			|| content_type == "image/tiff")
 			{
