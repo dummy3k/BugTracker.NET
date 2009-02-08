@@ -2554,9 +2554,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			if ( fieldLength > minTextAreaSize && !string.IsNullOrEmpty(text))
 			{
 				// more readable if there is a lot of text
-				Response.Write ("<div class='short_desc_static'  id=\"" + field_id +  "_static\">");
+				Response.Write ("<div class='short_desc_static'  id=\"" + field_id +  "_static\"><pre>");
 				Response.Write (text);
-				Response.Write ("</div>");
+				Response.Write ("</pre></div>");
 			}
 			else
 			{
@@ -2579,7 +2579,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				Response.Write (" cols=\"" + minTextAreaSize + "\" rows=\"" + (((fieldLength/minTextAreaSize)>maxTextAreaRows) ? maxTextAreaRows : (fieldLength/minTextAreaSize)) + "\" " );
                 Response.Write(" name=\"" + column_name + "\"");
 				Response.Write (" id=\"" + field_id + "\" >");
-                Response.Write(HttpUtility.HtmlEncode(hash_custom_cols[column_name]));
+                Response.Write(hash_custom_cols[column_name]);
 				Response.Write ("</textarea><div class=smallnote id=\"" + field_id + "_cnt\">&nbsp;</div>");
 			}
 			else

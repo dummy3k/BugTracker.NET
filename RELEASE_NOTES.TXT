@@ -23,21 +23,21 @@ Corey's TO DO list:
 * configurable start page, like start on dashboard
 * relationships in print?
 * Documentation improvements:
-* POP3Main, multiple filters
-
-workflow.cs
-ldap
-blog about lucene.net
-
-image/x-png
-image/pjpeg
-
+* POP3Main, multiple filters, workflow.cs, ldap
+* blog about lucene.net
 
 -----------------------------------------------------------------------
-Version 3.1.1   02/07/2009   (svn revision XXX)
+Version 3.1.1   02/07/2009   (svn revision 304)
 -----------------------------------------------------------------------
 
 * Fixed bug with "show images inline" when MIME type was pjpeg or x-png.
+IE7 tends to use these MIME types.
+
+* Fixed bug: Custom fields rendered as textareas were getting 
+HtmlEncoded twice.
+
+* Fixed bug: Custom fields displayed in textareas lost their formatting
+when displayed as read only.
 
 -----------------------------------------------------------------------
 Version 3.1.0   01/31/2009   (svn revision 302)
@@ -146,9 +146,9 @@ Web.config file:
 This is related to bug 2410699 "IIS7 and btnetSettings, medium trust, 
 Web.config"
 
-* Fixed "Exception: System.InvalidOperationException: The connection was
-not closed. The connection's current state is open." error when 
-attaching a file to an email.
+* Fixed bug 2573169, "Exception: System.InvalidOperationException: The 
+connection was not closed. The connection's current state is open." 
+error when attaching a file to an email.
 
 * Fixed bug where deleting of bugs was leaving behind the related tasks.
 Now deleting them.  I said I fixed in in version 3.0.5, but, actually,
