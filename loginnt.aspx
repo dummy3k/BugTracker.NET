@@ -67,6 +67,9 @@ void Page_Load(Object sender, EventArgs e)
 				userid,
 				(string) dr["us_username"],
 				"1");
+
+            btnet.Util.update_most_recent_login_datetime(userid);
+				
 			btnet.Util.redirect(Request, Response);
 		}
 
@@ -153,6 +156,9 @@ void Page_Load(Object sender, EventArgs e)
 					new_user_id,
 					windows_username.Replace("'", "''"),
 					"1");
+					
+	            btnet.Util.update_most_recent_login_datetime(new_user_id);
+					
 				btnet.Util.redirect(Request, Response);
 			}
         }
@@ -175,6 +181,9 @@ void Page_Load(Object sender, EventArgs e)
 				userid,
 				(string) dr["us_username"],
 				"1");
+				
+			btnet.Util.update_most_recent_login_datetime(userid);				
+			
 			btnet.Util.redirect(Request, Response);
 		}
 

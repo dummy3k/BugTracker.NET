@@ -1,5 +1,5 @@
 /*
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 */
 
@@ -53,6 +53,7 @@ where us_username = N'$username'";
 
             if (authenticated)
             {
+                btnet.Util.update_most_recent_login_datetime((int)dr["us_id"]);
                 return true;
             }
             else

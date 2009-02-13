@@ -1302,6 +1302,13 @@ where bg_id = $bg";
 			}
 		}
         
+		public static void update_most_recent_login_datetime(int us_id)
+		{
+			string sql = @"update users set us_most_recent_login_datetime = getdate() where us_id = $us";
+			sql = sql.Replace("$us", Convert.ToString(us_id));
+			DbUtil.execute_nonquery(sql);
+		}
+
 
     } // end Util
 }

@@ -26,6 +26,19 @@ Corey's TO DO list:
 * POP3Main, multiple filters, workflow.cs, ldap
 * blog about lucene.net
 
+
+-----------------------------------------------------------------------
+Version 3.1.2   02/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+* Version 3.0.5 broke the features where BugTracker.NET records the
+most recent login date of a user.  Fixed in this version.   
+
+* check multiline edits in chrome
+
+* Corrected some typos in the hour dropdowns in the time tracking 
+feature.
+
 -----------------------------------------------------------------------
 Version 3.1.1   02/07/2009   (svn revision 304)
 -----------------------------------------------------------------------
@@ -181,9 +194,6 @@ you need to add the line to your Web.config, and set it to "1".
 
 * Fixed bug where change history was missing from the emails.  The
 bug was introduced in version 3.0.4.
-
-* Fixed bug where us_most_recent_login_datetime wasn't being updated
-if Windows authentication was being used.
 
 * Fixed bug where guest was seeing "add task" link, but wasn't allowed
 to add task.
