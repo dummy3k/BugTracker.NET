@@ -1,3 +1,8 @@
+/*
+Copyright 2002-2009 Corey Trager
+Distributed under the terms of the GNU General Public License
+*/
+
 function on_body_unload()
 {
 	// don't leave stray child windows
@@ -191,13 +196,13 @@ function resize_iframe(elid, delta)
 {
 	var el = get_el(elid);
 
-	if (parseInt(el.height) + parseInt(delta) < 20)
+	if (parseInt(el.style.height) + parseInt(delta) < 20)
 	{
-		el.height = 20;
+		el.style.height = "20px";
 	}
 	else
 	{
-		el.height = parseInt(el.height) + parseInt(delta);
+		el.style.height = (parseInt(el.style.height) + parseInt(delta)) + "px";
 	}
 }
 

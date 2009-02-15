@@ -52,6 +52,11 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		fckeComment.Visible = true;
 		comment.Visible = false;
+		
+		if (fckeComment.Value == "<br />") // workaround for bug in fckEditor
+		{
+			fckeComment.Value = "";
+		}
 	}
 	else
 	{
@@ -124,7 +129,7 @@ void Page_Load(Object sender, EventArgs e)
 
 	if (!IsPostBack)
 	{
-
+		
 		// First time in
 
 		// Add or edit?

@@ -31,13 +31,18 @@ Corey's TO DO list:
 Version 3.1.2   02/xx/2009   (svn revision xxx)
 -----------------------------------------------------------------------
 
+* check multiline edits in chrome
+
 * Version 3.0.5 broke the features where BugTracker.NET records the
 most recent login date of a user.  Fixed in this version.   
 
-* check multiline edits in chrome
-
 * Corrected some typos in the hour dropdowns in the time tracking 
 feature.
+
+* Fixed bug 2596624 - "Blank comment entered when using the rich text 
+editor".  It's really a bug in fckEditor, but I found a workaround.
+
+* Fixed [+], [-] links to resize rich text editing area.
 
 -----------------------------------------------------------------------
 Version 3.1.1   02/07/2009   (svn revision 304)
