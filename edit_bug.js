@@ -196,9 +196,9 @@ function resize_iframe(elid, delta)
 {
 	var el = get_el(elid);
 
-	if (parseInt(el.style.height) + parseInt(delta) < 20)
+	if (parseInt(el.style.height) + parseInt(delta) < 100)
 	{
-		el.style.height = "20px";
+		el.style.height = "100px";
 	}
 	else
 	{

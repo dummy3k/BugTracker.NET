@@ -1211,8 +1211,8 @@ and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
 
 						sql = @"
 insert into queued_notifications
-(qn_date_created, qn_bug, qn_user, qn_status, qn_retries, qn_to, qn_from, qn_subject, qn_body)
-values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N'$body')";
+(qn_date_created, qn_bug, qn_user, qn_status, qn_retries, qn_to, qn_from, qn_subject, qn_body, qn_last_exception)
+values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N'$body', N'')";
 
 						sql = sql.Replace("$bug",Convert.ToString(bugid));
 						sql = sql.Replace("$user",Convert.ToString(dr["us_id"]));
