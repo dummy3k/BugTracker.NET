@@ -930,6 +930,8 @@ namespace btnet
                     s2,
                     new MatchEvaluator(convert_to_hyperlink));
 
+// This code doesn't perform well if s2 is one big string, no spaces, line breaks
+
                 // convert email addresses to send_email links
                 s2 = reEmail.Replace(
                     s2,
