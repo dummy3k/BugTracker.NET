@@ -27,10 +27,18 @@ Corey's TO DO list:
 * blog about lucene.net
 * links on posts don't respect permissions
 * Upgrade to CKeditor
+* Lucene search of custom text fields.
 
 -----------------------------------------------------------------------
-Version 3.1.2   02/15/2009   (svn revision xxx)
+Version 3.1.2   02/21/2009   (svn revision 309)
 -----------------------------------------------------------------------
+
+* Fixed bug when inserting a null into the qn_last_exception column of
+the queued_notification table.  Discussed here:
+http://sourceforge.net/forum/forum.php?thread_id=3015629&forum_id=226938
+
+* Fixed bug 2596624 - "Blank comment entered when using the rich text 
+editor".
 
 * Version 3.0.5 broke the features where BugTracker.NET records the
 most recent login date of a user.  Fixed in this version.   
@@ -38,14 +46,7 @@ most recent login date of a user.  Fixed in this version.
 * Corrected some typos in the hour dropdowns in the time tracking 
 feature.
 
-* Fixed bug 2596624 - "Blank comment entered when using the rich text 
-editor".  It's really a bug in fckEditor, but I found a workaround.
-
 * Fixed [+], [-] links to resize rich text editing area.
-
-* Fixed bug when inserting a null into the qn_last_exception column of
-the queued_notification table.  Discussed here:
-http://sourceforge.net/forum/forum.php?thread_id=3015629&forum_id=226938
 
 -----------------------------------------------------------------------
 Version 3.1.1   02/07/2009   (svn revision 304)
