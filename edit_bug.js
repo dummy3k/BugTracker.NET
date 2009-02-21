@@ -433,6 +433,9 @@ function on_body_load()
 			}
 		}
 	}
+
+	var short_desc = document.getElementById("short_desc")
+	short_desc.title = short_desc.value
 	
 	dirty = false // reset, because change_dropdown_style dirties the dropdowns
 

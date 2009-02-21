@@ -2412,7 +2412,7 @@ function disable_second_button()
 			<span class="short_desc_static" id="static_short_desc" runat="server" style='width:500px; display:none;'></span>
 
 
-			<input runat="server" type=text class="short_desc_input" id="short_desc" maxlength="200"  
+			<input title="" runat="server" type=text class="short_desc_input" id="short_desc" maxlength="200"  
 				onkeydown="count_chars('short_desc',200)" onkeyup="count_chars('short_desc',200)">
 				&nbsp;&nbsp;&nbsp;
 				<span runat="server" class=err id="short_desc_err"></span>
