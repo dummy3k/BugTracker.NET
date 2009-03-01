@@ -1818,7 +1818,7 @@ function do_doc_ready()
 
 <tr><td>
 <div id=searchfrom>
-<form class=frm method="post" runat="server" onmouseover="hide_suggest()">
+<form class=frm action="search.aspx" method="post" runat="server" onmouseover="hide_suggest()">
 
 <table border=0 cellpadding=6 cellspacing=0>
 	<tr>

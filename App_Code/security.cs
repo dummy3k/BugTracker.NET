@@ -222,7 +222,7 @@ and us_active = 1";
         public void write_menu_item(HttpResponse Response,
             string this_link, string menu_item, string href)
         {
-            Response.Write("<td valign=middle align=left'>");
+            Response.Write("<td class='menu_td'>");
             if (this_link == menu_item)
             {
                 Response.Write("<a href=" + href + "><span class='selected_menu_item warn'  style='margin-left:3px;'>" + menu_item + "</span></a>");

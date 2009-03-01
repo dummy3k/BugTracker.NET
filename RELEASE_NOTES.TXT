@@ -12,7 +12,7 @@ http://ifdefined.com/readme.html#upgrading
 Corey's TO DO list:
 
 * auto subscribe if you modified bug
-* default value for internal comments
+* default value for internal comments, other fields
 * many to many, queries to organizations
 * excel export for reports
 * escalation/reminder, "Due Date"
@@ -21,20 +21,41 @@ Corey's TO DO list:
 * edit_bug.aspx and css - support for multiple columns
 * set fields to required?  By org.
 * configurable start page, like start on dashboard
-* relationships in print?
+* relationships, tasks in print?
 * Documentation improvements:
 * POP3Main, multiple filters, workflow.cs, ldap
-* blog about lucene.net
 * links on posts don't respect permissions
 * Upgrade to CKeditor
 * Lucene search of custom text fields.
+* voting.
+* to run svn server: svnserve -d -r c:/cit
 
 -----------------------------------------------------------------------
-Version 3.1.3   02/XX/2009   (svn revision XXX)
+Version 3.1.3   03/01/2009   (svn revision XXX)
 -----------------------------------------------------------------------
+
+* Fixed bug with custom dropdowns of type char/nchar. The app was
+recording changes even when the user made no change, because of values
+being padded with spaces in the database.
+
+* Fixed bug 2634870 - edit_task.aspx crash if bug has empty "assigned to"
+
+* Fix for "Request is not available in this context" error for IIS
+integrated mode.  Thanks to Per-Erik Stendahl for the code.
+
+* Fixed bug with subversion post commit script.  It was associating the
+incorrect bugid with the the revision when the bugid wasn't entered
+with the checkin.  Thanks to Sam Eads for tracking this down. I also 
+improved the debug output.
 
 * Added tip for short description.  If it's longer than the INPUT and 
 you hover over it, you can see all the text.
+
+* The formatting of the links at the top of the page are now controlled
+by "menu_td" css class.
+
+* When replying to an email, and quoting the original email, blank 
+lines are now inserted into the reply before the quoted email.
 
 -----------------------------------------------------------------------
 Version 3.1.2   02/21/2009   (svn revision 309)

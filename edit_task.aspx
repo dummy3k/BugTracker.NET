@@ -297,7 +297,11 @@ order by us_username; ";
 	if (tsk_id == 0)
 	{
 		int default_assigned_to_user = (int) btnet.DbUtil.get_dataset(sql).Tables[2].Rows[0][0];
-		assigned_to.Items.FindByValue(Convert.ToString(default_assigned_to_user)).Selected = true;
+		ListItem li = assigned_to.Items.FindByValue(Convert.ToString(default_assigned_to_user));
+		if (li != null)
+		{
+			li.Selected = true;
+		}
 	}
 }
 

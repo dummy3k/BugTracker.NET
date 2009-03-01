@@ -1507,7 +1507,7 @@ bool did_something_change()
 			if (before == null) before = "";
 			if (after == null) after = "";
 
-			if (before != after)
+			if (before.Trim() != after.Trim())
 			{
 				something_changed = true;
 				break;
@@ -1723,7 +1723,7 @@ bool record_changes()
 			after = "";
 		}
 
-		if (before != after)
+		if (before.Trim() != after.Trim())
 		{
 
 			if ((string)drcc["dropdown type"] == "users")
@@ -1755,7 +1755,7 @@ bool record_changes()
 			do_update = true;
 			sql += base_sql.Replace(
 				"$3",
-                "changed " + column_name + " from \"" + before.Replace("'", "''") + "\" to \"" + after.Replace("'", "''") + "\"");
+                "changed " + column_name + " from \"" + before.Trim().Replace("'", "''") + "\" to \"" + after.Trim().Replace("'", "''") + "\"");
 
             hash_prev_custom_cols[column_name] = hash_custom_cols[column_name];
 		}

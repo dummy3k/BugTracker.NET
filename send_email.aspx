@@ -192,10 +192,12 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					if (security.user.use_fckeditor)
 					{
+					    fckeBody.Value += "<br><br><br>";
 					    fckeBody.Value += "&#62;From: " + dr["bp_email_from"].ToString().Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
 					}
 					else
 					{
+						body.Value += "\n\n\n";
 						body.Value += ">From: " + dr["bp_email_from"] + "\n";
 					}
 				}

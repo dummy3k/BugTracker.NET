@@ -104,12 +104,20 @@ namespace btnet
 
 
 				string url = "";
-				if (HttpContext.Current != null)
+				
+				try // To workaround problem with IIS integrated mode
 				{
-                    if (HttpContext.Current.Request != null)
-                    {
-                    	url = HttpContext.Current.Request.Url.ToString();
-                    }
+					if (HttpContext.Current != null)
+					{
+						if (HttpContext.Current.Request != null)
+						{
+							url = HttpContext.Current.Request.Url.ToString();
+						}
+					}
+				}
+				catch 
+				{
+					// do nothing
 				}
 
 				w.WriteLine(DateTime.Now.ToString("yyy-MM-dd HH:mm:ss")
