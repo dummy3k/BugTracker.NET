@@ -74,7 +74,10 @@ void Page_Load(Object sender, EventArgs e)
 			sql += "\ndelete from bug_subscriptions where bs_bug in (" + list + ")";
 			sql += "\ndelete from bug_relationships where re_bug1 in (" + list + ")";
 			sql += "\ndelete from bug_relationships where re_bug2 in (" + list + ")";
-			sql += "\ndelete from bugs where bg_id in (" + list + ")";
+			sql += "\ndelete from bug_user_flags where fl_bug in (" + list + ")";			
+			sql += "\ndelete from bug_user_seen where sn_bug in (" + list + ")";			
+			sql += "\ndelete from bug_tasks where tsk_bug in (" + list + ")";			
+			sql += "\ndelete from bugs where bg_id in (" + list + ")";			
 
 			confirm_href.InnerText = "Confirm Delete";
 

@@ -30,6 +30,33 @@ Corey's TO DO list:
 * voting.
 * svnserve -d -r c:/cit
 
+cleaning up old bugs in demo
+
+select count(1) from bugs
+delete from bugs where bg_id < 1000 -- CHANGE THIS
+
+delete from bug_user_flags where fl_bug not in (select bg_id from bugs)
+delete from bug_user_seen where sn_bug not in (select bg_id from bugs)
+delete from bug_posts where bp_bug not in (select bg_id from bugs)
+delete from bug_subscriptions where bs_bug not in (select bg_id from bugs)
+delete from bug_relationships where re_bug1 not in (select bg_id from bugs)
+delete from bug_relationships where re_bug2 not in (select bg_id from bugs)
+delete from bug_tasks where tsk_bug not in (select bg_id from bugs)
+
+
+delete from users where 
+us_id > 20
+us_id not in (select bg_reported_user from bugs) and 
+us_id not in (select bg_last_updated_user from bugs) and
+us_id not in (select bp_user from bug_posts)
+
+-----------------------------------------------------------------------
+Version 3.1.4   03/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+* Deletion of bugs was leaving some debris because it wasn't deleting 
+the rows from the related tables.
+
 -----------------------------------------------------------------------
 Version 3.1.3   03/01/2009   (svn revision 313)
 -----------------------------------------------------------------------
