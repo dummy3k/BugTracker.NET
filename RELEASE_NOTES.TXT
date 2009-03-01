@@ -28,25 +28,38 @@ Corey's TO DO list:
 * Upgrade to CKeditor
 * Lucene search of custom text fields.
 * voting.
-* to run svn server: svnserve -d -r c:/cit
+* svnserve -d -r c:/cit
 
 -----------------------------------------------------------------------
-Version 3.1.3   03/01/2009   (svn revision XXX)
+Version 3.1.3   03/01/2009   (svn revision 313)
 -----------------------------------------------------------------------
+
+* Fixed bug 2634870 - "edit_task.aspx crash if bug has empty 
+assigned-to"
+
+* Fixed bug 2414881 "btnet_post_commit svn script makes erroneous 
+posts". The post-commit script was associating the incorrect bugid with
+the the revision when the bugid wasn't entered with the checkin.
+Thanks to Sam Eads for tracking this down. I also improved the debug
+output.
+
+* Fixed bug 2446465 "subversion diff fails when comparing one-line
+files"
+
+* Fixed bug 2526512 "problems when subversion thinks file is binary"
 
 * Fixed bug with custom dropdowns of type char/nchar. The app was
 recording changes even when the user made no change, because of values
 being padded with spaces in the database.
 
-* Fixed bug 2634870 - edit_task.aspx crash if bug has empty "assigned to"
+* Fixed bug with svn_view.aspx.  It was displaying the source with
+my own copyright notice.
 
 * Fix for "Request is not available in this context" error for IIS
 integrated mode.  Thanks to Per-Erik Stendahl for the code.
 
-* Fixed bug with subversion post commit script.  It was associating the
-incorrect bugid with the the revision when the bugid wasn't entered
-with the checkin.  Thanks to Sam Eads for tracking this down. I also 
-improved the debug output.
+* Added a subversion post commit script in python, for those who are
+running a subversion server on linux, etc. 
 
 * Added tip for short description.  If it's longer than the INPUT and 
 you hover over it, you can see all the text.

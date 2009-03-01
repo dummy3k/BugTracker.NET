@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -210,6 +210,14 @@ void visual_diff(string file_path, int revision, int old_revision)
         Response.End();
     }
 
+	int error_pos = diff_text.IndexOf("Cannot display: file marked as a binary type.");
+	if (error_pos > -1)
+	{
+		Response.Write ("<div style='color:red; font-weight: bold; font-size: 10pt;>");
+		Response.Write(diff_text.Substring(error_pos));
+		Response.Write("<br>Subversion thinks this is a binary file.</div>");
+		Response.End();
+	}
 
 	// first, split everything into lines
 	string[] diff_lines = regex.Split(diff_text.Replace("\r\n","\n"));
@@ -227,8 +235,6 @@ void visual_diff(string file_path, int revision, int old_revision)
 			old_rev_after_int - old_rev_pos_start_of_int);
 
 		old_revision = Convert.ToInt32(old_revision_string);
-
-
 
 	}
 
@@ -280,8 +286,6 @@ void visual_diff(string file_path, int revision, int old_revision)
 		if (line.StartsWith("@@ -") && line.EndsWith(" @@"))
 		{
 
-
-
 			// See comment at the top of this file explaining Unified Diff Format
 			// Parse out the left start line.  For example, the "38" here:
 			// @@ -38,18 +39,12 @@
@@ -290,24 +294,16 @@ void visual_diff(string file_path, int revision, int old_revision)
 
 
             int pos1 = line.IndexOf("-");
-            int pos2 = Math.Min(line.IndexOf(" ", pos1), line.IndexOf(",", pos1));
-            //string left_start_line_string = line.Substring(pos1 + 1, (pos2-1) - pos1);
+			int comma_pos = line.IndexOf(",", pos1);
+			if (comma_pos == -1)
+			{
+				comma_pos = 9999;
+			}
+            int pos2 = Math.Min(line.IndexOf(" ", pos1), comma_pos);
             string left_start_line_string = line.Substring(pos1 + 1, pos2 - (pos1 + 1));
             int start_line = Convert.ToInt32(left_start_line_string);
             start_line -= 1; // adjust for zero based index
 
-            // parse out the number of lines, the "18" in our example. If just one line, it might not be specified.
-//            int pos3 = line.IndexOf(" +");
-//            int left_num_of_lines;
-//            if ((pos3) - (pos2 + 1) >= 0)
-//            {
-//            string left_num_of_lines_string = line.Substring(pos2 + 1, (pos3) - (pos2 + 1));
-//                left_num_of_lines = Convert.ToInt32(left_num_of_lines_string);
-//            }
-//            else
-//            {
-//                left_num_of_lines = 1; // this goes along with the second number optional case
-//            }
 
             // advance through left file until we hit the starting line of the range
             while (lx < start_line)
@@ -432,23 +428,9 @@ void visual_diff(string file_path, int revision, int old_revision)
             int pos2 = line.IndexOf(",", pos1);
             if (pos2 == -1) pos2 = line.IndexOf(" ", pos1);
 
-            //string right_start_line_string = line.Substring(pos1 + 1, (pos2 - 1) - pos1);
             string right_start_line_string = line.Substring(pos1 + 1, pos2 - (pos1 + 1));
             int start_line = Convert.ToInt32(right_start_line_string);
             start_line -= 1; // adjust for zero based index
-
-            // parse out the number of lines, the "12" in our example
-//            int pos3 = line.IndexOf(" ",pos1);
-//            int right_num_of_lines;
-//            if ((pos3) - (pos2 + 1) > 0)
-//            {
-//            string right_num_of_lines_string = line.Substring(pos2 + 1, (pos3) - (pos2 + 1));
-//                right_num_of_lines = Convert.ToInt32(right_num_of_lines_string);
-//            }
-//            else
-//            {
-//                right_num_of_lines = 1; // this goes along with the second number optional case
-//            }
 
             // advance through right file until we hit the starting line of the range
             while (rx < start_line)
@@ -557,8 +539,6 @@ void visual_diff(string file_path, int revision, int old_revision)
 	left = sL.ToString();
 	right = sR.ToString();
 	diff = diff_text;
-
-
 
 }
 
