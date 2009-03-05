@@ -402,12 +402,13 @@ string format_date_hour_min(string date, string hour, string min)
 {
 	if (!string.IsNullOrEmpty(date))
 	{
-		return date
-		+ " "
-		+ hour
-		+ ":"
-		+ min
-		+ ":00";
+		return btnet.Util.format_local_date_into_db_format(
+			date
+			+ " "
+			+ hour
+			+ ":"
+			+ min
+			+ ":00");
 	}
 	else
 	{
