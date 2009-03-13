@@ -282,11 +282,11 @@ void create_line_chart(string title, DataSet ds)
 		x += line_length;
 	}
 
-	// Since we are outputting a Jpeg, set the ContentType appropriately
-	Response.ContentType = "image/jpeg";
+	// Since we are outputting a Gif, set the ContentType appropriately
+	Response.ContentType = "image/gif";
 
 	// Save the image to a file
-	objBitmap.Save(Response.OutputStream, ImageFormat.Jpeg);
+	objBitmap.Save(Response.OutputStream, ImageFormat.Gif);
 
 	// clean up...
 	objGraphics.Dispose();
@@ -448,11 +448,11 @@ void create_bar_chart(string title, DataSet ds)
 		x += (int) (.30F * bar_space);
 	}
 
-	// Since we are outputting a Jpeg, set the ContentType appropriately
-	Response.ContentType = "image/jpeg";
+	// Since we are outputting a Gif, set the ContentType appropriately
+	Response.ContentType = "image/gif";
 
 	// Save the image to a file
-	objBitmap.Save(Response.OutputStream, ImageFormat.Jpeg);
+	objBitmap.Save(Response.OutputStream, ImageFormat.Gif);
 
 	// clean up...
 	objGraphics.Dispose();
@@ -600,12 +600,12 @@ void create_pie_chart(string title, DataSet ds)
 		start_of_rect + rect_width + 4,
 		y);
 
-	// Since we are outputting a Jpeg, set the ContentType appropriately
-	Response.ContentType = "image/jpeg";
+	// Since we are outputting a Gif, set the ContentType appropriately
+	Response.ContentType = "image/gif";
 
 
 	// Save the image to a file
-	objBitmap.Save(Response.OutputStream, ImageFormat.Jpeg);
+	objBitmap.Save(Response.OutputStream, ImageFormat.Gif);
 
 	// clean up...
 	objGraphics.Dispose();
@@ -678,11 +678,11 @@ void write_no_data_message(string title, DataSet ds)
         x_axis_text_offset,
         fontTitle.Height / 2);
 
-    // Since we are outputting a Jpeg, set the ContentType appropriately
-    Response.ContentType = "image/jpeg";
+    // Since we are outputting a Gif, set the ContentType appropriately
+    Response.ContentType = "image/gif";
 
     // Save the image to a file
-    objBitmap.Save(Response.OutputStream, ImageFormat.Jpeg);
+    objBitmap.Save(Response.OutputStream, ImageFormat.Gif);
 
     // clean up...
     objGraphics.Dispose();

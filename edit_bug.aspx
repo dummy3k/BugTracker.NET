@@ -775,7 +775,7 @@ from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or og_external_user = 0)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
 and us_id in
     (select pu_user from project_user_xref
         where pu_project = $pj
@@ -791,7 +791,7 @@ from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or og_external_user = 0)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
 and us_id not in
     (select pu_user from project_user_xref
 	    where pu_project = $pj
@@ -1949,10 +1949,48 @@ Boolean validate()
 		}
 	}
 
+	// validate assigned to user versus 
 
+	if (!does_assigned_to_have_permission_for_org(
+		Convert.ToInt32(assigned_to.SelectedValue),
+		Convert.ToInt32(org.SelectedValue)))
+	{
+		assigned_to_err.InnerText = "User does not have permission for the Organization";
+		good = false;
+	}
+	else
+	{
+		assigned_to_err.InnerText = "";
+	}
+	
 	return good;
 }
 
+///////////////////////////////////////////////////////////////////////
+bool does_assigned_to_have_permission_for_org(int assigned_to, int org)
+{
+	btnet.Util.write_to_log("corey user/org " + Convert.ToString(assigned_to) + " " + Convert.ToString(org));
+	
+	string sql = @"
+/* validate org versus assigned_to */
+select case when og_other_orgs_permission_level <> 0
+or $bg_org = og_id then 1
+else 0 end as [answer]
+from users
+inner join orgs on us_org = og_id
+where us_id = @us_id";
+
+	sql = sql.Replace("@us_id", Convert.ToString(assigned_to));
+	sql = sql.Replace("$bg_org", Convert.ToString(org));
+
+	int allowed = (int) btnet.DbUtil.execute_scalar(sql);
+
+	if (allowed == 1)
+		return true;
+	else
+		return false;
+}	
+	
 
 ///////////////////////////////////////////////////////////////////////
 void on_update (Object sender, EventArgs e)
@@ -2488,6 +2526,8 @@ function disable_second_button()
 		<td nowrap>
 			<span class="stat" id="static_assigned_to" runat="server"></span>
 			<asp:DropDownList id="assigned_to" runat="server"></asp:DropDownList>
+			&nbsp;
+			<span runat="server" class="err" id="assigned_to_err"></span>
 
 	<tr id="row6">
 		<td nowrap>

@@ -54,8 +54,28 @@ us_id not in (select bp_user from bug_posts)
 Version 3.1.4   03/xx/2009   (svn revision xxx)
 -----------------------------------------------------------------------
 
+
+create table sessions
+(
+	se_id char(37) not null,
+	se_date datetime not null default(getdate()),
+	se_user int not null
+)
+
+
+* a bug associated with org 3 should be assignable to a user from org 4
+
 * Deletion of bugs was leaving some debris because it wasn't deleting 
 the rows from the related tables.
+
+* handle bugs-per-page being zero
+
+* Fix of dates in edit_tasks.aspx
+
+* long email subjects
+
+* Changed format of generated chart images in reports from Jpeg to Gif.
+[ btnet-Bugs-2668288 ] Pie and Line reports in Gif format
 
 -----------------------------------------------------------------------
 Version 3.1.3   03/01/2009   (svn revision 313)

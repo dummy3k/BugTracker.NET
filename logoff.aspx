@@ -29,8 +29,14 @@ void Page_Load(Object sender, EventArgs e)
 	if (cookie != null)
 	{
 
-		// guard against "Sql Injection" exploit
 		string se_id = cookie.Value.Replace("'", "''");
+		
+		string sql = @"delete from sessions
+			where se_id = N'$se'
+			or datediff(d, se_date, getdate()) > 2";
+		sql = sql.Replace("$se", se_id);
+		btnet.DbUtil.execute_nonquery(sql);		
+		
 		Session[se_id] = 0;
 
 		Session["SelectedBugQuery"] = null;

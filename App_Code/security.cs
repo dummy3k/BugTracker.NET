@@ -82,9 +82,10 @@ namespace btnet
 /* check session */
 declare @project_admin int
 select @project_admin = count(1)
-from project_user_xref 
-where pu_user = $usid
-and pu_admin = 1
+	from sessions
+	inner join project_user_xref on pu_user = se_user
+	and pu_admin = 1
+	where se_id = '$se';
 
 select us_id, us_admin,
 us_username, us_firstname, us_lastname,
@@ -97,15 +98,16 @@ og.*,
 isnull(us_forced_project, 0 ) us_forced_project,
 isnull(pu_permission_level, $dpl) pu_permission_level,
 @project_admin [project_admin]
-from users
+from sessions
+inner join users on se_user = us_id
 inner join orgs og on us_org = og_id
 left outer join project_user_xref
 	on pu_project = us_forced_project
 	and pu_user = us_id
-where us_id = $usid
+where se_id = '$se'
 and us_active = 1";
 
-				sql = sql.Replace("$usid", Convert.ToString(user_id));
+				sql = sql.Replace("$se", se_id);
 				sql = sql.Replace("$dpl", Util.get_setting("DefaultPermissionLevel","2"));
 				dr = btnet.DbUtil.get_datarow(sql);
 
@@ -201,6 +203,12 @@ and us_active = 1";
 			string guid = Guid.NewGuid().ToString();
 
 			btnet.Util.write_to_log("guid=" + guid);
+			
+			string sql = @"insert into sessions (se_id, se_user) values('$gu', $us)";
+			sql = sql.Replace("$gu", guid);
+			sql = sql.Replace("$us", Convert.ToString(userid));
+
+			btnet.DbUtil.execute_nonquery(sql);			
 
 			HttpContext.Current.Session[guid] = userid;
 			
