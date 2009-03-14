@@ -30,6 +30,9 @@ Corey's TO DO list:
 * voting.
 * svnserve -d -r c:/cit
 
+* handle bugs-per-page being zero
+
+
 cleaning up old bugs in demo
 
 select count(1) from bugs
@@ -50,10 +53,17 @@ us_id not in (select bg_reported_user from bugs) and
 us_id not in (select bg_last_updated_user from bugs) and
 us_id not in (select bp_user from bug_posts)
 
+
+* mixed authentication
+
 -----------------------------------------------------------------------
-Version 3.1.4   03/xx/2009   (svn revision xxx)
+Version 3.1.4   03/14/2009   (svn revision 317)
 -----------------------------------------------------------------------
 
+* I'm reverting back to the old way of handling sessions, using my own
+"sessions" table.  If you have a BugTracker.NET version of 3.0.7 or 
+older, you already have a "sessions" table.   Otherwise, run this SQL
+to create the table:
 
 create table sessions
 (
@@ -62,20 +72,27 @@ create table sessions
 	se_user int not null
 )
 
+The problem with using ASP.NET sessions was that people had trouble 
+finding all the places that had to administer the timeout value.
+In newer versions of IIS, setting it in Web.config isn't enough.  You
+also have to set the IIS Application Pool timeout, and that was giving
+people trouble.
 
-* a bug associated with org 3 should be assignable to a user from org 4
+* Added logic that validates a bug's org against the assigned-to user,
+preventing you from assigning a bug to somebody who doesn't have
+permission for that org.
 
-* Deletion of bugs was leaving some debris because it wasn't deleting 
-the rows from the related tables.
+* Deletion of bugs was leaving some orphan rows in child tables.
 
-* handle bugs-per-page being zero
+* Fixed bug 2660653 "Date Conversion Error on tasks_frame.aspx". 
+Dates in the tasks/time page weren't being put into the format that 
+SQL expects.
 
-* Fix of dates in edit_tasks.aspx
+* Fixed bug 2668288 "Pie and Line reports in Gif format".  That is, I
+changed the format of the images from jpeg to gif.
 
-* long email subjects
-
-* Changed format of generated chart images in reports from Jpeg to Gif.
-[ btnet-Bugs-2668288 ] Pie and Line reports in Gif format
+* Fixed bug where incoming emails with long "From" addresses were
+having the address truncated.
 
 -----------------------------------------------------------------------
 Version 3.1.3   03/01/2009   (svn revision 313)

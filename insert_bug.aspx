@@ -203,7 +203,7 @@ void Page_Load(Object sender, EventArgs e)
 			subject = SharpMimeTools.parserfc2047Header(mime_message.Header.Subject);
 
 			// handle multiline subject
-			subject = subject.Replace("\t","");
+			subject = subject.Replace("\t"," ");
 
 			// Try to parse out the bugid from the subject line
 			string bugidString=Util.get_setting("TrackingIdString","DO NOT EDIT THIS:");
@@ -234,12 +234,20 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 
+		if (mime_message.Header.From != null && mime_message.Header.From != "")
+		{
+			from = SharpMimeTools.parserfc2047Header(mime_message.Header.From);
+
+			// handle multiline from
+			from = from.Replace("\t"," ");
+		}
+
 		if (mime_message.Header.Cc != null && mime_message.Header.Cc != "")
 		{
 			cc = SharpMimeTools.parserfc2047Header(mime_message.Header.Cc);
 
 			// handle multiline
-			cc = cc.Replace("\t","");
+			cc = cc.Replace("\t"," ");
 
 		}
 
@@ -635,14 +643,11 @@ void Page_Load(Object sender, EventArgs e)
 string extract_comment_text_from_email(SharpMimeMessage mime_message, string mimetype)
 {
 
-
 	string comment = null;
 
 	// use the first plain text message body
 	foreach (SharpMimeMessage part in mime_message)
 	{
-
-
 		if (part.IsMultipart)
 		{
 			foreach (SharpMimeMessage subpart in part)

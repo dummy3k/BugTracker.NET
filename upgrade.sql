@@ -766,3 +766,22 @@ create index tsk_index_1 on bug_tasks (tsk_bug)
 
 alter table orgs add og_can_view_tasks int not null default(0)
 alter table orgs add og_can_edit_tasks int not null default(0)
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 3.1.3 to 3.1.4
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+
+-- Don't worry if running this SQL gives you an error saying that the 
+-- table already exists. 
+
+create table sessions
+(
+	se_id char(37) not null,
+	se_date datetime not null default(getdate()),
+	se_user int not null
+)
