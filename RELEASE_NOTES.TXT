@@ -57,7 +57,7 @@ us_id not in (select bp_user from bug_posts)
 * mixed authentication
 
 -----------------------------------------------------------------------
-Version 3.1.5   03/16/2009   (svn revision 318)
+Version 3.1.5   03/16/2009   (svn revision 319)
 -----------------------------------------------------------------------
 
 Just one fix, in edit_bug.aspx.  This fixes a bug introduced in 
