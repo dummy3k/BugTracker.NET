@@ -1969,6 +1969,11 @@ Boolean validate()
 ///////////////////////////////////////////////////////////////////////
 bool does_assigned_to_have_permission_for_org(int assigned_to, int org)
 {
+	if (assigned_to < 1)
+	{
+		return true;
+	}
+	
 	btnet.Util.write_to_log("corey user/org " + Convert.ToString(assigned_to) + " " + Convert.ToString(org));
 	
 	string sql = @"
@@ -1983,9 +1988,9 @@ where us_id = @us_id";
 	sql = sql.Replace("@us_id", Convert.ToString(assigned_to));
 	sql = sql.Replace("$bg_org", Convert.ToString(org));
 
-	int allowed = (int) btnet.DbUtil.execute_scalar(sql);
+	object allowed =  btnet.DbUtil.execute_scalar(sql);
 
-	if (allowed == 1)
+	if (allowed != null && Convert.ToInt32(allowed) == 1)
 		return true;
 	else
 		return false;

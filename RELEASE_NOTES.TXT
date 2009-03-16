@@ -57,6 +57,20 @@ us_id not in (select bp_user from bug_posts)
 * mixed authentication
 
 -----------------------------------------------------------------------
+Version 3.1.5   03/16/2009   (svn revision 318)
+-----------------------------------------------------------------------
+
+Just one fix, in edit_bug.aspx.  This fixes a bug introduced in 
+version 3.1.4.   Here's what the error looks like, the important part
+being at ASP.edit_bug_aspx.does_assigned_to_have_permission_for_org
+
+EXCEPTION: System.NullReferenceException: Object reference not set to 
+an instance of an object.
+
+at ASP.edit_bug_aspx.does_assigned_to_have_permission_for_org(Int32 
+assigned_to, Int32 org) in c:\cit\btnet2\edit_bug.aspx:line 1986  
+
+-----------------------------------------------------------------------
 Version 3.1.4   03/14/2009   (svn revision 317)
 -----------------------------------------------------------------------
 
