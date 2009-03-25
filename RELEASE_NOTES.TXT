@@ -54,7 +54,87 @@ us_id not in (select bg_last_updated_user from bugs) and
 us_id not in (select bp_user from bug_posts)
 
 
+-----------------------------------------------------------------------
+Version 3.1.7   03/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+ 
+* What I am looking for is a popup dialog that asks: "Send notification email now?", with a Yes or a No. This will eliminate many of the duplicate emails. I would use that functionality for the attachment option and my spelling mistake option above, so they only get one email. 
+ 
+
+* Move to jquery 1.3.2
+
+* http://www.microsoft.com/web/gallery/developer.aspx
+
+*( if inline image is text/html type (for example, e-mail with HTML as
+alternative view of the body text), then pressing at [+] or [-] at the top
+of image block generates an error
+"Invalid argument." in edit_bug.js
+string #205
+el.style.height = (parseInt(el.style.height) + parseInt(delta)) + "px";
+
+* format_local_decimal_into_db_format
+
+*
+I was trying out the BugTracker and I am trying to deny a user from creating new bugs 
+I set DefaultPermissionLevel to 0 in the Web.config, now when i click on add new bug for a user who has only view rights  
+I get the following: (any suggestions) Thanks 
+ 
+Server Error in '/bugtracker' Application. 
+-------------------------------------------------------------------------------- 
+ 
+Object reference not set to an instance of an object.  
+Description: An unhandled exception occurred during the execution of the current web request. Please review the stack trace for more information about the error and where it originated in the code.  
+ 
+Exception Details: System.NullReferenceException: Object reference not set to an instance of an object. 
+ 
+Source Error:  
+ 
+ 
+Line 1172: { 
+Line 1173: project.Visible = false; 
+Line 1174: static_project.InnerText = project.SelectedItem.Text; 
+Line 1175: } 
+Line 1176: else 
+ 
+ 
+Source File: c:\Inetpub\wwwroot\bugtracker\edit_bug.aspx Line: 1174  
+ 
+Stack Trace:  
+ 
+ 
+[NullReferenceException: Object reference not set to an instance of an object.] 
+ASP.edit_bug_aspx.set_project_field_permission(Int32 bug_permission_level) in c:\Inetpub\wwwroot\bugtracker\edit_bug.aspx:1174 
+ASP.edit_bug_aspx.set_controls_field_permission(Int32 bug_permission_level) in c:\Inetpub\wwwroot\bugtracker\edit_bug.aspx:1273 
+ASP.edit_bug_aspx.Page_Load(Object sender, EventArgs e) in c:\Inetpub\wwwroot\bugtracker\edit_bug.aspx:288 
+System.Web.Util.CalliHelper.EventArgFunctionCaller(IntPtr fp, Object o, Object t, EventArgs e) +14 
+System.Web.Util.CalliEventHandlerDelegateProxy.Callback(Object sender, EventArgs e) +35 
+System.Web.UI.Control.OnLoad(EventArgs e) +99 
+System.Web.UI.Control.LoadRecursive() +50 
+System.Web.UI.Page.ProcessRequestMain(Boolean includeStagesBeforeAsyncPoint, Boolean includeStagesAfterAsyncPoint) +627 
+ 
+
+
+* if in web.config key "DefaultPermissionLevel" has level 3 (reporter) and user (even with admin rights) is visiting not his project bug then in the moment of pressing any links at edit_bug.aspx to leave this page user see notification 
+"You have unsaved changes. Do you want to leave this page and lose your changes?"  
+[Ok][Cancel] 
+ 
+Is this normal? What are the changes? 
+This behaviour is reproducible in IE8 & FireFox 3.0.7. 
+
 * mixed authentication
+
+
+* make the permission scheme looser per config
+/* users this project */'
+
+
+why didn't workflow get session's bug?
+response redirect?
+Session["bug_datarow"]
+
+windows auth?
+
 
 -----------------------------------------------------------------------
 Version 3.1.5   03/16/2009   (svn revision 319)
