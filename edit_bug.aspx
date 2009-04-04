@@ -1439,6 +1439,7 @@ void load_dropdowns(DataRow dr, User user)
 
     // Make it easier to customize the list of statuses
     Workflow.fill_status_dropdown(dr, security.user, status.Items);
+    
 
     if (status.Items.Count == 0)
     {
@@ -1852,10 +1853,10 @@ int fetch_permission_level(string projectToCheck)
 
 }
 ///////////////////////////////////////////////////////////////////////
-Boolean validate()
+bool validate()
 {
 
-	Boolean good = true;
+	bool good = true;
 	if (short_desc.Value == "")
 	{
 		good = false;
@@ -1973,8 +1974,6 @@ bool does_assigned_to_have_permission_for_org(int assigned_to, int org)
 	{
 		return true;
 	}
-	
-	btnet.Util.write_to_log("corey user/org " + Convert.ToString(assigned_to) + " " + Convert.ToString(org));
 	
 	string sql = @"
 /* validate org versus assigned_to */
@@ -2196,6 +2195,14 @@ void on_update (Object sender, EventArgs e)
 					{
 						
                         string column_name = (string) drcc["name"];
+                        
+                        // if we've made customizations that cause the field to not come back to us,
+                        // don't replace something with null
+                        string o = Request[column_name];
+                        if (o == null)
+                        {
+                        	continue;
+                        }                        
 
                         // skip if no permission to update
                         if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
@@ -2276,7 +2283,7 @@ void on_update (Object sender, EventArgs e)
                 bug = (DataRow) Session["bug_datarow"];
                 bug["status"] = int.Parse(status.SelectedItem.Value);
                 bug["status_name"] = status.SelectedItem.Text;
-
+    btnet.Util.write_to_log("after update");
                 Workflow.fill_status_dropdown(bug, security.user, status.Items);
             }
 		} // edit existing or not
@@ -2334,7 +2341,7 @@ void append_custom_field_msg(string s)
 <link rel="StyleSheet" href="jquery/ui.datepicker.css" type="text/css">
 <!-- use btnet_edit_bug.css to control positioning on edit_bug.asp.  use btnet_search.css to control position on search.aspx  -->
 <link rel="StyleSheet" href="custom/btnet_edit_bug.css" type="text/css">
-<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.3.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.6rc2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
 

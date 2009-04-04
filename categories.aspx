@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -20,6 +20,9 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
+	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+		+ "categories";
+		
 	ds = btnet.DbUtil.get_dataset(
 		@"select
 		ct_id [id],

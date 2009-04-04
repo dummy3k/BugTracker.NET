@@ -1212,6 +1212,8 @@ and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
 						// at this point "writer" has the bug html
 
 						sql = @"
+delete from queued_notifications where qn_bug = $bug and qn_to = N'$to'
+
 insert into queued_notifications
 (qn_date_created, qn_bug, qn_user, qn_status, qn_retries, qn_to, qn_from, qn_subject, qn_body, qn_last_exception)
 values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N'$body', N'')";
@@ -1252,6 +1254,10 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 			// just to be safe, make the worker threads wait for each other
 			lock (dummy)
 			{
+				
+				// Don't send emails right away, in case the guy is making a bunch of changes.
+				// Let's consolidate the notifications to one.
+				System.Threading.Thread.Sleep(1000 * 60);
 				
 				string sql = @"select * from queued_notifications where qn_status = N'not sent' and qn_retries < 3";
  				 // create a new one, just in case there would be multithreading issues...

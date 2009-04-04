@@ -153,8 +153,8 @@ void Page_Load(Object sender, EventArgs e)
 
             status.Items.FindByValue(Convert.ToString(dr["tsk_status"])).Selected = true;
             
-            planned_duration.Value = Convert.ToString(dr["tsk_planned_duration"]);
-			actual_duration.Value = Convert.ToString(dr["tsk_actual_duration"]);
+            planned_duration.Value = btnet.Util.format_db_value(dr["tsk_planned_duration"]);
+			actual_duration.Value =  btnet.Util.format_db_value(dr["tsk_actual_duration"]);
 			percent_complete.Value = Convert.ToString(dr["tsk_percent_complete"]);
 			sort_sequence.Value = Convert.ToString(dr["tsk_sort_sequence"]);
 			desc.Value = Convert.ToString(dr["tsk_description"]);
@@ -417,6 +417,16 @@ string format_date_hour_min(string date, string hour, string min)
 }
 
 ///////////////////////////////////////////////////////////////////////
+string format_decimal_for_db(string s)
+{
+	if (s == "")
+		return "null";
+	else
+		return btnet.Util.format_local_decimal_into_db_format(s);
+}
+
+
+///////////////////////////////////////////////////////////////////////
 string format_number_for_db(string s)
 {
 	if (s == "")
@@ -528,8 +538,8 @@ where tsk_id = $tsk_id";
 			actual_end_hour.SelectedItem.Value,
 			actual_end_min.SelectedItem.Value));
 			
-		sql = sql.Replace("$tsk_planned_duration", format_number_for_db(planned_duration.Value));
-		sql = sql.Replace("$tsk_actual_duration", format_number_for_db(actual_duration.Value));
+		sql = sql.Replace("$tsk_planned_duration", format_decimal_for_db(planned_duration.Value));
+		sql = sql.Replace("$tsk_actual_duration", format_decimal_for_db(actual_duration.Value));
 		sql = sql.Replace("$tsk_percent_complete", format_number_for_db(percent_complete.Value));
 		sql = sql.Replace("$tsk_status", status.SelectedItem.Value);
 		sql = sql.Replace("$tsk_sort_sequence", format_number_for_db(sort_sequence.Value));
@@ -563,7 +573,7 @@ where tsk_id = $tsk_id";
 <link rel="StyleSheet" href="btnet.css" type="text/css">
 <link rel="StyleSheet" href="jquery/ui.datepicker.css" type="text/css">
 
-<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.3.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="jquery/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.6rc2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="datejs/date.js"></script>
 

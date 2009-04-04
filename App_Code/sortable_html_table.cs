@@ -184,6 +184,7 @@ namespace btnet
                         {
                             r.Write("<td class=datad>");
                         }
+
                         if (dr[i].ToString() == "")
                         {
                             r.Write("&nbsp;");
@@ -193,6 +194,10 @@ namespace btnet
                             if (datatype == "System.DateTime")
                             {
                                 r.Write(Util.format_db_date_and_time(dr[i]));
+                            }
+                            else if (datatype == "System.Decimal")
+                            {
+                            	r.Write(btnet.Util.format_db_value(Convert.ToDecimal(dr[i])));
                             }
                             else
                             {

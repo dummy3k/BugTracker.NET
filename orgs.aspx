@@ -20,6 +20,9 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security( HttpContext.Current, Security.MUST_BE_ADMIN);
 
+	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
+		+ "organizations";
+
 	ds = btnet.DbUtil.get_dataset(
 		@"select og_id [id],
 		'<a href=edit_org.aspx?id=' + convert(varchar,og_id) + '>edit</a>' [$no_sort_edit],

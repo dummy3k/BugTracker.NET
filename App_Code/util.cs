@@ -320,7 +320,7 @@ namespace btnet
 		public static System.Globalization.CultureInfo get_culture_info()
 		{
 			// Create a basic culture object to provide also all input parsing
-			return new System.Globalization.CultureInfo(get_setting("CultureName",System.Threading.Thread.CurrentThread.CurrentCulture.Name));
+			return new System.Globalization.CultureInfo(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
 		}
 
 		///////////////////////////////////////////////////////////////////////

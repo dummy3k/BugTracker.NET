@@ -21,6 +21,7 @@ namespace btnet
             User user, // the currently logged in user
             System.Web.UI.WebControls.ListItemCollection statuses) // the options in the dropdown
         {
+            
             // If you do nothing here, by default the app will fill the status
             // dropdown with all the statuses in the database.
 

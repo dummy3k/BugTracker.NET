@@ -196,14 +196,15 @@ function resize_iframe(elid, delta)
 {
 	var el = get_el(elid);
 
-	if (parseInt(el.style.height) + parseInt(delta) < 100)
+	if (parseInt($(el).height()) + parseInt(delta) < 100)
 	{
-		el.style.height = "100px";
+		el.style.height = "100";
 	}
 	else
 	{
-		el.style.height = (parseInt(el.style.height) + parseInt(delta)) + "px";
+		el.style.height = (parseInt($(el).height()) + parseInt(delta)) + "px";
 	}
+
 }
 
 
@@ -435,9 +436,11 @@ function on_body_load()
 	}
 
 	var short_desc = document.getElementById("short_desc")
-	short_desc.title = short_desc.value
-	
-	dirty = false // reset, because change_dropdown_style dirties the dropdowns
+
+	dirty = false 
+
+	if (short_desc != null)
+		short_desc.title = short_desc.value
 
 	start_animation()	
 }
@@ -463,8 +466,6 @@ function change_dropdown_style()
 			sels[i].setAttribute(cls,'edit_bug_option')
 		}
 	}
-
-	mark_dirty()
 
 }
 

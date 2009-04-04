@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -84,6 +84,8 @@ Response.Write ("<br>ScriptTimeout=");
 Response.Write (HttpContext.Current.Server.ScriptTimeout);
 Response.Write ("<br>.NET Version=");
 Response.Write(Environment.Version.ToString());
+Response.Write ("<br>CurrentCulture=");
+Response.Write(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
 
 %>
 
