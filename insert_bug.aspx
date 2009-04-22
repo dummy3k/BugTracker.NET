@@ -824,13 +824,14 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
     MemoryStream attachmentStream = new MemoryStream();
 
     if (missing_attachment_msg == "")
-		{
+	{
         desc = "email attachment";
-		}
+	}
     else
-		{
+	{
         desc = missing_attachment_msg;
 	}
+    
     part.DumpBody(attachmentStream);
     attachmentStream.Position = 0;
     Bug.insert_post_attachment(
@@ -845,10 +846,6 @@ void add_attachment(string filename, SharpMimeMessage part, int bugid, int paren
         false,  // not hidden
         false); // don't send notifications
 
-	sql = @"insert into bug_posts
-			(bp_type, bp_bug, bp_file, bp_comment, bp_size, bp_date, bp_user, bp_content_type, bp_parent)
-			values ('file', $bg, N'$fi', N'$de', $si, getdate(), $us, N'$ct', $pp)
-			select scope_identity()";
 }
 
 

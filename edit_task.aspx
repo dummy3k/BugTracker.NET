@@ -621,7 +621,7 @@ function show_calendar(el)
 	</tr>
 
 	<tr runat="server" id="assigned_to_tr">
-	<td class="	lbl" id="assigned_to_label">Assigned to:</td>
+	<td class="lbl" id="assigned_to_label">Assigned to:</td>
 	<td><asp:DropDownList id="assigned_to" runat="server"></asp:DropDownList></td>
 	<td>&nbsp</td>
 	</tr>

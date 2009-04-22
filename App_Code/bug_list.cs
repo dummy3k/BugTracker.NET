@@ -627,7 +627,6 @@ namespace btnet
                     || dc.ColumnName == "status"
                     || dc.ColumnName == "reported by"
                     || dc.ColumnName == "assigned to"
-                    || dc.ColumnName == "assigned to"
                     || dc.ColumnName == udf_column_name)
                     {
                         string string_vals = get_distinct_vals_from_dataset(

@@ -312,7 +312,7 @@ function remove(bugid2_arg)
     var frm =  document.getElementById(asp_form_id)
     var actn = document.getElementById("actn")
     actn.value = "remove"
-    bugid2.value = bugid2_arg
+    document.getElementById("bugid2").value = bugid2_arg
     frm.submit()
 }
 

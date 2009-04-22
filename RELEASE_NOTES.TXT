@@ -62,6 +62,59 @@ http://www.microsoft.com/web/gallery/developer.aspx
 * can the service log into two different websites with two different user names?
 
 -----------------------------------------------------------------------
+Version 3.1.7   04/XX/2009   (svn revision XXX)
+-----------------------------------------------------------------------
+
+another problem with BTNet 3.1.6 is that taskes times are in db format (mm.dd.yyyy) and in overview table dates ignore format from web.config DateTimeFormat key. 
+my settings are 
+<add key="DatepickerDateFormat" value="dd.mm.yy"/> 
+<add key="DateTimeFormat" value="dd.MM.yyyy HH:mm" /> 
+<add key="JustDateFormat" value="dd.MM.yyyy" /> 
+ 
+if I set in new task starting time April 9, 2009, in overview I see 04.09.2009 and if I try to edit this task in edit mode time again 04.09.2009 and DatePicker shows me September 4th. 
+ 
+In bus list and in bug edit form dates are ok. 
+ 
+Gr. Sergey 
+
+
+You're right, there are pieces missing. 
+ 
+The Lucene search doesn't search the text of the tasks (yet). It doesn't search custom text fields either (yet). I'd like to add both of those things. 
+ 
+I guess the tasks also aren't hooked up to the notification scheme. That's also something I'd like to add. 
+ 
+The printing too.
+
+
+Hi Corey, 
+ 
+we have a strange behaviour of flags column in BTNet 3.1.6 if users work with or without css colouring. 
+ 
+If query is starting with  
+select  
+isnull(pr_background_color,'#ffffff'),  
+bg_id [id],... 
+ 
+flag filter is working fine. But if users use query with 
+select  
+isnull(pr_style + st_style,'datad'),  
+bg_id [id],... 
+ 
+it is impossible to use flags option. If you mark some issues and try to select them with the flag filter — system retunes empty table. If user tries several times in a row — system generates error report 
+ 
+========================================================================================= 
+ 
+Error: c:\Inetpub\wwwroot\BTNet\flag.aspx(74): error CS1009: Unrecognized escape sequence 
+TIME: 4:49:58 PM 
+URL: http://172.16.15.10/issuetracker/flag.aspx?ses=487fae53-37c9-465a-a7b4-df288443d09f&bugid=1615&flag=0 
+Exception: System.Web.HttpCompileException: c:\Inetpub\wwwroot\BTNet\flag.aspx(74): error CS1009: Unrecognized escape sequence 
+at System.Web.Compilation.BuildManager.PostProcessFoundBuildResult(Bu
+
+
+* Fixed "bugid2 was not defined" error when clicking on "detach" in relationships.aspx
+
+-----------------------------------------------------------------------
 Version 3.1.6   04/04/2009   (svn revision 321)
 -----------------------------------------------------------------------
 

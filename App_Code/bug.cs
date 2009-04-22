@@ -725,6 +725,13 @@ where bg_id = $bg";
 			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 			
 			DataRow dr = btnet.DbUtil.get_datarow(sql);
+			
+			if (dr == null)
+			{
+				return Security.PERMISSION_NONE;
+				
+			}
+			
 			int pl = (int)dr[0];
 			int bg_org = (int)dr[1];
 
