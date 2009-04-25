@@ -397,7 +397,10 @@ Boolean validate()
 	return good;
 }
 
+
+
 ///////////////////////////////////////////////////////////////////////
+// This might not be right.   Maybe use the commented out version, from Sergey Vasiliev
 string format_date_hour_min(string date, string hour, string min)
 {
 	if (!string.IsNullOrEmpty(date))
@@ -415,6 +418,33 @@ string format_date_hour_min(string date, string hour, string min)
 		return "";
 	}
 }
+
+///////////////////////////////////////////////////////////////////////
+/*
+// Version from Sergey Vasiliev
+static string format_date_hour_min(string date, string hour, string min) 
+{ 
+	if (!string.IsNullOrEmpty(date)) 
+	{ 
+		DateTime wDate = DateTime.ParseExact(date, 
+			Util.get_setting("JustDateFormat", "g"), 
+			new System.Globalization.CultureInfo(System.Threading.Thread.CurrentThread.CurrentCulture.Name, true), 
+			System.Globalization.DateTimeStyles.AllowWhiteSpaces); 
+ 
+		return Util.format_local_date_into_db_format(
+			new DateTime(
+				wDate.Year,  
+				wDate.Month,  
+				wDate.Day,  
+				Convert.ToInt32(hour),  
+				Convert.ToInt32(min),0)); 
+	} 
+	else 
+	{ 
+		return ""; 
+	} 
+}  
+*/
 
 ///////////////////////////////////////////////////////////////////////
 string format_decimal_for_db(string s)

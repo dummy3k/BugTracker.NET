@@ -59,60 +59,90 @@ http://www.microsoft.com/web/gallery/developer.aspx
 * Move to fckeditor 3
 
  
-* can the service log into two different websites with two different user names?
+* Can the service log into two different websites with two different user names?
+
+* 
 
 -----------------------------------------------------------------------
 Version 3.1.7   04/XX/2009   (svn revision XXX)
 -----------------------------------------------------------------------
 
-another problem with BTNet 3.1.6 is that taskes times are in db format (mm.dd.yyyy) and in overview table dates ignore format from web.config DateTimeFormat key. 
-my settings are 
-<add key="DatepickerDateFormat" value="dd.mm.yy"/> 
-<add key="DateTimeFormat" value="dd.MM.yyyy HH:mm" /> 
-<add key="JustDateFormat" value="dd.MM.yyyy" /> 
- 
-if I set in new task starting time April 9, 2009, in overview I see 04.09.2009 and if I try to edit this task in edit mode time again 04.09.2009 and DatePicker shows me September 4th. 
- 
-In bus list and in bug edit form dates are ok. 
- 
-Gr. Sergey 
+* Fixed "bugid2 was not defined" error when clicking on "detach" in 
+relationships.aspx
+
+* Fixed where filtering wasn't working for flags or seen, because the
+old logic was expecting them to be in a specific column of the query.
 
 
-You're right, there are pieces missing. 
+******************
+
+The Lucene search doesn't search the text of the tasks (yet). It doesn't search custom
+text fields either (yet). I'd like to add both of those things. 
  
-The Lucene search doesn't search the text of the tasks (yet). It doesn't search custom text fields either (yet). I'd like to add both of those things. 
- 
-I guess the tasks also aren't hooked up to the notification scheme. That's also something I'd like to add. 
- 
-The printing too.
+I guess the tasks also aren't hooked up to the notification scheme. That's also 
+something I'd like to add. 
 
 
-Hi Corey, 
- 
-we have a strange behaviour of flags column in BTNet 3.1.6 if users work with or without css colouring. 
- 
-If query is starting with  
-select  
-isnull(pr_background_color,'#ffffff'),  
-bg_id [id],... 
- 
-flag filter is working fine. But if users use query with 
-select  
-isnull(pr_style + st_style,'datad'),  
-bg_id [id],... 
- 
-it is impossible to use flags option. If you mark some issues and try to select them with the flag filter — system retunes empty table. If user tries several times in a row — system generates error report 
- 
-========================================================================================= 
- 
-Error: c:\Inetpub\wwwroot\BTNet\flag.aspx(74): error CS1009: Unrecognized escape sequence 
-TIME: 4:49:58 PM 
-URL: http://172.16.15.10/issuetracker/flag.aspx?ses=487fae53-37c9-465a-a7b4-df288443d09f&bugid=1615&flag=0 
-Exception: System.Web.HttpCompileException: c:\Inetpub\wwwroot\BTNet\flag.aspx(74): error CS1009: Unrecognized escape sequence 
-at System.Web.Compilation.BuildManager.PostProcessFoundBuildResult(Bu
+******************
+
+	First of all I found that IIS is running in  
+	CurrentCulture=en-US 
+	but date formats in web.config are 
+
+	<add key="DatepickerDateFormat" value="dd.mm.yy"/> 
+	<add key="DateTimeFormat" value="dd.MM.yyyy HH:mm" /> 
+	<add key="JustDateFormat" value="dd.MM.yyyy" /> 
+
+	so input of the date data for UPDATE or INPUT sql statements is not trivial 
+
+	to fix this situation I changed several files 
+
+	edit_task.aspx: 
+
+	static string format_date_hour_min(string date, string hour, string min) 
+	{ 
+		if (!string.IsNullOrEmpty(date)) 
+		{ 
+			DateTime wDate = DateTime.ParseExact(date, 
+				Util.get_setting("JustDateFormat", "g"), 
+				new System.Globalization.CultureInfo(System.Threading.Thread.CurrentThread.CurrentCulture.Name, true), 
+				System.Globalization.DateTimeStyles.AllowWhiteSpaces); 
+
+			return Util.format_local_date_into_db_format(
+				new DateTime(
+					wDate.Year,  
+					wDate.Month,  
+					wDate.Day,  
+					Convert.ToInt32(hour),  
+					Convert.ToInt32(min),0)); 
+		} 
+		else 
+		{ 
+			return ""; 
+		} 
+	}  
 
 
-* Fixed "bugid2 was not defined" error when clicking on "detach" in relationships.aspx
+	util.cs: 
+	add method 
+
+	public static string format_local_date_into_db_format(DateTime date) 
+	{ 
+		// Note that yyyyMMdd hh:mm:ss is a universal SQL dateformat for strings. 
+		return date.ToString(get_setting("SQLServerDateFormat", "yyyyMMdd HH:mm:ss")); 
+	} 
+
+	in method public static string format_local_date_into_db_format(string date) 
+	in return default format string is "yyyyMMdd HH:mm:ss", otherwise all time after midday is converting into morning time, for example 18:00 -> 6:00 
+
+	in method public static string format_db_date_and_time(object date) was changed if statement to show midday time, for example 14.04.2009 12:00 
+	//if ((dt.Hour == 0 || dt.Hour == 12) && dt.Minute == 0 && dt.Second == 0) 
+	if (dt.Hour == 0 && dt.Minute == 0 && dt.Second == 0) 
+
+	Regards, 
+	Sergey
+
+
 
 -----------------------------------------------------------------------
 Version 3.1.6   04/04/2009   (svn revision 321)

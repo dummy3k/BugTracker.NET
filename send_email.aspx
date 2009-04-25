@@ -863,18 +863,15 @@ function findPosY(obj)
 	
 	foreach (DataRowView drv_email in dv_related_users)
 	{
-		if ((string)drv_email["us_email"] != "")
+		if (dict_users_for_this_project.ContainsKey((int)drv_email["us_id"]))
 		{
-			if (dict_users_for_this_project.ContainsKey((int)drv_email["us_id"]))
-			{
-				Response.Write("<option value='");
-				Response.Write(drv_email["us_email"]);
-				Response.Write("'>");
-				Response.Write(drv_email["us_email"]);
-				Response.Write("  (");
-				Response.Write(drv_email["us_username"]);
-				Response.Write(")</option>");
-			}
+			Response.Write("<option value='");
+			Response.Write(drv_email["us_email"]);
+			Response.Write("'>");
+			Response.Write(drv_email["us_email"]);
+			Response.Write("  (");
+			Response.Write(drv_email["us_username"]);
+			Response.Write(")</option>");
 		}
 	}
 

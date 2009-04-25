@@ -416,7 +416,6 @@ namespace btnet
 
 		}
 
-
 		///////////////////////////////////////////////////////////////////////
 		public static string format_local_decimal_into_db_format( string val )
 		{
