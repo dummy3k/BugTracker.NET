@@ -47,7 +47,7 @@ void Page_Load(Object sender, EventArgs e)
 		if ((int)dv[i][1] == bugid)
 		{
 			int flag = Convert.ToInt32(Util.sanitize_integer(Request["flag"]));
-			dv[i][2] = flag;
+			dv[i]["$FLAG"] = flag;
 
 			if (flag == 0)
 			{

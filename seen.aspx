@@ -47,7 +47,7 @@ void Page_Load(Object sender, EventArgs e)
 		if ((int)dv[i][1] == bugid)
 		{
 			int seen = Convert.ToInt32(Util.sanitize_integer(Request["seen"]));
-			dv[i][2] = seen;
+			dv[i]["$SEEN"] = seen;
 
 			if (seen == 0)
 			{
