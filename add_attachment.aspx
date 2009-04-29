@@ -1,7 +1,7 @@
 <%@ Page language="C#"%>
 <%@ Import Namespace="System.IO" %>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -31,6 +31,7 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		write_msg("Invalid id.", false);
 		Response.End();
+		return;
 	}
 	else
 	{
@@ -41,6 +42,7 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			write_msg("You are not allowed to edit this item", false);
 			Response.End();
+			return;
 		}
 	}
 
@@ -49,6 +51,11 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		internal_only.Visible = false;
 		internal_only_label.Visible = false;
+	}
+	
+	if (IsPostBack)
+	{
+		on_update();
 	}
 }
 
@@ -74,7 +81,7 @@ void write_msg(string msg, bool rewrite_posts)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update(object Source, EventArgs e)
+void on_update()
 {
 
 	
@@ -218,7 +225,7 @@ Add attachment to <% Response.Write(Convert.ToString(bugid)); %>
 
 			<tr>
 			<td colspan=2 align=center>
-			<input runat="server" class=btn type=submit id="sub" value="Upload" onserverclick="on_update">
+			<input runat="server" class=btn type=submit id="sub" value="Upload">
 			</td>
 			</tr>
 			</table>

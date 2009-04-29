@@ -1,8 +1,8 @@
 <%@ Page language="C#" %>
-<%/*<!--
-Copyright 2002-2008 Corey Trager
+<!--
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
--->*/%>
+-->
 <!-- #include file = "inc.aspx" -->
 
 <script language="C#" runat="server">
@@ -44,13 +44,17 @@ void Page_Load(Object sender, EventArgs e) {
 		id = Convert.ToInt32(var);
 	}
 
-	if (!IsPostBack) {
+	if (!IsPostBack)
+	{
 		// add or edit?
-		if (id == 0) {
+		if (id == 0)
+		{
 			sub.Value = "Create";
 			sql_text.Value = Request.Form["sql_text"]; // if coming from search.aspx
 			table.Checked = true;
-		} else {
+		}
+		else
+		{
 			sub.Value = "Update";
 
 			// Get this entry's data from the db and fill in the form
@@ -79,6 +83,10 @@ void Page_Load(Object sender, EventArgs e) {
 			}
 		}
 	}
+	else
+	{
+		on_update();
+	}
 }
 
 
@@ -104,7 +112,8 @@ Boolean validate() {
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update (Object sender, EventArgs e) {
+void on_update()
+{
 	Boolean good = validate();
 	string ct;
 
@@ -206,7 +215,7 @@ void on_update (Object sender, EventArgs e) {
 					</tr>
 					<tr>
 						<td colspan='2' align='center'>
-							<input runat="server" class='btn' type='submit' id="sub" value="Create or Edit" OnServerClick="on_update">
+							<input runat="server" class='btn' type='submit' id="sub" value="Create or Edit">
 						</td>
 						<td>&nbsp</td>
 					</tr>

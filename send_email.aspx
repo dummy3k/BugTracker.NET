@@ -356,11 +356,11 @@ void Page_Load(Object sender, EventArgs e)
 			project = (int) dr["bg_project"];
 
 		}
-
 	}
-
-
-
+	else
+	{
+		on_update();
+	}
 }
 
 
@@ -423,7 +423,7 @@ string get_bug_text(int bugid)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update(object Source, EventArgs e)
+void on_update()
 {
 
 	if (!validate()) return;
@@ -779,7 +779,7 @@ function findPosY(obj)
 
 	<tr>
 	<td colspan=2 align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Send" OnServerClick="on_update">
+	<input runat="server" class=btn type=submit id="sub" value="Send">
 	</td>
 	<td>&nbsp;</td>
 	</tr>

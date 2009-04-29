@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -44,14 +44,17 @@ void Page_Load(Object sender, EventArgs e)
 		back_href.HRef = "edit_bug.aspx?id=" + orig_id_string;
 		from_bug.Value = orig_id_string;
 	}
-	else {
+	else
+	{
 		from_err.InnerText = "";
 		into_err.InnerText = "";
+		on_update();
 	}
 
 }
 
 
+///////////////////////////////////////////////////////////////////////
 bool validate()
 {
 
@@ -147,7 +150,7 @@ bool validate()
 
 
 ///////////////////////////////////////////////////////////////////////
-void on_update(object Source, EventArgs e)
+void on_update()
 {
 
 	// does it say "Merge" or "Confirm Merge"?
@@ -349,7 +352,7 @@ INTO <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %>:
 
 
 <tr><td colspan=2 align=center><br>
-<input class=btn type=submit runat="server" id="submit" value="Merge" OnServerClick="on_update">
+<input class=btn type=submit runat="server" id="submit" value="Merge">
 
 
 

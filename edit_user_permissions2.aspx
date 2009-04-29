@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -60,13 +60,17 @@ void Page_Load(Object sender, EventArgs e)
 		titl.InnerText = "Permissions for " + (string) ds.Tables[1].Rows[0][0];
 
 	}
+	else
+	{
+		on_update();
+	}
 
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////
-void on_update (Object sender, EventArgs e)
+void on_update()
 {
 
 	// now update all the recs
@@ -191,7 +195,7 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td colspan=2 align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Update" OnServerClick="on_update">
+	<input runat="server" class=btn type=submit id="sub" value="Update">
 	<td>&nbsp</td>
 	</td>
 	</tr>

@@ -90,7 +90,8 @@ void Page_Load(Object sender, EventArgs e)
 
 
 	// fill in the username first time in
-	if (!IsPostBack) {
+	if (!IsPostBack)
+	{
 		if ( previous_auth_mode == "0" )
 		{
 			if ((Request.QueryString["user"] == null) || (Request.QueryString["password"]  == null))
@@ -111,15 +112,19 @@ void Page_Load(Object sender, EventArgs e)
 				user.Value = Request.QueryString["user"];
 				pw.Value = Request.QueryString["password"];
 
-				on_logon(sender, e);
+				on_logon();
 			}
 		}
+	}
+	else
+	{
+		on_logon();
 	}
 
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_logon(Object sender, EventArgs e)
+void on_logon()
 {
 
 	string auth_mode = Util.get_setting("WindowsAuthentication","0");
@@ -219,7 +224,7 @@ Response.Write (Application["custom_logo"]);
 	</td></tr>
 
 	<tr><td colspan=2 align=center>
-	<input class=btn type=submit value="Logon" OnServerClick="on_logon"  runat="server">
+	<input class=btn type=submit value="Logon" runat="server">
 	</td></tr>
 
 	</table>

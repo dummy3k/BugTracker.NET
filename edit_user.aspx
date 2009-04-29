@@ -388,6 +388,10 @@ void Page_Load(Object sender, EventArgs e)
 
 		} // add or edit
 	} // if !postback
+	else
+	{
+		on_update();
+	}
 }
 
 
@@ -522,7 +526,7 @@ string replace_vars_in_sql_statement(string sql)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update (Object sender, EventArgs e)
+void on_update()
 {
 	Boolean good = validate();
 
@@ -1416,7 +1420,7 @@ function show_permissions_settings()
 	<tr>
 	<td width=300px>&nbsp;
 	<td align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Create or Edit" OnServerClick="on_update">
+	<input runat="server" class=btn type=submit id="sub" value="Create or Edit">
 	<td>&nbsp</td>
 	</td>
 	</tr>

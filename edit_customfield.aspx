@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -70,6 +70,10 @@ and sc.colorder = $co";
 		sort_seq.Value = Convert.ToString(dr["column order"]);
 
 	}
+	else
+	{
+		on_update();
+	}
 
 }
 
@@ -119,7 +123,7 @@ Boolean validate()
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update (Object sender, EventArgs e)
+void on_update()
 {
 
 	Boolean good = validate();
@@ -246,7 +250,7 @@ void on_update (Object sender, EventArgs e)
 
 	<tr>
 	<td colspan=2 align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Update" OnServerClick="on_update">
+	<input runat="server" class=btn type=submit id="sub" value="Update">
 	</td>
 	<td>&nbsp;</td>
 	</tr>

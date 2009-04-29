@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -40,6 +40,10 @@ void Page_Load(Object sender, EventArgs e)
 
 		sort_seq.Value = "1";
 
+	}
+	else
+	{
+		on_update();
 	}
 
 }
@@ -190,7 +194,7 @@ Boolean validate()
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update (Object sender, EventArgs e)
+void on_update ()
 {
 
 	Boolean good = validate();
@@ -458,7 +462,7 @@ alter table bugs add [$nm] $dt $ln $null $df";
 
 	<tr>
 	<td colspan=2 align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Create" OnServerClick="on_update">
+	<input runat="server" class=btn type=submit id="sub" value="Create">
 	<td>&nbsp</td>
 	</td>
 	</tr>

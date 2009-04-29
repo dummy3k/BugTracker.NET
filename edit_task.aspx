@@ -186,6 +186,10 @@ void Page_Load(Object sender, EventArgs e)
 			sub.Value = "Update";
 		}
 	}
+	else
+	{
+		on_update();
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -466,7 +470,7 @@ string format_number_for_db(string s)
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update (Object sender, EventArgs e)
+void on_update()
 {
 
 	Boolean good = validate();
@@ -889,7 +893,7 @@ function show_calendar(el)
 
 	<tr>
 	<td colspan=3 align=center>
-	<input runat="server" class=btn type=submit id="sub" value="Create or Edit" OnServerClick="on_update">
+	<input runat="server" class=btn type=submit id="sub" value="Create or Edit">
 	</tr>
 	
 	</table>

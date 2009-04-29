@@ -1,6 +1,6 @@
 <%@ Page language="C#"%>
 <!--
-Copyright 2002-2008 Corey Trager
+Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
 -->
 <!-- #include file = "inc.aspx" -->
@@ -147,10 +147,14 @@ void Page_Load(Object sender, EventArgs e)
 		}
 	}
 	else
-	foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
 	{
-		string bg_name = (string)dr_custom["name"];
-		dict_custom_field_permission_level[bg_name] = Convert.ToInt32(Request[bg_name]);
+		foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+		{
+			string bg_name = (string)dr_custom["name"];
+			dict_custom_field_permission_level[bg_name] = Convert.ToInt32(Request[bg_name]);
+		}
+		
+		on_update();
 	}
 }
 
@@ -175,7 +179,7 @@ Boolean validate()
 }
 
 ///////////////////////////////////////////////////////////////////////
-void on_update (Object sender, EventArgs e)
+void on_update ()
 {
 
 	Boolean good = validate();
@@ -604,7 +608,7 @@ update orgs set
 
 		<tr>
 		<td colspan=2 align=center>
-		<input runat="server" class=btn type=submit id="sub" value="Create or Edit" OnServerClick="on_update">
+		<input runat="server" class=btn type=submit id="sub" value="Create or Edit">
 		<td>&nbsp</td>
 		</td>
 		</tr>

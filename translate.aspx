@@ -81,6 +81,10 @@ Distributed under the terms of the GNU General Public License
 
 			fill_translationmodes();
 		}
+		else
+		{
+			on_translate();
+		}
 	}
 
 
@@ -100,7 +104,7 @@ Distributed under the terms of the GNU General Public License
 	}
 
     ///////////////////////////////////////////////////////////////////////
-    void on_translate(object Source, EventArgs e)
+    void on_translate()
     {
 		TranslationService ts = new TranslationService();
 		TranslationMode tm = ts.GetTranslationModeByObjectID(mode.SelectedValue);
@@ -149,7 +153,7 @@ Distributed under the terms of the GNU General Public License
                                     </tr>
                                     <tr>
                                         <td align="middle">
-                                            <input class="btn" id="sub" type="submit" value="Translate" runat="server" onserverclick="on_translate" />
+                                            <input class="btn" id="sub" type="submit" value="Translate" runat="server" />
                                         </td>
                                     </tr>
                                 </tbody>
