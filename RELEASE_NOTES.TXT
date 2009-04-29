@@ -61,19 +61,6 @@ http://www.microsoft.com/web/gallery/developer.aspx
  
 * Can the service log into two different websites with two different user names?
 
-* 
-
------------------------------------------------------------------------
-Version 3.1.7   04/XX/2009   (svn revision XXX)
------------------------------------------------------------------------
-
-* Fixed "bugid2 was not defined" error when clicking on "detach" in 
-relationships.aspx
-
-* Fixed where filtering wasn't working for flags or seen, because the
-old logic was expecting them to be in a specific column of the query.
-
-
 ******************
 
 The Lucene search doesn't search the text of the tasks (yet). It doesn't search custom
@@ -84,65 +71,26 @@ something I'd like to add.
 
 
 ******************
+ 
 
-	First of all I found that IIS is running in  
-	CurrentCulture=en-US 
-	but date formats in web.config are 
+-----------------------------------------------------------------------
+Version 3.1.7   04/XX/2009   (svn revision XXX)
+-----------------------------------------------------------------------
 
-	<add key="DatepickerDateFormat" value="dd.mm.yy"/> 
-	<add key="DateTimeFormat" value="dd.MM.yyyy HH:mm" /> 
-	<add key="JustDateFormat" value="dd.MM.yyyy" /> 
+* Fixed "bugid2 was not defined" error when clicking on "detach" in 
+relationships.aspx
 
-	so input of the date data for UPDATE or INPUT sql statements is not trivial 
+* Fixed where filtering wasn't working for flags or seen, because the
+old logic was expecting them to be in a specific column of the query.
+Thanks to Sergey Vasiliev for helping solving this bug.
 
-	to fix this situation I changed several files 
-
-	edit_task.aspx: 
-
-	static string format_date_hour_min(string date, string hour, string min) 
-	{ 
-		if (!string.IsNullOrEmpty(date)) 
-		{ 
-			DateTime wDate = DateTime.ParseExact(date, 
-				Util.get_setting("JustDateFormat", "g"), 
-				new System.Globalization.CultureInfo(System.Threading.Thread.CurrentThread.CurrentCulture.Name, true), 
-				System.Globalization.DateTimeStyles.AllowWhiteSpaces); 
-
-			return Util.format_local_date_into_db_format(
-				new DateTime(
-					wDate.Year,  
-					wDate.Month,  
-					wDate.Day,  
-					Convert.ToInt32(hour),  
-					Convert.ToInt32(min),0)); 
-		} 
-		else 
-		{ 
-			return ""; 
-		} 
-	}  
-
-
-	util.cs: 
-	add method 
-
-	public static string format_local_date_into_db_format(DateTime date) 
-	{ 
-		// Note that yyyyMMdd hh:mm:ss is a universal SQL dateformat for strings. 
-		return date.ToString(get_setting("SQLServerDateFormat", "yyyyMMdd HH:mm:ss")); 
-	} 
-
-	in method public static string format_local_date_into_db_format(string date) 
-	in return default format string is "yyyyMMdd HH:mm:ss", otherwise all time after midday is converting into morning time, for example 18:00 -> 6:00 
-
-	in method public static string format_db_date_and_time(object date) was changed if statement to show midday time, for example 14.04.2009 12:00 
-	//if ((dt.Hour == 0 || dt.Hour == 12) && dt.Minute == 0 && dt.Second == 0) 
-	if (dt.Hour == 0 && dt.Minute == 0 && dt.Second == 0) 
-
-	Regards, 
-	Sergey
-
-
+* Changed code to work around OnServerClick not working, at least for
+one user.  The magical OnServerClick event wasn't firing.  The
+handler (usually on_update) wasn't being called. So, I got rid of all 
+the OnServerClick's.  I don't know what the magic recipe is to make the
+bug happen, but it might involve IIS using Windows Authentication.
+Thanks again to Sergey Vasiliev for spending a lot of time with me on
+this bug.
 
 -----------------------------------------------------------------------
 Version 3.1.6   04/04/2009   (svn revision 321)
@@ -158,7 +106,7 @@ time/tasks feature.
 
 * Fixed bug 2726356 - "title modifier is missing in orgs.aspx"
 
-* There's no a delay of one minute between the time that you edit a bug
+* There's now a delay of one minute between the time that you edit a bug
 and when the notification email is sent.  If you edit the bug again
 within that minute, the system will only send one notification email,
 not many.
