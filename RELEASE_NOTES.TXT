@@ -58,9 +58,6 @@ http://www.microsoft.com/web/gallery/developer.aspx
 * Move to jquery 1.3.2
 * Move to fckeditor 3
 
- 
-* Can the service log into two different websites with two different user names?
-
 ******************
 
 The Lucene search doesn't search the text of the tasks (yet). It doesn't search custom
@@ -74,8 +71,15 @@ something I'd like to add.
  
 
 -----------------------------------------------------------------------
-Version 3.1.7   04/XX/2009   (svn revision XXX)
+Version 3.1.7   05/03/2009   (svn revision XXX)
 -----------------------------------------------------------------------
+
+* Run this sql to upgrade to this release:
+alter table orgs add og_can_assign_to_internal_users int not null default(0)
+
+* Added "can assign to internal users" to Organization.  Setting this
+to true would allow an external user to assign bugs to an internal
+user.
 
 * Fixed "bugid2 was not defined" error when clicking on "detach" in 
 relationships.aspx
@@ -92,7 +96,10 @@ bug happen, but it might involve IIS using Windows Authentication.
 Thanks again to Sergey Vasiliev for spending a lot of time with me on
 this bug.
 
-* Added og_can_assign_to_internal_users
+* Changed btnet_service.exe and btnet_console.exe to work with a website
+that doesn't allow anonymous access.  You need to run the service
+using a login that windows allows.   The bug itself will be added
+using the ServiceUserName from the config.
 
 -----------------------------------------------------------------------
 Version 3.1.6   04/04/2009   (svn revision 321)
