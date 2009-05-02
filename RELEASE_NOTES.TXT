@@ -92,6 +92,8 @@ bug happen, but it might involve IIS using Windows Authentication.
 Thanks again to Sergey Vasiliev for spending a lot of time with me on
 this bug.
 
+* Added og_can_assign_to_internal_users
+
 -----------------------------------------------------------------------
 Version 3.1.6   04/04/2009   (svn revision 321)
 -----------------------------------------------------------------------

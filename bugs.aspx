@@ -285,12 +285,6 @@ $(document).ready(function() {
 	$('.filter_selected').click(on_invert_filter)
 })
 
-function get_or_post()
-{
-	// set the main form's method to either GET or POST.
-	var frm =  document.getElementById('<% Response.Write(Util.get_form_name()); %>');
-	frm.method = '<% Response.Write(Util.get_setting("BugListFormSubmitMethod","POST")); %>';
-}
 
 function on_query_changed()
 {
@@ -302,10 +296,10 @@ function on_query_changed()
 </script>
 
 </head>
-<body onload="get_or_post()">
+<body>
 <% security.write_menu(Response, Util.get_setting("PluralBugLabel","bugs")); %>
 
-<form method="get" runat="server">
+<form method="POST" runat="server">
 
 <div class=align>
 

@@ -116,6 +116,7 @@ void Page_Load(Object sender, EventArgs e)
 			can_be_assigned_to.Checked = Convert.ToBoolean((int)dr["og_can_be_assigned_to"]);
 			can_view_tasks.Checked = Convert.ToBoolean((int)dr["og_can_view_tasks"]);
 			can_edit_tasks.Checked = Convert.ToBoolean((int)dr["og_can_edit_tasks"]);
+			can_assign_to_internal_users.Checked = Convert.ToBoolean((int)dr["og_can_assign_to_internal_users"]);
 
 			other_orgs.SelectedValue = Convert.ToString((int)dr["og_other_orgs_permission_level"]);
 
@@ -203,6 +204,7 @@ insert into orgs
 	og_can_be_assigned_to,
 	og_can_view_tasks,
 	og_can_edit_tasks,
+	og_can_assign_to_internal_users,
 	og_other_orgs_permission_level,
 	og_project_field_permission_level,
 	og_org_field_permission_level,
@@ -228,6 +230,7 @@ insert into orgs
 	$can_be_assigned_to,
 	$can_view_tasks,
 	$can_edit_tasks,
+	$can_assign_to_internal_users,
 	$other_orgs,
 	$flp_project,
 	$flp_org,
@@ -258,6 +261,7 @@ update orgs set
 	og_can_be_assigned_to = $can_be_assigned_to,
 	og_can_view_tasks = $can_view_tasks,
 	og_can_edit_tasks = $can_edit_tasks,
+	og_can_assign_to_internal_users = $can_assign_to_internal_users,
 	og_other_orgs_permission_level = $other_orgs,
 	og_project_field_permission_level = $flp_project,
 	og_org_field_permission_level = $flp_org,
@@ -287,6 +291,7 @@ update orgs set
 		sql = sql.Replace("$can_be_assigned_to", Util.bool_to_string(can_be_assigned_to.Checked));
 		sql = sql.Replace("$can_view_tasks", Util.bool_to_string(can_view_tasks.Checked));
 		sql = sql.Replace("$can_edit_tasks", Util.bool_to_string(can_edit_tasks.Checked));
+		sql = sql.Replace("$can_assign_to_internal_users", Util.bool_to_string(can_assign_to_internal_users.Checked));
 		sql = sql.Replace("$other_orgs", other_orgs.SelectedValue);
 		sql = sql.Replace("$flp_project", project_field.SelectedValue);
 		sql = sql.Replace("$flp_org", org_field.SelectedValue);
@@ -593,6 +598,12 @@ update orgs set
 		<tr>
 		<td><asp:checkbox runat="server" class=cb id="can_edit_tasks"/></td>
 		<td class=lbl>Can edit tasks/time</td>
+		<td>&nbsp</td>
+		</tr>
+
+		<tr>
+		<td><asp:checkbox runat="server" class=cb id="can_assign_to_internal_users"/></td>
+		<td class=lbl>Can assign to internal users (event if external org)</td>
 		<td>&nbsp</td>
 		</tr>
 

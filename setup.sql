@@ -97,6 +97,7 @@ og_can_edit_reports int not null default(0),
 og_can_view_tasks int not null default(0),
 og_can_edit_tasks int not null default(0),
 og_other_orgs_permission_level int not null default(2), -- 0=none, 1=read, 2=edit
+og_can_assign_to_internal_users int not null default(0),
 
 og_category_field_permission_level int not null default(2), -- 0=none, 1=read, 2=edit
 og_priority_field_permission_level int not null default(2),

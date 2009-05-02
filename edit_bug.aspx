@@ -60,7 +60,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	else
 	{
-	    fckeComment.Visible = false;
+		fckeComment.Visible = false;
 		comment.Visible = true;
 	}
 
@@ -149,9 +149,9 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (id == 0)  // prepare the page for adding a new bug
 		{
-            load_dropdowns(null, security.user);
+			load_dropdowns(null, security.user);
 
-            titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - Add New ";
+			titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - Add New ";
 			titl.InnerText += btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"));
 
 			if (security.user.adds_not_allowed)
@@ -277,13 +277,13 @@ void Page_Load(Object sender, EventArgs e)
 
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
-                string column_name = (string)drcc["name"];
-                if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
-                {
-                    string defaultval = get_custom_col_default_value(drcc["default value"]);
-                    hash_custom_cols.Add(column_name, defaultval);
-                    hash_prev_custom_cols.Add(column_name, "");
-                }
+				string column_name = (string)drcc["name"];
+				if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
+				{
+					string defaultval = get_custom_col_default_value(drcc["default value"]);
+					hash_custom_cols.Add(column_name, defaultval);
+					hash_prev_custom_cols.Add(column_name, "");
+				}
 			}
 
 			set_controls_field_permission(Security.PERMISSION_ALL);
@@ -295,9 +295,9 @@ void Page_Load(Object sender, EventArgs e)
 			// Get this entry's data from the db and fill in the form
 
 			dr = btnet.Bug.get_bug_datarow(id, security, ds_custom_cols);
-            Session["bug_datarow"] = dr;
+			Session["bug_datarow"] = dr;
 
-            load_dropdowns(dr, security.user);
+			load_dropdowns(dr, security.user);
 
 			if (dr == null)
 			{
@@ -325,12 +325,12 @@ void Page_Load(Object sender, EventArgs e)
 			foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 			{
 				string column_name = (string)drcc["name"];
-                if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
-                {
-                    string val = btnet.Util.format_db_value(dr[column_name]);
-                    hash_custom_cols.Add(column_name, val);
-                    hash_prev_custom_cols.Add(column_name, val);
-                }
+				if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
+				{
+					string val = btnet.Util.format_db_value(dr[column_name]);
+					hash_custom_cols.Add(column_name, val);
+					hash_prev_custom_cols.Add(column_name, val);
+				}
 			}
 
 			bugid.InnerText = Convert.ToString((int) dr["id"]);
@@ -347,7 +347,7 @@ void Page_Load(Object sender, EventArgs e)
 			s += btnet.PrintBug.format_email_username(
 					true,
 					Convert.ToInt32(dr["id"]),
-                    permission_level,
+					permission_level,
 					Convert.ToString(dr["reporter_email"]),
 					Convert.ToString(dr["reporter"]),
 					Convert.ToString(dr["reporter_fullname"]));
@@ -501,18 +501,18 @@ void Page_Load(Object sender, EventArgs e)
 				subscribers.InnerHtml = subscribers_link;
 			}
 
-            if (btnet.Util.get_setting("EnableRelationships", "0") == "1")
-            {
-                int relationship_cnt = 0;
-                if (id != 0)
-                {
-                    relationship_cnt = (int)dr["relationship_cnt"];
-                }
-                string relationships_link = "<a target=_blank href=relationships.aspx?bgid="
-                    + Convert.ToString(id)
-                    + " title='Create a relationship between this item and another item'><img src=database_link.png border=0 align=top>&nbsp;relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
-                relationships.InnerHtml = relationships_link;
-            }
+			if (btnet.Util.get_setting("EnableRelationships", "0") == "1")
+			{
+				int relationship_cnt = 0;
+				if (id != 0)
+				{
+					relationship_cnt = (int)dr["relationship_cnt"];
+				}
+				string relationships_link = "<a target=_blank href=relationships.aspx?bgid="
+					+ Convert.ToString(id)
+					+ " title='Create a relationship between this item and another item'><img src=database_link.png border=0 align=top>&nbsp;relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
+				relationships.InnerHtml = relationships_link;
+			}
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")
 			{
@@ -620,27 +620,27 @@ void Page_Load(Object sender, EventArgs e)
 
 		foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 		{
-            string column_name = (string)drcc["name"];
-            
-            if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
-            {
-                if (permission_level == Security.PERMISSION_ALL || id == 0)
-			    {
-				    hash_custom_cols.Add(column_name, Request[column_name]);
-			    }
-			    else
-			    {
-				    hash_custom_cols.Add(column_name, Request["prev_" + column_name]);
-			    }
-			    hash_prev_custom_cols.Add(column_name, Request["prev_" + column_name]);
-            }
+			string column_name = (string)drcc["name"];
+			
+			if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_NONE)
+			{
+				if (permission_level == Security.PERMISSION_ALL || id == 0)
+				{
+					hash_custom_cols.Add(column_name, Request[column_name]);
+				}
+				else
+				{
+					hash_custom_cols.Add(column_name, Request["prev_" + column_name]);
+				}
+				hash_prev_custom_cols.Add(column_name, Request["prev_" + column_name]);
+			}
 		}
 
 
 		// needs to be reloaded if project changed
 		load_project_and_user_dropdowns(null);
 
-        Workflow.fill_status_dropdown((DataRow)Session["bug_datarow"], security.user, status.Items);
+		Workflow.fill_status_dropdown((DataRow)Session["bug_datarow"], security.user, status.Items);
 
 		on_update();
 	}
@@ -768,37 +768,37 @@ void load_project_and_user_dropdowns(DataTable project_default)
 
 	// Load the user dropdown, which changes per project
 	// Only users explicitly allowed will be listed
-    if (btnet.Util.get_setting("DefaultPermissionLevel", "2") == "0")
-    {
-        sql = @"
+	if (btnet.Util.get_setting("DefaultPermissionLevel", "2") == "0")
+	{
+		sql = @"
 /* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
 from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or (og_external_user = 0 and $og_can_assign_to_internal_users))
 and us_id in
-    (select pu_user from project_user_xref
-        where pu_project = $pj
-	    and pu_permission_level <> 0)
+	(select pu_user from project_user_xref
+		where pu_project = $pj
+		and pu_permission_level <> 0)
 order by us_username; ";
-    }
-    // Only users explictly DISallowed will be omitted
-    else
-    {
-        sql = @"
+	}
+	// Only users explictly DISallowed will be omitted
+	else
+	{
+		sql = @"
 /* users this project */ select us_id, case when $fullnames then us_lastname + ', ' + us_firstname else us_username end us_username
 from users
 inner join orgs on us_org = og_id
 where us_active = 1
 and og_can_be_assigned_to = 1
-and ($og_other_orgs_permission_level <> 0 or $og_id = og_id)
+and ($og_other_orgs_permission_level <> 0 or $og_id = og_id or (og_external_user = 0 and $og_can_assign_to_internal_users))
 and us_id not in
-    (select pu_user from project_user_xref
-	    where pu_project = $pj
+	(select pu_user from project_user_xref
+		where pu_project = $pj
 		and pu_permission_level = 0)
 order by us_username; ";
-    }
+	}
 	
 	if (btnet.Util.get_setting("UseFullNames","0") == "0")
 	{
@@ -821,9 +821,18 @@ order by us_username; ";
 	}
 
 
-    sql = sql.Replace("$og_id", Convert.ToString(security.user.org));
-    sql = sql.Replace("$og_other_orgs_permission_level", Convert.ToString(security.user.other_orgs_permission_level));
-    
+	sql = sql.Replace("$og_id", Convert.ToString(security.user.org));
+	sql = sql.Replace("$og_other_orgs_permission_level", Convert.ToString(security.user.other_orgs_permission_level));
+
+	if (security.user.can_assign_to_internal_users)
+	{
+		sql = sql.Replace("$og_can_assign_to_internal_users", "1 = 1");
+	}
+	else
+	{
+		sql = sql.Replace("$og_can_assign_to_internal_users", "0 = 1");
+	}
+	
 	dt_users = btnet.DbUtil.get_dataset(sql).Tables[0];
 
 	assigned_to.DataSource = new DataView((DataTable)dt_users);
@@ -1438,18 +1447,18 @@ void load_dropdowns(DataRow dr, User user)
 	priority.DataBind();
 	priority.Items.Insert(0, new ListItem("[no priority]", "0"));
 
-    // Make it easier to customize the list of statuses
-    Workflow.fill_status_dropdown(dr, security.user, status.Items);
-    
+	// Make it easier to customize the list of statuses
+	Workflow.fill_status_dropdown(dr, security.user, status.Items);
+	
 
-    if (status.Items.Count == 0)
-    {
-        status.DataSource = ds_dropdowns.Tables[4];
-        status.DataTextField = "st_name";
-        status.DataValueField = "st_id";
-        status.DataBind();
-        status.Items.Insert(0, new ListItem("[no status]", "0"));
-    }
+	if (status.Items.Count == 0)
+	{
+		status.DataSource = ds_dropdowns.Tables[4];
+		status.DataTextField = "st_name";
+		status.DataValueField = "st_id";
+		status.DataBind();
+		status.Items.Insert(0, new ListItem("[no status]", "0"));
+	}
 
 	udf.DataSource  = ds_dropdowns.Tables[5];
 	udf.DataTextField = "udf_name";
@@ -1501,10 +1510,10 @@ bool did_something_change()
 
 	if (!something_changed)
 	{
-        foreach (string column_name in hash_custom_cols.Keys)
+		foreach (string column_name in hash_custom_cols.Keys)
 		{
-            string before = hash_prev_custom_cols[column_name];
-            string after = hash_custom_cols[column_name];
+			string before = hash_prev_custom_cols[column_name];
+			string after = hash_custom_cols[column_name];
 
 			if (before == null) before = "";
 			if (after == null) after = "";
@@ -1578,7 +1587,7 @@ bool record_changes()
 
 		if (btnet.Util.get_setting("EnableTags","0") == "1")
 		{
-            btnet.Tags.build_tag_index(Application);
+			btnet.Tags.build_tag_index(Application);
 		}
 
 	}
@@ -1709,12 +1718,12 @@ bool record_changes()
 	{
 		string column_name = (string)drcc["name"];
 
-        if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
-        {
-            continue;
-        }
-        string before = hash_prev_custom_cols[column_name];
-        string after = hash_custom_cols[column_name];
+		if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
+		{
+			continue;
+		}
+		string before = hash_prev_custom_cols[column_name];
+		string after = hash_custom_cols[column_name];
 
 		if (before == "0" || before == "")
 		{
@@ -1757,9 +1766,9 @@ bool record_changes()
 			do_update = true;
 			sql += base_sql.Replace(
 				"$3",
-                "changed " + column_name + " from \"" + before.Trim().Replace("'", "''") + "\" to \"" + after.Trim().Replace("'", "''") + "\"");
+				"changed " + column_name + " from \"" + before.Trim().Replace("'", "''") + "\" to \"" + after.Trim().Replace("'", "''") + "\"");
 
-            hash_prev_custom_cols[column_name] = hash_custom_cols[column_name];
+			hash_prev_custom_cols[column_name] = hash_custom_cols[column_name];
 		}
 	}
 
@@ -1773,11 +1782,11 @@ bool record_changes()
 			"$3",
 			"changed "
 			+ Request["label_pcd1"].Replace("'","''")
-            + " from \"" + prev_pcd1.Value + "\" to \"" + Request["pcd1"].Replace("'","''") + "\"");
+			+ " from \"" + prev_pcd1.Value + "\" to \"" + Request["pcd1"].Replace("'","''") + "\"");
 
 		prev_pcd1.Value = Request["pcd1"];
 	}
-    if (Request["label_pcd2"] != null && Request["pcd2"] != null && prev_pcd2.Value != Request["pcd2"].Replace("'","''"))
+	if (Request["label_pcd2"] != null && Request["pcd2"] != null && prev_pcd2.Value != Request["pcd2"].Replace("'","''"))
 	{
 
 		do_update = true;
@@ -1785,7 +1794,7 @@ bool record_changes()
 			"$3",
 			"changed "
 			+ Request["label_pcd2"].Replace("'","''")
-            + " from \"" + prev_pcd2.Value + "\" to \"" + Request["pcd2"].Replace("'","''") + "\"");
+			+ " from \"" + prev_pcd2.Value + "\" to \"" + Request["pcd2"].Replace("'","''") + "\"");
 
 		prev_pcd2.Value = Request["pcd2"];
 	}
@@ -1797,7 +1806,7 @@ bool record_changes()
 			"$3",
 			"changed "
 			+ Request["label_pcd3"].Replace("'","''")
-            + " from \"" + prev_pcd3.Value + "\" to \"" + Request["pcd3"].Replace("'","''") + "\"");
+			+ " from \"" + prev_pcd3.Value + "\" to \"" + Request["pcd3"].Replace("'","''") + "\"");
 
 		prev_pcd3.Value = Request["pcd3"];
 	}
@@ -1816,11 +1825,11 @@ bool record_changes()
 	}
 
 
-    if (do_update && btnet.Util.get_setting("EnableLucene", "1") == "1")
-    {
-        MyLucene.update_lucene_index(id);
-    }        
-    
+	if (do_update && btnet.Util.get_setting("EnableLucene", "1") == "1")
+	{
+		MyLucene.update_lucene_index(id);
+	}		
+	
 	// return true if something did change
 	return do_update;
 }
@@ -1884,17 +1893,17 @@ bool validate()
 	}
 
 
-    // validate custom columns
+	// validate custom columns
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
 
 		string name = (string) drcc["name"];
 
-        if (security.user.dict_custom_field_permission_level[name] != Security.PERMISSION_ALL)
-        {
-            continue;
-        }
-        
+		if (security.user.dict_custom_field_permission_level[name] != Security.PERMISSION_ALL)
+		{
+			continue;
+		}
+		
 		string val = Request[name];
 
 		if (val == null) continue;
@@ -2007,24 +2016,24 @@ void on_update()
 	Session["project"] = project.SelectedItem.Value;
 
 	bool bug_fields_have_changed = false;
-    bool bugpost_fields_have_changed = false;
+	bool bugpost_fields_have_changed = false;
 
 	if (good)
 	{
 		string comment_formated;
-        string comment_search;
+		string comment_search;
 		string commentType;
 
 
 		if (security.user.use_fckeditor) {
-		    comment_formated = btnet.Util.strip_dangerous_tags(fckeComment.Value);
-            comment_search = btnet.Util.strip_html(fckeComment.Value);
-		    commentType = "text/html";
+			comment_formated = btnet.Util.strip_dangerous_tags(fckeComment.Value);
+			comment_search = btnet.Util.strip_html(fckeComment.Value);
+			commentType = "text/html";
 		}
 		else
 		{
 			comment_formated = HttpUtility.HtmlDecode(comment.Value);
-            comment_search = comment_formated;
+			comment_search = comment_formated;
 			commentType = "text/plain";
 		}
 
@@ -2058,7 +2067,7 @@ void on_update()
 			btnet.Bug.NewIds new_ids = btnet.Bug.insert_bug(
 				short_desc.Value,
 				security,
-                tags.Value,
+				tags.Value,
 				Convert.ToInt32(project.SelectedItem.Value),
 				Convert.ToInt32(org.SelectedItem.Value),
 				Convert.ToInt32(category.SelectedItem.Value),
@@ -2070,25 +2079,25 @@ void on_update()
 				pcd2,
 				pcd3,
 				comment_formated,
-                comment_search,
+				comment_search,
 				null, // from
-                null, // cc
+				null, // cc
 				commentType,
 				internal_only.Checked,
 				hash_custom_cols,
-                true); // send notifications
+				true); // send notifications
 
-            if (tags.Value != "" && btnet.Util.get_setting("EnableTags", "0") == "1")
-            {
-                btnet.Tags.build_tag_index(Application);
-            }
+			if (tags.Value != "" && btnet.Util.get_setting("EnableTags", "0") == "1")
+			{
+				btnet.Tags.build_tag_index(Application);
+			}
 
 			id = new_ids.bugid;
 
-            if (btnet.Util.get_setting("EnableLucene", "1") == "1")
-            {
-                MyLucene.update_lucene_index(id);
-            }
+			if (btnet.Util.get_setting("EnableLucene", "1") == "1")
+			{
+				MyLucene.update_lucene_index(id);
+			}
 
 			btnet.WhatsNew.add_news(id, short_desc.Value, "added", security);
 
@@ -2132,7 +2141,7 @@ void on_update()
 
 						update bugs set
 						bg_short_desc = N'$sd',
-                        bg_tags = N'$tags',
+						bg_tags = N'$tags',
 						bg_project = $pj,
 						bg_org = $og,
 						bg_category = $ct,
@@ -2151,7 +2160,7 @@ void on_update()
 					select @now";
 
 				sql = sql.Replace("$sd", short_desc.Value.Replace("'","''"));
-                sql = sql.Replace("$tags", tags.Value.Replace("'", "''"));
+				sql = sql.Replace("$tags", tags.Value.Replace("'", "''"));
 				sql = sql.Replace("$lu", Convert.ToString(security.user.usid));
 				sql = sql.Replace("$id", Convert.ToString(id));
 				sql = sql.Replace("$pj", new_project);
@@ -2195,23 +2204,23 @@ void on_update()
 					foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 					{
 						
-                        string column_name = (string) drcc["name"];
-                        
-                        // if we've made customizations that cause the field to not come back to us,
-                        // don't replace something with null
-                        string o = Request[column_name];
-                        if (o == null)
-                        {
-                        	continue;
-                        }                        
+						string column_name = (string) drcc["name"];
+						
+						// if we've made customizations that cause the field to not come back to us,
+						// don't replace something with null
+						string o = Request[column_name];
+						if (o == null)
+						{
+							continue;
+						}						
 
-                        // skip if no permission to update
-                        if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
-                        {
-                            continue;
-                        }
-                        
-                        custom_cols_sql += ",[" + column_name + "]";
+						// skip if no permission to update
+						if (security.user.dict_custom_field_permission_level[column_name] != Security.PERMISSION_ALL)
+						{
+							continue;
+						}
+						
+						custom_cols_sql += ",[" + column_name + "]";
 						custom_cols_sql += " = ";
 						
 						string datatype = (string) drcc["datatype"];
@@ -2237,7 +2246,7 @@ void on_update()
 					snapshot_timestamp.Value = date_from_db;
 					btnet.Bug.auto_subscribe(id);
 					format_subcribe_cancel_link();
-                    bug_fields_have_changed = record_changes();
+					bug_fields_have_changed = record_changes();
 				}
 				else
 				{
@@ -2251,15 +2260,15 @@ void on_update()
 				}
 			} // permission_level = 3 or not
 
-            bugpost_fields_have_changed = (btnet.Bug.insert_comment(
-                id,
-                security.user.usid,
-                comment_formated,
-                comment_search,
-                null, // from
-                null, // cc
-                commentType,
-                internal_only.Checked) != 0);
+			bugpost_fields_have_changed = (btnet.Bug.insert_comment(
+				id,
+				security.user.usid,
+				comment_formated,
+				comment_search,
+				null, // from
+				null, // cc
+				commentType,
+				internal_only.Checked) != 0);
 
 			if (bug_fields_have_changed || (bugpost_fields_have_changed && !internal_only.Checked))
 			{
@@ -2276,17 +2285,17 @@ void on_update()
 
 			set_controls_field_permission(permission_level);
 
-            // GC: 16-Feb-2008: Bug fix to allow the Status drop down to be reloaded if there has been a change
-            if (status_changed && Session["bug_datarow"] != null)
-            {
-                DataRow bug;
+			// GC: 16-Feb-2008: Bug fix to allow the Status drop down to be reloaded if there has been a change
+			if (status_changed && Session["bug_datarow"] != null)
+			{
+				DataRow bug;
 
-                bug = (DataRow) Session["bug_datarow"];
-                bug["status"] = int.Parse(status.SelectedItem.Value);
-                bug["status_name"] = status.SelectedItem.Text;
-    btnet.Util.write_to_log("after update");
-                Workflow.fill_status_dropdown(bug, security.user, status.Items);
-            }
+				bug = (DataRow) Session["bug_datarow"];
+				bug["status"] = int.Parse(status.SelectedItem.Value);
+				bug["status_name"] = status.SelectedItem.Text;
+	btnet.Util.write_to_log("after update");
+				Workflow.fill_status_dropdown(bug, security.user, status.Items);
+			}
 		} // edit existing or not
 
 	}
@@ -2489,9 +2498,9 @@ function disable_second_button()
 	<table border=0 cellpadding=0 cellspacing=4>
 
 	<tr id="tags_row">
-	    <td nowrap>
-	        <span class=lbl id="tags_label" runat="server">Tags:&nbsp;</span>
-	    </td>
+		<td nowrap>
+			<span class=lbl id="tags_label" runat="server">Tags:&nbsp;</span>
+		</td>
 		<td nowrap>
 			<span class="stat" id="static_tags" runat="server"></span>
 			<input runat="server" type=text class=txt id="tags" size="70" maxlength="80"  onkeydown="mark_dirty()" onkeyup="mark_dirty()">
@@ -2569,19 +2578,19 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	// Create the custom column INPUT elements
 	foreach (DataRow drcc in ds_custom_cols.Tables[0].Rows)
 	{
-        string column_name = (string) drcc["name"];
+		string column_name = (string) drcc["name"];
 
-        int field_permission_level = security.user.dict_custom_field_permission_level[column_name];
-        if (field_permission_level == Security.PERMISSION_NONE)
-        {
-            continue;
-        }
-        
-        string field_id = column_name.Replace(" ", "");
-        
+		int field_permission_level = security.user.dict_custom_field_permission_level[column_name];
+		if (field_permission_level == Security.PERMISSION_NONE)
+		{
+			continue;
+		}
+		
+		string field_id = column_name.Replace(" ", "");
+		
 		Response.Write ("\n<tr id=\"" + field_id + "_row\">");
 		Response.Write ("<td nowrap><span id=\"" + field_id +  "_label\">");
-        Response.Write(column_name);
+		Response.Write(column_name);
 
 		int permission_on_original = permission_level;
 
@@ -2605,9 +2614,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		int fieldLength = int.Parse(drcc["length"].ToString());
 
 		if (permission_on_original == Security.PERMISSION_READONLY
-        || field_permission_level == Security.PERMISSION_READONLY)
+		|| field_permission_level == Security.PERMISSION_READONLY)
 		{
-            string text = hash_custom_cols[column_name];
+			string text = hash_custom_cols[column_name];
 			if ( fieldLength > minTextAreaSize && !string.IsNullOrEmpty(text))
 			{
 				// more readable if there is a lot of text
@@ -2634,9 +2643,9 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				Response.Write (" onkeydown=\"return count_chars('" + field_id + "'," + fieldLength + ")\" ");
 				Response.Write ("   onkeyup=\"return count_chars('" + field_id + "'," + fieldLength + ")\" ");
 				Response.Write (" cols=\"" + minTextAreaSize + "\" rows=\"" + (((fieldLength/minTextAreaSize)>maxTextAreaRows) ? maxTextAreaRows : (fieldLength/minTextAreaSize)) + "\" " );
-                Response.Write(" name=\"" + column_name + "\"");
+				Response.Write(" name=\"" + column_name + "\"");
 				Response.Write (" id=\"" + field_id + "\" >");
-                Response.Write(hash_custom_cols[column_name]);
+				Response.Write(hash_custom_cols[column_name]);
 				Response.Write ("</textarea><div class=smallnote id=\"" + field_id + "_cnt\">&nbsp;</div>");
 			}
 			else
@@ -2645,12 +2654,12 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 				if (dropdown_type != "" || dropdown_vals != "")
 				{
-                    string selected_value = hash_custom_cols[column_name].Trim();
+					string selected_value = hash_custom_cols[column_name].Trim();
 
 					Response.Write ("<select ");
 
 					Response.Write (" id=\"" + field_id + "\"");
-                    Response.Write(" name=\"" + column_name + "\"");
+					Response.Write(" name=\"" + column_name + "\"");
 					Response.Write (">");
 
 					if (dropdown_type != "users")
@@ -2715,22 +2724,22 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 						}
 					}
 
-                    Response.Write(" name=\"" + column_name + "\"");
+					Response.Write(" name=\"" + column_name + "\"");
 					Response.Write (" id=\"" + field_id + "\"");
 					Response.Write (" value=\"");
-                    Response.Write(hash_custom_cols[column_name]);
+					Response.Write(hash_custom_cols[column_name]);
 
 					if (datatype == "datetime")
 					{
-                        Response.Write("\" class='txt date'  >");
+						Response.Write("\" class='txt date'  >");
 						Response.Write("<a style=\"font-size: 8pt;\"href=\"javascript:show_calendar('"
 							+ field_id
 							+ "');\">[select]</a>");
 					}
 					else
 					{
-                        Response.Write("\" class='txt' >");
-    				}
+						Response.Write("\" class='txt' >");
+					}
 				}
 			}
 		} // end if readonly or editable
@@ -2935,13 +2944,13 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	foreach (string column_name in hash_custom_cols.Keys)
 	{
 		Response.Write ("<input type=hidden name=\"prev_");
-        Response.Write(column_name);
+		Response.Write(column_name);
 		Response.Write ("\"");
 
 		// output a date field according to the specified format
-	    Response.Write (" value=\"");
+		Response.Write (" value=\"");
 		//modified by CJU on jan 9 2008
-        Response.Write(hash_custom_cols[column_name]);
+		Response.Write(hash_custom_cols[column_name]);
 		//modified by CJU on jan 9 2008
 		Response.Write ("\">\n");
 	}
