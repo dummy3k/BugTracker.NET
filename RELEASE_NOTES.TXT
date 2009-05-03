@@ -71,7 +71,7 @@ something I'd like to add.
  
 
 -----------------------------------------------------------------------
-Version 3.1.7   05/03/2009   (svn revision XXX)
+Version 3.1.7   05/03/2009   (svn revision 329)
 -----------------------------------------------------------------------
 
 * Run this sql to upgrade to this release:
