@@ -7,16 +7,17 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.DirectoryServices.Protocols;
+using System.Web;
+using System.Collections.Generic;
 
 namespace btnet
 {
 	public class Authenticate {
+	
 
         // returns user id
         public static bool check_password(string username, string password)
         {
-
-            
 
             string sql = @"
 select us_username, us_id, us_password, isnull(us_salt,0) us_salt, us_active
@@ -42,6 +43,55 @@ where us_username = N'$username'";
             }
 
             bool authenticated = false;
+            LinkedList<DateTime> failed_attempts = null;
+
+            // Too many failed attempts?
+            // We'll only allow N in the last N minutes.
+            if (HttpContext.Current != null)
+            {
+                failed_attempts = (LinkedList<DateTime>)HttpContext.Current.Session[username];
+
+                if (failed_attempts != null)
+                {
+                    // Don't count attempts older than N minutes ago.
+                    int minutes_ago = Convert.ToInt32(btnet.Util.get_setting("FailedLoginAttemptsMinutes","10"));
+                    int failed_attempts_allowed = Convert.ToInt32(btnet.Util.get_setting("FailedLoginAttemptsAllowed", "10"));
+
+                    DateTime n_minutes_ago = DateTime.Now.AddMinutes(-1 * minutes_ago);
+                    while (true)
+                    {
+                        if (failed_attempts.Count > 0)
+                        {
+                            if (failed_attempts.First.Value < n_minutes_ago)
+                            {
+                                Util.write_to_log("removing stale failed attempt for " + username);
+                                failed_attempts.RemoveFirst();
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
+                    // how many failed attempts in last N minutes?
+                    Util.write_to_log("failed attempt count for " + username + ":" + Convert.ToString(failed_attempts.Count));
+
+                    if (failed_attempts.Count > failed_attempts_allowed)
+                    {
+                        Util.write_to_log("Too many failed login attempts in too short a time period: " + username);
+                        return false;                        
+                    }
+                    
+                    // Save the list of attempts
+                    HttpContext.Current.Session[username] = failed_attempts;
+                }
+            }
+            
             if (btnet.Util.get_setting("AuthenticateUsingLdap","0") == "1")
 			{
 				authenticated = check_password_with_ldap(username, password);
@@ -53,11 +103,29 @@ where us_username = N'$username'";
 
             if (authenticated)
             {
+                // clear list of failed attempts
+                if (HttpContext.Current != null)
+                {
+                    HttpContext.Current.Session[username] = null;
+                }
+
                 btnet.Util.update_most_recent_login_datetime((int)dr["us_id"]);
                 return true;
             }
             else
             {
+                if (HttpContext.Current != null)
+                {
+                    if (failed_attempts == null)
+                    {
+                        failed_attempts = new LinkedList<DateTime>();
+                    }
+
+                    // Record a failed login attempt.
+                    failed_attempts.AddLast(DateTime.Now);
+                    HttpContext.Current.Session[username] = failed_attempts;
+                }
+
                 return false;
             }
 		}
