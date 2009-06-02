@@ -71,17 +71,19 @@ something I'd like to add.
  
 
 -----------------------------------------------------------------------
-Version 3.1.8   05/xx/2009   (svn revision xxx)
+Version 3.1.8   06/02/2009   (svn revision 335)
 -----------------------------------------------------------------------
 
-* Better protection against brute force attacks.  Doc new Web.config settings.
+* If you are running BugTracker.NET on a public internet, this version
+has better protection against brute force attemps to crack user
+passwords.   See "FailedLoginAttemptsMinutes" and 
+"FailedLoginAttemptsAllowed" in Web.config.
 
- * 2794653  	 "select tags" filter doesn't work  <<, take a look.
+* Fixed bug in Subversion hook scripts.  Now, if you use TortoiseSVN
+and check in without filling in the bugid, the script won't wrongly
+use the comment length as the bug id.
 
-* Fixed subversion bug
-
-* Add "Last Updated" to search results - 2786635  	 Columns in search results
-
+* Add "last updated by", "last updated on" to search results columns.
 
 -----------------------------------------------------------------------
 Version 3.1.7   05/03/2009   (svn revision 329)
