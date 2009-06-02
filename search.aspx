@@ -485,7 +485,7 @@ order by bg_id desc
 
 		string select = "select isnull(pr_background_color,'#ffffff') [color], bg_id [id],\nbg_short_desc [desc]";
 
-		select += "\n,bg_reported_date [reported on]";
+		// reported
 		if (use_full_names)
 		{
 			select += "\n,isnull(rpt.us_lastname + ', ' + rpt.us_firstname,'') [reported by]";
@@ -494,6 +494,19 @@ order by bg_id desc
 		{
 			select += "\n,isnull(rpt.us_username,'') [reported by]";
 		}
+		select += "\n,bg_reported_date [reported on]";
+
+		// last updated
+		if (use_full_names)
+		{
+			select += "\n,isnull(lu.us_lastname + ', ' + lu.us_firstname,'') [last updated by]";
+		}
+		else
+		{
+			select += "\n,isnull(lu.us_username,'') [last updated by]";
+		}
+		select += "\n,bg_last_updated_date [last updated on]";
+
 
 		if (security.user.tags_field_permission_level != Security.PERMISSION_NONE)
 		{
@@ -667,6 +680,7 @@ order by bg_id desc
 
 		select += @" from bugs
 			left outer join users rpt on rpt.us_id = bg_reported_user
+			left outer join users lu on lu.us_id = bg_last_updated_user
 			left outer join users asg on asg.us_id = bg_assigned_to_user
 			left outer join projects on pj_id = bg_project
 			left outer join orgs on og_id = bg_org
@@ -1561,7 +1575,6 @@ function on_change()
 %>
 		var select = "select isnull(pr_background_color,'#ffffff') [color], bg_id [id]";
 		select += ",\nbg_short_desc [desc]"
-		select += ",\nbg_reported_date [reported on]"
 
 <%
 		if (use_full_names)
@@ -1576,7 +1589,25 @@ function on_change()
 			select += ",\nisnull(rpt.us_username,'') [reported by]";
 <%
 		}
+%>		
+		select += ",\nbg_reported_date [reported on]"
+<%		
+		if (use_full_names)
+		{
+%>
+			select += ",\nisnull(lu.us_lastname + ', ' + lu.us_firstname,'') [last updated by]";
+<%
+		}
+		else
+		{
+%>
+			select += ",\nisnull(lu.us_username,'') [last updated by]";
+<%
+		}
+%>		
+		select += ",\nbg_last_updated_date [last updated on]"
 
+<%
 		if (security.user.tags_field_permission_level != Security.PERMISSION_NONE)
 		{
 %>
@@ -1691,6 +1722,7 @@ function on_change()
 
 		select += "\nfrom bugs\n";
 		select += "left outer join users rpt on rpt.us_id = bg_reported_user\n";
+		select += "left outer join users lu on lu.us_id = bg_last_updated_user\n";		
 		select += "left outer join users asg on asg.us_id = bg_assigned_to_user\n";
 		select += "left outer join projects on pj_id = bg_project\n";
 		select += "left outer join orgs on og_id = bg_org\n";

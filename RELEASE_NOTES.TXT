@@ -71,6 +71,19 @@ something I'd like to add.
  
 
 -----------------------------------------------------------------------
+Version 3.1.8   05/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+* Better protection against brute force attacks.  Doc new Web.config settings.
+
+ * 2794653  	 "select tags" filter doesn't work  <<, take a look.
+
+* Fixed subversion bug
+
+* Add "Last Updated" to search results - 2786635  	 Columns in search results
+
+
+-----------------------------------------------------------------------
 Version 3.1.7   05/03/2009   (svn revision 329)
 -----------------------------------------------------------------------
 
