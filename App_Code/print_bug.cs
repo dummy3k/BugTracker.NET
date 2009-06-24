@@ -973,7 +973,7 @@ namespace btnet
                     s2,
                     new MatchEvaluator(convert_bug_link));
 
-                return s2;
+                return "<span class=cmt_text>" + s2 + "</span>";
             }
         }
 

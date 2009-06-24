@@ -1,3 +1,9 @@
+
+
+
+
+http://explore.twitter.com/malisancube/status/1605076492
+
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
@@ -69,13 +75,31 @@ something I'd like to add.
 
 ******************
  
+ 
+Hide delete in mass edit if not allowed to delete.
+per user defaults?
+http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-ibugtraqprovider.html
+ 
+
+-----------------------------------------------------------------------
+Version 3.1.9   06/23/2009   (svn revision XXX)
+-----------------------------------------------------------------------
+
+* The "fix" in version 3.1.7 "Changed code to work around OnServerClick
+ not working..." (see below) broke the way the project dropdown works
+ in edit_bug.aspx.  In this version, I revert back to the pre-3.1.7
+ behavior.
+ 
+* Changed search.aspx form method from "POST" to "GET" to avoid IE8
+"Webpage has expired" message (but now there's an anti-xss false alarm.
+Sigh...)
 
 -----------------------------------------------------------------------
 Version 3.1.8   06/02/2009   (svn revision 335)
 -----------------------------------------------------------------------
 
-* If you are running BugTracker.NET on a public internet, this version
-has better protection against brute force attemps to crack user
+* If you are running BugTracker.NET on the public internet, this version
+has better protection against brute force attempts to crack user
 passwords.   See "FailedLoginAttemptsMinutes" and 
 "FailedLoginAttemptsAllowed" in Web.config.
 

@@ -552,7 +552,7 @@ void Page_Load(Object sender, EventArgs e)
 
 
 			// merge
-			if (!security.user.is_guest) // don't allow delete
+			if (!security.user.is_guest) 
 			{
 				if (security.user.is_admin
 				|| security.user.can_merge_bugs)
@@ -642,7 +642,7 @@ void Page_Load(Object sender, EventArgs e)
 
 		Workflow.fill_status_dropdown((DataRow)Session["bug_datarow"], security.user, status.Items);
 
-		on_update();
+		//on_update();
 	}
 
 
@@ -2007,7 +2007,7 @@ where us_id = @us_id";
 	
 
 ///////////////////////////////////////////////////////////////////////
-void on_update()
+void on_update (Object sender, EventArgs e)
 {
 
 	bool good = validate();
@@ -2457,7 +2457,8 @@ function disable_second_button()
 				type=submit
 				id="sub2"
 				onclick="disable_me()"
-				value="Update">
+				value="Update"
+				OnServerClick="on_update">
 		</div>			
 	<% } %>			
 	<table border=0 cellpadding=3 cellspacing=0>
@@ -2914,7 +2915,8 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 			type=submit
 			id="sub"
 			onclick="disable_me()"
-			value="Update">
+			value="Update"
+			OnServerClick="on_update">
 
 	</table>
 
