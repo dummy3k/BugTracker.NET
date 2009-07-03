@@ -341,18 +341,6 @@ void Page_Load(Object sender, EventArgs e)
 
 			// select the dropdowns
 
-			foreach (ListItem li in org.Items)
-			{
-				if (Convert.ToInt32(li.Value) == (int) dr["organization"])
-				{
-					li.Selected = true;
-				}
-				else
-				{
-					li.Selected = false;
-				}
-			}
-
 			foreach (ListItem li in category.Items)
 			{
 				if (Convert.ToInt32(li.Value) == (int) dr["category"])
@@ -408,6 +396,7 @@ void Page_Load(Object sender, EventArgs e)
 			prev_project.Value = Convert.ToString((int)dr["project"]);
 			prev_project_name.Value = Convert.ToString(dr["current_project"]);
 			prev_org.Value = Convert.ToString((int)dr["organization"]);
+			prev_org_name.Value = Convert.ToString(dr["og_name"]);
 			prev_category.Value = Convert.ToString((int)dr["category"]);
 			prev_priority.Value = Convert.ToString((int)dr["priority"]);
 			prev_assigned_to.Value = Convert.ToString((int)dr["assigned_to_user"]);
@@ -696,21 +685,22 @@ void load_project_and_user_dropdowns(DataTable project_default)
 	if (id != 0) // if existing bug
 	{
 
+// Project
 		if (prev_project.Value != "0")
 		{
 			// see if already in the dropdown.
-			bool project_in_dropdown = false;
+			bool already_in_dropdown = false;
 			foreach (ListItem li in project.Items)
 			{
 				if (li.Value == prev_project.Value)
 				{
-					project_in_dropdown = true;
+					already_in_dropdown = true;
 					break;
 				}
 			}
 
 			// Add to the list, even if permissions don't allow it now, because, in the past, they did allow it.
-			if (!project_in_dropdown)
+			if (!already_in_dropdown)
 			{
 				project.Items.Add(
 					new ListItem(
@@ -718,8 +708,9 @@ void load_project_and_user_dropdowns(DataTable project_default)
 						prev_project.Value));
 
 			}
+			
 		}
-
+		
 		if (!IsPostBack)
 		{
 			foreach (ListItem li in project.Items)
@@ -734,6 +725,46 @@ void load_project_and_user_dropdowns(DataTable project_default)
 				}
 			}
 		}
+
+// Org
+		if (prev_org.Value != "0")
+		{
+			bool already_in_dropdown = false;
+			foreach (ListItem li in org.Items)
+			{
+				if (li.Value == prev_org.Value)
+				{
+					already_in_dropdown = true;
+					break;
+				}
+			}
+
+			// Add to the list, even if permissions don't allow it now, because, in the past, they did allow it.
+			if (!already_in_dropdown)
+			{
+				org.Items.Add(
+					new ListItem(
+						prev_org_name.Value,
+						prev_org.Value));
+
+			}			
+		}
+		
+		if (!IsPostBack)
+		{
+			foreach (ListItem li in org.Items)
+			{
+				if (li.Value == prev_org.Value)
+				{
+					li.Selected = true;
+				}
+				else
+				{
+					li.Selected = false;
+				}
+			}
+		}
+
 	}
 
 
@@ -1381,7 +1412,7 @@ void load_dropdowns(DataRow dr, User user)
 	sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel","2"));
 
 	// 1
-	sql += "\nselect og_id, og_name from orgs order by og_name;";
+	sql += "\nselect og_id, og_name from orgs where og_active = 1 order by og_name;";
 
 	// 2
 	sql += "\nselect ct_id, ct_name from categories order by ct_sort_seq, ct_name;";
@@ -2904,6 +2935,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	<input type=hidden id="prev_project" runat="server">
 	<input type=hidden id="prev_project_name" runat="server">
 	<input type=hidden id="prev_org" runat="server">
+	<input type=hidden id="prev_org_name" runat="server">
 	<input type=hidden id="prev_category" runat="server">
 	<input type=hidden id="prev_priority" runat="server">
 	<input type=hidden id="prev_assigned_to" runat="server">

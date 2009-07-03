@@ -106,7 +106,8 @@ og_status_field_permission_level int not null default(2),
 og_project_field_permission_level int not null default(2),
 og_org_field_permission_level int not null default(2),
 og_udf_field_permission_level int not null default(2),
-og_tags_field_permission_level int not null default(2)
+og_tags_field_permission_level int not null default(2),
+og_active int not null default(1)
 )
 
 create unique index unique_og_name on orgs (og_name)

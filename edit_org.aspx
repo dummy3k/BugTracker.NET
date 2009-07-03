@@ -71,6 +71,7 @@ void Page_Load(Object sender, EventArgs e)
 		if (id == 0)
 		{
 			sub.Value = "Create";
+			active.Checked = true;
 			//other_orgs_permission_level.SelectedIndex = 2;
 			can_be_assigned_to.Checked = true;
 			other_orgs.SelectedValue = "2";
@@ -104,6 +105,7 @@ void Page_Load(Object sender, EventArgs e)
 
 			// Fill in this form
 			name.Value = (string) dr["og_name"];
+			active.Checked = Convert.ToBoolean((int)dr["og_active"]);
 			non_admins_can_use.Checked = Convert.ToBoolean((int)dr["og_non_admins_can_use"]);
 			external_user.Checked = Convert.ToBoolean((int)dr["og_external_user"]);
 			can_edit_sql.Checked = Convert.ToBoolean((int)dr["og_can_edit_sql"]);
@@ -192,6 +194,7 @@ void on_update ()
 			sql = @"
 insert into orgs
 	(og_name,
+	og_active,
 	og_non_admins_can_use,
 	og_external_user,
 	og_can_edit_sql,
@@ -218,6 +221,7 @@ insert into orgs
 	)
 	values (
 	N'$name', 
+	$active,
 	$non_admins_can_use,
 	$external_user,
 	$can_edit_sql,
@@ -249,6 +253,7 @@ insert into orgs
 			sql = @"
 update orgs set
 	og_name = N'$name',
+	og_active = $active,
 	og_non_admins_can_use = $non_admins_can_use,
 	og_external_user = $external_user,
 	og_can_edit_sql = $can_edit_sql,
@@ -279,6 +284,7 @@ update orgs set
 		}
 
 		sql = sql.Replace("$name", name.Value.Replace("'","''"));
+		sql = sql.Replace("$active", Util.bool_to_string(active.Checked));
 		sql = sql.Replace("$non_admins_can_use", Util.bool_to_string(non_admins_can_use.Checked));
 		sql = sql.Replace("$external_user", Util.bool_to_string(external_user.Checked));
 		sql = sql.Replace("$can_edit_sql", Util.bool_to_string(can_edit_sql.Checked));
@@ -375,6 +381,13 @@ update orgs set
 	<td class=lbl>Organization Name:</td>
 	<td><input runat="server" type=text class=txt id="name" maxlength=30 size=30></td>
 	<td runat="server" class=err id="name_err">&nbsp;</td>
+	</tr>
+
+
+	<tr>
+	<td class=lbl>Active:</td>
+	<td><asp:checkbox runat="server" class=cb id="active"/></td>
+	<td>&nbsp</td>
 	</tr>
 
 	<tr>

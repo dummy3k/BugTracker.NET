@@ -28,6 +28,7 @@ void Page_Load(Object sender, EventArgs e)
 		'<a href=edit_org.aspx?id=' + convert(varchar,og_id) + '>edit</a>' [$no_sort_edit],
 		'<a href=delete_org.aspx?id=' + convert(varchar,og_id) + '>delete</a>' [$no_sort_delete],
 		og_name[desc],
+		case when og_active = 1 then 'Y' else 'N' end [active],
 		case when og_non_admins_can_use = 1 then 'Y' else 'N' end [non-admin<br>can use],
 		case
 			when og_other_orgs_permission_level = 0 then 'None'
