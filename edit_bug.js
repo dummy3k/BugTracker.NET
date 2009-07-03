@@ -467,6 +467,8 @@ function change_dropdown_style()
 		}
 	}
 
+	mark_dirty()
+
 }
 
 var ren = new RegExp( "\\n", "g" )

@@ -64,7 +64,7 @@ us_id not in (select bp_user from bug_posts)
 
 
 -----------------------------------------------------------------------
-Version 3.2.0   07/03/2009   (svn revision 342)
+Version 3.2.0   07/03/2009   (svn revision 343)
 -----------------------------------------------------------------------
 
 Run this SQL to upgrade to this release:
@@ -87,6 +87,9 @@ CKEditor 3.0 RC
 setting projects to be inactive.  Users adding or editing bugs won't
 be able to see in inactive org in the dropdown, but existing bugs
 still assigned to that org will work ok.
+
+* Fixed bug where prompt wasn't being displayed if you tried to leave
+a "dirty" bug page after changing a dropdown.
 
 -----------------------------------------------------------------------
 Version 3.1.9   06/23/2009   (svn revision 336)
