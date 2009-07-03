@@ -1,5 +1,4 @@
 <%@ Page language="C#" validateRequest="false"%>
-<%@ Register TagPrefix="FCKeditorV2" Namespace="FredCK.FCKeditorV2" Assembly="FredCK.FCKeditorV2" %>
 
 <!--
 Copyright 2002-2009 Corey Trager
@@ -41,28 +40,9 @@ void Page_Load(Object sender, EventArgs e)
 	security = new Security();
 	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
-	fckeComment.BasePath = @"fckeditor/";
-	fckeComment.ToolbarSet = "BugTracker";
-
 	set_msg("");
 	set_custom_field_msg("");
 
-
-	if (security.user.use_fckeditor)
-	{
-		fckeComment.Visible = true;
-		comment.Visible = false;
-		
-		if (fckeComment.Value == "<br />") // workaround for bug in fckEditor
-		{
-			fckeComment.Value = "";
-		}
-	}
-	else
-	{
-		fckeComment.Visible = false;
-		comment.Visible = true;
-	}
 
 	string string_bugid = Request["id"];
 	if (string_bugid == null || string_bugid == "0" || (string_bugid != "0" && clone_ignore_bugid.Value == "1"))
@@ -1256,7 +1236,6 @@ void set_controls_field_permission(int bug_permission_level)
 			plus_label.Visible = false;
 			comment_label.Visible = false;
 			comment.Visible = false;
-			fckeComment.Visible = false;
 		}
 
 		set_project_field_permission(Security.PERMISSION_READONLY);
@@ -1492,7 +1471,6 @@ bool did_something_change()
 	if (prev_short_desc.Value != short_desc.Value
 	|| prev_tags.Value != tags.Value
 	|| comment.Value.Length > 0
-	|| fckeComment.Value.Length > 0
 	|| clone_ignore_bugid.Value == "1"
 	|| prev_project.Value != project.SelectedItem.Value
 	|| prev_org.Value != org.SelectedItem.Value
@@ -1877,15 +1855,6 @@ bool validate()
 		short_desc_err.InnerText = "";
 	}
 
-//	if (comment.Value.Length > 200000 || fckeComment.Value.Length > 200000)
-//	{
-//		good = false;
-//		comment_err.InnerText = "Comment cannot be longer than 200,000 characters.";
-//	}
-//	else
-//	{
-//		comment_err.InnerText = "";
-//	}
 
 	if (!did_something_change())
 	{
@@ -2026,8 +1995,8 @@ void on_update (Object sender, EventArgs e)
 
 
 		if (security.user.use_fckeditor) {
-			comment_formated = btnet.Util.strip_dangerous_tags(fckeComment.Value);
-			comment_search = btnet.Util.strip_html(fckeComment.Value);
+			comment_formated = btnet.Util.strip_dangerous_tags(comment.Value);
+			comment_search = btnet.Util.strip_html(comment.Value);
 			commentType = "text/html";
 		}
 		else
@@ -2281,7 +2250,6 @@ void on_update (Object sender, EventArgs e)
 			set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was updated.");
 
 			comment.Value = "";
-			fckeComment.Value = "";
 
 			set_controls_field_permission(permission_level);
 
@@ -2354,6 +2322,7 @@ void append_custom_field_msg(string s)
 <script type="text/javascript" language="JavaScript" src="jquery/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="jquery/jquery-ui-1.6rc2.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="edit_bug.js"></script>
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 
 <script>
 var this_bugid = <% Response.Write(Convert.ToString(id)); %>
@@ -2366,6 +2335,12 @@ function do_doc_ready()
 	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
 	$(".date").change(mark_dirty)
 	$(".warn").click(warn_if_dirty) 
+<% 
+if (security.user.use_fckeditor && Util.get_setting("DisableFCKEditor","0") == "0")	
+{
+	Response.Write ("CKEDITOR.replace( 'comment' )");
+}
+%>	
 }
 
 function start_animation()
@@ -2873,13 +2848,17 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 	<table border=0 cellpadding=0 cellspacing=3 width=98%>
 
 	<tr><td nowrap>
+		<% if (!security.user.use_fckeditor) { %>
 		<span id="plus_label" runat="server">
 			<font size=0>
-				<a href="#" onclick="<%= security.user.use_fckeditor ? "resize_iframe('fckeComment___Frame', 50);" : "resize_comment(10);" %>"><span id="toggle_link_plus">[+]</span></a>
+				<a href="#" onclick="resize_comment(10);"><span id="toggle_link_plus">[+]</span></a>
 				&nbsp;
-				<a href="#" onclick="<%= security.user.use_fckeditor ? "resize_iframe('fckeComment___Frame', -50);" : "resize_comment(-10);" %>"><span id="toggle_link_minus">[-]</span></a>
+				<a href="#" onclick="resize_comment(-10);"><span id="toggle_link_minus">[-]</span></a>
 			</font>
 		</span>
+		
+		<% } %>
+		
 		&nbsp;
 		<span id="comment_label" runat="server">Comment:</span>
 		
@@ -2896,7 +2875,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		</span>
 		<br>
 		<textarea  id="comment" rows=5 cols=100 runat="server" class=txt onkeydown="mark_dirty()" onkeyup="mark_dirty()"></textarea>
-		<FCKeditorV2:FCKeditor id="fckeComment" runat="server"></FCKeditorV2:FCKeditor>
 
 	<tr><td  nowrap>
 		<asp:checkbox runat="server" class=cb id="internal_only"/>

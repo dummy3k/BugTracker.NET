@@ -434,7 +434,7 @@ namespace btnet
 
 			if (dpl == "0")
 			{
-				project_permissions_sql = @" (bg_project in (
+				project_permissions_sql = @" (bugs.bg_project in (
 					select pu_project
 					from project_user_xref
 					where pu_user = $user
@@ -442,7 +442,7 @@ namespace btnet
 			}
 			else
 			{
-				project_permissions_sql = @" (bg_project not in (
+				project_permissions_sql = @" (bugs.bg_project not in (
 					select pu_project
 					from project_user_xref
 					where pu_user = $user
@@ -452,7 +452,7 @@ namespace btnet
 			if (security.user.other_orgs_permission_level == 0)
 			{
 				project_permissions_sql += @"
-					and bg_org = $user.org ";
+					and bugs.bg_org = $user.org ";
 
 			}
 

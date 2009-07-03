@@ -1,9 +1,6 @@
 
 
 
-
-http://explore.twitter.com/malisancube/status/1605076492
-
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
@@ -81,8 +78,28 @@ per user defaults?
 http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-ibugtraqprovider.html
  
 
+
 -----------------------------------------------------------------------
-Version 3.1.9   06/23/2009   (svn revision XXX)
+Version 3.2.0   07/03/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+ 
+* Changed search.aspx form method from "GET" back to "POST"   See 3.1.9
+release notes too.   So, now, wtill with IE8, clicking on a link in 
+search.aspx to drill down into a bug, and then hitting Back to get back
+to the list, results in "Webpage has expired".   I don't really have a
+practical solution to this.
+
+* Tweaked the SQL I inject to enforce permissions, as described here:
+http://sourceforge.net/forum/forum.php?thread_id=3318801&forum_id=226938 
+Thanks to Luca Pardo for the idea.
+
+* Switched the rich text editor from FCKEditor 2.6 to the newer 
+CKEditor 3.0 RC
+
+* Ability to make an org inactive.
+
+-----------------------------------------------------------------------
+Version 3.1.9   06/23/2009   (svn revision 336)
 -----------------------------------------------------------------------
 
 * The "fix" in version 3.1.7 "Changed code to work around OnServerClick

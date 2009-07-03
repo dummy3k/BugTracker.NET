@@ -1,5 +1,4 @@
 <%@ Page language="C#" validateRequest="false" %>
-<%@ Register TagPrefix="FCKeditorV2" Namespace="FredCK.FCKeditorV2" Assembly="FredCK.FCKeditorV2" %>
 <!--
 Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
@@ -82,16 +81,10 @@ void Page_Load(Object sender, EventArgs e)
 	if (content_type == "text/html" &&  btnet.Util.get_setting("DisableFCKEditor","0") == "0")
 	{
 		use_fckeditor = true;
-		fckeComment.Visible = true;
-		comment.Visible = false;
-		fckeComment.BasePath = @"fckeditor/";
-		fckeComment.ToolbarSet = "BugTracker";
 	}
 	else
 	{
 		use_fckeditor = false;
-		fckeComment.Visible = false;
-		comment.Visible = true;
 	}
 
 	if (security.user.external_user || btnet.Util.get_setting("EnableInternalOnlyPosts","0") == "0")
@@ -104,20 +97,13 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		internal_only.Checked = Convert.ToBoolean((int) dr["bp_hidden_from_external_users"]);
 
-		if (content_type == "text/html")
+		if (use_fckeditor)
 		{
- 			if (btnet.Util.get_setting("DisableFCKEditor","0") == "1")
- 			{
- 				comment.Value = (string) dr["bp_comment_search"];
-			}
-			else
-			{
-       			fckeComment.Value = (string)dr["bp_comment"];
-			}
+   			comment.Value = (string)dr["bp_comment"];
 		}
 		else
 		{
-			comment.Value = (string) dr["bp_comment"];
+			comment.Value = (string) dr["bp_comment_search"];
 		}
 	}
 	else
@@ -134,7 +120,7 @@ Boolean validate()
 
 	Boolean good = true;
 
-	if (comment.Value.Length == 0 && fckeComment.Value.Length == 0)
+	if (comment.Value.Length == 0)
 	{
 		msg.InnerText = "Comment cannot be blank.";
 		return false;
@@ -163,9 +149,9 @@ void on_update()
 
         if (use_fckeditor)
 		{
-            string text = btnet.Util.strip_dangerous_tags(fckeComment.Value);
+            string text = btnet.Util.strip_dangerous_tags(comment.Value);
             sql = sql.Replace("$cm", text.Replace("'", "&#39;"));
-            sql = sql.Replace("$cs", btnet.Util.strip_html(fckeComment.Value).Replace("'", "''"));
+            sql = sql.Replace("$cs", btnet.Util.strip_html(comment.Value).Replace("'", "''"));
             sql = sql.Replace("$cn", "text/html");
 		}
 		else
@@ -209,8 +195,23 @@ void on_update()
 <head>
 <title id="titl" runat="server">btnet edit comment</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script>
+function my_on_load()
+{
+<% 
+	
+if (use_fckeditor)	
+{
+	Response.Write ("CKEDITOR.replace( 'comment' )");
+}
+
+%>
+
+}
+</script>
 </head>
-<body>
+<body onload="my_on_load()">
 <% security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs")); %>
 
 
@@ -224,7 +225,6 @@ void on_update()
 		<tr>
 		<td colspan=3>
 		<textarea rows=16 cols=80 runat="server" class=txt id="comment"></textarea>
-		<FCKeditorV2:FCKeditor id="fckeComment" runat="server" Width="700px" Height="400px"></FCKeditorV2:FCKeditor>
 
 		<tr>
 		<td colspan=3>

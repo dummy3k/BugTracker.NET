@@ -953,28 +953,20 @@ namespace btnet
                 s2 = s2.Replace("  ", "&nbsp; ");
                 s2 = s2.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
 
-                // convert references to other bugs to links
-                link_marker = Util.get_setting("BugLinkMarker", "bugid#");
-                Regex reLinkMarker = new Regex(link_marker + "[0-9]+");
-                s2 = reLinkMarker.Replace(
-                    s2,
-                    new MatchEvaluator(convert_bug_link));
-
-                // wrap it up with the proper style
-                return "<span class=cmt_text>" + s2 + "</span>";
             }
             else
             {
                 s2 = s1;
+			}
+			
+            // convert references to other bugs to links
+			link_marker = Util.get_setting("BugLinkMarker", "bugid#");
+			Regex reLinkMarker = new Regex(link_marker + "[0-9]+");
+			s2 = reLinkMarker.Replace(
+				s2,
+				new MatchEvaluator(convert_bug_link));
 
-                link_marker = Util.get_setting("BugLinkMarker", "bugid#");
-                Regex reLinkMarker = new Regex(link_marker + "[0-9]+");
-                s2 = reLinkMarker.Replace(
-                    s2,
-                    new MatchEvaluator(convert_bug_link));
-
-                return "<span class=cmt_text>" + s2 + "</span>";
-            }
+			return "<span class=cmt_text>" + s2 + "</span>";
         }
 
         ///////////////////////////////////////////////////////////////////////
