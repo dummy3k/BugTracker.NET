@@ -14,6 +14,10 @@ http://ifdefined.com/readme.html#upgrading
 
 Corey's TO DO list:
 
+********
+* svnserve -d -r c:/cit
+********
+
 * auto subscribe if you modified bug
 * default value for internal comments, other fields
 * many to many, queries to organizations
@@ -31,16 +35,19 @@ Corey's TO DO list:
 * Upgrade to CKeditor
 * Lucene search of custom text fields.
 * voting.
-* svnserve -d -r c:/cit
-
 * handle bugs-per-page being zero
+* tasks part of notifiaction scheme?
+* tasks part of audit trail?
+* tasks part of full text search, other search?
+* http://www.microsoft.com/web/gallery/developer.aspx
+* Hide delete in mass edit if not allowed to delete.
+* per user defaults?
 
 
 cleaning up old bugs in demo
 
 select count(1) from bugs
 delete from bugs where bg_id < 1000 -- CHANGE THIS
-
 delete from bug_user_flags where fl_bug not in (select bg_id from bugs)
 delete from bug_user_seen where sn_bug not in (select bg_id from bugs)
 delete from bug_posts where bp_bug not in (select bg_id from bugs)
@@ -49,7 +56,6 @@ delete from bug_relationships where re_bug1 not in (select bg_id from bugs)
 delete from bug_relationships where re_bug2 not in (select bg_id from bugs)
 delete from bug_tasks where tsk_bug not in (select bg_id from bugs)
 
-
 delete from users where 
 us_id > 20
 us_id not in (select bg_reported_user from bugs) and 
@@ -57,31 +63,12 @@ us_id not in (select bg_last_updated_user from bugs) and
 us_id not in (select bp_user from bug_posts)
 
 
-http://www.microsoft.com/web/gallery/developer.aspx
-* Move to jquery 1.3.2
-* Move to fckeditor 3
-
-******************
-
-The Lucene search doesn't search the text of the tasks (yet). It doesn't search custom
-text fields either (yet). I'd like to add both of those things. 
- 
-I guess the tasks also aren't hooked up to the notification scheme. That's also 
-something I'd like to add. 
-
-
-******************
- 
- 
-Hide delete in mass edit if not allowed to delete.
-per user defaults?
-http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-ibugtraqprovider.html
- 
-
-
 -----------------------------------------------------------------------
-Version 3.2.0   07/03/2009   (svn revision xxx)
+Version 3.2.0   07/03/2009   (svn revision 342)
 -----------------------------------------------------------------------
+
+Run this SQL to upgrade to this release:
+alter table orgs add og_active int not null default(1)
  
 * Changed search.aspx form method from "GET" back to "POST"   See 3.1.9
 release notes too.   So, now, wtill with IE8, clicking on a link in 
@@ -96,7 +83,10 @@ Thanks to Luca Pardo for the idea.
 * Switched the rich text editor from FCKEditor 2.6 to the newer 
 CKEditor 3.0 RC
 
-* Ability to make an org inactive.
+* You can now set organizations to be inactive.  It works the same as
+setting projects to be inactive.  Users adding or editing bugs won't
+be able to see in inactive org in the dropdown, but existing bugs
+still assigned to that org will work ok.
 
 -----------------------------------------------------------------------
 Version 3.1.9   06/23/2009   (svn revision 336)
