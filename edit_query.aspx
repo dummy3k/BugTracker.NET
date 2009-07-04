@@ -308,6 +308,22 @@ void on_update()
 <head>
 <title id="titl" runat="server">btnet edit query</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<script language="Javascript" type="text/javascript" src="edit_area/edit_area_full.js"></script>
+
+<script>
+		editAreaLoader.init({
+			id: "sql_text"	// id of the textarea to transform
+			,start_highlight: true	// if start with highlight
+			,toolbar: "search, go_to_line, undo, redo, help"
+			,browsers: "all"
+			,language: "en"
+			,syntax: "sql"
+			,allow_toggle: false
+			,min_height: 300
+			,min_width: 400
+		});
+</script>		
+
 </head>
 <body>
 <% security.write_menu(Response, "queries"); %>
@@ -340,7 +356,7 @@ void on_update()
 	<tr>
 	<td colspan=3>
 	<span class=lbl id="sql_text_label" runat="server">SQL:</span><br>
-	<textarea rows=24 cols=100 runat="server" class=txt name="sql_text" id="sql_text"></textarea></td>
+	<textarea style="height:300px; width:800px;" runat="server" class=txt name="sql_text" id="sql_text"></textarea></td>
 
 
 	<tr><td colspan=3 align=center>
@@ -354,52 +370,53 @@ void on_update()
 	</td>
 	</tr>
 
-	<tr>
-	<td id="explanation" colspan=3 class=cmt runat="server">
-		In order to work with the bugs.aspx page, your SQL must be structured in a particular way.
-		The first column must be either a color starting with "#" or a CSS style class.  
-		If it starts with "#", it will be interpreted as the background color of the row.
-		Otherwise, it will be interpreted as the name of a CSS style class in your CSS file.
-		<br>
-		<br>
-		View this <a target="_blank" href="edit_styles.aspx">example</a> of one way to change the color of your rows.  
-		The example uses a combination of priority and status to determine the CSS style, but feel free to come up with your own scheme.
-		<br>
-		<br>
-		The second column must be "bg_id".
-		<br><br>
-		<b>"$ME"</b> is a magic word you can use in your query that gets replaced by your user ID.
-		<br>
-		For example:
-		<br>
-		<ul>
-			select isnull(pr_background_color,'#ffffff'), bg_id [id], bg_short_desc<br>
-			from bugs<br>
-			left outer join priorities on bg_priority = pr_id<br>
-			where bg_assigned_to_user = $ME
-		</ul>
-		<br>
-		<b>"$FLAG"</b> is a magic word that controls whether a query shows the "flag" column that lets an individual user flag items for himself.<br>
-		To use it, add the SQL shown below to your select columns and do a "left outer join" to the bug_user_flags table.
-		<ul>
-			Select ...., isnull(fl_flag,0) [$FLAG],...<br>
-			from bugs<br>
-			left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME
-		</ul>
-		<br>
-		<b>"$SEEN"</b> is a magic word that controls whether a query shows the "new" column.  The new column works the same as an indicator for unread email.
-		To use it, add the SQL shown below to your select columns and do a "left outer join" to the bug_user_seen table.
-		<ul>
-			Select ...., isnull(sn_seen,0) [$SEEN],...<br>
-			from bugs<br>
-			left outer join bug_user_seen on sn_bug = bg_id and sn_user = $ME
-		</ul>
-	</td>
-	</tr>
-
 	</table>
-	<p>
 </form>
+
+<p>&nbsp;<p>
+
+<div id="explanation" style="width:800px" class=cmt runat="server">
+	In order to work with the bugs.aspx page, your SQL must be structured in a particular way.
+	The first column must be either a color starting with "#" or a CSS style class.  
+	If it starts with "#", it will be interpreted as the background color of the row.
+	Otherwise, it will be interpreted as the name of a CSS style class in your CSS file.
+	<br>
+	<br>
+	View this <a target="_blank" href="edit_styles.aspx">example</a> of one way to change the color of your rows.  
+	The example uses a combination of priority and status to determine the CSS style, but feel free to come up with your own scheme.
+	<br>
+	<br>
+	The second column must be "bg_id".
+	<br><br>
+	<b>"$ME"</b> is a magic word you can use in your query that gets replaced by your user ID.
+	<br>
+	For example:
+	<br>
+	<ul>
+		select isnull(pr_background_color,'#ffffff'), bg_id [id], bg_short_desc<br>
+		from bugs<br>
+		left outer join priorities on bg_priority = pr_id<br>
+		where bg_assigned_to_user = $ME
+	</ul>
+	<br>
+	<b>"$FLAG"</b> is a magic word that controls whether a query shows the "flag" column that lets an individual user flag items for himself.<br>
+	To use it, add the SQL shown below to your select columns and do a "left outer join" to the bug_user_flags table.
+	<ul>
+		Select ...., isnull(fl_flag,0) [$FLAG],...<br>
+		from bugs<br>
+		left outer join bug_user_flags on fl_bug = bg_id and fl_user = $ME
+	</ul>
+	<br>
+	<b>"$SEEN"</b> is a magic word that controls whether a query shows the "new" column.  The new column works the same as an indicator for unread email.
+	To use it, add the SQL shown below to your select columns and do a "left outer join" to the bug_user_seen table.
+	<ul>
+		Select ...., isnull(sn_seen,0) [$SEEN],...<br>
+		from bugs<br>
+		left outer join bug_user_seen on sn_bug = bg_id and sn_user = $ME
+	</ul>
+</div>
+
+
 </td></tr></table>
 <% Response.Write(Application["custom_footer"]); %></body>
 </html>

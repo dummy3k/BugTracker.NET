@@ -64,6 +64,14 @@ us_id not in (select bp_user from bug_posts)
 
 
 -----------------------------------------------------------------------
+Version 3.2.1   07/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+* The page for editing your SQL queries now has syntax highlighting, 
+using "EditArea", from http://www.cdolivet.com/index.php?page=editArea.
+Thanks to "Gettinlucky" for the suggestion.
+
+-----------------------------------------------------------------------
 Version 3.2.0   07/03/2009   (svn revision 343)
 -----------------------------------------------------------------------
 
