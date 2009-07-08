@@ -2366,12 +2366,12 @@ function do_doc_ready()
 	$(".date").datepicker({dateFormat: date_format, duration: 'fast'})
 	$(".date").change(mark_dirty)
 	$(".warn").click(warn_if_dirty) 
-<% 
-if (security.user.use_fckeditor && Util.get_setting("DisableFCKEditor","0") == "0")	
-{
-	Response.Write ("CKEDITOR.replace( 'comment' )");
-}
-%>	
+	<% 
+	if (security.user.use_fckeditor)	
+	{
+		Response.Write ("CKEDITOR.replace( 'comment' )");
+	}
+	%>	
 }
 
 function start_animation()

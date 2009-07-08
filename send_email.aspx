@@ -1,5 +1,4 @@
 <%@ Page language="C#" validateRequest="false" %>
-<%@ Register TagPrefix="FCKeditorV2" Namespace="FredCK.FCKeditorV2" Assembly="FredCK.FCKeditorV2" %>
 <%@ Import Namespace="System.IO" %>
 <!--
 Copyright 2002-2009 Corey Trager
@@ -32,9 +31,6 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ "send email";
 
-	fckeBody.BasePath = @"fckeditor/";
-	fckeBody.ToolbarSet = "BugTracker";
-
 	msg.InnerText = "";
 
 	string string_bp_id = Request["bp_id"];
@@ -43,21 +39,11 @@ void Page_Load(Object sender, EventArgs e)
 	string request_from = Request["from"];
 	string reply = Request["reply"];
 
-
-	if (security.user.use_fckeditor)
-	{
-		fckeBody.Visible = true;
-		body.Visible = false;
-	}
-	else
-	{
-	    fckeBody.Visible = false;
-		body.Visible = true;
-	}
-
 	if (!IsPostBack)
 	{
 
+		Session["email_addresses"] = null;
+		
 		DataRow dr = null;
 
 		if (string_bp_id != null)
@@ -170,9 +156,9 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				if (security.user.use_fckeditor)
 				{
-				    fckeBody.Value += "<br><br><br>";
-					fckeBody.Value += dr["us_signature"].ToString().Replace("\r\n", "<br>");
-					fckeBody.Value += "<br><br><br>";
+				    body.Value += "<br><br><br>";
+					body.Value += dr["us_signature"].ToString().Replace("\r\n", "<br>");
+					body.Value += "<br><br><br>";
 				}
 				else
 				{
@@ -192,8 +178,8 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					if (security.user.use_fckeditor)
 					{
-					    fckeBody.Value += "<br><br><br>";
-					    fckeBody.Value += "&#62;From: " + dr["bp_email_from"].ToString().Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
+					    body.Value += "<br><br><br>";
+					    body.Value += "&#62;From: " + dr["bp_email_from"].ToString().Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
 					}
 					else
 					{
@@ -210,7 +196,7 @@ void Page_Load(Object sender, EventArgs e)
 						next_line_is_date = true;
 						if (security.user.use_fckeditor)
 						{
-                            fckeBody.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
+                            body.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
 						}
 						else
 						{
@@ -222,7 +208,7 @@ void Page_Load(Object sender, EventArgs e)
 						next_line_is_date = false;
 						if (security.user.use_fckeditor)
 						{
-							fckeBody.Value += "&#62;Date: " + Convert.ToString(dr["bp_date"]) + "<br>&#62;<br>";
+							body.Value += "&#62;Date: " + Convert.ToString(dr["bp_date"]) + "<br>&#62;<br>";
 						}
 						else
 						{
@@ -235,15 +221,16 @@ void Page_Load(Object sender, EventArgs e)
 						{
                             if (Convert.ToString(dr["bp_content_type"]) != "text/html")
                             {
-							fckeBody.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
-						}
-						else
-						{
+								body.Value += "&#62;" + lines[i].Replace("<", "&#60;").Replace(">", "&#62;") + "<br>";
+							}
+							else
+							{
                                 if (i == 0)
                                 {
-                                    fckeBody.Value += "<hr>";
+                                    body.Value += "<hr>";
                                 }
-                                fckeBody.Value += lines[i];
+                            
+                            	body.Value += lines[i];
                             }
 						}
 						else
@@ -329,8 +316,8 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				if (security.user.use_fckeditor)
 				{
-				    fckeBody.Value += "<br><br><br>";
-					fckeBody.Value += dr["us_signature"].ToString().Replace("\r\n", "<br>");
+				    body.Value += "<br><br><br>";
+					body.Value += dr["us_signature"].ToString().Replace("\r\n", "<br>");
 				}
 				else
 				{
@@ -443,7 +430,7 @@ update bugs set
 	if (security.user.use_fckeditor)
 	{
 		string adjusted_body = "Subject: " + subject.Value + "<br><br>";
-		adjusted_body += btnet.Util.strip_dangerous_tags(fckeBody.Value);
+		adjusted_body += btnet.Util.strip_dangerous_tags(body.Value);
 
 		sql = sql.Replace("$cm", adjusted_body.Replace("'", "&#39;"));
 		sql = sql.Replace("$cs", adjusted_body.Replace("'", "''"));
@@ -499,7 +486,7 @@ update bugs set
 		// white space isn't handled well, I guess.
 		if (security.user.use_fckeditor)
 		{
-		    body_text = fckeBody.Value;
+		    body_text = body.Value;
 			body_text  += "<br><br>";
 		}
 		else
@@ -516,7 +503,7 @@ update bugs set
 	{
 		if (security.user.use_fckeditor)
 		{
-		    body_text = fckeBody.Value;
+		    body_text = body.Value;
 			format = System.Web.Mail.MailFormat.Html;
 		}
 		else
@@ -617,6 +604,8 @@ int[] handle_attachments(int comment_id)
 <head>
 <title id="titl" runat="server">btnet send email</title>
 <link rel="StyleSheet" href="btnet.css" type="text/css">
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+
 
 <script>
 
@@ -683,11 +672,21 @@ function findPosY(obj)
 	return curtop;
 }
 
+function my_on_load()
+{
+	<%
+	if (security.user.use_fckeditor)	
+	{
+		Response.Write ("CKEDITOR.replace( 'body' )");
+	}
+	%>
+}
+
 </script>
 
 
 </head>
-<body>
+<body onload="my_on_load()">
 <% security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs")); %>
 <div class=align><table border=0><tr><td>
 
@@ -769,7 +768,6 @@ function findPosY(obj)
 	<tr>
 	<td colspan=3>
 	<textarea rows=15 cols=72 runat="server" class=txt id="body"></textarea>
-	<FCKeditorV2:FCKeditor id="fckeBody" runat="server" Width="700px" Height="300px"></FCKeditorV2:FCKeditor>
 	</td>
 	</tr>
 
@@ -803,78 +801,86 @@ function findPosY(obj)
 	Dictionary<int, int> dict_users_for_this_project = new Dictionary<int,int>();
 	
 	// list of email addresses to use.
-	if (project > -1)
+	if (Session["email_addresses"] == null)
 	{
-		if (project == 0)
+		if (project > -1)
 		{
-
-			sql = @"select us_id
-				from users
-				where us_active = 1
-				and len(us_email) > 0
-				order by us_email";
-
-		}
-		else
-		{
-			// Only users explicitly allowed will be listed
-			if (btnet.Util.get_setting("DefaultPermissionLevel","2") == "0")
+			if (project == 0)
 			{
+
 				sql = @"select us_id
 					from users
 					where us_active = 1
 					and len(us_email) > 0
-					and us_id in
-						(select pu_user from project_user_xref
-						where pu_project = $pr
-						and pu_permission_level <> 0)
 					order by us_email";
+
 			}
-			// Only users explictly DISallowed will be omitted
 			else
 			{
-				sql = @"select us_id
-					from users
-					where us_active = 1
-					and len(us_email) > 0
-					and us_id not in
-						(select pu_user from project_user_xref
-						where pu_project = $pr
-						and pu_permission_level = 0)
-					order by us_email";
+				// Only users explicitly allowed will be listed
+				if (btnet.Util.get_setting("DefaultPermissionLevel","2") == "0")
+				{
+					sql = @"select us_id
+						from users
+						where us_active = 1
+						and len(us_email) > 0
+						and us_id in
+							(select pu_user from project_user_xref
+							where pu_project = $pr
+							and pu_permission_level <> 0)
+						order by us_email";
+				}
+				// Only users explictly DISallowed will be omitted
+				else
+				{
+					sql = @"select us_id
+						from users
+						where us_active = 1
+						and len(us_email) > 0
+						and us_id not in
+							(select pu_user from project_user_xref
+							where pu_project = $pr
+							and pu_permission_level = 0)
+						order by us_email";
+				}
+			}
+
+			sql = sql.Replace("$pr", Convert.ToString(project));
+			DataSet ds_users_for_this_project = btnet.DbUtil.get_dataset(sql);
+
+			// remember the users for this this project
+			foreach (DataRow dr in ds_users_for_this_project.Tables[0].Rows)
+			{
+				dict_users_for_this_project[(int) dr[0]] = 1;
 			}
 		}
 
-		sql = sql.Replace("$pr", Convert.ToString(project));
-		DataSet ds_users_for_this_project = btnet.DbUtil.get_dataset(sql);
+
+		DataTable dt_related_users = btnet.Util.get_related_users(security);
+		// let's sort by email
+		DataView dv_related_users = new DataView(dt_related_users);
+		dv_related_users.Sort = "us_email";
+
+		StringBuilder sb = new StringBuilder();
+
+		foreach (DataRowView drv_email in dv_related_users)
+		{
+			if (dict_users_for_this_project.ContainsKey((int)drv_email["us_id"]))
+			{
+				sb.Append("<option value='");
+				sb.Append(drv_email["us_email"]);
+				sb.Append("'>");
+				sb.Append(drv_email["us_email"]);
+				sb.Append("  (");
+				sb.Append(drv_email["us_username"]);
+				sb.Append(")</option>");
+			}
+		}
 		
-		// remember the users for this this project
-		foreach (DataRow dr in ds_users_for_this_project.Tables[0].Rows)
-		{
-			dict_users_for_this_project[(int) dr[0]] = 1;
-		}
+		Session["email_addresses"] = sb.ToString();
 	}
-
-
-	DataTable dt_related_users = btnet.Util.get_related_users(security);
-	// let's sort by email
-	DataView dv_related_users = new DataView(dt_related_users);
-	dv_related_users.Sort = "us_email";
 	
-	foreach (DataRowView drv_email in dv_related_users)
-	{
-		if (dict_users_for_this_project.ContainsKey((int)drv_email["us_id"]))
-		{
-			Response.Write("<option value='");
-			Response.Write(drv_email["us_email"]);
-			Response.Write("'>");
-			Response.Write(drv_email["us_email"]);
-			Response.Write("  (");
-			Response.Write(drv_email["us_username"]);
-			Response.Write(")</option>");
-		}
-	}
-
+	Response.Write(Session["email_addresses"]);
 
 	%>
 
