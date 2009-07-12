@@ -1377,9 +1377,12 @@ function format_from_date_for_db(s)
 	
 }
 
+var asp_form_id = '<% Response.Write(Util.get_form_name()); %>';
+
 function on_change()
 {
-	var frm = document.forms[2];
+
+    var frm = document.getElementById(asp_form_id);
 
 
 	// Build "WHERE" clause

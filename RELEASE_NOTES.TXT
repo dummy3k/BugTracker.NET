@@ -67,54 +67,18 @@ us_id not in (select bp_user from bug_posts)
 
 
 
-
-
-
-
+-----------------------------------------------------------------------
+Version 3.2.2   07/xx/2009   (svn revision xxx)
 -----------------------------------------------------------------------
 
+* Fixed javascript error in search.aspx that was preventing SQL from
+displaying when "EnableLucene" was set to "0" in Web.config.
 
-
-In POP3Main.cs:
-
-            for (int k = 0; k < FromCannotContainStrings.Length; k++)
-            {
-                if (FromCannotContainStrings[k] != "")
-                {
-                    if (subject.IndexOf(FromCannotContainStrings[k]) >= 0)
-                    {
-                        write_line("skipping because from cannot contain: " + FromCannotContainStrings[k]);
-                        bSkip = true;
-                        break; // done checking, skip this message
-                    }
-                }
-            }
-
-should be:
-
-            for (int k = 0; k < FromCannotContainStrings.Length; k++)
-            {
-                if (FromCannotContainStrings[k] != "")
-                {
-                    if (from.IndexOf(FromCannotContainStrings[k]) >= 0)
-                    {
-                        write_line("skipping because from cannot contain: " + FromCannotContainStrings[k]);
-                        bSkip = true;
-                        break; // done checking, skip this message
-                    }
-                }
-            }
-
-
-
-
-
-
-
-
+* Fixed bug with "FLAGS".   The filtered state wasn't being preserved 
+in the bug list when you navigated away and back to it.
 
 -----------------------------------------------------------------------
-Version 3.2.1   07/07/2009   (svn revision xxx)
+Version 3.2.1   07/07/2009   (svn revision 345)
 -----------------------------------------------------------------------
 
 * send_email.aspx was broken in version 3.2.0 because it still 

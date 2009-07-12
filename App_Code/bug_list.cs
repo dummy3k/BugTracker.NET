@@ -167,6 +167,19 @@ namespace btnet
             return paging_string;
         }
 
+        protected static string adjust_filter_val(string filter_val)
+        {
+            string s = filter_val.Replace("[$FLAG] =$$$red$$$", "[$FLAG] =1");
+            s = s.Replace("[$FLAG] =$$$green$$$", "[$FLAG] =2");
+            s = s.Replace("[$FLAG]<>$$$$$$", "[$FLAG] <>0");
+            s = s.Replace("[$FLAG] =$$$$$$", "[$FLAG] =0");
+
+            s = s.Replace("[$SEEN] =$$$no$$$", "[$SEEN] =1");
+            s = s.Replace("[$SEEN] =$$$yes$$$", "[$SEEN] =0");
+
+            return s;
+        }
+
         ///////////////////////////////////////////////////////////////////////
         public static void sort_and_filter_buglist_dataview(DataView dv, bool IsPostBack,
             string actn_val,
@@ -186,7 +199,7 @@ namespace btnet
                     filter_val = (string)HttpContext.Current.Session["filter"];
                     try
                     {
-                        dv.RowFilter = filter_val.Replace("'", "''").Replace("$$$", "'");
+                        dv.RowFilter = adjust_filter_val(filter_val).Replace("'", "''").Replace("$$$", "'");
                     }
                     catch (Exception)
                     {
@@ -198,19 +211,9 @@ namespace btnet
             {
 
                 HttpContext.Current.Session["filter"] = filter_val;
-                string filter_string = filter_val;
-
-                filter_string = filter_string.Replace("[$FLAG] =$$$red$$$", "[$FLAG] =1");
-                filter_string = filter_string.Replace("[$FLAG] =$$$green$$$", "[$FLAG] =2");
-                filter_string = filter_string.Replace("[$FLAG]<>$$$$$$", "[$FLAG] <>0");
-                filter_string = filter_string.Replace("[$FLAG] =$$$$$$", "[$FLAG] =0");
-
-                filter_string = filter_string.Replace("[$SEEN] =$$$no$$$", "[$SEEN] =1");
-                filter_string = filter_string.Replace("[$SEEN] =$$$yes$$$", "[$SEEN] =0");
-
                 try
                 {
-                    string filter_string2 = filter_string.Replace("'", "''").Replace("$$$", "'");
+                    string filter_string2 = adjust_filter_val(filter_val).Replace("'", "''").Replace("$$$", "'");
                     if (HttpContext.Current.Request["tags"] != null && HttpContext.Current.Request["tags"] != "")
                     {
                         filter_string2 += btnet.Tags.build_filter_clause(
