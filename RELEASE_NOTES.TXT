@@ -68,7 +68,7 @@ us_id not in (select bp_user from bug_posts)
 
 
 -----------------------------------------------------------------------
-Version 3.2.2   07/xx/2009   (svn revision xxx)
+Version 3.2.2   07/25/2009   (svn revision xxx)
 -----------------------------------------------------------------------
 
 * Fixed javascript error in search.aspx that was preventing SQL from
@@ -76,6 +76,14 @@ displaying when "EnableLucene" was set to "0" in Web.config.
 
 * Fixed bug with "FLAGS".   The filtered state wasn't being preserved 
 in the bug list when you navigated away and back to it.
+
+* Fixed bug with "NOT" and flags, so now "NOT red" and "NOT green" work.
+
+* Now using "EditArea" for edi_reports.asxp.  See notes for previous 
+version for more on "EditArea".
+
+* Look at sort order.
+* Look at email addresses.
 
 -----------------------------------------------------------------------
 Version 3.2.1   07/07/2009   (svn revision 345)

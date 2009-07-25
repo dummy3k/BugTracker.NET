@@ -546,32 +546,62 @@ create unique index unique_rp_desc on reports (rp_desc)
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)
 values('Bugs by Status',
-'select st_name [status], count(1) [count] from bugs inner join statuses on bg_status = st_id group by st_name order by st_name',
+'select st_name [status], count(1) [count] '
++ char(10) + ' from bugs '
++ char(10) + ' inner join statuses on bg_status = st_id '
++ char(10) + ' group by st_name '
++ char(10) + ' order by st_name',
 'pie')
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)
 values('Bugs by Priority',
-'select pr_name [priority], count(1) [count] from bugs inner join priorities on bg_priority = pr_id group by pr_name order by pr_name',
+'select pr_name [priority], count(1) [count] '
++ char(10) + ' from bugs '
++ char(10) + ' inner join priorities on bg_priority = pr_id '
++ char(10) + ' group by pr_name '
++ char(10) + ' order by pr_name',
 'pie')
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)
 values('Bugs by Category',
-'select ct_name [category], count(1) [count] from bugs inner join categories on bg_category = ct_id group by ct_name order by ct_name',
+'select ct_name [category], count(1) [count] '
++ char(10) + ' from bugs '
++ char(10) + ' inner join categories on bg_category = ct_id '
++ char(10) + ' group by ct_name '
++ char(10) + ' order by ct_name',
 'pie')
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)
 values('Bugs by Month',
-'select month(bg_reported_date) [month], count(1) [count] from bugs group by year(bg_reported_date), month(bg_reported_date) order by year(bg_reported_date), month(bg_reported_date)',
+'select month(bg_reported_date) [month], count(1) [count] '
++ char(10) + ' from bugs '
++ char(10) + ' group by year(bg_reported_date), month(bg_reported_date) '
++ char(10) + ' order by year(bg_reported_date), month(bg_reported_date)',
 'bar')
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)
 values('Bugs by Day of Year',
-'select datepart(dy, bg_reported_date) [day of year], count(1) [count] from bugs group by datepart(dy, bg_reported_date), datepart(dy,bg_reported_date) order by 1',
+'select datepart(dy, bg_reported_date) [day of year], count(1) [count] '
++ char(10) + ' from bugs '
++ char(10) + ' group by datepart(dy, bg_reported_date), '
++ char(10) + ' datepart(dy,bg_reported_date) order by 1',
 'line')
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)
 values('Bugs by User',
-'select bg_reported_user, count(1) [r] into #t from bugs group by bg_reported_user; select bg_assigned_to_user, count(1) [a] into #t2 from bugs group by bg_assigned_to_user; select us_username, r [reported], a [assigned] from users left outer join #t on bg_reported_user = us_id left outer join #t2 on bg_assigned_to_user = us_id order by 1', 
+'select bg_reported_user, count(1) [r] '
++ char(10) + ' into #t '
++ char(10) + ' from bugs '
++ char(10) + ' group by bg_reported_user; '
++ char(10) + ' select bg_assigned_to_user, count(1) [a] '
++ char(10) + ' into #t2 '
++ char(10) + ' from bugs '
++ char(10) + ' group by bg_assigned_to_user; '
++ char(10) + ' select us_username, r [reported], a [assigned] '
++ char(10) + ' from users '
++ char(10) + ' left outer join #t on bg_reported_user = us_id '
++ char(10) + ' left outer join #t2 on bg_assigned_to_user = us_id '
++ char(10) + ' order by 1', 
 'table')
 
 insert into reports (rp_desc, rp_sql, rp_chart_type)

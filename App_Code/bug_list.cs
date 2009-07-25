@@ -173,6 +173,8 @@ namespace btnet
             s = s.Replace("[$FLAG] =$$$green$$$", "[$FLAG] =2");
             s = s.Replace("[$FLAG]<>$$$$$$", "[$FLAG] <>0");
             s = s.Replace("[$FLAG] =$$$$$$", "[$FLAG] =0");
+            s = s.Replace("[$FLAG]<>$$$red$$$", "[$FLAG]<>1");
+            s = s.Replace("[$FLAG]<>$$$green$$$", "[$FLAG]<>2");
 
             s = s.Replace("[$SEEN] =$$$no$$$", "[$SEEN] =1");
             s = s.Replace("[$SEEN] =$$$yes$$$", "[$SEEN] =0");

@@ -169,8 +169,22 @@ void on_update()
 <html>
 <head>
 <title id="titl" runat="server">btnet edit report</title>
-<link rel="stylesheet" href="/include/site.css" type="text/css">
 <link rel="stylesheet" href="btnet.css" type="text/css">
+<script language="Javascript" type="text/javascript" src="edit_area/edit_area_full.js"></script>
+
+<script>
+		editAreaLoader.init({
+			id: "sql_text"	// id of the textarea to transform
+			,start_highlight: true	// if start with highlight
+			,toolbar: "search, go_to_line, undo, redo, help"
+			,browsers: "all"
+			,language: "en"
+			,syntax: "sql"
+			,allow_toggle: false
+			,min_height: 300
+			,min_width: 400
+		});
+</script>
 </head>
 
 <body>
@@ -202,6 +216,13 @@ void on_update()
 						</td>
 						<td runat="server" class='err' id="chart_type_err">&nbsp;</td>
 					</tr>
+					
+					<tr>
+						<td colspan=3>
+						&nbsp;
+						</td>
+					</tr>
+					
 					<tr>
 						<td class='lbl'>SQL:</td>
 						<td colspan='2'>
