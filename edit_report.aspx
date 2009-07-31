@@ -66,7 +66,16 @@ void Page_Load(Object sender, EventArgs e) {
 
 			// Fill in this form
 			desc.Value = (string) dr["rp_desc"];
-			sql_text.Value = Server.HtmlEncode((string) dr["rp_sql"]);
+			
+			if (Util.get_setting("HtmlEncodeSql","0") == "1")
+			{
+				sql_text.Value = Server.HtmlEncode((string) dr["rp_sql"]);
+			}
+			else
+			{
+				sql_text.Value = (string) dr["rp_sql"];
+			}
+			
 			switch ((string) dr["rp_chart_type"]) {
 				case "pie":
 					pie.Checked = true;

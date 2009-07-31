@@ -42,6 +42,18 @@ Corey's TO DO list:
 * http://www.microsoft.com/web/gallery/developer.aspx
 * Hide delete in mass edit if not allowed to delete.
 * per user defaults?
+*<select>
+  <optgroup label="Mammals">
+    <option value ="dogs">Dogs</option>
+    <option value ="mrrow">Cats</option>
+    <option value ="pigs">Pigs</option>
+  </optgroup>
+  <optgroup label="Reptiles">
+    <option value ="lizards">Lizards</option>
+    <option value ="geckos">Geckos</option>
+    <option value ="iguanas">Iguanas</option>
+  </optgroup>
+</select>
 
 
 cleaning up old bugs in demo
@@ -80,10 +92,18 @@ in the bug list when you navigated away and back to it.
 * Fixed bug with "NOT" and flags, so now "NOT red" and "NOT green" work.
 
 * Now using "EditArea" for edi_reports.asxp.  See notes for previous 
-version for more on "EditArea".
+version for more on "EditArea".   Also, fixed bug with text being
+HTML encoded that should have been.
 
-* Look at sort order.
+* Added back the "CommentSortOrder" to Web.config.  Controls whether
+bug posts are sorted from most recent to least recent (the default)
+or least recent to most.
+
+* Added "DisplayTimeOffsetInHours" to Web.config, for displaying
+the times in a different time zone than the server's time zone.
+
 * Look at email addresses.
+* Look at relying on email in incoming email to hook up to user
 
 -----------------------------------------------------------------------
 Version 3.2.1   07/07/2009   (svn revision 345)

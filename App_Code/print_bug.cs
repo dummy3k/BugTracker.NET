@@ -1061,7 +1061,9 @@ and a.bp_parent is null";
 				sql += "\n and a.bp_hidden_from_external_users = 0";
 			}
 			
-			sql += "\n order by a.bp_id desc";
+			sql += "\n order by a.bp_id "; 
+			sql += btnet.Util.get_setting("CommentSortOrder","desc");
+			sql += ", ba.bp_parent, ba.bp_id";
 
             sql = sql.Replace("$id", Convert.ToString(bugid));
             

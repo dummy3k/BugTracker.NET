@@ -25,7 +25,7 @@ namespace btnet
                 object returnValue;
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 returnValue = cmd.ExecuteScalar();
-                conn.Close();
+                conn.Close(); // redundant, but just to be clear
                 return returnValue;
             }
         }
@@ -37,7 +37,7 @@ namespace btnet
             {
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
-                conn.Close();
+                conn.Close(); // redundant, but just to be clear
             }
 
         }
@@ -55,8 +55,8 @@ namespace btnet
             {
                 SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
-                conn.Close();
-            }
+                conn.Close(); // redundant, but just to be clear
+            } 
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -70,10 +70,11 @@ namespace btnet
                 {
                     cmd.Connection = conn;
                     cmd.ExecuteNonQuery();
-                    conn.Close();
+                    conn.Close(); // redundant, but just to be clear
                 }
                 finally
                 {
+                    conn.Close(); // redundant, but just to be clear
                     cmd.Connection = null;
                 }
             }
@@ -143,6 +144,7 @@ namespace btnet
                     da.Fill(ds);
                     stopwatch.Stop();
                     log_stopwatch_time(stopwatch);
+                    conn.Close(); // redundant, but just to be clear
                 	return ds;
                 }
             }

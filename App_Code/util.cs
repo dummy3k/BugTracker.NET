@@ -361,6 +361,14 @@ namespace btnet
                     {
                         date_time_format = get_setting("DateTimeFormat", "g");
                     }
+	                
+	                int hours_offset = Convert.ToInt32(btnet.Util.get_setting("DisplayTimeOffsetInHours","0"));
+	                
+	                if (hours_offset != 0)
+	                {
+	                	dt = dt.AddHours(hours_offset);
+	                }
+	                
 	                return dt.ToString(date_time_format,get_culture_info());
                 }
 			}
