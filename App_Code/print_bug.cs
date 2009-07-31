@@ -903,9 +903,8 @@ namespace btnet
                 email_part = from;
             }
 
-
             return display_part
-                + "<a href="
+                + " <a href="
                 + Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/")
                 + "send_email.aspx?bp_id="
                 + Convert.ToString(comment_id)
