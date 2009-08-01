@@ -89,11 +89,15 @@ displaying when "EnableLucene" was set to "0" in Web.config.
 * Fixed bug with "FLAGS".   The filtered state wasn't being preserved 
 in the bug list when you navigated away and back to it.
 
-* Fixed bug with "NOT" and flags, so now "NOT red" and "NOT green" work.
+* Fixed bug 2821937 "NOT logic does not work for 'flag' field"
 
-* Now using "EditArea" for edi_reports.asxp.  See notes for previous 
-version for more on "EditArea".   Also, fixed bug with text being
-HTML encoded that should have been.
+* Fixed bug 2830310 "tags filter - only one result page can be used, 
+filter remov"
+
+* Fixed bug 2821768 "sql editor in edit_report.aspx".  Now using 
+"EditArea" for edi_reports.asxp.  See notes for previous version for 
+more on "EditArea".   Also, fixed bug with text being HTML encoded 
+that should have been.
 
 * Added back the "CommentSortOrder" to Web.config.  Controls whether
 bug posts are sorted from most recent to least recent (the default)

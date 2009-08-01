@@ -1,5 +1,7 @@
 function on_page(page)
 {
+	add_tags_to_form_var()
+	
 	var frm =  document.getElementById(asp_form_id);
 	frm.actn.value = "page";
 	frm.new_page.value = page
@@ -8,6 +10,8 @@ function on_page(page)
 
 function on_sort(col)
 {
+	add_tags_to_form_var()
+	
 	var frm = document.getElementById(asp_form_id);
 	frm.actn.value = "sort";
 	frm.sort.value = col;
@@ -101,6 +105,9 @@ function on_filter()
 
 		}
 	}
+	
+	add_tags_to_form_var()
+	
 	var frm = document.getElementById(asp_form_id);
 	
 	frm.new_page.value = "0"
@@ -299,11 +306,19 @@ function append_tag(s)
 	el.value += s;
 }
 
-function on_tags_change()
+function add_tags_to_form_var()
 {
 	el = document.getElementById("tags_input")
-	var frm = document.getElementById(asp_form_id)
-	frm.tags.value = el.value
+	if (el != null)
+	{
+		var frm = document.getElementById(asp_form_id)
+		frm.tags.value = el.value
+	}
+}
+
+function on_tags_change()
+{
+	add_tags_to_form_var()
 	on_filter()
 }
 
