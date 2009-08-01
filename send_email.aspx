@@ -1,4 +1,4 @@
-<%@ Page language="C#" validateRequest="false" %>
+<%@ Page language="C#"  %>
 <%@ Import Namespace="System.IO" %>
 <!--
 Copyright 2002-2009 Corey Trager
@@ -36,7 +36,6 @@ void Page_Load(Object sender, EventArgs e)
 	string string_bp_id = Request["bp_id"];
 	string string_bg_id = Request["bg_id"];
 	string request_to = Request["to"];
-	string request_from = Request["from"];
 	string reply = Request["reply"];
 
 	if (!IsPostBack)
@@ -103,10 +102,7 @@ void Page_Load(Object sender, EventArgs e)
 
 
 			// format from dropdown
-			if (request_from != null)
-			{
-				from.Items.Add(new ListItem(request_from));
-			}
+
 			if (dr["pj_pop3_email_from"].ToString() != "")
 			{
 				from.Items.Add(new ListItem(dr["pj_pop3_email_from"].ToString()));
@@ -286,10 +282,7 @@ void Page_Load(Object sender, EventArgs e)
 			dr = btnet.DbUtil.get_datarow(sql);
 
 			// format from dropdown
-			if (request_from != null)
-			{
-				from.Items.Add(new ListItem(request_from));
-			}
+
 			if (dr["us_email"].ToString() != "")
 			{
 				from.Items.Add(new ListItem(dr["us_email"].ToString()));

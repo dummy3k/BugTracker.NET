@@ -102,9 +102,6 @@ or least recent to most.
 * Added "DisplayTimeOffsetInHours" to Web.config, for displaying
 the times in a different time zone than the server's time zone.
 
-* Look at email addresses.
-* Look at relying on email in incoming email to hook up to user
-
 -----------------------------------------------------------------------
 Version 3.2.1   07/07/2009   (svn revision 345)
 -----------------------------------------------------------------------
