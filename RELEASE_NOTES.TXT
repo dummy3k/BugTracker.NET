@@ -80,7 +80,7 @@ us_id not in (select bp_user from bug_posts)
 
 
 -----------------------------------------------------------------------
-Version 3.2.2   07/25/2009   (svn revision xxx)
+Version 3.2.2   07/31/2009   (svn revision 352)
 -----------------------------------------------------------------------
 
 * Fixed javascript error in search.aspx that was preventing SQL from
