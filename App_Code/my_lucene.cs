@@ -319,7 +319,6 @@ and bp_bug = " + Convert.ToString(bug_id));
 
                     foreach (DataRow dr2 in ds.Tables[0].Rows)
                     {
-btnet.Util.write_to_log("corey updating post" + (string) dr2["text"]);
                         modifier.AddDocument(MyLucene.create_doc(
                             (int)dr2["bp_bug"],
                             (int)dr2["bp_id"],
