@@ -53,7 +53,7 @@ Corey's TO DO list:
 * links on posts don't respect permissions
 * voting.
 * handle bugs-per-page being zero
-* tasks part of notifiaction scheme?
+* tasks part of notification scheme?
 * tasks part of audit trail?
 * tasks part of full text search, other search?
 * http://www.microsoft.com/web/gallery/developer.aspx
@@ -74,16 +74,18 @@ workflow.  If you have edited yours, adding your own custom code, then
 you will have to rework it to upgrade to this release.  I wonder if 
 anybody could have been using the old "workflow.cs" - because I don't 
 think it worked well enough.  This new revised one does seem to work, 
-Also in workflow.cs, I added some sample code for customized
-validations.
+
+Also workflow.cs now supports customized validations.
+
+Of course, to use it, you need to code C#, but there is some sample
+code to follow and it's not that hard.   Just a bunch of "if" 
+statuments.
+
 
 * Full text search (Lucene) now also indexes custom text fields.
 
 * Fixed bug where full text search index wasn't always being updated 
-when text was changing.
-
-
-test with some fields view only
+when bug was changed.
 
 -----------------------------------------------------------------------
 Version 3.2.2   07/31/2009   (svn revision 352)
