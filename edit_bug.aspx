@@ -569,7 +569,7 @@ void Page_Load(Object sender, EventArgs e)
 		}
 
 		// Could be null, or could be what we fetched from the db.
-		Workflow.adjust_status_dropdown((DataRow)Session["bug_datarow"], security.user, status, this);
+		Workflow.custom_adjust_controls((DataRow)Session["bug_datarow"], security.user, this);
 		
 	}
 	else // is PostBack
@@ -2298,6 +2298,12 @@ void on_update (Object sender, EventArgs e)
 				
 				bug["category"] = int.Parse(category.SelectedItem.Value);
 				bug["category_name"] = category.SelectedItem.Text;
+
+				bug["category"] = int.Parse(category.SelectedItem.Value);
+				bug["category_name"] = category.SelectedItem.Text;
+				
+				bug["assigned_to_user"] = int.Parse(assigned_to.SelectedItem.Value);
+				bug["assigned_to_username"] = assigned_to.SelectedItem.Text;
 				
 				/*
 					"Note about customizing workflow"
@@ -2307,7 +2313,7 @@ void on_update (Object sender, EventArgs e)
 					logic needs to know about other fields, then maybe add logic here,
 					or refetch the bug from the db from within your customized workflow.
 				*/
-				Workflow.adjust_status_dropdown(bug, security.user, status, this);
+				Workflow.custom_adjust_controls(bug, security.user, this);
 			}
 		} // edit existing or not
 

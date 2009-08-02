@@ -14,21 +14,24 @@ namespace btnet
 {
 
 // This is sample code that gives you an idea of how you could customize the validation 
-// and workflow, i.e, the change in bug statuses.   What you want to do, ideally,
-// is isolate your customizations to this file so that you can still upgrade
-// to future BugTracker.NET versions without too much trouble.
+// and workflow.   What you want to do, ideally, is isolate your customizations to this 
+// file so that you can still upgrade to future BugTracker.NET versions without too 
+// much trouble.
+
+// If you customize this file, just make sure you don't overlay this file when you
+// upgrade.
 
     public class Workflow
     {
-        public static void adjust_status_dropdown(
+		///////////////////////////////////////////////////////////////////////
+        public static void custom_adjust_controls(
             DataRow bug,  // null if a new bug, otherwise the state of the bug now in the db
             User user, // the currently logged in user
-            DropDownList statuses, // the "status" dropdown
             Page page) // the whole page, so that you can customize other stuff
         {
 
             // Uncomment the next line to play with the sample code.
-            //adjust_status_dropdown_sample(bug, user, statuses);
+            //custom_adjust_controls_sample(bug, user, page);
             
             // This method will be called when a new form is displayed and
             // when the bug has been updated.   You'll get the updated status,
@@ -45,6 +48,7 @@ namespace btnet
             
         }
 
+		///////////////////////////////////////////////////////////////////////
         public static bool custom_validations(
             DataRow bug,  // null if a new bug, otherwise the state of the bug now in the db
             User user, // the currently logged in user
@@ -64,6 +68,7 @@ namespace btnet
         	return true;
         }
 
+		///////////////////////////////////////////////////////////////////////
         public static bool custom_validations_sample(
             DataRow bug,  // null if a new bug, otherwise the state of the bug now in the db
             User user, // the currently logged in user
@@ -71,6 +76,9 @@ namespace btnet
             HtmlContainerControl custom_validation_err_msg) 
         {
 
+            // Just a stupid example.  Show that we can cross-validate between
+            // a couple different fields.
+            
             DropDownList category = (DropDownList) find_control(page.Controls, "category");
 			DropDownList priority = (DropDownList) find_control(page.Controls, "priority");
 			
@@ -87,30 +95,31 @@ namespace btnet
             }
         }
 
+
+		///////////////////////////////////////////////////////////////////////
         // Just to give you an idea of what you could do...
-        private static void adjust_status_dropdown_sample(
+        private static void custom_adjust_controls_sample(
             DataRow bug,  // null if a new bug, otherwise the way the bug is now in the db
             User user, // the currently logged in user
-            System.Web.UI.WebControls.DropDownList statuses) // the options in the dropdown
+            Page page) // the options in the dropdown
         {
+                       
+			// Adjust the contents of the status dropdown
+			DropDownList status = (DropDownList) find_control(page.Controls, "status");
+                       
             if (bug != null) // existing bug
             {
+
                 // Get the bug's current status.
                 // See "get_bug_datarow()" in bug.cs for the sql
                 string status_name = (string) bug["status_name"];
-
-				// Get rid of everything we don't want
-				// We do always want to keep the currently selected status,
-				// which isn't necessarily the bug's status.
-				for (int i = statuses.Items.Count - 1; i > -1; i--)
-				{
-					//if (statuses.Items[i].Selected == false)
-					if (statuses.Items[i].Text != status_name)
-					{
-						statuses.Items.Remove(statuses.Items[i]);
-					}
-				}
-
+                
+				// My logic here first gets rid of all the statuses except the
+				// selected status.  Then it adds back just the statuses we want to 
+				// appear in the dropdown.
+                remove_all_dropdown_items_that_dont_match_text(status, status_name);
+                
+				
 				// Add back what we do want.
 				// Notice that the user is one of the arguments, so
 				// you can adjust values by user.
@@ -118,53 +127,66 @@ namespace btnet
 				
                 if (status_name == "new" || status_name == "re-opened")
                 {
-					if (statuses.Items.FindByValue("2") == null)
-						statuses.Items.Add(new ListItem("in progress", "2"));
+					if (status.Items.FindByValue("2") == null)
+						status.Items.Add(new ListItem("in progress", "2"));
 
-					if (statuses.Items.FindByValue("5") == null)
-						statuses.Items.Add(new ListItem("closed", "5"));
+					if (status.Items.FindByValue("5") == null)
+						status.Items.Add(new ListItem("closed", "5"));
 
 				}
                 else if (status_name == "in progress")
                 {
 
-					if (statuses.Items.FindByValue("1") == null)
-						statuses.Items.Add(new ListItem("new", "1"));
+					if (status.Items.FindByValue("1") == null)
+						status.Items.Add(new ListItem("new", "1"));
 
 					if ((string) bug["category_name"] != "question") // just to show we can reference other fields
 					{
-						if (statuses.Items.FindByValue("3") == null)
-							statuses.Items.Add(new ListItem("checked in", "3"));
+						if (status.Items.FindByValue("3") == null)
+							status.Items.Add(new ListItem("checked in", "3"));
 					}
 
-					if (statuses.Items.FindByValue("5") == null)
-						statuses.Items.Add(new ListItem("closed", "5"));
+					if (status.Items.FindByValue("5") == null)
+						status.Items.Add(new ListItem("closed", "5"));
 
 
 				}
                 else if (status_name == "checked in")
                 {
-					if (statuses.Items.FindByValue("2") == null)
-						statuses.Items.Add(new ListItem("in progress", "2"));
+					if (status.Items.FindByValue("2") == null)
+						status.Items.Add(new ListItem("in progress", "2"));
 
-					if (statuses.Items.FindByValue("5") == null)
-						statuses.Items.Add(new ListItem("closed", "5"));
+					if (status.Items.FindByValue("5") == null)
+						status.Items.Add(new ListItem("closed", "5"));
 
 				}
                 else if (status_name == "closed")
                 {
-					if (statuses.Items.FindByValue("4") == null)
-						statuses.Items.Add(new ListItem("re-opened", "4"));
+					if (status.Items.FindByValue("4") == null)
+						status.Items.Add(new ListItem("re-opened", "4"));
 
 				}
             }
             else // new bug
             {
-				statuses.Items.Clear();
-                statuses.Items.Add(new ListItem("new", "1"));
+				status.Items.Clear();
+                status.Items.Add(new ListItem("new", "1"));
             }
         }
         
+		///////////////////////////////////////////////////////////////////////
+        public static void remove_all_dropdown_items_that_dont_match_text(DropDownList dropdown, string text)
+       	{
+			for (int i = dropdown.Items.Count - 1; i > -1; i--)
+			{
+				if (dropdown.Items[i].Text != text)
+				{
+					dropdown.Items.Remove(dropdown.Items[i]);
+				}
+			}        
+		}
+		///////////////////////////////////////////////////////////////////////
+		// Returns an HTMLControl or WebControl by its id.
         public static Control find_control(ControlCollection controls, string id)
         {
             foreach (System.Web.UI.Control c in controls)
