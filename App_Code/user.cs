@@ -263,7 +263,6 @@ END
 			sql = sql.Replace("$salt", Convert.ToString(salt));
 			sql = sql.Replace("$password", password);
 			sql = sql.Replace("$template", template_username);
-			
 			return Convert.ToInt32(btnet.DbUtil.execute_scalar(sql));
         
         }

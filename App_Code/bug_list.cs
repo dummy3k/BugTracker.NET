@@ -563,7 +563,7 @@ namespace btnet
                     else if (dc.ColumnName == "search_text")
                     {
                         search_text_column = db_column_count;
-                        Response.Write("comment/email text");
+                        Response.Write("context");
                     }
                     else if (dc.ColumnName == "search_source")
                     {
@@ -845,15 +845,22 @@ namespace btnet
                                         {
                                             string[] parts = btnet.Util.split_string_using_commas(val);
 
-                                            Response.Write("<a href=edit_bug.aspx?id=");
-                                            Response.Write(Convert.ToString(dr[1])); // bg_id
-                                            Response.Write("#");
-                                            Response.Write(parts[1]);  // bp_id, the post id
-                                            Response.Write(">");
-                                            Response.Write(parts[0]); // sent, received, comment
-                                            Response.Write(" #");
-                                            Response.Write(parts[1]);
-                                            Response.Write("</a>");
+                                            if (parts.Length < 2)
+                                            {
+                                            	Response.Write(val);
+                                            }
+                                            else
+                                            {
+												Response.Write("<a href=edit_bug.aspx?id=");
+												Response.Write(Convert.ToString(dr[1])); // bg_id
+												Response.Write("#");
+												Response.Write(parts[1]);  // bp_id, the post id
+												Response.Write(">");
+												Response.Write(parts[0]); // sent, received, comment
+												Response.Write(" #");
+												Response.Write(parts[1]);
+												Response.Write("</a>");
+											}
                                         }
                                     }
                                     else if (i == search_text_column)

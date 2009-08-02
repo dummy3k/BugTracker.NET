@@ -137,9 +137,11 @@ void Page_Load(Object sender, EventArgs e)
     {
 		username = btnet.Util.simplify_email_address(from);
 
+		// does a user with this email already exist?
 		sql = sql.Replace("$us",username.Replace("'","''"));		
 		dr = btnet.DbUtil.get_datarow(sql);
-		
+
+		// if not, then create one		
 		if (dr == null)
 		{
 			btnet.User.copy_user(
@@ -149,9 +151,10 @@ void Page_Load(Object sender, EventArgs e)
 				0,  // salt
 				Guid.NewGuid().ToString(), // random value for password,
 				Util.get_setting("CreateUsersFromEmailTemplate","[NO CreateUsersFromEmailTemplate!]"));
+			
+			// now that we ahev created a user, try again
+			dr = btnet.DbUtil.get_datarow(sql);
 		}
-
-		dr = btnet.DbUtil.get_datarow(sql);
 		
     }
     else
@@ -162,6 +165,7 @@ void Page_Load(Object sender, EventArgs e)
 	}
 	
 
+	
     // this should never happen
     if (dr == null)
 	{

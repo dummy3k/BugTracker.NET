@@ -30,7 +30,7 @@ namespace btnet
         public static object my_lock = new object(); // for a lock
 
         ///////////////////////////////////////////////////////////////////////
-        static Lucene.Net.Documents.Document create_doc(int bug_id, int post_id, string text)
+        static Lucene.Net.Documents.Document create_doc(int bug_id, int post_id, string source, string text)
         {
            // btnet.Util.write_to_log("indexing " + Convert.ToString(bug_id));
 
@@ -50,6 +50,12 @@ namespace btnet
                 Lucene.Net.Documents.Field.Store.YES,
                 Lucene.Net.Documents.Field.Index.UN_TOKENIZED));
 
+            doc.Add(new Lucene.Net.Documents.Field(
+                "src",
+                source,
+                Lucene.Net.Documents.Field.Store.YES,
+                Lucene.Net.Documents.Field.Index.UN_TOKENIZED));
+
             // For the highlighter, store the raw text
             doc.Add(new Lucene.Net.Documents.Field(
                 "raw_text",
@@ -64,6 +70,55 @@ namespace btnet
             return doc;
         }
 
+        ///////////////////////////////////////////////////////////////////////
+		static DataSet get_text_custom_cols()
+		{
+			DataSet ds_custom_fields  = btnet.DbUtil.get_dataset(@"
+/* get searchable cols */					
+select sc.name
+from syscolumns sc
+inner join systypes st on st.xusertype = sc.xusertype
+inner join sysobjects so on sc.id = so.id
+where so.name = 'bugs'
+and st.[name] <> 'sysname'
+and sc.name not in ('rowguid',
+'bg_id',
+'bg_short_desc',
+'bg_reported_user',
+'bg_reported_date',
+'bg_project',
+'bg_org',
+'bg_category',
+'bg_priority',
+'bg_status',
+'bg_assigned_to_user',
+'bg_last_updated_user',
+'bg_last_updated_date',
+'bg_user_defined_attribute',
+'bg_project_custom_dropdown_value1',
+'bg_project_custom_dropdown_value2',
+'bg_project_custom_dropdown_value3',
+'bg_tags')
+and st.[name] in ('nvarchar','varchar')
+and sc.length > 50");					
+				
+			return ds_custom_fields;				
+		}
+
+        ///////////////////////////////////////////////////////////////////////
+		static string get_text_custom_cols_names(DataSet ds_custom_fields)
+		{
+		
+			string custom_cols = "";
+			foreach (DataRow dr in ds_custom_fields.Tables[0].Rows)
+			{
+				custom_cols += (string) dr["name"] + ",";
+			}		
+			return custom_cols;
+		
+		}
+
+        ///////////////////////////////////////////////////////////////////////
         // create a new index
         static void threadproc_build(object obj)
 		{
@@ -76,38 +131,72 @@ namespace btnet
                     btnet.Util.write_to_log("started creating Lucene index using folder " + MyLucene.index_path);
                     Lucene.Net.Index.IndexWriter writer = new Lucene.Net.Index.IndexWriter(index_path, anal, true);
 
-                    
+
+
+					
+					string sql = @"
+select bg_id, 	
+$custom_cols
+isnull(bg_tags,'') bg_tags,
+bg_short_desc
+from bugs";
+					DataSet ds_text_custom_cols = get_text_custom_cols();
+					
+					sql = sql.Replace("$custom_cols", get_text_custom_cols_names(ds_text_custom_cols));
 
                     // index the bugs
-                    DataSet ds = btnet.DbUtil.get_dataset(@"
-    select bg_id, 
-    case 
-        when isnull(bg_tags,'') <> '' then bg_short_desc + ' / ' + bg_tags
-        else bg_short_desc 
-        end [text] 
-    from bugs");
+                    DataSet ds = btnet.DbUtil.get_dataset(sql);
 
                     foreach (DataRow dr in ds.Tables[0].Rows)
                     {
-                        writer.AddDocument(MyLucene.create_doc(
-                            (int)dr["bg_id"],
-                            0,
-                            (string)dr["text"]));
+						// desc
+						writer.AddDocument(MyLucene.create_doc(
+							(int)dr["bg_id"],
+							0,
+							"desc",
+							(string)dr["bg_short_desc"]));
+
+						// tags
+						string tags = (string) dr["bg_tags"];
+                        if (tags != "")
+                        {
+							writer.AddDocument(MyLucene.create_doc(
+								(int)dr["bg_id"],
+								0,
+								"tags",
+								tags));
+						}
+                            
+						// custom text fields
+						foreach (DataRow dr_custom_col in ds_text_custom_cols.Tables[0].Rows)                            
+						{
+							string name = (string) dr_custom_col["name"];
+							string val = Convert.ToString(dr[name]);
+							if (val != "")
+							{
+								writer.AddDocument(MyLucene.create_doc(
+									(int)dr["bg_id"],
+									0,
+									name.Replace("'","''"),
+									val));
+							}
+						}
                     }
 
                     // index the bug posts
                     ds = btnet.DbUtil.get_dataset(@"
-    select bp_bug, bp_id, 
-    isnull(bp_comment_search,bp_comment) [text] 
-    from bug_posts 
-    where bp_type <> 'update'
-    and bp_hidden_from_external_users = 0");
+select bp_bug, bp_id, 
+isnull(bp_comment_search,bp_comment) [text] 
+from bug_posts 
+where bp_type <> 'update'
+and bp_hidden_from_external_users = 0");
 
                     foreach (DataRow dr in ds.Tables[0].Rows)
                     {
                         writer.AddDocument(MyLucene.create_doc(
                             (int)dr["bp_bug"],
                             (int)dr["bp_id"],
+                            "post",
                             (string)dr["text"]));
                     }
 
@@ -170,40 +259,72 @@ namespace btnet
 
                     modifier.DeleteDocuments(new Lucene.Net.Index.Term("bg_id", Convert.ToString(bug_id)));
 
-                    
+					string sql = @"
+select bg_id, 
+$custom_cols
+isnull(bg_tags,'') bg_tags,
+bg_short_desc    
+from bugs where bg_id = $bugid";
+
+					sql = sql.Replace("$bugid",Convert.ToString(bug_id));
+
+					DataSet ds_text_custom_cols = get_text_custom_cols();
+					
+					sql = sql.Replace("$custom_cols", get_text_custom_cols_names(ds_text_custom_cols));                   
 
                     // index the bugs
-                    DataSet ds = btnet.DbUtil.get_dataset(@"
-    select bg_id, 
-    case 
-        when isnull(bg_tags,'') <> '' then bg_short_desc + ' / ' + bg_tags
-        else bg_short_desc 
-        end [text] 
-    from bugs where bg_id = " + Convert.ToString(bug_id));
+                    DataRow dr = btnet.DbUtil.get_datarow(sql);	
 
-                    foreach (DataRow dr in ds.Tables[0].Rows)
-                    {
-                        modifier.AddDocument(MyLucene.create_doc(
-                            (int)dr["bg_id"],
-                            0,
-                            (string)dr["text"]));
-                    }
+					modifier.AddDocument(MyLucene.create_doc(
+						(int)dr["bg_id"],
+						0,
+						"desc",
+						(string)dr["bg_short_desc"]));
+
+					// tags
+					string tags = (string) dr["bg_tags"];
+					if (tags != "")
+					{
+						modifier.AddDocument(MyLucene.create_doc(
+							(int)dr["bg_id"],
+							0,
+							"tags",
+							tags));
+					}
+                            
+					// custom text fields
+					foreach (DataRow dr_custom_col in ds_text_custom_cols.Tables[0].Rows)                            
+					{
+						string name = (string) dr_custom_col["name"];
+						string val = Convert.ToString(dr[name]);
+						if (val != "")
+						{
+							modifier.AddDocument(MyLucene.create_doc(
+								(int)dr["bg_id"],
+								0,
+								name.Replace("'","''"),
+								val));
+						}
+					}
+
 
                     // index the bug posts
-                    ds = btnet.DbUtil.get_dataset(@"
-    select bp_bug, bp_id, 
-    isnull(bp_comment_search,bp_comment) [text] 
-    from bug_posts 
-    where bp_type <> 'update'
-    and bp_hidden_from_external_users = 0
-    and bp_bug = " + Convert.ToString(bug_id));
+                    DataSet ds = btnet.DbUtil.get_dataset(@"
+select bp_bug, bp_id, 
+isnull(bp_comment_search,bp_comment) [text] 
+from bug_posts 
+where bp_type <> 'update'
+and bp_hidden_from_external_users = 0
+and bp_bug = " + Convert.ToString(bug_id));
 
-                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    foreach (DataRow dr2 in ds.Tables[0].Rows)
                     {
+btnet.Util.write_to_log("corey updating post" + (string) dr2["text"]);
                         modifier.AddDocument(MyLucene.create_doc(
-                            (int)dr["bp_bug"],
-                            (int)dr["bp_id"],
-                            (string)dr["text"]));
+                            (int)dr2["bp_bug"],
+                            (int)dr2["bp_id"],
+                            "post",
+                            (string)dr2["text"]));
                     }
 
                     modifier.Flush();

@@ -1007,7 +1007,7 @@ select scope_identity();";
 		///////////////////////////////////////////////////////////////////////
 		// This used to send the emails, but not now.  Now it just queues
 		// the emails to be sent, then spawns a thread to send them.
-		public static void send_notifications(int insert_or_update,
+		public static void send_notifications(int insert_or_update,  // The implementation
 			int bugid,
 			Security security,
 			int just_to_this_userid,
@@ -1016,35 +1016,45 @@ select scope_identity();";
 			int prev_assigned_to_user)
 		{
 
+			// If there's something worth emailing about, then there's 
+			// probably something worth updating the index about.
+			// Really, though, we wouldn't want to update the index if it were
+			// just the status that were changing...
+			if (btnet.Util.get_setting("EnableLucene", "1") == "1")
+			{
+				MyLucene.update_lucene_index(bugid);
+			}
 
 			bool notification_email_enabled = (btnet.Util.get_setting("NotificationEmailEnabled", "1") == "1");
 
-			if (notification_email_enabled)
+			if (!notification_email_enabled)
 			{
-				// MAW -- 2006/01/27 -- Determine level of change detected
-				int changeLevel = 0;
-				if (insert_or_update == INSERT)
-				{
-					changeLevel = 1;
-				}
-				else if (status_changed)
-				{
-					changeLevel = 2;
-				}
-				else if (assigned_to_changed)
-				{
-					changeLevel = 3;
-				}
-				else
-				{
-					changeLevel = 4;
-				}
+				return;
+			}
+			// MAW -- 2006/01/27 -- Determine level of change detected
+			int changeLevel = 0;
+			if (insert_or_update == INSERT)
+			{
+				changeLevel = 1;
+			}
+			else if (status_changed)
+			{
+				changeLevel = 2;
+			}
+			else if (assigned_to_changed)
+			{
+				changeLevel = 3;
+			}
+			else
+			{
+				changeLevel = 4;
+			}
 
-				string sql;
+			string sql;
 
-				if (just_to_this_userid > 0)
-				{
-					sql = @"
+			if (just_to_this_userid > 0)
+			{
+				sql = @"
 /* get notification email for just one user  */
 select us_email, us_id, us_admin, og.*
 from bug_subscriptions
@@ -1059,24 +1069,24 @@ and us_active = 1
 and us_email <> ''
 and
 case
-	when
-		us_org <> bg_org
-		and og_other_orgs_permission_level < 2
-		and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-			then og_other_orgs_permission_level
-	else
-		isnull(pu_permission_level,$dpl)
+when
+	us_org <> bg_org
+	and og_other_orgs_permission_level < 2
+	and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+		then og_other_orgs_permission_level
+else
+	isnull(pu_permission_level,$dpl)
 end <> 0
 and bs_bug = $id
 and us_id = $just_this_usid";
 
-					sql = sql.Replace("$just_this_usid", Convert.ToString(just_to_this_userid));
-				}
-				else
-				{
+				sql = sql.Replace("$just_this_usid", Convert.ToString(just_to_this_userid));
+			}
+			else
+			{
 
-					// MAW -- 2006/01/27 -- Added different notifications if reported or assigned-to
-					sql = @"
+				// MAW -- 2006/01/27 -- Added different notifications if reported or assigned-to
+				sql = @"
 /* get notification emails for all subscribers */
 select us_email, us_id, us_admin, og.*
 from bug_subscriptions
@@ -1096,159 +1106,157 @@ or ($cl <= us_subscribed_notifications))
 and
 case
 when
-	us_org <> bg_org
-	and og_other_orgs_permission_level < 2
-	and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
-		then og_other_orgs_permission_level
+us_org <> bg_org
+and og_other_orgs_permission_level < 2
+and og_other_orgs_permission_level < isnull(pu_permission_level,$dpl)
+	then og_other_orgs_permission_level
 else
-	isnull(pu_permission_level,$dpl)
+isnull(pu_permission_level,$dpl)
 end <> 0
 and bs_bug = $id
 and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
+			}
+
+			sql = sql.Replace("$cl", changeLevel.ToString());
+			sql = sql.Replace("$pau", prev_assigned_to_user.ToString());
+			sql = sql.Replace("$id", Convert.ToString(bugid));
+			sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
+			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
+
+
+			DataSet ds_subscribers = btnet.DbUtil.get_dataset(sql);
+
+			if (ds_subscribers.Tables[0].Rows.Count > 0)
+			{
+
+				bool added_to_queue = false;
+
+
+				// Get bug html
+				DataRow bug_dr = btnet.Bug.get_bug_datarow(bugid, security);
+
+				string from = btnet.Util.get_setting("NotificationEmailFrom", "");
+
+				// Format the subject line
+				string subject = btnet.Util.get_setting("NotificationSubjectFormat", "$THING$:$BUGID$ was $ACTION$ - $SHORTDESC$ $TRACKINGID$");
+
+				subject = subject.Replace("$THING$", btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel", "bug")));
+
+				string action = "";
+				if (insert_or_update == INSERT)
+				{
+					action = "added";
+				}
+				else
+				{
+					action = "updated";
 				}
 
-				sql = sql.Replace("$cl", changeLevel.ToString());
-				sql = sql.Replace("$pau", prev_assigned_to_user.ToString());
-				sql = sql.Replace("$id", Convert.ToString(bugid));
-				sql = sql.Replace("$dpl", btnet.Util.get_setting("DefaultPermissionLevel", "2"));
-				sql = sql.Replace("$us", Convert.ToString(security.user.usid));
+				subject = subject.Replace("$ACTION$", action);
+				subject = subject.Replace("$BUGID$", Convert.ToString(bugid));
+				subject = subject.Replace("$SHORTDESC$", (string)bug_dr["short_desc"]);
 
-				
-				DataSet ds_subscribers = btnet.DbUtil.get_dataset(sql);
+				string tracking_id = " (";
+				tracking_id += btnet.Util.get_setting("TrackingIdString", "DO NOT EDIT THIS:");
+				tracking_id += Convert.ToString(bugid);
+				tracking_id += ")";
+				subject = subject.Replace("$TRACKINGID$", tracking_id);
 
-				if (ds_subscribers.Tables[0].Rows.Count > 0)
+				subject = subject.Replace("$PROJECT$", (string)bug_dr["current_project"]);
+				subject = subject.Replace("$ORGANIZATION$", (string)bug_dr["og_name"]);
+				subject = subject.Replace("$CATEGORY$", (string)bug_dr["category_name"]);
+				subject = subject.Replace("$PRIORITY$", (string)bug_dr["priority_name"]);
+				subject = subject.Replace("$STATUS$", (string)bug_dr["status_name"]);
+				subject = subject.Replace("$ASSIGNED_TO$", (string)bug_dr["assigned_to_username"]);
+
+
+				// send a separate email to each subscriber
+				foreach (DataRow dr in ds_subscribers.Tables[0].Rows)
 				{
+					string to = (string)dr["us_email"];
 
-					bool added_to_queue = false;
+					// Create a fake response and let the code
+					// write the html to that response
+					System.IO.StringWriter writer = new System.IO.StringWriter();
+					HttpResponse my_response = new HttpResponse(writer);
+					my_response.Write("<html>");
+					my_response.Write("<base href=\"" +
+					btnet.Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/") + "\"/>");
 
+					// create a security rec for the user receiving the email
+					Security sec2 = new Security();
 
-					// Get bug html
-					DataRow bug_dr = btnet.Bug.get_bug_datarow(bugid, security);
+					// fill in what we know is needed downstream
+					sec2.user.is_admin = Convert.ToBoolean(dr["us_admin"]);
+					sec2.user.external_user = Convert.ToBoolean(dr["og_external_user"]);
+					sec2.user.tags_field_permission_level = (int)dr["og_category_field_permission_level"];
+					sec2.user.category_field_permission_level = (int)dr["og_category_field_permission_level"];
+					sec2.user.priority_field_permission_level = (int)dr["og_priority_field_permission_level"];
+					sec2.user.assigned_to_field_permission_level = (int)dr["og_assigned_to_field_permission_level"];
+					sec2.user.status_field_permission_level = (int)dr["og_status_field_permission_level"];
+					sec2.user.project_field_permission_level = (int)dr["og_project_field_permission_level"];
+					sec2.user.org_field_permission_level = (int)dr["og_org_field_permission_level"];
+					sec2.user.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
 
-					string from = btnet.Util.get_setting("NotificationEmailFrom", "");
-
-					// Format the subject line
-					string subject = btnet.Util.get_setting("NotificationSubjectFormat", "$THING$:$BUGID$ was $ACTION$ - $SHORTDESC$ $TRACKINGID$");
-
-					subject = subject.Replace("$THING$", btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel", "bug")));
-
-					string action = "";
-					if (insert_or_update == INSERT)
+					DataSet ds_custom = Util.get_custom_columns();
+					foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
 					{
-						action = "added";
-					}
-					else
-					{
-						action = "updated";
-					}
+						string bg_name = (string)dr_custom["name"];
+						string og_name = "og_"
+							+ (string)dr_custom["name"]
+							+ "_field_permission_level";
 
-					subject = subject.Replace("$ACTION$", action);
-					subject = subject.Replace("$BUGID$", Convert.ToString(bugid));
-					subject = subject.Replace("$SHORTDESC$", (string)bug_dr["short_desc"]);
-
-					string tracking_id = " (";
-					tracking_id += btnet.Util.get_setting("TrackingIdString", "DO NOT EDIT THIS:");
-					tracking_id += Convert.ToString(bugid);
-					tracking_id += ")";
-					subject = subject.Replace("$TRACKINGID$", tracking_id);
-
-					subject = subject.Replace("$PROJECT$", (string)bug_dr["current_project"]);
-					subject = subject.Replace("$ORGANIZATION$", (string)bug_dr["og_name"]);
-					subject = subject.Replace("$CATEGORY$", (string)bug_dr["category_name"]);
-					subject = subject.Replace("$PRIORITY$", (string)bug_dr["priority_name"]);
-					subject = subject.Replace("$STATUS$", (string)bug_dr["status_name"]);
-					subject = subject.Replace("$ASSIGNED_TO$", (string)bug_dr["assigned_to_username"]);
-
-
-					// send a separate email to each subscriber
-					foreach (DataRow dr in ds_subscribers.Tables[0].Rows)
-					{
-						string to = (string)dr["us_email"];
-
-						// Create a fake response and let the code
-						// write the html to that response
-						System.IO.StringWriter writer = new System.IO.StringWriter();
-						HttpResponse my_response = new HttpResponse(writer);
-						my_response.Write("<html>");
-						my_response.Write("<base href=\"" +
-						btnet.Util.get_setting("AbsoluteUrlPrefix", "http://127.0.0.1/") + "\"/>");
-
-						// create a security rec for the user receiving the email
-						Security sec2 = new Security();
-
-						// fill in what we know is needed downstream
-						sec2.user.is_admin = Convert.ToBoolean(dr["us_admin"]);
-						sec2.user.external_user = Convert.ToBoolean(dr["og_external_user"]);
-						sec2.user.tags_field_permission_level = (int)dr["og_category_field_permission_level"];
-						sec2.user.category_field_permission_level = (int)dr["og_category_field_permission_level"];
-						sec2.user.priority_field_permission_level = (int)dr["og_priority_field_permission_level"];
-						sec2.user.assigned_to_field_permission_level = (int)dr["og_assigned_to_field_permission_level"];
-						sec2.user.status_field_permission_level = (int)dr["og_status_field_permission_level"];
-						sec2.user.project_field_permission_level = (int)dr["og_project_field_permission_level"];
-						sec2.user.org_field_permission_level = (int)dr["og_org_field_permission_level"];
-						sec2.user.udf_field_permission_level = (int)dr["og_udf_field_permission_level"];
-
-						DataSet ds_custom = Util.get_custom_columns();
-						foreach (DataRow dr_custom in ds_custom.Tables[0].Rows)
+						object obj = dr[og_name];
+						if (Convert.IsDBNull(obj))
 						{
-							string bg_name = (string)dr_custom["name"];
-							string og_name = "og_"
-								+ (string)dr_custom["name"]
-								+ "_field_permission_level";
-
-							object obj = dr[og_name];
-							if (Convert.IsDBNull(obj))
-							{
-								sec2.user.dict_custom_field_permission_level[bg_name] = Security.PERMISSION_ALL;
-							}
-							else
-							{
-								sec2.user.dict_custom_field_permission_level[bg_name] = (int) dr[og_name];
-							}
-
+							sec2.user.dict_custom_field_permission_level[bg_name] = Security.PERMISSION_ALL;
+						}
+						else
+						{
+							sec2.user.dict_custom_field_permission_level[bg_name] = (int) dr[og_name];
 						}
 
-						PrintBug.print_bug(
-							my_response,
-							bug_dr,
-							sec2,
-							true, /* include style */
-                            false, /* images_inline */
-                            true /* history_inline */);
+					}
 
-						// at this point "writer" has the bug html
+					PrintBug.print_bug(
+						my_response,
+						bug_dr,
+						sec2,
+						true, /* include style */
+						false, /* images_inline */
+						true /* history_inline */);
 
-						sql = @"
+					// at this point "writer" has the bug html
+
+					sql = @"
 delete from queued_notifications where qn_bug = $bug and qn_to = N'$to'
 
 insert into queued_notifications
 (qn_date_created, qn_bug, qn_user, qn_status, qn_retries, qn_to, qn_from, qn_subject, qn_body, qn_last_exception)
 values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N'$body', N'')";
 
-						sql = sql.Replace("$bug",Convert.ToString(bugid));
-						sql = sql.Replace("$user",Convert.ToString(dr["us_id"]));
-						sql = sql.Replace("$to", to.Replace("'","''"));
-						sql = sql.Replace("$from", from.Replace("'","''"));
-						sql = sql.Replace("$subject", subject.Replace("'","''"));
-						sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
+					sql = sql.Replace("$bug",Convert.ToString(bugid));
+					sql = sql.Replace("$user",Convert.ToString(dr["us_id"]));
+					sql = sql.Replace("$to", to.Replace("'","''"));
+					sql = sql.Replace("$from", from.Replace("'","''"));
+					sql = sql.Replace("$subject", subject.Replace("'","''"));
+					sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
 
-						btnet.DbUtil.execute_nonquery_without_logging(sql);
+					btnet.DbUtil.execute_nonquery_without_logging(sql);
 
-						added_to_queue = true;
+					added_to_queue = true;
 
-					} // end loop through ds_subscribers
+				} // end loop through ds_subscribers
 
-					if (added_to_queue)
-					{
-						// spawn a worker thread to send the emails
-						System.Threading.ThreadStart worker = new System.Threading.ThreadStart(threadproc_notifications);
-						System.Threading.Thread thread = new System.Threading.Thread(worker);
-						thread.Start();
-					}
+				if (added_to_queue)
+				{
+					// spawn a worker thread to send the emails
+					System.Threading.ThreadStart worker = new System.Threading.ThreadStart(threadproc_notifications);
+					System.Threading.Thread thread = new System.Threading.Thread(worker);
+					thread.Start();
+				}
 
-				}  // if there are any subscribers
-
-			} // notifications enabled or not
+			}  // if there are any subscribers
 
 
 		}

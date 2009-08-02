@@ -1833,12 +1833,6 @@ bool record_changes()
 		permission_level = fetch_permission_level(project.SelectedItem.Value);
 	}
 
-
-	if (do_update && btnet.Util.get_setting("EnableLucene", "1") == "1")
-	{
-		MyLucene.update_lucene_index(id);
-	}		
-	
 	// return true if something did change
 	return do_update;
 }
@@ -2094,11 +2088,6 @@ void on_update (Object sender, EventArgs e)
 
 			id = new_ids.bugid;
 
-			if (btnet.Util.get_setting("EnableLucene", "1") == "1")
-			{
-				MyLucene.update_lucene_index(id);
-			}
-
 			btnet.WhatsNew.add_news(id, short_desc.Value, "added", security);
 
 			new_id.Value = Convert.ToString(id);
@@ -2276,6 +2265,7 @@ void on_update (Object sender, EventArgs e)
 					status_changed,
 					assigned_to_changed,
 					Convert.ToInt32(assigned_to.SelectedItem.Value));
+
 			}
 
 			set_msg(btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug")) + " was updated.");

@@ -183,6 +183,7 @@ void on_update()
 			btnet.WhatsNew.add_news(bugid, (string) dr["bg_short_desc"], "updated", security);
 		}
 
+
 		Response.Redirect ("edit_bug.aspx?id=" + Request["bug_id"]);
 
 	}

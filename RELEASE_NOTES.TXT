@@ -12,6 +12,25 @@ http://ifdefined.com/readme.html#upgrading
 -----------------------------------------------------------------------
 -----------------------------------------------------------------------
 
+cleaning up old bugs in demo
+
+select count(1) from bugs
+delete from bugs where bg_id < 1000 -- CHANGE THIS
+delete from bug_user_flags where fl_bug not in (select bg_id from bugs)
+delete from bug_user_seen where sn_bug not in (select bg_id from bugs)
+delete from bug_posts where bp_bug not in (select bg_id from bugs)
+delete from bug_subscriptions where bs_bug not in (select bg_id from bugs)
+delete from bug_relationships where re_bug1 not in (select bg_id from bugs)
+delete from bug_relationships where re_bug2 not in (select bg_id from bugs)
+delete from bug_tasks where tsk_bug not in (select bg_id from bugs)
+
+delete from users where 
+us_id > 20
+us_id not in (select bg_reported_user from bugs) and 
+us_id not in (select bg_last_updated_user from bugs) and
+us_id not in (select bp_user from bug_posts)
+
+
 Corey's TO DO list:
 
 ********
@@ -32,8 +51,6 @@ Corey's TO DO list:
 * Documentation improvements:
 * POP3Main, multiple filters, workflow.cs, ldap
 * links on posts don't respect permissions
-* Upgrade to CKeditor
-* Lucene search of custom text fields.
 * voting.
 * handle bugs-per-page being zero
 * tasks part of notifiaction scheme?
@@ -42,42 +59,20 @@ Corey's TO DO list:
 * http://www.microsoft.com/web/gallery/developer.aspx
 * Hide delete in mass edit if not allowed to delete.
 * per user defaults?
-*<select>
-  <optgroup label="Mammals">
-    <option value ="dogs">Dogs</option>
-    <option value ="mrrow">Cats</option>
-    <option value ="pigs">Pigs</option>
-  </optgroup>
-  <optgroup label="Reptiles">
-    <option value ="lizards">Lizards</option>
-    <option value ="geckos">Geckos</option>
-    <option value ="iguanas">Iguanas</option>
-  </optgroup>
-</select>
+
+* string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, 
+"btnet_service.exe.config"); versus
+pop3 = new POP3Main("c:\\btnet_service.exe.config", verbose);
 
 
-cleaning up old bugs in demo
+-----------------------------------------------------------------------
+Version 3.2.3   08/01/2009   (svn revision 353+)
+-----------------------------------------------------------------------
 
-select count(1) from bugs
-delete from bugs where bg_id < 1000 -- CHANGE THIS
-delete from bug_user_flags where fl_bug not in (select bg_id from bugs)
-delete from bug_user_seen where sn_bug not in (select bg_id from bugs)
-delete from bug_posts where bp_bug not in (select bg_id from bugs)
-delete from bug_subscriptions where bs_bug not in (select bg_id from bugs)
-delete from bug_relationships where re_bug1 not in (select bg_id from bugs)
-delete from bug_relationships where re_bug2 not in (select bg_id from bugs)
-delete from bug_tasks where tsk_bug not in (select bg_id from bugs)
+* Full text search (Lucene) now also indexes custom text fields.
 
-delete from users where 
-us_id > 20
-us_id not in (select bg_reported_user from bugs) and 
-us_id not in (select bg_last_updated_user from bugs) and
-us_id not in (select bp_user from bug_posts)
-
-
-
-
-
+* Fixed bug where full text search index wasn't always being updated 
+when text was changing.
 
 -----------------------------------------------------------------------
 Version 3.2.2   07/31/2009   (svn revision 352)

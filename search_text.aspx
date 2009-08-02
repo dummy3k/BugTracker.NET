@@ -49,6 +49,7 @@ create table #$GUID
 (
 temp_bg_id int,
 temp_bp_id int,
+temp_source varchar(30),
 temp_score float,
 temp_text nvarchar(3000)
 )
@@ -83,8 +84,9 @@ temp_text nvarchar(3000)
                     sb.Append(bg_id);
                     sb.Append(",");
                     sb.Append(doc.Get("bp_id"));
-                    sb.Append(",");
-                    //sb.Append(Convert.ToString((hits.Score(i))));
+                    sb.Append(",'");
+                    sb.Append(doc.Get("src"));
+                    sb.Append("',");
                     sb.Append(Convert.ToString((hits.Score(i))).Replace(",", "."));  // Somebody said this fixes a bug. Localization issue?
                     sb.Append(",N'");
 
@@ -114,8 +116,12 @@ temp_text nvarchar(3000)
 
 
     sb.Append(@"
-select '#ffffff', bg_id [id], temp_text [search_desc],
-'' [search_source], '' [search_text], bg_reported_date [date], isnull(st_name,'') [status], temp_score [$SCORE]
+select '#ffffff', bg_id [id], bg_short_desc [desc] ,
+	temp_source [search_source] ,
+	temp_text [search_text],
+	bg_reported_date [date],
+	isnull(st_name,'') [status],
+	temp_score [$SCORE]
 from bugs
 inner join #$GUID t on t.temp_bg_id = bg_id and t.temp_bp_id = 0
 left outer join statuses on st_id = bg_status
@@ -123,10 +129,14 @@ where $ALTER_HERE
 
 union
 
-select '#ffffff', bg_id, bg_short_desc COLLATE DATABASE_DEFAULT,
-bp_type + ',' + convert(varchar,bp_id),
-temp_text, bp_date, isnull(st_name,''), temp_score
-from bugs inner join #$GUID t on t.temp_bg_id = bg_id
+select '#ffffff', bg_id, bg_short_desc,
+	bp_type + ',' + convert(varchar,bp_id) COLLATE DATABASE_DEFAULT,
+	temp_text,
+	bp_date,
+	isnull(st_name,''),
+	temp_score
+from bugs
+inner join #$GUID t on t.temp_bg_id = bg_id
 inner join bug_posts on temp_bp_id = bp_id
 left outer join statuses on st_id = bg_status
 where $ALTER_HERE
