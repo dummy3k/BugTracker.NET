@@ -267,6 +267,8 @@ void Page_Load(Object sender, EventArgs e)
 			}
 
 			set_controls_field_permission(Security.PERMISSION_ALL);
+			
+			Session["bug_datarow"] = null;
 
 		}
 		else // prepare page for editing existing bug
@@ -566,6 +568,9 @@ void Page_Load(Object sender, EventArgs e)
 
 		}
 
+		// Could be null, or could be what we fetched from the db.
+		Workflow.adjust_status_dropdown((DataRow)Session["bug_datarow"], security.user, status, this);
+		
 	}
 	else // is PostBack
 	{
@@ -609,11 +614,8 @@ void Page_Load(Object sender, EventArgs e)
 		// needs to be reloaded if project changed
 		load_project_and_user_dropdowns(null);
 
-		Workflow.fill_status_dropdown((DataRow)Session["bug_datarow"], security.user, status.Items);
-
 		//on_update();
 	}
-
 
 }
 
@@ -1457,19 +1459,13 @@ void load_dropdowns(DataRow dr, User user)
 	priority.DataBind();
 	priority.Items.Insert(0, new ListItem("[no priority]", "0"));
 
-	// Make it easier to customize the list of statuses
-	Workflow.fill_status_dropdown(dr, security.user, status.Items);
+
+	status.DataSource = ds_dropdowns.Tables[4];
+	status.DataTextField = "st_name";
+	status.DataValueField = "st_id";
+	status.DataBind();
+	status.Items.Insert(0, new ListItem("[no status]", "0"));
 	
-
-	if (status.Items.Count == 0)
-	{
-		status.DataSource = ds_dropdowns.Tables[4];
-		status.DataTextField = "st_name";
-		status.DataValueField = "st_id";
-		status.DataBind();
-		status.Items.Insert(0, new ListItem("[no status]", "0"));
-	}
-
 	udf.DataSource  = ds_dropdowns.Tables[5];
 	udf.DataTextField = "udf_name";
 	udf.DataValueField = "udf_id";
@@ -1497,6 +1493,7 @@ string get_dropdown_text_from_value(DropDownList dropdown, string value)
 ///////////////////////////////////////////////////////////////////////
 bool did_something_change()
 {
+	
 	bool something_changed = false;
 
 	if (prev_short_desc.Value != short_desc.Value
@@ -1699,6 +1696,7 @@ bool record_changes()
 			+ status.SelectedItem.Text.Replace("'","''") + "\"");
 
 		prev_status.Value = status.SelectedItem.Value;
+		
 	}
 
 	if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
@@ -1966,6 +1964,17 @@ bool validate()
 	else
 	{
 		assigned_to_err.InnerText = "";
+	}
+
+
+	// custom validations go here
+	if (!Workflow.custom_validations(
+		(DataRow)Session["bug_datarow"], 
+		security.user, 
+		this,
+		custom_validation_err_msg))
+	{
+		good = false;
 	}
 	
 	return good;
@@ -2274,16 +2283,31 @@ void on_update (Object sender, EventArgs e)
 
 			set_controls_field_permission(permission_level);
 
-			// GC: 16-Feb-2008: Bug fix to allow the Status drop down to be reloaded if there has been a change
-			if (status_changed && Session["bug_datarow"] != null)
+			if (bug_fields_have_changed)
 			{
-				DataRow bug;
-
-				bug = (DataRow) Session["bug_datarow"];
+				DataRow bug = (DataRow) Session["bug_datarow"];
+				
 				bug["status"] = int.Parse(status.SelectedItem.Value);
 				bug["status_name"] = status.SelectedItem.Text;
-	btnet.Util.write_to_log("after update");
-				Workflow.fill_status_dropdown(bug, security.user, status.Items);
+				
+				bug["project"] = int.Parse(project.SelectedItem.Value);
+				bug["current_project"] = project.SelectedItem.Text;
+				
+				bug["organization"] = int.Parse(org.SelectedItem.Value);
+				bug["og_name"] = org.SelectedItem.Text;
+				
+				bug["category"] = int.Parse(category.SelectedItem.Value);
+				bug["category_name"] = category.SelectedItem.Text;
+				
+				/*
+					"Note about customizing workflow"
+					
+					We've updated some but not all of the fields in the cached DataRow.
+					We haven't updated, for example, the custom fields.   If your workflow
+					logic needs to know about other fields, then maybe add logic here,
+					or refetch the bug from the db from within your customized workflow.
+				*/
+				Workflow.adjust_status_dropdown(bug, security.user, status, this);
 			}
 		} // edit existing or not
 
@@ -2904,6 +2928,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 	<tr><td nowrap align=left>
 		<span runat="server" class=err id="custom_field_msg">&nbsp;</span>
+		<span runat="server" class=err id="custom_validation_err_msg">&nbsp;</span>
 		<span runat="server" class=err id="msg">&nbsp;</span>
 
 

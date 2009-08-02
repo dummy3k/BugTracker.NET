@@ -69,10 +69,19 @@ pop3 = new POP3Main("c:\\btnet_service.exe.config", verbose);
 Version 3.2.3   08/01/2009   (svn revision 353+)
 -----------------------------------------------------------------------
 
+* I revised the "workflow.cs" file, for creating a customized, enforced 
+workflow.  If you have edited yours, adding your own custom code, then
+you will have to rework it to upgrade to this release.  I wonder if 
+anybody could have been using the old "workflow.cs" - because I don't 
+think it worked well enough.  This new revised one does seem to work, 
+Also in workflow.cs, I added some sample code for customized
+validations.
+
 * Full text search (Lucene) now also indexes custom text fields.
 
 * Fixed bug where full text search index wasn't always being updated 
 when text was changing.
+
 
 -----------------------------------------------------------------------
 Version 3.2.2   07/31/2009   (svn revision 352)
