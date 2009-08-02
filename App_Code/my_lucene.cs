@@ -112,7 +112,7 @@ and sc.length > 50");
 			string custom_cols = "";
 			foreach (DataRow dr in ds_custom_fields.Tables[0].Rows)
 			{
-				custom_cols += (string) dr["name"] + ",";
+				custom_cols += "[" + (string) dr["name"] + "],";
 			}		
 			return custom_cols;
 		
