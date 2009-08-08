@@ -14,7 +14,7 @@ CKEDITOR.editorConfig = function( config )
 	// A simpler toolbar for BugTracker.NET
 	config.toolbar_Btnet=[
 		
-		['Cut','Copy','Paste','PasteText','-','SpellChecker','Scayt','-',
+		['Cut','Copy','Paste','PasteText','-','SpellChecker','-',
 		'Undo','Redo','-',
 		'Find','Replace','-', 
 		'Link','Unlink','-',
@@ -36,5 +36,6 @@ CKEDITOR.editorConfig = function( config )
 	
 	// Turn off the elementspath plugin for BugTracker.NET
 	config.plugins = config.plugins.replace( /(?:^|,)elementspath(?=,|$)/, '' );
+	
 	
 };

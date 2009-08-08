@@ -576,7 +576,7 @@ namespace btnet
                     }
 
                     Response.Write("</a>");
-                    Response.Write("</td>\n");
+                    Response.Write("\n");
 
                 }
 
@@ -584,7 +584,7 @@ namespace btnet
 
             }
 
-            Response.Write("</tr>\n<tr>");
+            Response.Write("\n<tr>");
 
             ////////////////////////////////////////////////////////////////////
             /// filter row
@@ -606,7 +606,7 @@ namespace btnet
                 {
                     if (show_checkbox)
                     {
-                        Response.Write("<td class=bugf>&nbsp;</td>");
+                        Response.Write("<td class=bugf>&nbsp;");
                     }
                 }
                 else if (dc.ColumnName == "$SCORE")
@@ -677,14 +677,14 @@ namespace btnet
                         }
                     }
 
-                    Response.Write("</td>\n");
+                    Response.Write("\n");
                 }
 
                 db_column_count++;
 
             }
 
-            Response.Write("</tr>\n");
+            Response.Write("\n");
 
             string class_or_color = "class=bugd";
             string col_one;
@@ -768,7 +768,7 @@ namespace btnet
                                 + cls
                                 + " onclick='flag(this, "
                                 + Convert.ToString(dr[1])
-                                + ")'>&nbsp;</span></td>");
+                                + ")'>&nbsp;</span>");
                         }
                         else if (dv.Table.Columns[i].ColumnName == "$SEEN")
                         {
@@ -787,7 +787,7 @@ namespace btnet
                                 + cls
                                 + " onclick='seen(this, "
                                 + Convert.ToString(dr[1])
-                                + ")'>&nbsp;</span></td>");
+                                + ")'>&nbsp;</span>");
                         }
                         else
                         {
@@ -875,12 +875,12 @@ namespace btnet
                             }
                         }
 
-                        Response.Write("</td>");
+                        Response.Write("");
 
                     }
                 }
 
-                Response.Write("</tr>\n");
+                Response.Write("\n");
 
                 j++;
             }

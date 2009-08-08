@@ -49,7 +49,7 @@ Corey's TO DO list:
 * configurable start page, like start on dashboard
 * relationships, tasks in print?
 * Documentation improvements:
-* POP3Main, multiple filters, workflow.cs, ldap
+* POP3Main, multiple filters, ldap
 * links on posts don't respect permissions
 * voting.
 * handle bugs-per-page being zero
@@ -66,26 +66,31 @@ pop3 = new POP3Main("c:\\btnet_service.exe.config", verbose);
 
 
 -----------------------------------------------------------------------
-Version 3.2.3   08/01/2009   (svn revision 353+)
+Version 3.2.3   08/08/2009   (svn revision 361)
 -----------------------------------------------------------------------
 
-* I revised the "workflow.cs" file, for creating a customized, enforced 
-workflow.  If you have edited yours, adding your own custom code, then
-you will have to rework it to upgrade to this release.  I wonder if 
-anybody could have been using the old "workflow.cs" - because I don't 
-think it worked well enough.  This new revised one does seem to work, 
+* I made it a bit easier to customize BugTracker.NET if you are able to
+code C#.
 
-Also workflow.cs now supports customized validations.
+I revised the "workflow.cs" file.  I really wonder if anybody could 
+have been using the old workflow.cs?  I was hired to do some 
+BugTracker.NET customization for somebody and I myself couldn't get my 
+own workflow.cs to work right.
 
-Of course, to use it, you need to code C#, but there is some sample
-code to follow and it's not that hard.   Just a bunch of "if" 
-statuments.
+If you are using workflow.cs, you'll have to rework your code to
+upgrade to this version.
 
+See http://ifdefined.com/doc_bug_tracker_programmers.html#workflow
+and the comments and sample code in App_Code/workflow.cs itself for 
+more info.
 
 * Full text search (Lucene) now also indexes custom text fields.
 
 * Fixed bug where full text search index wasn't always being updated 
 when bug was changed.
+
+* I removed the SCAYT (Spell Check As You Type) from the rich text 
+editor, CKEditor, because it was working so poorly and unreliably.
 
 -----------------------------------------------------------------------
 Version 3.2.2   07/31/2009   (svn revision 352)
