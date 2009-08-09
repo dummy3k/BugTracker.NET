@@ -247,17 +247,16 @@ void load_query_dropdown()
 {
 
 	// populate query drop down
-	sql = @"declare @us_org int
-		select @us_org = us_org from users where us_id = $us
-
-		select qu_id, qu_desc
-		from queries
-		where (isnull(qu_user,0) = 0 and isnull(qu_org,0) = 0)
-		or isnull(qu_user,0) = $us
-		or isnull(qu_org,0) = @us_org
-		order by qu_desc";
+	sql = @"/* query dropdown */
+select qu_id, qu_desc
+from queries
+where (isnull(qu_user,0) = 0 and isnull(qu_org,0) = 0)
+or isnull(qu_user,0) = $us
+or isnull(qu_org,0) = $org
+order by qu_desc";
 
 	sql = sql.Replace("$us",Convert.ToString(security.user.usid));
+	sql = sql.Replace("$org",Convert.ToString(security.user.org));
 
 	query.DataSource = btnet.DbUtil.get_dataview(sql);
 

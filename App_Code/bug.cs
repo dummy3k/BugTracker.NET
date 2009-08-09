@@ -632,7 +632,7 @@ when '' then isnull(asg.us_lastname, '[not assigned]')
 else isnull(asg.us_lastname + ', ' + asg.us_firstname,'[not assigned]')
 end [assigned_to_fullname],
 
-isnull(bs_id,0) [subscribed],
+isnull(bs_user,0) [subscribed],
 
 case
 when

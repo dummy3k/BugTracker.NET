@@ -193,10 +193,12 @@ values ('guest', 'Special', 'cannot save searches, settings', 'guest', 0, 1, 1, 
 
 create table sessions
 (
-	se_id char(37) not null,
+	se_id char(37) primary key not null,
 	se_date datetime not null default(getdate()),
 	se_user int not null
 )
+
+
 
 
 /* EMAILED LINKS */
@@ -204,7 +206,7 @@ create table sessions
 
 create table emailed_links
 (
-el_id char(37) not null,
+el_id char(37) primary key not null,
 el_date datetime not null default(getdate()),
 el_email nvarchar(120) not null,
 el_action nvarchar(20) not null, -- "registration" or "forgot"
@@ -299,7 +301,7 @@ bg_tags nvarchar(200) null
 
 create table bug_posts
 (
-bp_id int identity primary key not null,
+bp_id int identity primary key nonclustered not null,
 bp_bug int not null,
 bp_type varchar(8) not null,
 bp_user int not null,
@@ -317,14 +319,14 @@ bp_hidden_from_external_users int not null default(0),
 bp_email_cc nvarchar(800) null
 )
 
-create index bp_index_1 on bug_posts (bp_bug)
+create clustered index bp_index_1 on bug_posts (bp_bug)
 
 
 /* BUG TASKS - subtasks and time tracking */
 
 create table bug_tasks
 (
-tsk_id int identity primary key not null,
+tsk_id int identity primary key nonclustered not null,
 tsk_bug int not null,
 tsk_created_user int not null,
 tsk_created_date datetime not null,
@@ -345,7 +347,7 @@ tsk_sort_sequence int null,
 tsk_description nvarchar(400) null,
 )
 
-create index tsk_index_1 on bug_tasks (tsk_bug)
+create clustered index tsk_index_1 on bug_tasks (tsk_bug)
 
 /* BUG POST ATTACHMENTS -- database storage of attachments */
 
@@ -356,21 +358,18 @@ bpa_post int not null,
 bpa_content image not null
 )
 
-
 create unique index bpa_index on bug_post_attachments (bpa_post)
 
 /* BUG USER SUBSCRIPTIONS */
 
 create table bug_subscriptions
 (
-bs_id int identity primary key not null,
 bs_bug int not null,
 bs_user int not null,
 )
 
-
+create unique clustered index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
 create unique index bs_index_1 on bug_subscriptions (bs_user, bs_bug)
-create unique index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
 
 /* BUG USER FLAGS */
 
@@ -381,7 +380,7 @@ fl_user int not null,
 fl_flag int not null
 )
 
-create unique index fl_index_1 on bug_user_flags (fl_bug, fl_user)
+create unique clustered index fl_index_1 on bug_user_flags (fl_bug, fl_user)
 
 
 /* BUG USER SEEN */
@@ -393,8 +392,7 @@ sn_user int not null,
 sn_seen int not null
 )
 
-create unique index sn_index_1 on bug_user_seen (sn_bug, sn_user)
-
+create unique clustered index sn_index_1 on bug_user_seen (sn_bug, sn_user)
 
 
 /* BUG RELATIONSHIPS */
@@ -493,19 +491,16 @@ insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) val
 
 create table custom_col_metadata
 (
-ccm_colorder int not null,
+ccm_colorder int primary key not null,
 ccm_dropdown_vals nvarchar(1000) not null default(''),
 ccm_sort_seq int default(0),
 ccm_dropdown_type varchar(20) null
 )
 
-create unique index cdv_index on custom_col_metadata (ccm_colorder)
-
-
 
 create table svn_revisions
 (
-svnrev_id int identity primary key not null,
+svnrev_id int identity primary key nonclustered not null,
 svnrev_revision int not null,
 svnrev_bug int not null,
 svnrev_repository nvarchar(400) not null,
@@ -515,20 +510,20 @@ svnrev_btnet_date datetime not null,
 svnrev_msg ntext not null
 )
 
-create index svn_bug_index on svn_revisions (svnrev_bug)
+create clustered index svn_bug_index on svn_revisions (svnrev_bug)
 
 
 /* SVN AFFECTED PATH */
 
 create table svn_affected_paths
 (
-svnap_id int identity primary key not null,
+svnap_id int identity primary key nonclustered not null,
 svnap_svnrev_id int not null,
 svnap_action nvarchar(8) not null,
 svnap_path nvarchar(400) not null
 )
 
-create index svn_revision_index on svn_affected_paths (svnap_svnrev_id)
+create clustered index svn_revision_index on svn_affected_paths (svnap_svnrev_id)
 
 
 /* REPORTS */

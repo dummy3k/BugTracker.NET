@@ -75,7 +75,7 @@ void Page_Load(Object sender, EventArgs e)
 	{
 		sql = @"
 select
-'<a href=delete_subscriber.aspx?ses=$ses&bg_id=$bg&bs_id=' + convert(varchar,bs_id) + '>unsubscribe</a>'	[$no_sort_unsubscriber],
+'<a href=delete_subscriber.aspx?ses=$ses&bg_id=$bg&us_id=' + convert(varchar,us_id) + '>unsubscribe</a>'	[$no_sort_unsubscriber],
 us_username [user],
 us_lastname + ', ' + us_firstname [name],
 us_email [email],

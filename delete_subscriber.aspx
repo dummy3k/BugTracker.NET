@@ -25,8 +25,9 @@ void Page_Load(Object sender, EventArgs e)
 		Response.End();
 	}
 
-	string sql = "delete from bug_subscriptions where bs_id = $bs_id";
-	sql = sql.Replace("$bs_id", Util.sanitize_integer(Request["bs_id"]));
+	string sql = "delete from bug_subscriptions where bs_bug = $bg_id and bs_user = $us_id";
+	sql = sql.Replace("$bg_id", Util.sanitize_integer(Request["bg_id"]));
+	sql = sql.Replace("$us_id", Util.sanitize_integer(Request["us_id"]));
 	btnet.DbUtil.execute_nonquery(sql);
 
 	Response.Redirect("view_subscribers.aspx?id=" + Request["bg_id"]);

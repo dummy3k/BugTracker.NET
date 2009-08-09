@@ -66,6 +66,28 @@ pop3 = new POP3Main("c:\\btnet_service.exe.config", verbose);
 
 
 -----------------------------------------------------------------------
+Version 3.2.4   08/xx/2009   (svn revision 361)
+-----------------------------------------------------------------------
+
+
+--drop index bug_posts.bp_index_1
+--create clustered index bp_index_1 on bug_posts (bp_bug)
+--alter table bug_posts drop constraint PK__bug_posts__32E0915F
+--alter table bug_posts add constraint PK__bug_posts primary key nonclustered (bp_id)
+--create clustered index bp_index_1 on bug_posts (bp_bug)
+
+
+
+Don't know if this is truly an issue, but after upgrading to 2.9.7 I wanted
+to add the Flag and Seen fields to all of the queries. When I tried to add
+them to a private query I got an error saying that I had to select an
+organization (that radiobox was highlighted by default). Since I didn't
+have the option of selecting the existing user again I set it to myself
+then updated it back via SQL. I guess to resolve this, Admin users would
+need to be able to select from a list of users in the edit query screen
+(with the existing user already highlighted).
+
+-----------------------------------------------------------------------
 Version 3.2.3   08/08/2009   (svn revision 361)
 -----------------------------------------------------------------------
 
