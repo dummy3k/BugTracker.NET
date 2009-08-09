@@ -52,7 +52,6 @@ Corey's TO DO list:
 * POP3Main, multiple filters, ldap
 * links on posts don't respect permissions
 * voting.
-* handle bugs-per-page being zero
 * tasks part of notification scheme?
 * tasks part of audit trail?
 * tasks part of full text search, other search?
