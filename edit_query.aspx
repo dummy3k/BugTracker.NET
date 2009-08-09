@@ -49,19 +49,25 @@ void Page_Load(Object sender, EventArgs e)
 			// these guys can do everything
 			vis_everybody.Checked = true;
 
-			sql = @"/* populate org dropdown */
-				select og_id, og_name
-				from orgs
-				order by og_name;";
+			sql = @"/* populate org/user dropdowns */
+select og_id, og_name from orgs order by og_name;
+select us_id, us_username from users order by us_username";
 
-			DataSet ds_orgs = btnet.DbUtil.get_dataset(sql);
+			DataSet ds_orgs_and_users = btnet.DbUtil.get_dataset(sql);
 
 			// forced project dropdown
-			org.DataSource = ds_orgs.Tables[0].DefaultView;
+			org.DataSource = ds_orgs_and_users.Tables[0].DefaultView;
 			org.DataTextField = "og_name";
 			org.DataValueField = "og_id";
 			org.DataBind();
 			org.Items.Insert(0, new ListItem("[select org]", "0"));
+
+			user.DataSource = ds_orgs_and_users.Tables[1].DefaultView;
+			user.DataTextField = "us_username";
+			user.DataValueField = "us_id";
+			user.DataBind();
+			user.Items.Insert(0, new ListItem("[select user]", "0"));
+
 
 		}
 		else
@@ -74,8 +80,10 @@ void Page_Load(Object sender, EventArgs e)
 			vis_org.Enabled = false;
 			vis_user.Checked = true;
 			org.Enabled = false;
+			user.Enabled = false;
 
 			org.Visible = false;
+			user.Visible = false;
 			vis_everybody.Visible = false;
 			vis_org.Visible = false;
 			vis_user.Visible = false;
@@ -136,9 +144,17 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				vis_everybody.Checked = true;
 			}
-			else if ((int) dr["qu_user"] == security.user.usid)
+			else if ((int) dr["qu_user"] != 0)
 			{
 				vis_user.Checked = true;
+				foreach (ListItem li in user.Items)
+				{
+					if (Convert.ToInt32(li.Value) == (int) dr["qu_user"])
+					{
+						li.Selected = true;
+						break;
+					}
+				}
 			}
 			else
 			{
@@ -180,23 +196,38 @@ Boolean validate()
 	}
 
 
-	if (vis_org.Checked)
+	if (security.user.is_admin || security.user.can_edit_sql)
 	{
-		if (org.SelectedIndex < 1)
+		if (vis_org.Checked)
 		{
-			good = false;
-			org_err.InnerText = "You must select a org.";
+			if (org.SelectedIndex < 1)
+			{
+				good = false;
+				org_err.InnerText = "You must select a org.";
+			}
+			else
+			{
+				org_err.InnerText = "";
+			}
+		}
+		else if (vis_user.Checked)
+		{
+			if (user.SelectedIndex < 1)
+			{
+				good = false;
+				user_err.InnerText = "You must select a user.";
+			}
+			else
+			{
+				user_err.InnerText = "";
+			}
 		}
 		else
 		{
 			org_err.InnerText = "";
 		}
 	}
-	else
-	{
-		org_err.InnerText = "";
-	}
-
+	
 	if (id == 0)
 	{
 		// See if name is already used?
@@ -267,22 +298,30 @@ void on_update()
 			sql = sql.Replace("$sq", sql_text.Value.Replace("'","''"));
 		}
 
-		if (vis_everybody.Checked)
+		if (security.user.is_admin || security.user.can_edit_sql)
 		{
-			sql = sql.Replace("$us", "0");
-			sql = sql.Replace("$rl", "0");
+			if (vis_everybody.Checked)
+			{
+				sql = sql.Replace("$us", "0");
+				sql = sql.Replace("$rl", "0");
+			}
+			else if (vis_user.Checked)
+			{
+				sql = sql.Replace("$us", Convert.ToString(user.SelectedItem.Value));
+				sql = sql.Replace("$rl", "0");
+			}
+			else
+			{
+				sql = sql.Replace("$rl", Convert.ToString(org.SelectedItem.Value));
+				sql = sql.Replace("$us", "0");
+			}
 		}
-		else if (vis_user.Checked)
+		else
 		{
 			sql = sql.Replace("$us", Convert.ToString(security.user.usid));
 			sql = sql.Replace("$rl", "0");
 		}
-		else
-		{
-			sql = sql.Replace("$rl", Convert.ToString(org.SelectedItem.Value));
-			sql = sql.Replace("$us", "0");
-		}
-
+		
 		btnet.DbUtil.execute_nonquery(sql);
 		Server.Transfer ("queries.aspx");
 
@@ -344,8 +383,14 @@ void on_update()
 	<td colspan=2>
 		<asp:RadioButton text="Everybody" runat="server" GroupName="visibility" id="vis_everybody"/>
 		&nbsp;&nbsp;&nbsp;
-		<asp:RadioButton text="Just You" runat="server" GroupName="visibility" id="vis_user"/>
+		
+		<asp:RadioButton text="Just User" runat="server" GroupName="visibility" id="vis_user"/>
 		&nbsp;&nbsp;&nbsp;
+		<asp:DropDownList id="user" runat="server">
+		</asp:DropDownList>
+		&nbsp;&nbsp;
+		<span runat="server" class=err id="user_err">&nbsp;</span>		
+		
 		<asp:RadioButton text="Users with org" runat="server" GroupName="visibility" id="vis_org"/>
 		<asp:DropDownList id="org" runat="server">
 		</asp:DropDownList>

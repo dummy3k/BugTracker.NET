@@ -124,6 +124,7 @@ and bp_bug = $bug_id";
 			}
 			else
 			{
+				Response.Cache.SetExpires(DateTime.Now.AddDays(3));
 				Response.AddHeader ("content-disposition","inline; filename=\"" + filename + "\"");
 			}
 
