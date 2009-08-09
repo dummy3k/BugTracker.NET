@@ -69,14 +69,10 @@ pop3 = new POP3Main("c:\\btnet_service.exe.config", verbose);
 Version 3.2.4   08/xx/2009   (svn revision 361)
 -----------------------------------------------------------------------
 
-
---drop index bug_posts.bp_index_1
---create clustered index bp_index_1 on bug_posts (bp_bug)
---alter table bug_posts drop constraint PK__bug_posts__32E0915F
---alter table bug_posts add constraint PK__bug_posts primary key nonclustered (bp_id)
---create clustered index bp_index_1 on bug_posts (bp_bug)
-
-
+* If you want to maybe improve the performance of you BugTracker.NET
+database a little bit, and I mean just a little bit, take a look in the
+SQL for this release.  The SQL mostly deals with changing which indexes
+are clustered.   
 
 Don't know if this is truly an issue, but after upgrading to 2.9.7 I wanted
 to add the Flag and Seen fields to all of the queries. When I tried to add

@@ -808,3 +808,107 @@ alter table orgs add og_can_assign_to_internal_users int not null default(0)
 -----------------------------------------------------------------------
 
 alter table orgs add og_active int not null default(1)
+
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-- upgrade from 3.2.3 to 3.2.4
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+
+/*
+
+You can skip this upgrade step from 3.2.3 to 3.2.4.  It's only related
+to performance, and the performance differences are minor.
+
+We are going to change nonclustered indexes to clustered indexes, but to do 
+that, we need to change the clustered primary key constraint to nonclustered,
+because a table can only have one clustered index.  (A clustered index
+means the data is physically in the order of the index).
+
+Th primary key constraints have random, generated names.  We need to know
+the names so that we can delete the constraints, so let's first 
+find out what those names are.   Run this SQL and save the results.
+
+*/
+
+select so.name, si.name from sys.indexes si
+inner join sysobjects so on si.object_id = so.id
+where  si.name like 'PK%'
+and so.name in (
+'bug_tasks', 
+'bug_posts', 
+'svn_revisions', 
+'svn_affected_paths', 
+'dashboard_items', 
+'bug_subscriptions')
+
+/*
+
+For me the results look like this:
+
+bug_posts	PK__bug_posts_37DF4923
+bug_tasks	PK__bug_tasks__36B12243
+svn_revisions	PK__svn_revisions__534D60F1
+svn_affected_paths	PK__svn_affected_pat__5535A963
+dashboard_items	PK__dashboard_items__5CD6CB2B
+bug_subscriptions PK__bug_subscription__37A5467C
+
+Drop the clustered primary keys, then add them back as nonclustered.
+Use YOUR names, not my names.
+
+*/
+
+alter table bug_posts drop constraint PK__bug_posts_37DF4923
+alter table bug_tasks drop constraint PK__bug_tasks__36B12243
+alter table svn_revisions drop constraint PK__svn_revisions__534D60F1
+alter table svn_affected_paths drop constraint PK__svn_affected_pat__5535A963
+alter table dashboard_items drop constraint PK__dashboard_items__5CD6CB2B
+alter table bug_subscriptions drop constraint PK__bug_subscription__37A5467C
+-- get rid of this column
+alter table bug_subscriptions drop column bs_id
+
+/*
+
+Now add back the primary key constraints as nonclustered.  We'll also
+give them our own names.
+
+*/
+
+alter table bug_posts add constraint pk_bug_posts primary key nonclustered (bp_id)
+alter table bug_tasks add constraint pk_bug_tasks primary key nonclustered (tsk_id)
+alter table svn_revisions add constraint pk_svn_revisions primary key nonclustered (svnrev_id)
+alter table svn_affected_paths add constraint pk_svn_affected_paths primary key nonclustered (svnap_id)
+alter table dashboard_items add constraint pk_dashboard_items primary key nonclustered (ds_id)
+
+/*
+
+Now lets change some index from nonclustered to clustered.
+
+*/
+
+drop index bug_posts.bp_index_1
+drop index bug_tasks.tsk_index_1
+drop index svn_revisions.svn_bug_index
+drop index svn_affected_paths.svn_revision_index
+drop index dashboard_items.ds_user_index
+drop index bug_subscriptions.bs_index_2
+drop index bug_user_flags.fl_index_1
+drop index bug_user_seen.sn_index_1
+
+create clustered index bp_index_1 on bug_posts (bp_bug)
+create clustered index tsk_index_1 on bug_tasks (tsk_bug)
+create clustered index svn_bug_index on svn_revisions (svnrev_bug)
+create clustered index svn_revision_index on svn_affected_paths (svnap_svnrev_id)
+create clustered index ds_user_index on dashboard_items (ds_user)
+create unique clustered index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
+create unique clustered index fl_index_1 on bug_user_flags (fl_bug, fl_user)
+create unique clustered index sn_index_1 on bug_user_seen (sn_bug, sn_user)
+
+-- add primary keys to tables that were missing them
+alter table sessions add constraint pk_sessions primary key (se_id)
+alter table emailed_links add constraint pk_emailed_links primary key (el_id)
+alter table custom_col_metadata add constraint pk_custom_col_metadata primary key (ccm_colorder)

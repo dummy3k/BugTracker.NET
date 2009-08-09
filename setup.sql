@@ -82,7 +82,7 @@ drop table [bug_tasks]
 
 create table orgs
 (
-og_id int identity primary key not null,
+og_id int identity constraint pk_orgs primary key not null,
 og_name nvarchar(80) not null,
 og_non_admins_can_use int not null default(0),
 og_external_user int not null default(0), /* external user can't view post marked internal */
@@ -122,7 +122,7 @@ insert into orgs (og_name, og_external_user, og_can_be_assigned_to, og_other_org
 
 create table users
 (
-us_id int identity primary key not null,
+us_id int identity constraint pk_users primary key not null,
 us_username nvarchar(40) not null,
 us_salt int null,
 us_password nvarchar(64) not null,
@@ -193,7 +193,7 @@ values ('guest', 'Special', 'cannot save searches, settings', 'guest', 0, 1, 1, 
 
 create table sessions
 (
-	se_id char(37) primary key not null,
+	se_id char(37) constraint pk_sessions primary key not null,
 	se_date datetime not null default(getdate()),
 	se_user int not null
 )
@@ -206,7 +206,7 @@ create table sessions
 
 create table emailed_links
 (
-el_id char(37) primary key not null,
+el_id char(37) constraint pk_emailed_links primary key not null,
 el_date datetime not null default(getdate()),
 el_email nvarchar(120) not null,
 el_action nvarchar(20) not null, -- "registration" or "forgot"
@@ -222,7 +222,7 @@ el_lastname nvarchar(60) null
 
 create table categories
 (
-ct_id int identity primary key not null,
+ct_id int identity constraint pk_categories primary key not null,
 ct_name nvarchar(80) not null,
 ct_sort_seq int not null default(0),
 ct_default int not null default(0)
@@ -241,7 +241,7 @@ insert into categories (ct_name) values('ticket')
 
 create table projects
 (
-pj_id int identity primary key not null,
+pj_id int identity constraint pk_projects primary key not null,
 pj_name nvarchar(80) not null,
 pj_active int not null default(1),
 pj_default_user int null,
@@ -278,7 +278,7 @@ insert into projects (pj_name) values('project 2')
 
 create table bugs 
 (
-bg_id int identity primary key not null,
+bg_id int identity constraint pk_bugs primary key not null,
 bg_short_desc nvarchar(200) not null,
 bg_reported_user int not null,
 bg_reported_date datetime not null,
@@ -301,7 +301,7 @@ bg_tags nvarchar(200) null
 
 create table bug_posts
 (
-bp_id int identity primary key nonclustered not null,
+bp_id int identity constraint pk_bug_posts primary key nonclustered not null,
 bp_bug int not null,
 bp_type varchar(8) not null,
 bp_user int not null,
@@ -326,7 +326,7 @@ create clustered index bp_index_1 on bug_posts (bp_bug)
 
 create table bug_tasks
 (
-tsk_id int identity primary key nonclustered not null,
+tsk_id int identity constraint pk_bug_tasks primary key nonclustered not null,
 tsk_bug int not null,
 tsk_created_user int not null,
 tsk_created_date datetime not null,
@@ -353,7 +353,7 @@ create clustered index tsk_index_1 on bug_tasks (tsk_bug)
 
 create table bug_post_attachments
 (
-bpa_id int identity primary key not null,
+bpa_id int identity constraint pk_bug_post_attachements primary key not null,
 bpa_post int not null,
 bpa_content image not null
 )
@@ -368,8 +368,8 @@ bs_bug int not null,
 bs_user int not null,
 )
 
-create unique clustered index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
 create unique index bs_index_1 on bug_subscriptions (bs_user, bs_bug)
+create unique clustered index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
 
 /* BUG USER FLAGS */
 
@@ -399,7 +399,7 @@ create unique clustered index sn_index_1 on bug_user_seen (sn_bug, sn_user)
 
 create table bug_relationships
 (
-re_id int identity primary key not null,
+re_id int identity constraint pk_bug_relationships primary key not null,
 re_bug1 int not null,
 re_bug2 int not null,
 re_type nvarchar(500) null,
@@ -414,7 +414,7 @@ create unique index re_index_2 on bug_relationships (re_bug2, re_bug1)
 
 create table project_user_xref
 (
-pu_id int identity primary key not null,
+pu_id int identity constraint pk_project_user_xref primary key not null,
 pu_project int not null,
 pu_user int not null,
 pu_auto_subscribe int not null default(0),
@@ -437,7 +437,7 @@ insert into project_user_xref (pu_project, pu_user, pu_permission_level) values 
 
 create table user_defined_attribute
 (
-udf_id int identity primary key not null,
+udf_id int identity constraint pk_user_defined_attribute primary key not null,
 udf_name nvarchar(60) not null,
 udf_sort_seq int not null default(0),
 udf_default int not null default(0)
@@ -453,7 +453,7 @@ insert into user_defined_attribute (udf_name) values ('anything')
 
 create table statuses
 (
-st_id int identity primary key not null,
+st_id int identity constraint pk_statuses primary key not null,
 st_name nvarchar(60) not null,
 st_sort_seq int not null default(0),
 st_style nvarchar(30) null,
@@ -472,7 +472,7 @@ insert into statuses (st_name, st_sort_seq, st_style, st_default) values ('close
 
 create table priorities
 (
-pr_id int identity primary key not null,
+pr_id int identity constraint pk_priorities primary key not null,
 pr_name nvarchar(60) not null,
 pr_sort_seq int not null default(0),
 pr_background_color nvarchar(14) not null,
@@ -491,7 +491,7 @@ insert into priorities (pr_name, pr_sort_seq, pr_background_color, pr_style) val
 
 create table custom_col_metadata
 (
-ccm_colorder int primary key not null,
+ccm_colorder int constraint pk_custom_col_metadata primary key not null,
 ccm_dropdown_vals nvarchar(1000) not null default(''),
 ccm_sort_seq int default(0),
 ccm_dropdown_type varchar(20) null
@@ -500,7 +500,7 @@ ccm_dropdown_type varchar(20) null
 
 create table svn_revisions
 (
-svnrev_id int identity primary key nonclustered not null,
+svnrev_id int identity constraint pk_svn_revisions primary key nonclustered not null,
 svnrev_revision int not null,
 svnrev_bug int not null,
 svnrev_repository nvarchar(400) not null,
@@ -517,7 +517,7 @@ create clustered index svn_bug_index on svn_revisions (svnrev_bug)
 
 create table svn_affected_paths
 (
-svnap_id int identity primary key nonclustered not null,
+svnap_id int identity constraint pk_svn_affected_paths primary key nonclustered not null,
 svnap_svnrev_id int not null,
 svnap_action nvarchar(8) not null,
 svnap_path nvarchar(400) not null
@@ -529,7 +529,7 @@ create clustered index svn_revision_index on svn_affected_paths (svnap_svnrev_id
 /* REPORTS */
 create table reports
 (
-rp_id int identity primary key not null,
+rp_id int identity constraint pk_reports primary key not null,
 rp_desc nvarchar(200) not null,
 rp_sql ntext not null,
 rp_chart_type varchar(8) not null
@@ -639,7 +639,7 @@ values ('Hours Remaining by Project',
 
 create table queries
 (
-qu_id int identity primary key not null,
+qu_id int identity constraint pk_queries primary key not null,
 qu_desc nvarchar(200) not null,
 qu_sql ntext not null,
 qu_default int null,
@@ -652,7 +652,7 @@ create unique index unique_qu_desc on queries (qu_desc, qu_user, qu_org)
 
 create table queued_notifications
 (
-qn_id int identity primary key not null,
+qn_id int identity constraint pk_queued_notificatons primary key not null,
 qn_date_created datetime not null,
 qn_bug int not null,
 qn_user int not null,
@@ -668,7 +668,7 @@ qn_body ntext not null
 
 create table dashboard_items
 (
-ds_id int identity primary key not null,
+ds_id int identity constraint pk_dashboard_items primary key nonclustered not null,
 ds_user int not null,
 ds_report int not null,
 ds_chart_type varchar(8) not null,
@@ -676,8 +676,7 @@ ds_col int not null,
 ds_row int not null
 )
 
-create index ds_user_index on dashboard_items (ds_user)
-
+create clustered index ds_user_index on dashboard_items (ds_user)
 
 /*
 
