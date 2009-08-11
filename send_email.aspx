@@ -1,4 +1,4 @@
-<%@ Page language="C#"  %>
+<%@ Page language="C#" validateRequest="false" %>
 <%@ Import Namespace="System.IO" %>
 <!--
 Copyright 2002-2009 Corey Trager

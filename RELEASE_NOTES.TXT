@@ -68,6 +68,13 @@ pop3 = new POP3Main("c:\\btnet_service.exe.config", verbose);
 Version 3.2.4   08/xx/2009   (svn revision 361++++)
 -----------------------------------------------------------------------
 
+CHANGE THE SQL TO WHAT THE DUTCH GUY SAYS
+
+CACHE STUFF FOR DROPDOWNS and for LUCENE TEXT FIELDS
+
+
+Skip this release and wait for the next one if you are busy.
+
 * If you want to maybe improve the performance of you BugTracker.NET
 database a little bit, and I mean just a little bit, take a look in the
 SQL for this release.  The SQL mostly deals with changing which indexes
