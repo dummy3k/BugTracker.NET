@@ -829,38 +829,10 @@ that, we need to change the clustered primary key constraint to nonclustered,
 because a table can only have one clustered index.  (A clustered index
 means the data is physically in the order of the index).
 
-Th primary key constraints have random, generated names.  We need to know
-the names so that we can delete the constraints, so let's first 
-find out what those names are.   Run this SQL and save the results.
-
-*/
-
-select so.name, si.name from sys.indexes si
-inner join sysobjects so on si.object_id = so.id
-where  si.name like 'PK%'
-and so.name in (
-'bug_tasks', 
-'bug_posts', 
-'svn_revisions', 
-'svn_affected_paths', 
-'dashboard_items', 
-'bug_subscriptions')
-
-/*
-
-For me the results look like this:
-
-bug_posts	PK__bug_posts_37DF4923
-bug_tasks	PK__bug_tasks__36B12243
-svn_revisions	PK__svn_revisions__534D60F1
-svn_affected_paths	PK__svn_affected_pat__5535A963
-dashboard_items	PK__dashboard_items__5CD6CB2B
-bug_subscriptions PK__bug_subscription__37A5467C
-
-Drop the clustered primary keys, then add them back as nonclustered.
-Use YOUR names, not my names.
-
-*/
+Th primary key constraints have random, generated names, so I can't just
+give you the script to drop them.   Instead run the following script which
+generates the SQL you'll need, then run that generated SQL   The generated
+SQL will look something like this:
 
 alter table bug_posts drop constraint PK__bug_posts_37DF4923
 alter table bug_tasks drop constraint PK__bug_tasks__36B12243
@@ -868,8 +840,23 @@ alter table svn_revisions drop constraint PK__svn_revisions__534D60F1
 alter table svn_affected_paths drop constraint PK__svn_affected_pat__5535A963
 alter table dashboard_items drop constraint PK__dashboard_items__5CD6CB2B
 alter table bug_subscriptions drop constraint PK__bug_subscription__37A5467C
--- get rid of this column
-alter table bug_subscriptions drop column bs_id
+
+*/
+
+
+
+select 'alter table ' + so.name + ' drop constraint ' + si.name
+from sys.indexes si
+inner join sysobjects so on si.object_id = so.id
+where  si.name like 'PK%'
+and so.name in (
+'bug_tasks',
+'bug_posts',
+'svn_revisions',
+'svn_affected_paths',
+'dashboard_items',
+'bug_subscriptions')
+
 
 /*
 

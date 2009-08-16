@@ -91,14 +91,16 @@ void Page_Load(Object sender, EventArgs e)
 			back_href.HRef = "edit_bug.aspx?id=" + string_bg_id;
 			bg_id.Value = string_bg_id;
 
-			if (request_to != null)
+
+			to.Value = dr["bp_email_from"].ToString();
+
+
+			// Work around for a mysterious bug:
+			// http://sourceforge.net/tracker/?func=detail&aid=2815733&group_id=66812&atid=515837
+			if (btnet.Util.get_setting("StripDisplayNameFromEmailAddress","0") == "1")
 			{
-				to.Value = request_to;
-			}
-			else
-			{
-				to.Value = dr["bp_email_from"].ToString();
-			}
+				to.Value = btnet.Util.simplify_email_address(to.Value);
+			}			
 
 
 			// format from dropdown
@@ -304,6 +306,13 @@ void Page_Load(Object sender, EventArgs e)
 			{
 				to.Value = request_to;
 			}
+
+			// Work around for a mysterious bug:
+			// http://sourceforge.net/tracker/?func=detail&aid=2815733&group_id=66812&atid=515837
+			if (btnet.Util.get_setting("StripDisplayNameFromEmailAddress","0") == "1")
+			{
+				to.Value = btnet.Util.simplify_email_address(to.Value);
+			}			
 
 			if (dr["us_signature"].ToString() != "")
 			{

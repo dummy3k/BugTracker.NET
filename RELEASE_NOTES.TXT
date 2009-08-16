@@ -58,30 +58,68 @@ Corey's TO DO list:
 * http://www.microsoft.com/web/gallery/developer.aspx
 * Hide delete in mass edit if not allowed to delete.
 * per user defaults?
+* cache category, etc dropdowns for edit_bug.aspx?
 
 * string configFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, 
 "btnet_service.exe.config"); versus
 pop3 = new POP3Main("c:\\btnet_service.exe.config", verbose);
 
 
+I just added the following query to the ifdefined.com/btnet as "bugs closed by me".
+
+select '#ffffff', bg_id [id], bg_short_desc [desc],
+isnull(st_name,'') [status],
+isnull(lu.us_username,'') [last updated by],
+bg_last_updated_date [last updated on]
+from bugs
+left outer join statuses on st_id = bg_status
+left outer join users lu on lu.us_id = bg_last_updated_user
+WhErE bg_id in
+(
+select bp_bug
+from bug_posts
+where bp_type = 'update'
+and bp_comment like 'changed status%to "closed"'
+and bp_user = $ME
+)
+order by bg_id desc
+
+The sample queries "most recent comment" and "days in status" are also pretty close to what you want.   In what way do these queries fall short?
+
+I do have a "copy bug" function, but it doesn't copy all the posts.   I guess it should have the option of copying the posts too.
+
+
+ssues will arise when you don’t escape special characters. Note that those are special characters in Javascript, nowhere else. So, since everything is in a JS string, we need to escape the string delimiter (”) and we need to escape, well, the escape character (\) ;) In Javascript, “\”" would return a string with ” in it.
+
+By adding two simple replaces to your server-side code, you avoid those issues, and bugs:
+
+Response.Write("{\"Name\": \"" + MyDBStringField.Replace("\", "\\").Replace("\"", "\\"") + "\", \"City\": \"Davis\"}")
+
 -----------------------------------------------------------------------
-Version 3.2.4   08/xx/2009   (svn revision 361++++)
+Version 3.2.4   08/16/2009   (svn revision 367)
 -----------------------------------------------------------------------
 
-CHANGE THE SQL TO WHAT THE DUTCH GUY SAYS
+* send_email.aspx with CKEditor was broken.  This release fixes it by
+restoring the first line as:
+<%@ Page language="C#" validateRequest="false" %>
 
-CACHE STUFF FOR DROPDOWNS and for LUCENE TEXT FIELDS
-
-
-Skip this release and wait for the next one if you are busy.
+* Added setting to Web.config "StripDisplayNameFromEmailAddress" to
+work around a problem that some users are having when email addresses
+are in the format 
+Corey Trager <ctrager@yahoo.com>
+instead of
+ctrager@yahoo.com
+I can't reproduce the problem myself. see also bug 2815733, "When 
+sending mail to btnet, the mail address isn't correct"
+http://sourceforge.net/tracker/?func=detail&aid=2815733&group_id=66812&atid=515837
 
 * If you want to maybe improve the performance of you BugTracker.NET
-database a little bit, and I mean just a little bit, take a look in the
-SQL for this release.  The SQL mostly deals with changing which indexes
-are the clustered indexes.  If you don't understand what that means, 
-don't worry about it.
+database a little bit, and I mean just a little bit, take a look at the
+SQL in the file upgrade.sql for this release. The SQL mostly deals with 
+changing which indexes are the clustered indexes.  If you don't 
+understand what that means, don't worry about it.
 
-* Performance tweak of viewing images, giving the browser a better
+* Performance tweak of viewing images, giving the browser a better 
 chance of caching them.
 
 * Fix of bug in edit_query.aspx, so that admins can now edit the queries

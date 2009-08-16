@@ -13,18 +13,12 @@ namespace btnet
 	public class WhatsNew
 	{
 
+		static object mylock = new Object();
+		
 		public static void add_news(int id, string desc, string action, Security security)
 		{
 			if (btnet.Util.get_setting("EnableWhatsNewPage","0") == "1")
 			{
-
-				// create the list if necessary
-				List<BugNews> list = (List<BugNews>) HttpContext.Current.Application["whatsnew"];
-				if (list == null)
-				{
-					list = new List<BugNews>();
-					HttpContext.Current.Application["whatsnew"] = list;
-				}
 
 				BugNews bn = new BugNews();
 				bn.when = DateTime.Now;
@@ -33,8 +27,19 @@ namespace btnet
 				bn.action = action;
 				bn.who = security.user.username;
 
-				list.Add(bn);
+				// create the list if necessary
+				lock(mylock)
+				{
+					List<BugNews> list = (List<BugNews>) HttpContext.Current.Application["whatsnew"];
 
+					if (list == null)
+					{
+						list = new List<BugNews>();
+						HttpContext.Current.Application["whatsnew"] = list;
+					}
+
+					list.Add(bn);
+				}
 			}
 
 		}

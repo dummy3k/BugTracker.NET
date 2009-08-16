@@ -456,7 +456,6 @@ void Page_Load(Object sender, EventArgs e)
 		if (statusid == 0) {statusid = (int) defaults["st"];}
 		if (udfid == 0) {udfid = (int) defaults["udf"];}
 
-
 		btnet.Bug.NewIds new_ids = btnet.Bug.insert_bug(
 			short_desc,
 			security,
