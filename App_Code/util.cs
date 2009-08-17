@@ -98,35 +98,42 @@ namespace btnet
 
 			lock(dummy)
 			{
-				System.IO.StreamWriter w = System.IO.File.AppendText(path);
+                try
+                {
+                    System.IO.StreamWriter w = System.IO.File.AppendText(path);
 
-				// write to it
+                    // write to it
 
 
-				string url = "";
-				
-				try // To workaround problem with IIS integrated mode
-				{
-					if (HttpContext.Current != null)
-					{
-						if (HttpContext.Current.Request != null)
-						{
-							url = HttpContext.Current.Request.Url.ToString();
-						}
-					}
-				}
-				catch 
-				{
-					// do nothing
-				}
+                    string url = "";
+                    
+                    try // To workaround problem with IIS integrated mode
+                    {
+                        if (HttpContext.Current != null)
+                        {
+                            if (HttpContext.Current.Request != null)
+                            {
+                                url = HttpContext.Current.Request.Url.ToString();
+                            }
+                        }
+                    }
+                    catch 
+                    {
+                        // do nothing
+                    }
 
-				w.WriteLine(DateTime.Now.ToString("yyy-MM-dd HH:mm:ss")
-					+ " "
-					+ url
-					+ " "
-					+ s);
+                    w.WriteLine(DateTime.Now.ToString("yyy-MM-dd HH:mm:ss")
+                        + " "
+                        + url
+                        + " "
+                        + s);
 
-				w.Close();
+                    w.Close();
+                }
+                catch
+                {
+                    //what now?
+                }
 			}
 		}
 
