@@ -899,3 +899,9 @@ create unique clustered index sn_index_1 on bug_user_seen (sn_bug, sn_user)
 alter table sessions add constraint pk_sessions primary key (se_id)
 alter table emailed_links add constraint pk_emailed_links primary key (el_id)
 alter table custom_col_metadata add constraint pk_custom_col_metadata primary key (ccm_colorder)
+
+
+/*
+    changes made by L.Wagner
+*/
+alter table queued_notifications add qn_xml ntext

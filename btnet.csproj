@@ -49,10 +49,123 @@
     <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="add_attachment.aspx" />
+    <Content Include="add_customfield.aspx" />
+    <Content Include="add_svn_revision.aspx" />
+    <Content Include="admin.aspx" />
+    <Content Include="ajax.aspx" />
+    <Content Include="ajax2.aspx" />
+    <Content Include="bugs.aspx" />
+    <Content Include="categories.aspx" />
+    <Content Include="change_password.aspx" />
+    <Content Include="complete_registration.aspx" />
+    <Content Include="customfields.aspx" />
+    <Content Include="dashboard.aspx" />
     <Content Include="Default.aspx" />
+    <Content Include="delete_attachment.aspx" />
+    <Content Include="delete_bug.aspx" />
+    <Content Include="delete_category.aspx" />
+    <Content Include="delete_comment.aspx" />
+    <Content Include="delete_customfield.aspx" />
+    <Content Include="delete_org.aspx" />
+    <Content Include="delete_priority.aspx" />
+    <Content Include="delete_project.aspx" />
+    <Content Include="delete_query.aspx" />
+    <Content Include="delete_report.aspx" />
+    <Content Include="delete_status.aspx" />
+    <Content Include="delete_subscriber.aspx" />
+    <Content Include="delete_udf.aspx" />
+    <Content Include="delete_user.aspx" />
+    <Content Include="edit_attachment.aspx" />
+    <Content Include="edit_bug.aspx" />
+    <Content Include="edit_category.aspx" />
+    <Content Include="edit_comment.aspx" />
+    <Content Include="edit_customfield.aspx" />
+    <Content Include="edit_dashboard.aspx" />
+    <Content Include="edit_org.aspx" />
+    <Content Include="edit_priority.aspx" />
+    <Content Include="edit_project.aspx" />
+    <Content Include="edit_query.aspx" />
+    <Content Include="edit_queued_notifications.aspx" />
+    <Content Include="edit_report.aspx" />
+    <Content Include="edit_self.aspx" />
+    <Content Include="edit_status.aspx" />
+    <Content Include="edit_styles.aspx" />
+    <Content Include="edit_task.aspx" />
+    <Content Include="edit_udf.aspx" />
+    <Content Include="edit_user.aspx" />
+    <Content Include="edit_user_permissions2.aspx" />
+    <Content Include="flag.aspx" />
+    <Content Include="forgot.aspx" />
+    <Content Include="generate_btnetsc_reg.aspx" />
+    <Content Include="get_db_datetime.aspx" />
+    <Content Include="hello.aspx" />
+    <Content Include="inc.aspx" />
+    <Content Include="insert_bug.aspx" />
+    <Content Include="install.aspx" />
+    <Content Include="loginnt.aspx" />
+    <Content Include="logoff.aspx" />
+    <Content Include="massedit.aspx" />
+    <Content Include="merge_bug.aspx" />
+    <Content Include="notifications.aspx" />
+    <Content Include="orgs.aspx" />
+    <Content Include="print_bug.aspx" />
+    <Content Include="print_bugs.aspx" />
+    <Content Include="print_bugs2.aspx" />
+    <Content Include="priorities.aspx" />
+    <Content Include="projects.aspx" />
+    <Content Include="queries.aspx" />
+    <Content Include="query.aspx" />
+    <Content Include="register.aspx" />
+    <Content Include="relationships.aspx" />
+    <Content Include="reports.aspx" />
+    <Content Include="search.aspx" />
+    <Content Include="search_text.aspx" />
+    <Content Include="seen.aspx" />
+    <Content Include="select_report.aspx" />
+    <Content Include="send_email.aspx" />
+    <Content Include="server_variables.aspx" />
+    <Content Include="statuses.aspx" />
+    <Content Include="subscribe.aspx" />
+    <Content Include="svn_blame.aspx" />
+    <Content Include="svn_diff.aspx" />
+    <Content Include="svn_log.aspx" />
+    <Content Include="svn_view.aspx" />
+    <Content Include="tags.aspx" />
+    <Content Include="tasks.aspx" />
+    <Content Include="tasks_frame.aspx" />
+    <Content Include="translate.aspx" />
+    <Content Include="udfs.aspx" />
+    <Content Include="update_dashboard.aspx" />
+    <Content Include="upgrade_273_to_274.aspx" />
+    <Content Include="users.aspx" />
+    <Content Include="view_attachment.aspx" />
+    <Content Include="view_memory_log.aspx" />
+    <Content Include="view_report.aspx" />
+    <Content Include="view_subscribers.aspx" />
+    <Content Include="view_svn_file_revisions.aspx" />
+    <Content Include="view_web_config.aspx" />
+    <Content Include="view_whatsnew.aspx" />
     <Content Include="Web.config" />
+    <Content Include="whatsnew.aspx" />
+    <Content Include="write_posts.aspx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Code\authenticate.cs" />
+    <Content Include="App_Code\bug.cs" />
+    <Content Include="App_Code\bug_list.cs" />
+    <Content Include="App_Code\dbutil.cs" />
+    <Content Include="App_Code\email.cs" />
+    <Content Include="App_Code\my_lucene.cs" />
+    <Content Include="App_Code\print_bug.cs" />
+    <Content Include="App_Code\security.cs" />
+    <Content Include="App_Code\sortable_html_table.cs" />
+    <Content Include="App_Code\tags.cs" />
+    <Content Include="App_Code\TranslationService.cs" />
+    <Content Include="App_Code\user.cs" />
+    <Content Include="App_Code\util.cs" />
+    <Content Include="App_Code\whatsnew.cs" />
+    <Content Include="App_Code\workflow.cs" />
     <Compile Include="Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>Default.aspx</DependentUpon>
@@ -61,6 +174,10 @@
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App_Code\.gitignore" />
+    <None Include="App_Code\util.cs.bak" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

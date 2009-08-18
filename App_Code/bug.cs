@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Xml;
 
 // disable System.Net.Mail warnings
 #pragma warning disable 618
@@ -988,7 +989,8 @@ select scope_identity();";
 				just_to_this,
 				false,  // status changed
 				false,  // assigend to changed
-				0);  // prev assigned to
+                0,      // prev assigned to
+                "");    // last Comment
 		}
 
 		///////////////////////////////////////////////////////////////////////
@@ -1000,8 +1002,9 @@ select scope_identity();";
 				0,  // just to this
 				false,  // status changed
 				false,  // assigend to changed
-				0);  // prev assigned to
-		}
+                0,      // prev assigned to
+                "");    // last Comment
+        }
 
 
 		///////////////////////////////////////////////////////////////////////
@@ -1013,7 +1016,8 @@ select scope_identity();";
 			int just_to_this_userid,
 			bool status_changed,
 			bool assigned_to_changed,
-			int prev_assigned_to_user)
+			int prev_assigned_to_user,
+            string lastComment)
 		{
 
 			// If there's something worth emailing about, then there's 
@@ -1232,8 +1236,8 @@ and (us_id <> $us or isnull(us_send_notifications_to_self,0) = 1)";
 delete from queued_notifications where qn_bug = $bug and qn_to = N'$to'
 
 insert into queued_notifications
-(qn_date_created, qn_bug, qn_user, qn_status, qn_retries, qn_to, qn_from, qn_subject, qn_body, qn_last_exception)
-values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N'$body', N'')";
+(qn_date_created, qn_bug, qn_user, qn_status, qn_retries, qn_to, qn_from, qn_subject, qn_body, qn_last_exception, qn_xml)
+values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N'$body', N'', N'$xml')";
 
 					sql = sql.Replace("$bug",Convert.ToString(bugid));
 					sql = sql.Replace("$user",Convert.ToString(dr["us_id"]));
@@ -1241,6 +1245,22 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 					sql = sql.Replace("$from", from.Replace("'","''"));
 					sql = sql.Replace("$subject", subject.Replace("'","''"));
 					sql = sql.Replace("$body", writer.ToString().Replace("'","''"));
+
+                    // begin write XML Attachment
+                    XmlDocument doc = new XmlDocument();
+                    XmlElement xmlRoot = doc.CreateElement("notification");
+                    xmlRoot.SetAttribute("bugid", Convert.ToString(bugid));
+
+                    XmlElement xmlSubject = doc.CreateElement("subject");
+                    xmlSubject.InnerText = subject;
+                    xmlRoot.AppendChild(xmlSubject);
+
+                    XmlElement xmlBody = doc.CreateElement("body");
+                    xmlBody.InnerText = lastComment;
+                    xmlRoot.AppendChild(xmlBody);
+
+                    doc.AppendChild(xmlRoot);
+                    sql = sql.Replace("$xml", doc.OuterXml.Replace("'", "''"));
 
 					btnet.DbUtil.execute_nonquery_without_logging(sql);
 
@@ -1293,8 +1313,9 @@ values (getdate(), $bug, $user, N'not sent', 0, N'$to', N'$from', N'$subject', N
 							(string) dr["qn_from"],
 							"", // cc
 							(string) dr["qn_subject"],
-							(string) dr["qn_body"],
-							System.Web.Mail.MailFormat.Html);
+                            (string)dr["qn_body"],
+                            (string)dr["qn_xml"],
+                            System.Web.Mail.MailFormat.Html);
 
 						if (err == "")
 						{

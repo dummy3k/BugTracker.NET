@@ -2273,7 +2273,8 @@ void on_update (Object sender, EventArgs e)
 				btnet.Bug.send_notifications(btnet.Bug.UPDATE,	id,	security, 0,
 					status_changed,
 					assigned_to_changed,
-					Convert.ToInt32(assigned_to.SelectedItem.Value));
+					Convert.ToInt32(assigned_to.SelectedItem.Value),
+                    comment_formated);
 
 			}
 

@@ -31,6 +31,7 @@ namespace btnet
 				cc,
 				subject,
 				body,
+                "", // XML
 				System.Web.Mail.MailFormat.Text,
 				System.Web.Mail.MailPriority.Normal,
 				null,
@@ -44,6 +45,7 @@ namespace btnet
 			string cc,
 			string subject,
 			string body,
+            string xml,
 			System.Web.Mail.MailFormat body_format)
 		{
 			return send_email(
@@ -52,6 +54,7 @@ namespace btnet
 				cc,
 				subject,
 				body,
+                xml,
 				body_format,
 				System.Web.Mail.MailPriority.Normal,
 				null,
@@ -65,7 +68,8 @@ namespace btnet
 			string cc,
 			string subject,
 			string body,
-			System.Web.Mail.MailFormat body_format,
+            string xml,
+            System.Web.Mail.MailFormat body_format,
 			System.Web.Mail.MailPriority priority,
 			int[] attachment_bpids,
 			bool return_receipt)
@@ -193,6 +197,27 @@ namespace btnet
 					files_to_delete.Add(dest_path_and_filename);
 				}
 			}
+
+
+            // Add XML Attachment
+            string xml_tmp_filename = Path.Combine(Path.GetTempPath(), "notification.xml");
+            ASCIIEncoding encoder = new ASCIIEncoding();
+            using (FileStream xml_out_stream = new FileStream(
+                xml_tmp_filename,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None))
+            {
+                xml_out_stream.Write(
+                    encoder.GetBytes(xml),
+                    0, //Offset
+                    encoder.GetByteCount(xml));
+            }
+
+            System.Web.Mail.MailAttachment xml_attachment = new System.Web.Mail.MailAttachment(
+                xml_tmp_filename, System.Web.Mail.MailEncoding.Base64);
+            msg.Attachments.Add(xml_attachment);
+            files_to_delete.Add(xml_tmp_filename);
 
 
 			try
