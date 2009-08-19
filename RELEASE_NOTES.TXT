@@ -95,6 +95,16 @@ By adding two simple replaces to your server-side code, you avoid those issues, 
 
 Response.Write("{\"Name\": \"" + MyDBStringField.Replace("\", "\\").Replace("\"", "\\"") + "\", \"City\": \"Davis\"}")
 
+
+-----------------------------------------------------------------------
+Version 3.2.5   08/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+new imlementation of whatsnew.
+
+Setting User Password to value > 20 characters breaks login
+
+
 -----------------------------------------------------------------------
 Version 3.2.4   08/16/2009   (svn revision 367)
 -----------------------------------------------------------------------

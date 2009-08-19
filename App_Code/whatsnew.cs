@@ -14,15 +14,26 @@ namespace btnet
 	{
 
 		static object mylock = new Object();
+		static long prev_seconds = 0;
+		public const long ten_million = 10000000; 
 		
-		public static void add_news(int id, string desc, string action, Security security)
+		public static void add_news(int bugid, string desc, string action, Security security)
 		{
+
 			if (btnet.Util.get_setting("EnableWhatsNewPage","0") == "1")
 			{
 
+				long seconds = DateTime.Now.Ticks / ten_million;
+				if (seconds == prev_seconds)
+				{
+					seconds++; // prevent dupes, even if we have to lie.
+				}
+				prev_seconds = seconds;
+				
 				BugNews bn = new BugNews();
-				bn.when = DateTime.Now;
-				bn.id = id;
+				bn.seconds = seconds;
+				bn.seconds_string = Convert.ToString(seconds);
+				bn.bugid = Convert.ToString(bugid);
 				bn.desc = desc;
 				bn.action = action;
 				bn.who = security.user.username;
@@ -39,7 +50,9 @@ namespace btnet
 					}
 
 					list.Add(bn);
+
 				}
+
 			}
 
 		}
@@ -48,13 +61,14 @@ namespace btnet
 
 	public class BugNews
 	{
-		public DateTime when;
-		public int id;
+		public long seconds;
+		public string seconds_string;
+		public string bugid;
 		public string desc;
 		public string action;
 		public string who;
 	}
-
+	
 }
 
 

@@ -1,12 +1,38 @@
 <%@ Page language="C#"%>
-<!--
-Copyright 2002-2008 Corey Trager
-Distributed under the terms of the GNU General Public License
--->
+
 <!-- #include file = "inc.aspx" -->
 
 <script language="C#" runat="server">
 
+/*
+
+The server sends back the current System.Now.Milliseconds and a list of the 
+bugs since the "since" value.   The data is formated as JSON.
+
+{
+"now" : 9999,
+"news_list" : [ 
+		  	{
+		  		"seconds":12,
+		  		"bugid": 34,
+		  		"desc": "foo",
+		  		"action": "add",
+		  		"who" : "ctrager",
+		  	},
+
+		  	{
+		  		"seconds":12,
+		  		"bugid": 34,
+		  		"desc": "foo",
+		  		"action": "add",
+		  		"who" : "ctrager",
+		  	},
+		  	
+		  ]
+
+}
+
+*/
 
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
@@ -18,77 +44,85 @@ void Page_Load(Object sender, EventArgs e)
 		Response.Write("Sorry, Web.config EnableWhatsNewPage is set to 0");
 		Response.End();
 	}
+	
+	string since_string = Request["since"];
+	if (string.IsNullOrEmpty(since_string))
+	{
+		since_string = "0";
+	}
+	
+	long since = Convert.ToInt64(since_string);
+	
+
+	Response.ContentType = "application/json";
+	
+	StringBuilder json = new StringBuilder();
+	
+	json.Append("{");
+	append_json_var_val(json, "now", Convert.ToString(System.DateTime.Now.Ticks/WhatsNew.ten_million));
+	
+	// Serialize an array of BugNews objects
+	json.Append(",\"news_list\":[");
 
 	List<BugNews> list = (List<BugNews>) Application["whatsnew"];
-	if (list == null)
+	
+	bool first_news = true;
+	if (list != null)
 	{
-		Response.Write("no news");
-		Response.End();
+		//for (int i = list.Count - 1; i > -1; i--)
+		for (int i = 0; i < list.Count; i++)
+		{
+			BugNews news = list[i];
+			if (news.seconds > since)
+			{
+				if (first_news)
+				{
+					first_news = false;					
+				}					
+				else
+				{
+					json.Append(",");
+				}
+				
+				// Serialize BugNews object
+				json.Append("{");
+					append_json_var_val(json, "seconds", news.seconds_string);
+					json.Append(",");
+					append_json_var_val(json, "bugid", news.bugid);
+					json.Append(",");
+					append_json_var_val(json, "desc", HttpUtility.HtmlEncode(news.desc));
+					json.Append(",");
+					append_json_var_val(json, "action", news.action);
+					json.Append(",");
+					append_json_var_val(json, "who", news.who);
+				json.Append("}");
+			}
+		}
 	}
 
-	StringBuilder sb = new StringBuilder();
 
-	sb.Append("<table border=1 class=datat><tr>");
-	sb.Append("<td class=datah>when");
-	sb.Append("<td class=datah>id");
-	sb.Append("<td class=datah>desc");
-	sb.Append("<td class=datah>action");
-	sb.Append("<td class=datah>user");
+	json.Append("]}");
+	
 
-	long ticks_now = DateTime.Now.Ticks;
-
-	for (int i = list.Count - 1; i > -1; i--)
-	{
-		if (i == list.Count-101)
-		{
-			break; // just the most recent 100
-		}
-
-		BugNews news = list[i];
-
-		sb.Append("<tr>");
-
-		TimeSpan ts = new TimeSpan(ticks_now - news.when.Ticks);
-
-		if (ts.TotalSeconds < 90)
-		{
-			sb.Append("<td class=datad style='background:red;'>");
-		}
-		else if (ts.TotalSeconds < 180)
-		{
-			sb.Append("<td class=datad style='background:orange;'>");
-		}
-		else if (ts.TotalSeconds < 300)
-		{
-			sb.Append("<td class=datad style='background:yellow;'>");
-		}
-		else
-		{
-			sb.Append("<td class=datad>");
-		}
-		sb.Append(btnet.Util.how_long_ago(ts));
-
-		sb.Append("<td class=datad>");
-		sb.Append(Convert.ToString(news.id));
-
-		sb.Append("<td class=datad><a href=edit_bug.aspx?id=");
-		sb.Append(Convert.ToString(news.id));
-		sb.Append(">");
-		sb.Append(news.desc);
-		sb.Append("</a>");
-
-		sb.Append("<td class=datad>");
-		sb.Append(news.action);
-
-		sb.Append("<td class=datad>");
-		sb.Append(news.who);
-
-	}
-
-	sb.Append("</table>");
-	Response.Write(sb.ToString());
+	Response.Write(json.ToString());
+	
 
 }
 
+string escape_for_json(string s)
+{
+
+	return s.Replace("\\", "\\\\").Replace("\"", "\\\"");
+}
+
+
+void append_json_var_val(StringBuilder json, string var, string val)
+{
+	json.Append("\"");
+	json.Append(var);
+	json.Append("\":\"");
+	json.Append(escape_for_json(val));
+	json.Append("\"");
+}
 
 </script>
