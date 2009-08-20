@@ -6,7 +6,7 @@
 
 /*
 
-The server sends back the current System.Now.Milliseconds and a list of the 
+The server sends back the current time and a list of the 
 bugs since the "since" value.   The data is formated as JSON.
 
 {
@@ -59,6 +59,8 @@ void Page_Load(Object sender, EventArgs e)
 	StringBuilder json = new StringBuilder();
 	
 	json.Append("{");
+	
+	// The web server's time.  The client javascript will use this a a reference point.
 	append_json_var_val(json, "now", Convert.ToString(System.DateTime.Now.Ticks/WhatsNew.ten_million));
 	
 	// Serialize an array of BugNews objects
@@ -69,7 +71,6 @@ void Page_Load(Object sender, EventArgs e)
 	bool first_news = true;
 	if (list != null)
 	{
-		//for (int i = list.Count - 1; i > -1; i--)
 		for (int i = 0; i < list.Count; i++)
 		{
 			BugNews news = list[i];
@@ -100,12 +101,9 @@ void Page_Load(Object sender, EventArgs e)
 		}
 	}
 
-
 	json.Append("]}");
-	
 
 	Response.Write(json.ToString());
-	
 
 }
 

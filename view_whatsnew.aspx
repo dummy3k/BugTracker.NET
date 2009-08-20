@@ -44,6 +44,8 @@ var my_news_list = new Array()
 function how_long_ago(seconds)
 {
 
+	// turn seconds ago into a friendly piece of text
+	
 	var days = Math.floor(seconds/seconds_in_a_day)
 	var hours = Math.floor(seconds/seconds_in_an_hour)
 	var minutes = Math.floor(seconds/60)
@@ -99,7 +101,6 @@ function how_long_ago(seconds)
 	{
 		return seconds + " seconds ago";
 	}
-
 }
 
 
@@ -126,7 +127,6 @@ function get_color(seconds_ago)
 function process_json(json)
 {
 
-
 	for (i = 0; i < json.news_list.length; i++)
 	{
 
@@ -140,7 +140,6 @@ function process_json(json)
 		}
 
 	}
-
 
 	// iterate backwards through all the news retrieved, updating the "how long ago"
 

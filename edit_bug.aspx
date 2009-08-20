@@ -2287,33 +2287,36 @@ void on_update (Object sender, EventArgs e)
 			{
 				DataRow bug = (DataRow) Session["bug_datarow"];
 				
-				bug["status"] = int.Parse(status.SelectedItem.Value);
-				bug["status_name"] = status.SelectedItem.Text;
-				
-				bug["project"] = int.Parse(project.SelectedItem.Value);
-				bug["current_project"] = project.SelectedItem.Text;
-				
-				bug["organization"] = int.Parse(org.SelectedItem.Value);
-				bug["og_name"] = org.SelectedItem.Text;
-				
-				bug["category"] = int.Parse(category.SelectedItem.Value);
-				bug["category_name"] = category.SelectedItem.Text;
+				if (bug != null) // this happens in development...
+				{
+					bug["status"] = int.Parse(status.SelectedItem.Value);
+					bug["status_name"] = status.SelectedItem.Text;
 
-				bug["category"] = int.Parse(category.SelectedItem.Value);
-				bug["category_name"] = category.SelectedItem.Text;
-				
-				bug["assigned_to_user"] = int.Parse(assigned_to.SelectedItem.Value);
-				bug["assigned_to_username"] = assigned_to.SelectedItem.Text;
-				
-				/*
-					"Note about customizing workflow"
-					
-					We've updated some but not all of the fields in the cached DataRow.
-					We haven't updated, for example, the custom fields.   If your workflow
-					logic needs to know about other fields, then maybe add logic here,
-					or refetch the bug from the db from within your customized workflow.
-				*/
-				Workflow.custom_adjust_controls(bug, security.user, this);
+					bug["project"] = int.Parse(project.SelectedItem.Value);
+					bug["current_project"] = project.SelectedItem.Text;
+
+					bug["organization"] = int.Parse(org.SelectedItem.Value);
+					bug["og_name"] = org.SelectedItem.Text;
+
+					bug["category"] = int.Parse(category.SelectedItem.Value);
+					bug["category_name"] = category.SelectedItem.Text;
+
+					bug["category"] = int.Parse(category.SelectedItem.Value);
+					bug["category_name"] = category.SelectedItem.Text;
+
+					bug["assigned_to_user"] = int.Parse(assigned_to.SelectedItem.Value);
+					bug["assigned_to_username"] = assigned_to.SelectedItem.Text;
+
+					/*
+						"Note about customizing workflow"
+
+						We've updated some but not all of the fields in the cached DataRow.
+						We haven't updated, for example, the custom fields.   If your workflow
+						logic needs to know about other fields, then maybe add logic here,
+						or refetch the bug from the db from within your customized workflow.
+					*/
+					Workflow.custom_adjust_controls(bug, security.user, this);
+				}
 			}
 		} // edit existing or not
 

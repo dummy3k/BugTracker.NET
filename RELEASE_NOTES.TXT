@@ -89,21 +89,20 @@ The sample queries "most recent comment" and "days in status" are also pretty cl
 I do have a "copy bug" function, but it doesn't copy all the posts.   I guess it should have the option of copying the posts too.
 
 
-ssues will arise when you don’t escape special characters. Note that those are special characters in Javascript, nowhere else. So, since everything is in a JS string, we need to escape the string delimiter (”) and we need to escape, well, the escape character (\) ;) In Javascript, “\”" would return a string with ” in it.
-
-By adding two simple replaces to your server-side code, you avoid those issues, and bugs:
-
-Response.Write("{\"Name\": \"" + MyDBStringField.Replace("\", "\\").Replace("\"", "\\"") + "\", \"City\": \"Davis\"}")
-
-
 -----------------------------------------------------------------------
-Version 3.2.5   08/xx/2009   (svn revision xxx)
+Version 3.2.5   08/19/2009   (svn revision xxx)
 -----------------------------------------------------------------------
 
-new imlementation of whatsnew.
+* If you are using the "news" link, enabled by setting 
+"EnableWhatsNewPage" to "1" in Web.config, then this release should be
+an improvement for you.   Now, if you keep the web page up, you won't 
+loose news items even if you restart the IIS server.   Also, you
+control the number of news items via the new "WhatsNewMaxItemsCount"
+setting in Web.config.   Performance probably wasn't an issue before,
+but it's even less likely to be an issue now.
 
-Setting User Password to value > 20 characters breaks login
-
+As before, news items are listed regardless of project and org
+permissions.
 
 -----------------------------------------------------------------------
 Version 3.2.4   08/16/2009   (svn revision 367)

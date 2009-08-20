@@ -38,18 +38,26 @@ namespace btnet
 				bn.action = action;
 				bn.who = security.user.username;
 
-				// create the list if necessary
 				lock(mylock)
 				{
 					List<BugNews> list = (List<BugNews>) HttpContext.Current.Application["whatsnew"];
 
+					// create the list if necessary
 					if (list == null)
 					{
 						list = new List<BugNews>();
 						HttpContext.Current.Application["whatsnew"] = list;
 					}
 
+					// Add the newest item
 					list.Add(bn);
+					
+					// Trim the old items
+					int max = Convert.ToInt32(btnet.Util.get_setting("WhatsNewMaxItemsCount","200"));
+					while (list.Count > max)
+					{
+						list.RemoveAt(0);
+					}
 
 				}
 
