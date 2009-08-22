@@ -26,10 +26,23 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ Util.get_setting("PluralBugLabel","bugs");
 
-    String templ = "group simple; AddNewBug()::=\"bugs_aspx hinzufügen\"";
-    tmplGroup = new StringTemplateGroup(new System.IO.StringReader(templ));
-    
+    // load template groups
+    String language = Request["lang"];
+    if (language== null)
+    {
+        language = "en";
+    }
+    language = language.ToLower();
 
+    String[] directories = new String[]{ System.IO.Path.Combine(@"stringtemplates", language)};
+    CommonGroupLoader groupLoader = new CommonGroupLoader(
+        new DefaultGroupFactory(), null, Encoding.UTF8, directories);
+    StringTemplateGroup.RegisterGroupLoader(groupLoader);
+    tmplGroup = StringTemplateGroup.LoadGroup("templates");
+
+
+    
+        
 	if (!IsPostBack) {
 
         load_query_dropdown();
@@ -84,6 +97,11 @@ void Page_Load(Object sender, EventArgs e)
 
 }
 
+
+string getTmpl(string name)
+{
+    return tmplGroup.GetInstanceOf(name).ToString();
+}
 
 ///////////////////////////////////////////////////////////////////////
 void select_query_in_dropdown()
@@ -310,11 +328,7 @@ function on_query_changed()
 <table border=0><tr>
 	<td  nowrap>
 	<% if (!security.user.adds_not_allowed) { %>
-	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>&nbsp;
-	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;<% 
-        StringTemplate tmpl = tmplGroup.GetInstanceOf("AddNewBug");
-        Response.Write(tmpl.ToString()); 
-        %></a>&nbsp;
+	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;<%=getTmpl("AddNewBug") %></a>&nbsp;
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<% } %>
 
@@ -323,13 +337,13 @@ function on_query_changed()
 	</asp:DropDownList>
 
 	<td nowrap>
-	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx>print list</a>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx><%=getTmpl("PrintList")%></a>
 	<td  nowrap>
-	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs2.aspx>print detail</a>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs2.aspx><%=getTmpl("PrintDetail")%></a>
 	<td  nowrap>
-	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx?format=excel>export to excel</a>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx?format=excel><%=getTmpl("ExportToExcel")%></a>
 	<td  nowrap align=right width=100%>
-	<a target=_blank href=screen_capture.html>screen capture</a>
+	<a target=_blank href=screen_capture.html><%=getTmpl("ScreenCapture")%></a>
 </table>
 <br>
 <%

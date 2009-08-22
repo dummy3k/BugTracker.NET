@@ -1,0 +1,7 @@
+﻿group simple;
+
+AddNewBug()::="Bug hinzufügen"
+PrintList()::="Liste drucken"
+PrintDetail()::="Detail drucken"
+ExportToExcel()::="als Exceldatei exportieren"
+ScreenCapture()::="Screen capture"
