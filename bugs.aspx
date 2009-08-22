@@ -1,4 +1,6 @@
 <%@ Page language="C#"%>
+<%@Import Namespace="Antlr.StringTemplate" %>
+
 <!--
 Copyright 2002-2009 Corey Trager
 Distributed under the terms of the GNU General Public License
@@ -7,11 +9,11 @@ Distributed under the terms of the GNU General Public License
 
 <script language="C#" runat="server">
 
-
 Security security;
 string qu_id_string = null;
 string sql_error = "";
-
+StringTemplateGroup tmplGroup;
+    
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
@@ -24,6 +26,9 @@ void Page_Load(Object sender, EventArgs e)
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ Util.get_setting("PluralBugLabel","bugs");
 
+    String templ = "group simple; AddNewBug()::=\"bugs_aspx hinzufügen\"";
+    tmplGroup = new StringTemplateGroup(new System.IO.StringReader(templ));
+    
 
 	if (!IsPostBack) {
 
@@ -305,7 +310,11 @@ function on_query_changed()
 <table border=0><tr>
 	<td  nowrap>
 	<% if (!security.user.adds_not_allowed) { %>
-	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>
+	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(Util.get_setting("SingularBugLabel","bug")); %></a>&nbsp;
+	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;<% 
+        StringTemplate tmpl = tmplGroup.GetInstanceOf("AddNewBug");
+        Response.Write(tmpl.ToString()); 
+        %></a>&nbsp;
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<% } %>
 

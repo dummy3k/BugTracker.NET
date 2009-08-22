@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{BE3C8A22-0F4B-4DFC-9B8F-DA3F14720849}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="antlr.runtime, Version=2.7.7.3, Culture=neutral, PublicKeyToken=d7701e059243744f">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>depends\StringTemplate v3.1b1\antlr.runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Highlighter.Net, Version=2.0.0.1, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>depends\Highlighter.Net.dll</HintPath>
@@ -37,6 +41,10 @@
     <Reference Include="Lucene.Net, Version=2.0.0.4, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>depends\Lucene.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="StringTemplate, Version=3.0.1.6846, Culture=neutral, PublicKeyToken=beee492b52c41e85, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>depends\StringTemplate v3.1b1\StringTemplate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -177,7 +185,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App_Code\.gitignore" />
-    <None Include="App_Code\util.cs.bak" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -202,9 +209,6 @@
           <IISUrl>
           </IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
