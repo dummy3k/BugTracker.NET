@@ -662,7 +662,8 @@ qn_last_exception nvarchar(1000) not null,
 qn_to nvarchar(200) not null,
 qn_from nvarchar(200) not null,
 qn_subject nvarchar(400) not null,
-qn_body ntext not null
+qn_body ntext not null,
+qn_xml ntext
 )
 
 
