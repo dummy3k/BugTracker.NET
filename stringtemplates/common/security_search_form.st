@@ -5,4 +5,4 @@
         value='$query$'name=query accesskey=s>
         <a href=lucene_syntax.html target=_blank style='font-size: 7pt;'>$Advanced()$</a>
     </form>
-</td>";
+</td>

@@ -33,14 +33,6 @@ namespace btnet
 
         private StringTemplates mStringTemplates;
 
-        static string goto_form = @"
-<td nowrap valign=middle>
-    <form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>
-        <input class=menubtn type=submit value='go to ID'>
-        <input class=menuinput size=4 type=text class=txt name=id accesskey=g>
-    </form>
-</td>";
-
         public Security()
         {
             mStringTemplates = new StringTemplates();
@@ -291,6 +283,7 @@ function on_submit_search()
 </script>
 <table border=0 width=100% cellpadding=0 cellspacing=0 class=menubar><tr>");
 
+
             // logo
             string logo = (string)Util.context.Application["custom_logo"];
             Response.Write(logo);
@@ -330,10 +323,8 @@ function on_submit_search()
                 write_menu_item(Response, this_link, mStringTemplates.getI18N("Users"), "users.aspx");
             }
 
-
             // go to
-
-            Response.Write (goto_form);
+            Response.Write(mStringTemplates.Common.GetInstanceOf("security_goto_form"));
 
             // search
             if (Util.get_setting("EnableLucene", "1") == "1")
@@ -349,43 +340,35 @@ function on_submit_search()
                 Response.Write(tmpl.ToString());
             }
 
-            Response.Write("<td nowrap valign=middle>");
-			if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
-			{
-				Response.Write("<span class=smallnote>using as<br>");
-			}
-			else
-			{
-				Response.Write("<span class=smallnote>logged in as<br>");
-			}
-           	Response.Write(user.username);
-            Response.Write("</span></td>");
+            StringTemplate tmplLoggedIn = mStringTemplates.Common.GetInstanceOf("security_logged_in_as");
+            tmplLoggedIn.SetAttribute("user", user.username);
+            Response.Write(tmplLoggedIn.ToString());
 
             if (auth_method == "plain")
             {
                 if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
                 {
-                	write_menu_item(Response, this_link, "login", "default.aspx");
-				}
+                    write_menu_item(Response, this_link, mStringTemplates.getI18N("Login"), "default.aspx");
+                }
 				else
 				{
-					write_menu_item(Response, this_link, "logoff", "logoff.aspx");
-				}
+                    write_menu_item(Response, this_link, mStringTemplates.getI18N("Logoff"), "logoff.aspx");
+                }
             }
             
             // for guest account, suppress display of "edit_self
             if (!user.is_guest)
             {
-                //write_menu_item(Response, this_link, "settings", "edit_self.aspx");
                 write_menu_item(Response, this_link, mStringTemplates.getI18N("Settings"), "edit_self.aspx");
             }
 
 
-            Response.Write("<td valign=middle align=left'>");
-            Response.Write("<a target=_blank href=about.html><span class='menu_item' style='margin-left:3px;'>about</span></a></td>");
-            Response.Write("<td nowrap valign=middle>");
-            Response.Write("<a target=_blank href=http://ifdefined.com/README.html>help</a></td>");
+            //Response.Write("<td valign=middle align=left'>");
+            //Response.Write("<a target=_blank href=about.html><span class='menu_item' style='margin-left:3px;'>about</span></a></td>");
+            //Response.Write("<td nowrap valign=middle>");
+            //Response.Write("<a target=_blank href=http://ifdefined.com/README.html>help</a></td>");
 
+            Response.Write(mStringTemplates.Common.GetInstanceOf("security_about_help"));
             Response.Write("</tr></table><br>");
         }
 	} // end Security
