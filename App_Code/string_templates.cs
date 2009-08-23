@@ -74,16 +74,24 @@ namespace btnet
             return mI18N.GetInstanceOf(name).ToString();
         }
 
-        public string getCommon(String name)
-        {
-            return mCommon.GetInstanceOf(name).ToString();
-        }
+        //public string getCommon(String name)
+        //{
+        //    return mCommon.GetInstanceOf(name).ToString();
+        //}
 
         public StringTemplateGroup Common
         {
             get
             {
                 return mCommon;
+            }
+        }
+
+        public StringTemplateGroup I18N
+        {
+            get
+            {
+                return mI18N;
             }
         }
     }

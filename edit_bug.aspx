@@ -1,4 +1,5 @@
 <%@ Page language="C#" validateRequest="false"%>
+<%@Import Namespace="Antlr.StringTemplate" %>
 
 <!--
 Copyright 2002-2009 Corey Trager
@@ -15,7 +16,7 @@ DataSet ds_custom_cols;
 DataRow dr;
 DataTable dt_users = null;
 
-
+StringTemplates templates;
 Security security;
 SortedDictionary<string, string> hash_custom_cols = new SortedDictionary<string, string>();
 SortedDictionary<string, string> hash_prev_custom_cols = new SortedDictionary<string, string>();
@@ -36,9 +37,10 @@ void Page_Load(Object sender, EventArgs e)
 {
 
 	btnet.Util.do_not_cache(Response);
-	
-	security = new Security();
-	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
+
+    templates = new StringTemplates(Request);
+    security = new Security(templates);
+    security.check_security(HttpContext.Current, Security.ANY_USER_OK);
 
 	set_msg("");
 	set_custom_field_msg("");
@@ -47,7 +49,7 @@ void Page_Load(Object sender, EventArgs e)
 	string string_bugid = Request["id"];
 	if (string_bugid == null || string_bugid == "0" || (string_bugid != "0" && clone_ignore_bugid.Value == "1"))
 	{
-		bugid_label.InnerHtml = "Description:&nbsp;";
+		bugid_label.InnerHtml = templates.getI18N("Description") + ":&nbsp;";
 		id = 0;
 	}
 	else
@@ -116,14 +118,14 @@ void Page_Load(Object sender, EventArgs e)
 
 		if (id == 0)
 		{
-			sub.Value = "Create";
+			sub.Value = templates.getI18N("Create");
 		}
 
 		if (btnet.Util.get_setting("DisplayAnotherButtonInEditBugPage","0") == "1")
 		{
 			if (id == 0)
 			{
-				sub2.Value = "Create";
+                sub2.Value = templates.getI18N("Create");
 			}
 		}
 
@@ -131,8 +133,8 @@ void Page_Load(Object sender, EventArgs e)
 		{
 			load_dropdowns(null, security.user);
 
-			titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - Add New ";
-			titl.InnerText += btnet.Util.capitalize_first_letter(btnet.Util.get_setting("SingularBugLabel","bug"));
+            titl.InnerText = btnet.Util.get_setting("AppTitle","BugTracker.NET") + " - ";
+            titl.InnerText += templates.getI18N("AddNewBug");
 
 			if (security.user.adds_not_allowed)
 			{
@@ -2436,12 +2438,12 @@ function disable_second_button()
 </head>
 
 <body onload='on_body_load()' onunload='on_body_unload()'>
-<% security.write_menu(Response, btnet.Util.get_setting("PluralBugLabel","bugs")); %>
+<% security.write_menu(Response, templates.getI18N("BugPlural")); %>
 
 <div class=align>
 
 <% if (!security.user.adds_not_allowed) { %>
-<a class=warn href="edit_bug.aspx?id=0"><img src=add.png border=0 align=top>&nbsp;add new <% Response.Write(btnet.Util.get_setting("SingularBugLabel","bug")); %></a>
+<a class=warn href="edit_bug.aspx?id=0"><img src=add.png border=0 align=top>&nbsp;<%= templates.getI18N("AddNewBug") %></a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 <% } %>
 <span id="prev_next" runat="server">&nbsp;</span>
@@ -2515,14 +2517,11 @@ function disable_second_button()
 		<td nowrap>
 			<span runat="server" id=reported_by></span>
 
-		<% if (id == 0 || permission_level == Security.PERMISSION_ALL) { %>
-		<td nowrap align=right id="presets" >Presets:
-			<a title="Use previously saved settings for project, category, priority, etc..."
-				href="javascript:get_presets()">use</a>
-			&nbsp;/&nbsp;
-			<a title="Save current settings for project, category, priority, etc., so that you can reuse later."
-				href="javascript:set_presets()">save</a>
-		<% } %>
+		<% if (id == 0 || permission_level == Security.PERMISSION_ALL)
+             {
+                 Response.Write(templates.Common.GetInstanceOf("edit_bug_presets").ToString());
+             }
+        %>
 
 	</table>
 
@@ -2540,7 +2539,7 @@ function disable_second_button()
 
 	<tr id="row1">
 		<td nowrap>
-			<span class=lbl id="project_label" runat="server">Project:&nbsp;</span>
+			<span class=lbl id="project_label" runat="server"><%= templates.getI18N("Project") %>:&nbsp;</span>
 		<td nowrap>
 			<span class="stat" id="static_project" runat="server"></span>
 
@@ -2553,28 +2552,28 @@ function disable_second_button()
 		-->
 	<tr id="row2">
 		<td nowrap>
-			<span class=lbl id="org_label" runat="server">Organization:&nbsp;</span>
+			<span class=lbl id="org_label" runat="server"><%= templates.getI18N("Organization")%>:&nbsp;</span>
 		<td nowrap>
 			<span class="stat" id="static_org" runat="server"></span>
 			<asp:DropDownList id="org" runat="server"></asp:DropDownList>
 
 	<tr id="row3">
 		<td nowrap>
-			<span class=lbl id="category_label" runat="server">Category:&nbsp;</span>
+			<span class=lbl id="category_label" runat="server"><%= templates.getI18N("Category")%>:&nbsp;</span>
 		<td nowrap>
 			<span class="stat" id="static_category" runat="server"></span>
 			<asp:DropDownList id="category" runat="server"></asp:DropDownList>
 
 	<tr id="row4">
 		<td nowrap>
-			<span class=lbl id="priority_label" runat="server">Priority:&nbsp;</span>
+			<span class=lbl id="priority_label" runat="server"><%= templates.getI18N("Priority")%>:&nbsp;</span>
 		<td nowrap>
 			<span class="stat" id="static_priority" runat="server"></span>
 			<asp:DropDownList id="priority" runat="server"></asp:DropDownList>
 
 	<tr id="row5">
 		<td nowrap>
-			<span class=lbl id="assigned_to_label" runat="server">Assigned to:&nbsp;</span>
+			<span class=lbl id="assigned_to_label" runat="server"><%= templates.getI18N("AssignedTo")%>:&nbsp;</span>
 		<td nowrap>
 			<span class="stat" id="static_assigned_to" runat="server"></span>
 			<asp:DropDownList id="assigned_to" runat="server"></asp:DropDownList>
@@ -2583,7 +2582,7 @@ function disable_second_button()
 
 	<tr id="row6">
 		<td nowrap>
-			<span class=lbl id="status_label" runat="server">Status:&nbsp;</span>
+			<span class=lbl id="status_label" runat="server"><%= templates.getI18N("Status")%>:&nbsp;</span>
 		<td nowrap>
 			<span class="stat" id="static_status" runat="server"></span>
 			<asp:DropDownList id="status" runat="server"></asp:DropDownList>
@@ -2915,16 +2914,18 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 		<% } %>
 		
 		&nbsp;
-		<span id="comment_label" runat="server">Comment:</span>
+		<span id="comment_label" runat="server"><%= templates.getI18N("Comment")%>:</span>
 		
 		<span class="smallnote" style="margin-left: 170px">
 		<% 
 		if (permission_level != Security.PERMISSION_READONLY)
 		{		
-
-			Response.Write ("Entering \"" 
-				+ btnet.Util.get_setting("BugLinkMarker","bugid#") 
-				+"999\" in comment creates link to id 999");
+            //Response.Write ("Entering \"" 
+            //    + btnet.Util.get_setting("BugLinkMarker","bugid#") 
+            //    +"999\" in comment creates link to id 999");
+            StringTemplate tmpl = templates.I18N.GetInstanceOf("EnteringBugIdCreatesLink");
+            tmpl.SetAttribute("BugLinkMarker", btnet.Util.get_setting("BugLinkMarker", "bugid#"));
+            Response.Write(tmpl.ToString());
 		} 
 		%>		
 		</span>
@@ -2933,7 +2934,7 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 	<tr><td  nowrap>
 		<asp:checkbox runat="server" class=cb id="internal_only"/>
-		<span runat="server" id="internal_only_label">Comment visible to internal users only</span>
+		<span runat="server" id="internal_only_label"><%= templates.getI18N("CommentVisibleToInternalUsersOnly")%></span>
 
 
 	<tr><td nowrap align=left>

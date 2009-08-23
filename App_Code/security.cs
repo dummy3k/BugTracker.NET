@@ -362,12 +362,6 @@ function on_submit_search()
                 write_menu_item(Response, this_link, mStringTemplates.getI18N("Settings"), "edit_self.aspx");
             }
 
-
-            //Response.Write("<td valign=middle align=left'>");
-            //Response.Write("<a target=_blank href=about.html><span class='menu_item' style='margin-left:3px;'>about</span></a></td>");
-            //Response.Write("<td nowrap valign=middle>");
-            //Response.Write("<a target=_blank href=http://ifdefined.com/README.html>help</a></td>");
-
             Response.Write(mStringTemplates.Common.GetInstanceOf("security_about_help"));
             Response.Write("</tr></table><br>");
         }
