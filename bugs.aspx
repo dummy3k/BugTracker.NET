@@ -1,5 +1,6 @@
 <%@ Page language="C#"%>
 <%@Import Namespace="Antlr.StringTemplate" %>
+<%@Import Namespace="System.IO" %>
 
 <!--
 Copyright 2002-2009 Corey Trager
@@ -12,37 +13,22 @@ Distributed under the terms of the GNU General Public License
 Security security;
 string qu_id_string = null;
 string sql_error = "";
-StringTemplateGroup tmplGroup;
+StringTemplates templates;
     
 ///////////////////////////////////////////////////////////////////////
 void Page_Load(Object sender, EventArgs e)
 {
 
 	Util.do_not_cache(Response);
-	
-	security = new Security();
+
+    templates = new StringTemplates(Request);
+    security = new Security(templates);
 	security.check_security( HttpContext.Current, Security.ANY_USER_OK);
 
 	titl.InnerText = Util.get_setting("AppTitle","BugTracker.NET") + " - "
 		+ Util.get_setting("PluralBugLabel","bugs");
 
-    // load template groups
-    String language = Request["lang"];
-    if (language== null)
-    {
-        language = "en";
-    }
-    language = language.ToLower();
 
-    String[] directories = new String[]{ System.IO.Path.Combine(@"stringtemplates", language)};
-    CommonGroupLoader groupLoader = new CommonGroupLoader(
-        new DefaultGroupFactory(), null, Encoding.UTF8, directories);
-    StringTemplateGroup.RegisterGroupLoader(groupLoader);
-    tmplGroup = StringTemplateGroup.LoadGroup("templates");
-
-
-    
-        
 	if (!IsPostBack) {
 
         load_query_dropdown();
@@ -95,12 +81,6 @@ void Page_Load(Object sender, EventArgs e)
 
     actn.Value = "";
 
-}
-
-
-string getTmpl(string name)
-{
-    return tmplGroup.GetInstanceOf(name).ToString();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -288,7 +268,6 @@ order by qu_desc";
 	query.DataBind();
 
 }
-
 </script>
 
 <!-- #include file = "inc_bugs.inc" -->
@@ -319,16 +298,17 @@ function on_query_changed()
 
 </head>
 <body>
-<% security.write_menu(Response, Util.get_setting("PluralBugLabel","bugs")); %>
+<% security.write_menu(Response, templates.getI18N("BugPlural")); %>
 
 <form method="POST" runat="server">
+<% query = new DropDownList(); %>
 
 <div class=align>
 
 <table border=0><tr>
 	<td  nowrap>
 	<% if (!security.user.adds_not_allowed) { %>
-	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;<%=getTmpl("AddNewBug") %></a>&nbsp;
+	<a href=edit_bug.aspx><img src=add.png border=0 align=top>&nbsp;<%=templates.getI18N("AddNewBug") %></a>&nbsp;
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<% } %>
 
@@ -336,14 +316,31 @@ function on_query_changed()
 	<asp:DropDownList id="query" runat="server" onchange="on_query_changed()">
 	</asp:DropDownList>
 
+    <%
+        String sTmp ="<asp:DropDownList id=\"query3\" runat=\"server\" onchange=\"on_query_changed()\"></asp:DropDownList>";
+
+        DropDownList drpDwnList = new DropDownList();
+        //drpDwnList.ID = "query";
+        
+        
+        //Page pageHolder = new Page();
+        //pageHolder.Controls.Add(drpDwnList);
+
+        //StringWriter output = new StringWriter();
+        //HttpContext.Current.Server.Execute(pageHolder, output, false);
+
+        ////Response.Write(output.ToString());
+        ////Response.Write(sTmp.ToString());
+    %>
+
 	<td nowrap>
-	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx><%=getTmpl("PrintList")%></a>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx><%=templates.getI18N("PrintList")%></a>
 	<td  nowrap>
-	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs2.aspx><%=getTmpl("PrintDetail")%></a>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs2.aspx><%=templates.getI18N("PrintDetail")%></a>
 	<td  nowrap>
-	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx?format=excel><%=getTmpl("ExportToExcel")%></a>
+	&nbsp;&nbsp;&nbsp;&nbsp;<a target=_blank href=print_bugs.aspx?format=excel><%=templates.getI18N("ExportToExcel")%></a>
 	<td  nowrap align=right width=100%>
-	<a target=_blank href=screen_capture.html><%=getTmpl("ScreenCapture")%></a>
+	<a target=_blank href=screen_capture.html><%=templates.getI18N("ScreenCapture")%></a>
 </table>
 <br>
 <%
@@ -359,10 +356,8 @@ if (dv != null)
 	}
 	else
 	{
-		Response.Write ("<p>No ");
-		Response.Write (Util.get_setting("PluralBugLabel","bugs"));
-		Response.Write (" yet.<p>");
-	}
+        Response.Write(templates.getI18N("NoBugsYet"));
+    }
 }
 else
 {

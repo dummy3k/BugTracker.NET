@@ -1,7 +1,20 @@
-﻿group simple;
+﻿group I18N;
 
-AddNewBug()::="add new bug"
+BugSingular()::="issue"
+BugPlural()::="<BugSingular()>s"
+
+AddNewBug()::="add new <BugSingular()>"
 PrintList()::="print list"
 PrintDetail()::="print detail"
 ExportToExcel()::="export to excel"
 ScreenCapture()::="screen capture"
+NoBugsYet()::="No <BugPlural()> yet."
+Search()::="search"
+News()::="news"
+Queries()::="queries"
+Reports()::="reports"
+Admin()::="admin"
+Users()::="users"
+Settings()::="settings"
+Advanced()::="advanced"
+SearchText()::="search text"

@@ -1,7 +1,20 @@
-﻿group simple;
+﻿group I18N;
 
-AddNewBug()::="Bug hinzufügen"
+BugSingular()::="Bug"
+BugPlural()::="<BugSingular()>s"
+
+AddNewBug()::="<BugSingular()> hinzufügen"
 PrintList()::="Liste drucken"
 PrintDetail()::="Detail drucken"
 ExportToExcel()::="als Exceldatei exportieren"
 ScreenCapture()::="Screen capture"
+NoBugsYet()::="Noch keine <BugPlural()> vorhanden."
+Search()::="Suchen"
+News()::="News"
+Queries()::="Abfragen"
+Reports()::="Berichte"
+Admin()::="Admin"
+Users()::="Benutzer"
+Settings()::="Einstellungen"
+Advanced()::="Erweitert"
+SearchText()::="Suchen"

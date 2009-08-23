@@ -10,6 +10,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using Antlr.StringTemplate;
 
 namespace btnet
 {
@@ -30,6 +31,8 @@ namespace btnet
         public string auth_method = "";
         public HttpContext context = null;
 
+        private StringTemplates mStringTemplates;
+
         static string goto_form = @"
 <td nowrap valign=middle>
     <form style='margin: 0px; padding: 0px;' action=edit_bug.aspx method=get>
@@ -37,6 +40,17 @@ namespace btnet
         <input class=menuinput size=4 type=text class=txt name=id accesskey=g>
     </form>
 </td>";
+
+        public Security()
+        {
+            mStringTemplates = new StringTemplates();
+        }
+
+        public Security(StringTemplates st)
+        {
+            mStringTemplates = st;
+        }
+
 
 		///////////////////////////////////////////////////////////////////////
 		public void check_security(HttpContext asp_net_context, int level)
@@ -282,22 +296,22 @@ function on_submit_search()
             Response.Write(logo);
 
             Response.Write("<td width=20>&nbsp;</td>");
-            write_menu_item(Response, this_link, Util.get_setting("PluralBugLabel", "bugs"), "bugs.aspx");
-            write_menu_item(Response, this_link, "search", "search.aspx");
+            write_menu_item(Response, this_link, mStringTemplates.getI18N("BugPlural"), "bugs.aspx");
+            write_menu_item(Response, this_link, mStringTemplates.getI18N("Search"), "search.aspx");
 
             if (Util.get_setting("EnableWhatsNewPage", "0") == "1")
             {
-				write_menu_item(Response, this_link, "news", "view_whatsnew.aspx");
-			}
+                write_menu_item(Response, this_link, mStringTemplates.getI18N("News"), "view_whatsnew.aspx");
+            }
 
             if (!user.is_guest)
             {
-                write_menu_item(Response, this_link, "queries", "queries.aspx");
+                write_menu_item(Response, this_link, mStringTemplates.getI18N("Queries"), "queries.aspx");
             }
 
             if (user.is_admin || user.can_use_reports || user.can_edit_reports)
             {
-                write_menu_item(Response, this_link, "reports", "reports.aspx");
+                write_menu_item(Response, this_link, mStringTemplates.getI18N("Reports"), "reports.aspx");
             }
 
             if (Util.get_setting("CustomMenuLinkLabel", "") != "")
@@ -309,11 +323,11 @@ function on_submit_search()
 
             if (user.is_admin)
             {
-                write_menu_item(Response, this_link, "admin", "admin.aspx");
+                write_menu_item(Response, this_link, mStringTemplates.getI18N("Admin"), "admin.aspx");
             }
             else if (user.is_project_admin)
             {
-                write_menu_item(Response, this_link, "users", "users.aspx");
+                write_menu_item(Response, this_link, mStringTemplates.getI18N("Users"), "users.aspx");
             }
 
 
@@ -329,19 +343,11 @@ function on_submit_search()
                 {
                     query = "";
                 }
-                string search_form = @"
 
-<td nowrap valign=middle>
-    <form style='margin: 0px; padding: 0px;' action=search_text.aspx method=get onsubmit='return on_submit_search()'>
-        <input class=menubtn type=submit value='search text'>
-        <input class=menuinput  id=lucene_input size=24 type=text class=txt
-        value='" + query + @"'name=query accesskey=s>
-        <a href=lucene_syntax.html target=_blank style='font-size: 7pt;'>advanced</a>
-    </form>
-</td>";
-                //context.Session["query"] = null;
-                Response.Write(search_form);
-			}
+                StringTemplate tmpl = mStringTemplates.Common.GetInstanceOf("security_search_form");
+                tmpl.SetAttribute("query", query);
+                Response.Write(tmpl.ToString());
+            }
 
             Response.Write("<td nowrap valign=middle>");
 			if (user.is_guest && Util.get_setting("AllowGuestWithoutLogin","0") == "1")
@@ -370,7 +376,8 @@ function on_submit_search()
             // for guest account, suppress display of "edit_self
             if (!user.is_guest)
             {
-                write_menu_item(Response, this_link, "settings", "edit_self.aspx");
+                //write_menu_item(Response, this_link, "settings", "edit_self.aspx");
+                write_menu_item(Response, this_link, mStringTemplates.getI18N("Settings"), "edit_self.aspx");
             }
 
 
