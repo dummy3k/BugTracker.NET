@@ -441,38 +441,33 @@ void Page_Load(Object sender, EventArgs e)
 
 			if (permission_level == Security.PERMISSION_ALL)
 			{
-				string clone_link = "<a class=warn href=\"javascript:clone()\" "
-					+ " title='Create a copy of this item'><img src=paste_plain.png border=0 align=top>&nbsp;create copy</a>";
-				clone.InnerHtml = clone_link;
+                clone.InnerHtml = templates.Common.GetInstanceOf("CreateCopyLink").ToString();
 			}
 
 
 			if (permission_level != Security.PERMISSION_READONLY)
 			{
-				string attachment_link = "<img src=attach.gif align=top>&nbsp;<a href=\"javascript:open_popup_window('add_attachment.aspx','add attachment ',"
-					+ Convert.ToString(id)
-					+ ",600,300)\" title='Attach an image, document, or other file to this item'>add attachment</a>";
-				attachment.InnerHtml = attachment_link;
-			}
+                StringTemplate tmpl = templates.Common.GetInstanceOf("AddAttachmentLink");
+                tmpl.SetAttribute("bugid", id);
+                attachment.InnerHtml = tmpl.ToString();
+            }
 
 			if (!security.user.is_guest)
 			{
 				if (permission_level != Security.PERMISSION_READONLY)
 				{
-					string send_email_link = "<a href='javascript:send_email("
-						+ Convert.ToString(id)
-						+ ")' title='Send an email about this item'><img src=email_edit.png border=0 align=top>&nbsp;send email</a>";
-					send_email.InnerHtml = send_email_link;
-				}
+                    StringTemplate tmpl = templates.Common.GetInstanceOf("SendMailLink");
+                    tmpl.SetAttribute("bugid", id);
+                    send_email.InnerHtml = tmpl.ToString();
+                }
 			}
 
 			if (permission_level != Security.PERMISSION_READONLY)
 			{
-				string subscribers_link = "<a target=_blank href=view_subscribers.aspx?id="
-					+ Convert.ToString(id)
-					+ " title='View users who have subscribed to email notifications for this item'><img src=telephone_edit.png border=0 align=top>&nbsp;subscribers</a>";
-				subscribers.InnerHtml = subscribers_link;
-			}
+                StringTemplate tmpl = templates.Common.GetInstanceOf("SubscribersLink");
+                tmpl.SetAttribute("bugid", id);
+                subscribers.InnerHtml = tmpl.ToString();
+            }
 
 			if (btnet.Util.get_setting("EnableRelationships", "0") == "1")
 			{
@@ -481,11 +476,11 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					relationship_cnt = (int)dr["relationship_cnt"];
 				}
-				string relationships_link = "<a target=_blank href=relationships.aspx?bgid="
-					+ Convert.ToString(id)
-					+ " title='Create a relationship between this item and another item'><img src=database_link.png border=0 align=top>&nbsp;relationships(<span id=relationship_cnt>" + relationship_cnt + "</span>)</a>";
-				relationships.InnerHtml = relationships_link;
-			}
+                StringTemplate tmpl = templates.Common.GetInstanceOf("RelationshipsLink");
+                tmpl.SetAttribute("bugid", id);
+                tmpl.SetAttribute("relationship_cnt", relationship_cnt);
+                relationships.InnerHtml = tmpl.ToString();
+            }
 
 			if (btnet.Util.get_setting("EnableSubversionIntegration","0") == "1")
 			{
@@ -494,11 +489,11 @@ void Page_Load(Object sender, EventArgs e)
 				{
 					revision_cnt = (int) dr["revision_cnt"];
 				}
-				string revisions_link = "<a target=_blank href=view_svn_file_revisions.aspx?id="
-					+ Convert.ToString(id)
-				+ " title='View Subversion revisions related to this item'><img src=accept.png border=0 align=top>&nbsp;svn revisions(<span id=revision_cnt>" + revision_cnt + "</span>)</a>";
-				revisions.InnerHtml = revisions_link;
-			}
+                StringTemplate tmpl = templates.Common.GetInstanceOf("SvnRevisionsLink");
+                tmpl.SetAttribute("bugid", id);
+                tmpl.SetAttribute("revision_cnt", revision_cnt);
+                revisions.InnerHtml = tmpl.ToString();
+            }
 
 			if (security.user.is_admin || security.user.can_view_tasks)
 			{
@@ -509,20 +504,19 @@ void Page_Load(Object sender, EventArgs e)
 					{
 						task_cnt = (int) dr["task_cnt"];
 					}
-					string tasks_link = "<a target=_blank href=tasks_frame.aspx?bugid="
-						+ Convert.ToString(id)
-					+ " title='View sub-tasks/time-tracking entries related to this item'><img src=clock.png border=0 align=top>&nbsp;tasks/time(<span id=task_cnt>" + task_cnt + "</span>)</a>";
-					tasks.InnerHtml = tasks_link;
-				}
+                    StringTemplate tmpl = templates.Common.GetInstanceOf("TasksOrTimeLink");
+                    tmpl.SetAttribute("bugid", id);
+                    tmpl.SetAttribute("task_cnt", task_cnt);
+                    tasks.InnerHtml = tmpl.ToString();
+                }
 			}
 
 			format_subcribe_cancel_link();
 
-
-			print.InnerHtml = "<a target=_blank href=print_bug.aspx?id="
-				+ Convert.ToString(id)
-				+ " title='Display this item in a printer-friendly format'><img src=printer.png border=0 align=top>&nbsp;print</a>";
-
+            StringTemplate tmplPrint = templates.Common.GetInstanceOf("PrintLink");
+            tmplPrint.SetAttribute("bugid", id);
+            print.InnerHtml = tmplPrint.ToString();
+            
 
 			// merge
 			if (!security.user.is_guest) 
@@ -530,12 +524,10 @@ void Page_Load(Object sender, EventArgs e)
 				if (security.user.is_admin
 				|| security.user.can_merge_bugs)
 				{
-					string merge_bug_link = "<a href=merge_bug.aspx?id="
-						+ Convert.ToString(id)
-						+ " title='Merge this item and another item together'><img src=database_refresh.png border=0 align=top>&nbsp;merge</a>";
-
-					merge_bug.InnerHtml = merge_bug_link;
-				}
+                    StringTemplate tmpl = templates.Common.GetInstanceOf("MergeLink");
+                    tmpl.SetAttribute("bugid", id);
+                    merge_bug.InnerHtml = tmpl.ToString();
+                }
 			}
 
 			// delete 
@@ -544,12 +536,10 @@ void Page_Load(Object sender, EventArgs e)
 				if (security.user.is_admin
 				|| security.user.can_delete_bug)
 				{
-					string delete_bug_link = "<a href=delete_bug.aspx?id="
-						+ Convert.ToString(id)
-						+ " title='Delete this item'><img src=delete.png border=0 align=top>&nbsp;delete</a>";
-
-					delete_bug.InnerHtml = delete_bug_link;
-				}
+                    StringTemplate tmpl = templates.Common.GetInstanceOf("DeleteLink");
+                    tmpl.SetAttribute("bugid", id);
+                    delete_bug.InnerHtml = tmpl.ToString();
+                }
 			}
 
 			// custom bug link
@@ -1010,11 +1000,11 @@ void format_subcribe_cancel_link()
 
 			if (subscribed > 0)
 			{
-				subscription_link += "stop notifications</span></a>";
+				subscription_link += templates.getI18N("StopNotifications") + "</span></a>";
 			}
 			else
 			{
-				subscription_link += "get notifications</span></a>";
+                subscription_link += templates.getI18N("GetNotifications") + "</span></a>";
 			}
 
 			subscriptions.InnerHtml = subscription_link;

@@ -1,0 +1,64 @@
+group Common;
+
+CreateCopyLink()::=<<
+<a class=warn href='javascript:clone()' title='$CreateCopyOfThisItem()$'>
+    <img src=paste_plain.png border=0 align=top>&nbsp;$CreateCopy()$
+</a>
+>>
+
+AddAttachmentLink(bugid)::=<<
+
+<a href="javascript:open_popup_window('add_attachment.aspx','add attachment',$bugid$,600,300)"
+   title='$AttachAnImage()$'>
+   <img src=attach.gif align=top border=0>
+   $AddAttachment()$</a>
+>>
+
+SendMailLink(bugid)::=<<
+<a href='javascript:send_email($bugid$)'
+   title='$SendEmailAboutThisItem()$'>
+   <img src=email_edit.png border=0 align=top>&nbsp;$SendEmail()$</a>
+>>
+
+SubscribersLink(bugid)::=<<
+<a target=_blank href=view_subscribers.aspx?id=$bugid$
+   title='$ViewUsersSubscribedToThisItem()$'>
+   <img src=telephone_edit.png border=0 align=top>&nbsp;$Subscribers()$</a>
+>>
+
+RelationshipsLink(bugid, relationship_cnt)::=<<
+<a target=_blank href=relationships.aspx?bgid=$bugid$
+   title='$CreateRelationship()$'>
+   <img src=database_link.png border=0 align=top>
+   $Relationships()$(<span id=relationship_cnt>$relationship_cnt$</span>)</a>
+>>
+
+SvnRevisionsLink(bugid, revision_cnt)::=<<
+<a target=_blank href=view_svn_file_revisions.aspx?id=$bugid$
+   title='$ViewSubversionRevisionsRelatedToThisItem()$'>
+   <img src=accept.png border=0 align=top>
+   $SvnRevisions()$(<span id=revision_cnt>$revision_cnt$</span>)</a>
+>>
+
+TasksOrTimeLink(bugid,task_cnt)::=<<
+<a target=_blank href=tasks_frame.aspx?bugid=$bugid$
+   title='$ViewTimeTrackingEntries()$'>
+   <img src=clock.png border=0 align=top>&nbsp;$TasksOrTime()$(<span id=task_cnt>$task_cnt$</span>)</a>
+>>
+
+PrintLink(bugid)::=<<
+<a target=_blank href=print_bug.aspx?id=$bugid$
+   title='$DisplayPrinterFriendlyFormat()$'>
+   <img src=printer.png border=0 align=top>&nbsp;$Print()$</a>
+>>
+
+MergeLink(bugid)::=<<
+<a href=merge_bug.aspx?id=$bugid$
+   title='$MergeThisItem()$'>
+   <img src=database_refresh.png border=0 align=top>&nbsp;$Merge()$</a>
+>>
+
+DeleteLink(bugid)::=<<
+<a href=delete_bug.aspx?id=$bugid$
+   title='$DeleteThisItem()$'><img src=delete.png border=0 align=top>&nbsp;$Delete()$</a>
+>>

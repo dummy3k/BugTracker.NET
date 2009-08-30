@@ -44,40 +44,27 @@ namespace btnet
             this.Language = language;
 
             String[] directories = new String[] {
-                System.IO.Path.Combine(@"stringtemplates", language)};
+                @"stringtemplates",
+                System.IO.Path.Combine(@"stringtemplates", language)
+            };
             CommonGroupLoader groupLoader = new CommonGroupLoader(
                 new DefaultGroupFactory(), null, Encoding.UTF8, directories);
-
             StringTemplateGroup.RegisterGroupLoader(groupLoader);
 
             mI18N = StringTemplateGroup.LoadGroup("templates");
 
-            //mCommon = StringTemplateGroup.LoadGroup("common", mI18N);
+            //StringTemplateGroup commonOneFile = StringTemplateGroup.LoadGroup("common");
+            StringTemplateGroup commonOneFile = groupLoader.LoadGroup("common", mI18N, typeof(Antlr.StringTemplate.Language.DefaultTemplateLexer));
+            commonOneFile.SuperGroup = mI18N;
 
-            //FileSystemTemplateLoader commonLoader = new FileSystemTemplateLoader(
-            //    System.IO.Path.Combine(@"stringtemplates", "common"), Encoding.UTF8, true);
-
-            //IStringTemplateErrorListener blub = null;
-            //mCommon = new StringTemplateGroup(
-            //    "common",
-            //    commonLoader,
-            //    typeof(Antlr.StringTemplate.Language.DefaultTemplateLexer), new ConsoleErrorListener(), mI18N);
-            ////mCommon.SetSuperGroup("templates");
-
-            //mCommon = new StringTemplateGroup(System.IO.Path.Combine(@"stringtemplates", "common"));
-            mCommon = new StringTemplateGroup("common", @"C:\Projekte\sis\BugTracker.NET\stringtemplates\common");
-            mCommon.SuperGroup = mI18N;
+            mCommon = new StringTemplateGroup("common", @"stringtemplates\common");
+            mCommon.SuperGroup = commonOneFile;
         }
 
         public string getI18N(string name)
         {
             return mI18N.GetInstanceOf(name).ToString();
         }
-
-        //public string getCommon(String name)
-        //{
-        //    return mCommon.GetInstanceOf(name).ToString();
-        //}
 
         public StringTemplateGroup Common
         {
