@@ -90,8 +90,11 @@ I do have a "copy bug" function, but it doesn't copy all the posts.   I guess it
 
 
 -----------------------------------------------------------------------
-Version 3.2.5   08/19/2009   (svn revision xxx)
+Version 3.2.5   08/29/2009   (svn revision 370)
 -----------------------------------------------------------------------
+
+* Fixed bug where nvarchar and nchar custom fields were allowing text
+to be entered with more characters than could fit in the db field.
 
 * If you are using the "news" link, enabled by setting 
 "EnableWhatsNewPage" to "1" in Web.config, then this release should be

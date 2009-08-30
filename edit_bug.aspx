@@ -2530,7 +2530,7 @@ function disable_second_button()
 	<tr id="tags_row">
 		<td nowrap>
 			<span class=lbl id="tags_label" runat="server">Tags:&nbsp;</span>
-		</td>
+		
 		<td nowrap>
 			<span class="stat" id="static_tags" runat="server"></span>
 			<input runat="server" type=text class=txt id="tags" size="70" maxlength="80"  onkeydown="mark_dirty()" onkeyup="mark_dirty()">
@@ -2547,8 +2547,8 @@ function disable_second_button()
 			AutoPostBack="True"></asp:DropDownList>
 
 		<!--
-		<td rowspan=100 bgcolor=yellow width=40>&nbsp;</td>
-		<td rowspan=100 bgcolor=pink width=200>I'll put something here eventually...</td>
+		<td rowspan=100 bgcolor=yellow width=40>&nbsp;
+		<td rowspan=100 bgcolor=pink width=200>I'll put something here eventually...
 		-->
 	<tr id="row2">
 		<td nowrap>
@@ -2642,6 +2642,12 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 
 		//20040413 WWR - If a custom database field is over the defined character length, use a TextArea control
 		int fieldLength = int.Parse(drcc["length"].ToString());
+		string datatype = drcc["datatype"].ToString();
+
+		if (datatype == "nvarchar" ||  datatype == "nchar")
+		{
+			fieldLength = fieldLength / 2;
+		}
 
 		if (permission_on_original == Security.PERMISSION_READONLY
 		|| field_permission_level == Security.PERMISSION_READONLY)
@@ -2738,20 +2744,11 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 					Response.Write ("<input type=text onkeydown=\"mark_dirty()\" onkeyup=\"mark_dirty()\" ");
 
 					// match the size of the text field to the size of the database field
-					string datatype = drcc["datatype"].ToString();
 					
 					if (datatype.IndexOf("char") > -1)
 					{
-						if (datatype == "nvarchar")
-						{
-							Response.Write (" size=" + Convert.ToString((Convert.ToInt32(drcc["length"]) / 2)));
-							Response.Write (" maxlength=" + Convert.ToString((Convert.ToInt32(drcc["length"]) / 2)));
-						}
-						else
-						{
-							Response.Write (" size=" + drcc["length"]);
-							Response.Write (" maxlength=" + drcc["length"]);
-						}
+						Response.Write (" size=" + Convert.ToString(fieldLength));
+						Response.Write (" maxlength=" + Convert.ToString(fieldLength));
 					}
 
 					Response.Write(" name=\"" + column_name + "\"");
@@ -2773,7 +2770,6 @@ if (btnet.Util.get_setting("ShowUserDefinedBugAttribute","1") == "1")
 				}
 			}
 		} // end if readonly or editable
-		Response.Write ("</td></tr>");
 	} // end loop through custom fields
 
 	// create project custom dropdowns
