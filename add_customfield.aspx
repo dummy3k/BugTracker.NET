@@ -76,12 +76,14 @@ Boolean validate()
 			name_err.InnerText = "Field name of \"URL\" causes problems with ASP.NET.";
 		}
 		else if (name.Value.Contains("'")
+		|| name.Value.Contains("\\")
+		|| name.Value.Contains("/")
 		|| name.Value.Contains("\"")
 		|| name.Value.Contains("<")
 		|| name.Value.Contains(">"))
 		{
 			good = false;
-			name_err.InnerText = "Special characters like quotes not allowed.";
+			name_err.InnerText = "Some special characters like quotes, slashes are not allowed.";
 		}
 	}
 

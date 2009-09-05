@@ -420,7 +420,7 @@ namespace btnet
 				return "";
 			}
 			// Note that yyyyMMdd hh:mm:ss is a universal SQL dateformat for strings.
-			return d.ToString(get_setting("SQLServerDateFormat","yyyyMMdd hh:mm:ss"));
+			return d.ToString(get_setting("SQLServerDateFormat","yyyyMMdd HH:mm:ss"));
 
 		}
 

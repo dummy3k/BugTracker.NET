@@ -891,6 +891,8 @@ create clustered index tsk_index_1 on bug_tasks (tsk_bug)
 create clustered index svn_bug_index on svn_revisions (svnrev_bug)
 create clustered index svn_revision_index on svn_affected_paths (svnap_svnrev_id)
 create clustered index ds_user_index on dashboard_items (ds_user)
+
+alter table bug_subscriptions drop column bs_id
 create unique clustered index bs_index_2 on bug_subscriptions (bs_bug, bs_user)
 create unique clustered index fl_index_1 on bug_user_flags (fl_bug, fl_user)
 create unique clustered index sn_index_1 on bug_user_seen (sn_bug, sn_user)

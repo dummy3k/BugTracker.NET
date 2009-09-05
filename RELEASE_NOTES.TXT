@@ -90,6 +90,14 @@ I do have a "copy bug" function, but it doesn't copy all the posts.   I guess it
 
 
 -----------------------------------------------------------------------
+Version 3.2.6   09/xx/2009   (svn revision xxx)
+-----------------------------------------------------------------------
+
+* Fixed bug where task's times were switched from PM to AM.  Thanks to
+Philip Parmenter for the fix.
+
+alter table bug_subscriptions drop column bs_id
+-----------------------------------------------------------------------
 Version 3.2.5   08/29/2009   (svn revision 370)
 -----------------------------------------------------------------------
 
