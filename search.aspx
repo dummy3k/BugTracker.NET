@@ -1379,10 +1379,11 @@ function format_from_date_for_db(s)
 
 var asp_form_id = '<% Response.Write(Util.get_form_name()); %>';
 
+
+
 function on_change()
 {
-
-    var frm = document.getElementById(asp_form_id);
+    var frm = document.getElementById(asp_form_id)
 
 
 	// Build "WHERE" clause
@@ -1785,7 +1786,7 @@ function on_change()
 }
 
 function set_hit_submit_button() {
-	document.forms[2].hit_submit_button.value = "1";
+	document.getElementById(asp_form_id).hit_submit_button.value = "1";
 }
 
 
@@ -1809,7 +1810,7 @@ function showhide_form()
 
 function set_project_changed() {
 	on_change();
-	document.forms[2].project_changed.value = "1";
+	document.getElementById(asp_form_id).project_changed.value = "1";
 }
 
 

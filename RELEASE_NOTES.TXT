@@ -93,6 +93,9 @@ I do have a "copy bug" function, but it doesn't copy all the posts.   I guess it
 Version 3.2.6   09/xx/2009   (svn revision xxx)
 -----------------------------------------------------------------------
 
+* The SQL based search.aspx page wasn't working when the Lucene full
+text search was disabled.
+
 * Fixed bug where task's times were switched from PM to AM.  Thanks to
 Philip Parmenter for the fix.
 
