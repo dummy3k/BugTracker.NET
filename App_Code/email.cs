@@ -5,6 +5,7 @@ Distributed under the terms of the GNU General Public License
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -70,7 +71,7 @@ namespace btnet
 			int[] attachment_bpids,
 			bool return_receipt)
 		{
-			ArrayList files_to_delete = new ArrayList();
+            Dictionary<string,int> files_to_delete = new Dictionary<string,int>();
 			ArrayList directories_to_delete = new ArrayList();
 			System.Web.Mail.MailMessage msg = new System.Web.Mail.MailMessage();
 			msg.To = to;
@@ -169,13 +170,25 @@ namespace btnet
 					using (bpa.content)
 					{
 						dest_path_and_filename = Path.Combine(upload_folder, bpa.file);
+
+                        // logic to rename in case of dupes.  MS Outlook embeds images all with the same filename
+                        int suffix = 0;
+                        string renamed_to_prevent_dupe = dest_path_and_filename;
+                        while (files_to_delete.ContainsKey(renamed_to_prevent_dupe))
+                        {
+                            suffix++;
+                            renamed_to_prevent_dupe = dest_path_and_filename + Convert.ToString(suffix);
+                        }
+                        dest_path_and_filename = renamed_to_prevent_dupe;
+
+                        // Save to disk
 						using (FileStream out_stream = new FileStream(
 							dest_path_and_filename,
 							FileMode.CreateNew,
 							FileAccess.Write,
 							FileShare.None))
 						{
-							int bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
+                            int bytes_read = bpa.content.Read(buffer, 0, buffer.Length);
 							while (bytes_read != 0)
 							{
 								out_stream.Write(buffer, 0, bytes_read);
@@ -186,11 +199,12 @@ namespace btnet
 
 					}
 
+                    // Add saved file as attachment
 					System.Web.Mail.MailAttachment mail_attachment = new System.Web.Mail.MailAttachment(
 						dest_path_and_filename,
 						System.Web.Mail.MailEncoding.Base64);
 					msg.Attachments.Add(mail_attachment);
-					files_to_delete.Add(dest_path_and_filename);
+                    files_to_delete[dest_path_and_filename] = 1;
 				}
 			}
 
@@ -203,20 +217,14 @@ namespace btnet
 
 				// We delete late here because testing showed that SmtpMail class
 				// got confused when we deleted too soon.
-				if (files_to_delete.Count > 0)
+				foreach (string file in files_to_delete.Keys)
 				{
-					foreach (string file in files_to_delete)
-					{
-						File.Delete(file);
-					}
+					File.Delete(file);
 				}
 
-				if (directories_to_delete.Count > 0)
+				foreach (string directory in directories_to_delete)
 				{
-					foreach (string directory in directories_to_delete)
-					{
-						Directory.Delete(directory);
-					}
+					Directory.Delete(directory);
 				}
 
 				return "";

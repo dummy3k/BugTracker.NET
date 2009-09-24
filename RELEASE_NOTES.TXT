@@ -99,6 +99,9 @@ text search was disabled.
 * Fixed bug where task's times were switched from PM to AM.  Thanks to
 Philip Parmenter for the fix.
 
+* Fixed bug 2864901 - Duplicate file error when trying to forward MS 
+Outlook with multiple embedded images.
+
 alter table bug_subscriptions drop column bs_id
 -----------------------------------------------------------------------
 Version 3.2.5   08/29/2009   (svn revision 370)
